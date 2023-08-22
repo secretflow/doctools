@@ -15,7 +15,7 @@
     "test": "nx run-many -t test:pytest -t test:vitest",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "nx run-many -t release && changeset tag",
+    "release": "nx run-many --nx-bail -t release && changeset tag",
     "nx": "nx",
     "start:docs": "nx run docs:start",
     "clean": "git clean -fX ."
