@@ -1,0 +1,8 @@
+{
+  "name": "doctools-sphinx-mdx-assets",
+  "private": true,
+  "version": "0.0.0",
+  "devDependencies": {
+    "mdserver": "workspace:^"
+  }
+}

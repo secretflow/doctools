@@ -1,0 +1,1 @@
+# @secretflow/dumi-plugin-yuque

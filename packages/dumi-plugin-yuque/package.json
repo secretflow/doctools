@@ -1,0 +1,60 @@
+{
+  "name": "@secretflow/dumi-plugin-yuque",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "version": "0.0.1",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "types": "./dist/typing/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/typing/index.d.ts",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "setup": "tsup",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test:vitest": "vitest run",
+    "lint:eslint": "eslint src",
+    "lint:tsc": "tsc --noEmit",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@secretflow/dumi-mdx-loader-core": "workspace:^",
+    "@secretflow/unified-toolkit": "workspace:^",
+    "postcss": "^8.4.24",
+    "postcss-js": "^4.0.1",
+    "rehype-raw": "^6.1.1",
+    "remark-extract-frontmatter": "^3.2.0",
+    "remark-frontmatter": "^4.0.1",
+    "unist-util-is": "^5.2.1",
+    "unist-util-visit": "^4.1.2",
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "tsup-utils": "workspace:^",
+    "@types/hast": "^2.3.5",
+    "@types/mdast": "^3.0.12",
+    "@types/postcss-js": "^4.0.1",
+    "dumi": "^2.2.1",
+    "mdast-util-mdx": "^2.0.1",
+    "rehype-stringify": "^9.0.3",
+    "remark-mdx": "^2.3.0",
+    "remark-parse": "^10.0.2",
+    "remark-rehype": "^10.1.0",
+    "unified": "^10.1.2"
+  },
+  "peerDependencies": {
+    "dumi": "^2.2.1"
+  }
+}

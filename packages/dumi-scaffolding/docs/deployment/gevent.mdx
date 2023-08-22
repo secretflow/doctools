@@ -1,0 +1,83 @@
+:target{#gevent}
+
+# gevent
+
+Prefer using [Gunicorn](gunicorn.mdx) or [uWSGI](uwsgi.mdx) with gevent workers rather
+than using [gevent](https://www.gevent.org/) directly. Gunicorn and uWSGI provide much more
+configurable and production-tested servers.
+
+[gevent](https://www.gevent.org/) allows writing asynchronous, coroutine-based code that looks
+like standard synchronous Python. It uses [greenlet](https://greenlet.readthedocs.io/en/latest/) to enable task
+switching without writing <code>async/await</code> or using <code>asyncio</code>.
+
+[eventlet](eventlet.mdx) is another library that does the same thing. Certain
+dependencies you have, or other considerations, may affect which of the
+two you choose to use.
+
+gevent provides a WSGI server that can handle many connections at once
+instead of one per worker process. You must actually use gevent in your
+own code to see any benefit to using the server.
+
+:target{#installing}
+
+## Installing
+
+When using gevent, greenlet>=1.0 is required, otherwise context locals
+such as <code>request</code> will not work as expected. When using PyPy,
+PyPy>=7.3.7 is required.
+
+Create a virtualenv, install your application, then install <code>gevent</code>.
+
+```text
+$ cd hello-app
+$ python -m venv venv
+$ . venv/bin/activate
+$ pip install .  # install your application
+$ pip install gevent
+```
+
+:target{#running}
+
+## Running
+
+To use gevent to serve your application, write a script that imports its
+<code>WSGIServer</code>, as well as your app or app factory.
+
+<figure id="id2">
+  <figcaption>
+    <code>wsgi.py</code>
+  </figcaption>
+
+  ```python
+  from gevent.pywsgi import WSGIServer
+  from hello import create_app
+
+  app = create_app()
+  http_server = WSGIServer(("127.0.0.1", 8000), app)
+  http_server.serve_forever()
+  ```
+</figure>
+
+```text
+$ python wsgi.py
+```
+
+No output is shown when the server starts.
+
+:target{#binding-externally}
+
+## Binding Externally
+
+gevent should not be run as root because it would cause your
+application code to run as root, which is not secure. However, this
+means it will not be possible to bind to port 80 or 443. Instead, a
+reverse proxy such as [nginx](nginx.mdx) or [Apache httpd](apache-httpd.mdx) should be used
+in front of gevent.
+
+You can bind to all external IPs on a non-privileged port by using
+<code>0.0.0.0</code> in the server arguments shown in the previous section. Don’t
+do this when using a reverse proxy setup, otherwise it will be possible
+to bypass the proxy.
+
+<code>0.0.0.0</code> is not a valid address to navigate to, you’d use a specific
+IP address in your browser.

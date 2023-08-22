@@ -1,0 +1,107 @@
+:target{#dealing-with-request-data}
+
+# Dealing with Request Data
+
+The most important rule about web development is “Do not trust the user”.
+This is especially true for incoming request data on the input stream.
+With WSGI this is actually a bit harder than you would expect.  Because
+of that Werkzeug wraps the request stream for you to save you from the
+most prominent problems with it.
+
+:target{#missing-eof-marker-on-input-stream}
+
+## Missing EOF Marker on Input Stream
+
+The input stream has no end-of-file marker.  If you would call the
+<code>read()</code> method on the <cite>wsgi.input</cite> stream you would cause your
+application to hang on conforming servers.  This is actually intentional
+however painful.  Werkzeug solves that problem by wrapping the input
+stream in a special <code>LimitedStream</code>.  The input stream is exposed
+on the request objects as <code>stream</code>.  This one is either
+an empty stream (if the form data was parsed) or a limited stream with
+the contents of the input stream.
+
+:target{#when-does-werkzeug-parse}
+
+## When does Werkzeug Parse?
+
+Werkzeug parses the incoming data under the following situations:
+
+- you access either <code>form</code>, <code>files</code>,
+  or <code>stream</code> and the request method was
+  <cite>POST</cite> or <cite>PUT</cite>.
+- if you call <code>parse\_form\_data()</code>.
+
+These calls are not interchangeable.  If you invoke <code>parse\_form\_data()</code>
+you must not use the request object or at least not the attributes that
+trigger the parsing process.
+
+This is also true if you read from the <cite>wsgi.input</cite> stream before the
+parsing.
+
+<strong>General rule:</strong> Leave the WSGI input stream alone.  Especially in
+WSGI middlewares.  Use either the parsing functions or the request
+object.  Do not mix multiple WSGI utility libraries for form data
+parsing or anything else that works on the input stream.
+
+:target{#how-does-it-parse}
+
+## How does it Parse?
+
+The standard Werkzeug parsing behavior handles three cases:
+
+- input content type was <cite>multipart/form-data</cite>.  In this situation the
+  <code>stream</code> will be empty and
+  <code>form</code> will contain the regular <cite>POST</cite> / <cite>PUT</cite>
+  data, <code>files</code> will contain the uploaded
+  files as <code>FileStorage</code> objects.
+- input content type was <cite>application/x-www-form-urlencoded</cite>.  Then the
+  <code>stream</code> will be empty and
+  <code>form</code> will contain the regular <cite>POST</cite> / <cite>PUT</cite>
+  data and <code>files</code> will be empty.
+- the input content type was neither of them, <code>stream</code>
+  points to a <code>LimitedStream</code> with the input data for further
+  processing.
+
+Special note on the <code>get\_data</code> method: Calling this
+loads the full request data into memory.  This is only safe to do if the
+<code>max\_content\_length</code> is set.  Also you can <em>either</em>
+read the stream <em>or</em> call <code>get\_data()</code>.
+
+:target{#limiting-request-data}
+
+## Limiting Request Data
+
+The <code>Request</code> class provides a few attributes to control how much data is
+processed from the request body. This can help mitigate DoS attacks that craft the
+request in such a way that the server uses too many resources to handle it. Each of
+these limits will raise a [<code>RequestEntityTooLarge</code>](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge") if they are
+exceeded.
+
+- <code>max\_content\_length</code> Stop reading request data after this number
+  of bytes. It’s better to configure this in the WSGI server or HTTP server, rather
+  than the WSGI application.
+- <code>max\_form\_memory\_size</code> Stop reading request data if any form part is
+  larger than this number of bytes. While file parts can be moved to disk, regular
+  form field data is stored in memory only.
+- <code>max\_form\_parts</code> Stop reading request data if more than this number
+  of parts are sent in multipart form data. This is useful to stop a very large number
+  of very small parts, especially file parts. The default is 1000.
+
+Using Werkzeug to set these limits is only one layer of protection. WSGI servers
+and HTTPS servers should set their own limits on size and timeouts. The operating system
+or container manager should set limits on memory and processing time for server
+processes.
+
+If a 413 Content Too Large error is returned before the entire request is read, clients
+may show a “connection reset” failure instead of the 413 error. This is based on how the
+WSGI/HTTP server and client handle connections, it’s not something the WSGI application
+(Werkzeug) has control over.
+
+:target{#how-to-extend-parsing}
+
+## How to extend Parsing?
+
+Modern web applications transmit a lot more than multipart form data or
+url encoded data. To extend the capabilities, subclass <code>Request</code>
+or <code>Request</code> and add or extend methods.

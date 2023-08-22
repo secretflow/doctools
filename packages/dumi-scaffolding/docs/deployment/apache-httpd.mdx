@@ -1,0 +1,91 @@
+:target{#apache-httpd}
+
+# Apache httpd
+
+[Apache httpd](https://httpd.apache.org/) is a fast, production level HTTP server. When serving
+your application with one of the WSGI servers listed in [Deploying to Production](index.mdx), it
+is often good or necessary to put a dedicated HTTP server in front of
+it. This “reverse proxy” can handle incoming requests, TLS, and other
+security and performance concerns better than the WSGI server.
+
+httpd can be installed using your system package manager, or a pre-built
+executable for Windows. Installing and running httpd itself is outside
+the scope of this doc. This page outlines the basics of configuring
+httpd to proxy your application. Be sure to read its documentation to
+understand what features are available.
+
+:target{#domain-name}
+
+## Domain Name
+
+Acquiring and configuring a domain name is outside the scope of this
+doc. In general, you will buy a domain name from a registrar, pay for
+server space with a hosting provider, and then point your registrar
+at the hosting provider’s name servers.
+
+To simulate this, you can also edit your <code>hosts</code> file, located at
+<code>/etc/hosts</code> on Linux. Add a line that associates a name with the
+local IP.
+
+Modern Linux systems may be configured to treat any domain name that
+ends with <code>.localhost</code> like this without adding it to the <code>hosts</code>
+file.
+
+<figure id="id2">
+  <figcaption>
+    <code>/etc/hosts</code>
+  </figcaption>
+
+  ```python
+  127.0.0.1 hello.localhost
+  ```
+</figure>
+
+:target{#configuration}
+
+## Configuration
+
+The httpd configuration is located at <code>/etc/httpd/conf/httpd.conf</code> on
+Linux. It may be different depending on your operating system. Check the
+docs and look for <code>httpd.conf</code>.
+
+Remove or comment out any existing <code>DocumentRoot</code> directive. Add the
+config lines below. We’ll assume the WSGI server is listening locally at
+<code>http\://127.0.0.1:8000</code>.
+
+<figure id="id3">
+  <figcaption>
+    <code>/etc/httpd/conf/httpd.conf</code>
+  </figcaption>
+
+  ```apache
+  LoadModule proxy_module modules/mod_proxy.so
+  LoadModule proxy_http_module modules/mod_proxy_http.so
+  ProxyPass / http://127.0.0.1:8000/
+  RequestHeader set X-Forwarded-Proto http
+  RequestHeader set X-Forwarded-Prefix /
+  ```
+</figure>
+
+The <code>LoadModule</code> lines might already exist. If so, make sure they are
+uncommented instead of adding them manually.
+
+Then [Tell Werkzeug it is Behind a Proxy](proxy_fix.mdx) so that your application uses the <code>X-Forwarded</code>
+headers. <code>X-Forwarded-For</code> and <code>X-Forwarded-Host</code> are automatically
+set by <code>ProxyPass</code>.
+
+:target{#static-files}
+
+## Static Files
+
+If your application has static files such as JavaScript, CSS, and
+images, it will be more efficient to let Nginx serve them directly
+rather than going through the Python application.
+
+Assuming the static files are expected to be available under the
+<code>/static/</code> URL, and are stored at <code>/home/project/static/</code>, add the
+following to the config above.
+
+```apache
+Alias /static/ /home/project/static/
+```

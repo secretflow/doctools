@@ -1,0 +1,110 @@
+:target{#x-forwarded-for-proxy-fix}
+
+# X-Forwarded-For Proxy Fix
+
+This module provides a middleware that adjusts the WSGI environ based on
+<code>X-Forwarded-</code> headers that proxies in front of an application may
+set.
+
+When an application is running behind a proxy server, WSGI may see the
+request as coming from that server rather than the real client. Proxies
+set various headers to track where the request actually came from.
+
+This middleware should only be used if the application is actually
+behind such a proxy, and should be configured with the number of proxies
+that are chained in front of it. Not all proxies set all the headers.
+Since incoming headers can be faked, you must set how many proxies are
+setting each header so the middleware knows what to trust.
+
+<Outline domain="py" objectType="class" target={"werkzeug.middleware.proxy_fix.ProxyFix"} module={"werkzeug.middleware.proxy_fix"} fullname={"ProxyFix"} parameters={["app", "x_for", "x_proto", "x_host", "x_port", "x_prefix"]} description={"Adjust the WSGI environ based on X-Forwarded- that proxies in\nfront of the application may set."}>
+  <Outline.Signature fullname="ProxyFix" id="werkzeug.middleware.proxy_fix.ProxyFix">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.middleware.proxy\_fix.</Outline.Prefix><Outline.Name>ProxyFix</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">app</span></Outline.Parameter>, <Outline.Parameter><span className="name">x\_for</span><span>=</span><span>1</span></Outline.Parameter>, <Outline.Parameter><span className="name">x\_proto</span><span>=</span><span>1</span></Outline.Parameter>, <Outline.Parameter><span className="name">x\_host</span><span>=</span><span>0</span></Outline.Parameter>, <Outline.Parameter><span className="name">x\_port</span><span>=</span><span>0</span></Outline.Parameter>, <Outline.Parameter><span className="name">x\_prefix</span><span>=</span><span>0</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Adjust the WSGI environ based on <code>X-Forwarded-</code> that proxies in
+    front of the application may set.
+
+    - <code>X-Forwarded-For</code> sets <code>REMOTE\_ADDR</code>.
+    - <code>X-Forwarded-Proto</code> sets <code>wsgi.url\_scheme</code>.
+    - <code>X-Forwarded-Host</code> sets <code>HTTP\_HOST</code>, <code>SERVER\_NAME</code>, and
+      <code>SERVER\_PORT</code>.
+    - <code>X-Forwarded-Port</code> sets <code>HTTP\_HOST</code> and <code>SERVER\_PORT</code>.
+    - <code>X-Forwarded-Prefix</code> sets <code>SCRIPT\_NAME</code>.
+
+    You must tell the middleware how many proxies set each header so it
+    knows what values to trust. It is a security issue to trust values
+    that came from the client rather than a proxy.
+
+    The original values of the headers are stored in the WSGI
+    environ as <code>werkzeug.proxy\_fix.orig</code>, a dict.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>app</Outline.ParameterTarget> (<em>WSGIApplication</em>) – The WSGI application to wrap.
+          - <Outline.ParameterTarget>x\_for</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-For</code>.
+          - <Outline.ParameterTarget>x\_proto</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Proto</code>.
+          - <Outline.ParameterTarget>x\_host</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Host</code>.
+          - <Outline.ParameterTarget>x\_port</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Port</code>.
+          - <Outline.ParameterTarget>x\_prefix</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for
+            <code>X-Forwarded-Prefix</code>.
+        </dd>
+      </dl>
+    </FieldList>
+
+    ```python
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    # App is behind one proxy that sets the -For and -Host headers.
+    app = ProxyFix(app, x_for=1, x_host=1)
+    ```
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 1.0: </span>The <code>num\_proxies</code> argument and attribute; the <code>get\_remote\_addr</code> method; and
+      the environ keys <code>orig\_remote\_addr</code>, <code>orig\_wsgi\_url\_scheme</code>, and
+      <code>orig\_http\_host</code> were removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>All headers support multiple values. Each header is configured with a separate
+      number of trusted proxies.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>Original WSGI environ values are stored in the <code>werkzeug.proxy\_fix.orig</code> dict.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>Support <code>X-Forwarded-Port</code> and <code>X-Forwarded-Prefix</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span><code>X-Forwarded-Host</code> and <code>X-Forwarded-Port</code> modify
+      <code>SERVER\_NAME</code> and <code>SERVER\_PORT</code>.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<FieldList>
+  <dl>
+    <dt className="field-name">
+      copyright
+    </dt>
+
+    <dd className="field-body">
+      2007 Pallets
+    </dd>
+
+    <dt className="field-name">
+      license
+    </dt>
+
+    <dd className="field-body">
+      BSD-3-Clause
+    </dd>
+  </dl>
+</FieldList>

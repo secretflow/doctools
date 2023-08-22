@@ -1,0 +1,25 @@
+pnpm-lock.yaml
+**/node_modules
+**/.venv
+
+# build artifacts
+**/build
+**/_build
+**/dist
+**/coverage
+
+# generated code
+**/.dumi/tmp
+**/.dumi/tmp-production
+**/.docusaurus
+
+# protobuf
+**/*_pb.ts
+**/*_connect.ts
+
+**/tests/**/*.md
+**/tests/**/*.mdx
+**/packages/dumi-scaffolding/docs/**/*
+
+# symlinks
+.github/pull_request_template.md

@@ -1,0 +1,1219 @@
+:target{id="module-werkzeug.urls"}
+
+# URL Helpers
+
+Functions for working with URLs.
+
+Contains implementations of functions from [<code>urllib.parse</code>](https://docs.python.org/3/library/urllib.parse.html#module-urllib.parse "(in Python v3.11)") that
+handle bytes and strings.
+
+<Outline domain="py" objectType="class" target={"werkzeug.urls.BaseURL"} module={"werkzeug.urls"} fullname={"BaseURL"} parameters={["args", "kwargs"]} description={"Superclass of URL and BytesURL."}>
+  <Outline.Signature fullname="BaseURL" id="werkzeug.urls.BaseURL">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>BaseURL</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Superclass of [<code>URL</code>](#werkzeug.urls.URL "werkzeug.urls.URL") and [<code>BytesURL</code>](#werkzeug.urls.BytesURL "werkzeug.urls.BytesURL").
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use the <code>urllib.parse</code> library instead.
+    </Container>
+
+    Create new instance of \_URLTuple(scheme, netloc, path, query, fragment)
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [BaseURL](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.ascii_host"} module={"werkzeug.urls"} fullname={"BaseURL.ascii_host"} parameters={["args", "kwargs"]} description={"Works exactly like host but will return a result that\nis restricted to ASCII.  If it finds a netloc that is not ASCII\nit will attempt to idna decode it.  This is useful for socket\noperations when the URL might include internationalized characters."}>
+      <Outline.Signature fullname="BaseURL.ascii_host" id="werkzeug.urls.BaseURL.ascii_host">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>ascii\_host</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Works exactly like [<code>host</code>](#werkzeug.urls.BaseURL.host "werkzeug.urls.BaseURL.host") but will return a result that
+        is restricted to ASCII.  If it finds a netloc that is not ASCII
+        it will attempt to idna decode it.  This is useful for socket
+        operations when the URL might include internationalized characters.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.auth"} module={"werkzeug.urls"} fullname={"BaseURL.auth"} parameters={["args", "kwargs"]} description={"The authentication part in the URL if available, None\notherwise."}>
+      <Outline.Signature fullname="BaseURL.auth" id="werkzeug.urls.BaseURL.auth">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>auth</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The authentication part in the URL if available, <cite>None</cite>
+        otherwise.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.decode_netloc"} module={"werkzeug.urls"} fullname={"BaseURL.decode_netloc"} parameters={[]} description={"Decodes the netloc part into a string."}>
+      <Outline.Signature fullname="BaseURL.decode_netloc" id="werkzeug.urls.BaseURL.decode_netloc">
+        <Outline.Name>decode\_netloc</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Decodes the netloc part into a string.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.decode_query"} module={"werkzeug.urls"} fullname={"BaseURL.decode_query"} parameters={["args", "kwargs"]} description={"Decodes the query part of the URL.  Ths is a shortcut for\ncalling url_decode() on the query argument.  The arguments and\nkeyword arguments are forwarded to url_decode() unchanged."}>
+      <Outline.Signature fullname="BaseURL.decode_query" id="werkzeug.urls.BaseURL.decode_query">
+        <Outline.Name>decode\_query</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Decodes the query part of the URL.  Ths is a shortcut for
+        calling [<code>url\_decode()</code>](#werkzeug.urls.url_decode "werkzeug.urls.url_decode") on the query argument.  The arguments and
+        keyword arguments are forwarded to [<code>url\_decode()</code>](#werkzeug.urls.url_decode "werkzeug.urls.url_decode") unchanged.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+              - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              ds.MultiDict\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.encode_netloc"} module={"werkzeug.urls"} fullname={"BaseURL.encode_netloc"} parameters={[]} description={"Encodes the netloc part to an ASCII safe URL as bytes."}>
+      <Outline.Signature fullname="BaseURL.encode_netloc" id="werkzeug.urls.BaseURL.encode_netloc">
+        <Outline.Name>encode\_netloc</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Encodes the netloc part to an ASCII safe URL as bytes.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.get_file_location"} module={"werkzeug.urls"} fullname={"BaseURL.get_file_location"} parameters={["pathformat"]} description={"Returns a tuple with the location of the file in the form\n(server, location).  If the netloc is empty in the URL or\npoints to localhost, it\u2019s represented as None."}>
+      <Outline.Signature fullname="BaseURL.get_file_location" id="werkzeug.urls.BaseURL.get_file_location">
+        <Outline.Name>get\_file\_location</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">pathformat</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns a tuple with the location of the file in the form
+        <code>(server, location)</code>.  If the netloc is empty in the URL or
+        points to localhost, it’s represented as <code>None</code>.
+
+        The <cite>pathformat</cite> by default is autodetection but needs to be set
+        when working with URLs of a specific system.  The supported values
+        are <code>'windows'</code> when working with Windows or DOS paths and
+        <code>'posix'</code> when working with posix paths.
+
+        If the URL does not point to a local file, the server and location
+        are both represented as <code>None</code>.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>pathformat</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The expected format of the path component.
+              Currently <code>'windows'</code> and <code>'posix'</code> are
+              supported.  Defaults to <code>None</code> which is
+              autodetect.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)") | None, [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)") | None]
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.host"} module={"werkzeug.urls"} fullname={"BaseURL.host"} parameters={["args", "kwargs"]} description={"The host part of the URL if available, otherwise None.  The\nhost is either the hostname or the IP address mentioned in the\nURL.  It will not contain the port."}>
+      <Outline.Signature fullname="BaseURL.host" id="werkzeug.urls.BaseURL.host">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>host</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The host part of the URL if available, otherwise <cite>None</cite>.  The
+        host is either the hostname or the IP address mentioned in the
+        URL.  It will not contain the port.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.join"} module={"werkzeug.urls"} fullname={"BaseURL.join"} parameters={["args", "kwargs"]} description={"Joins this URL with another one.  This is just a convenience\nfunction for calling into url_join() and then parsing the\nreturn value again."}>
+      <Outline.Signature fullname="BaseURL.join" id="werkzeug.urls.BaseURL.join">
+        <Outline.Name>join</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Joins this URL with another one.  This is just a convenience
+        function for calling into [<code>url\_join()</code>](#werkzeug.urls.url_join "werkzeug.urls.url_join") and then parsing the
+        return value again.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>BaseURL</em>](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.password"} module={"werkzeug.urls"} fullname={"BaseURL.password"} parameters={["args", "kwargs"]} description={"The password if it was part of the URL, None otherwise.\nThis undergoes URL decoding and will always be a string."}>
+      <Outline.Signature fullname="BaseURL.password" id="werkzeug.urls.BaseURL.password">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>password</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The password if it was part of the URL, <cite>None</cite> otherwise.
+        This undergoes URL decoding and will always be a string.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.port"} module={"werkzeug.urls"} fullname={"BaseURL.port"} parameters={["args", "kwargs"]} description={"The port in the URL as an integer if it was present, None\notherwise.  This does not fill in default ports."}>
+      <Outline.Signature fullname="BaseURL.port" id="werkzeug.urls.BaseURL.port">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>port</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The port in the URL as an integer if it was present, <cite>None</cite>
+        otherwise.  This does not fill in default ports.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.raw_password"} module={"werkzeug.urls"} fullname={"BaseURL.raw_password"} parameters={["args", "kwargs"]} description={"The password if it was part of the URL, None otherwise.\nUnlike password this one is not being decoded."}>
+      <Outline.Signature fullname="BaseURL.raw_password" id="werkzeug.urls.BaseURL.raw_password">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>raw\_password</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The password if it was part of the URL, <cite>None</cite> otherwise.
+        Unlike [<code>password</code>](#werkzeug.urls.BaseURL.password "werkzeug.urls.BaseURL.password") this one is not being decoded.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.raw_username"} module={"werkzeug.urls"} fullname={"BaseURL.raw_username"} parameters={["args", "kwargs"]} description={"The username if it was part of the URL, None otherwise.\nUnlike username this one is not being decoded."}>
+      <Outline.Signature fullname="BaseURL.raw_username" id="werkzeug.urls.BaseURL.raw_username">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>raw\_username</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The username if it was part of the URL, <cite>None</cite> otherwise.
+        Unlike [<code>username</code>](#werkzeug.urls.BaseURL.username "werkzeug.urls.BaseURL.username") this one is not being decoded.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.replace"} module={"werkzeug.urls"} fullname={"BaseURL.replace"} parameters={["kwargs"]} description={"Return an URL with the same values, except for those parameters\ngiven new values by whichever keyword arguments are specified."}>
+      <Outline.Signature fullname="BaseURL.replace" id="werkzeug.urls.BaseURL.replace">
+        <Outline.Name>replace</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return an URL with the same values, except for those parameters
+        given new values by whichever keyword arguments are specified.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>BaseURL</em>](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.to_iri_tuple"} module={"werkzeug.urls"} fullname={"BaseURL.to_iri_tuple"} parameters={[]} description={"Returns a URL tuple that holds a IRI.  This will try\nto decode as much information as possible in the URL without\nlosing information similar to how a web browser does it for the\nURL bar."}>
+      <Outline.Signature fullname="BaseURL.to_iri_tuple" id="werkzeug.urls.BaseURL.to_iri_tuple">
+        <Outline.Name>to\_iri\_tuple</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns a [<code>URL</code>](#werkzeug.urls.URL "werkzeug.urls.URL") tuple that holds a IRI.  This will try
+        to decode as much information as possible in the URL without
+        losing information similar to how a web browser does it for the
+        URL bar.
+
+        It’s usually more interesting to directly call [<code>uri\_to\_iri()</code>](#werkzeug.urls.uri_to_iri "werkzeug.urls.uri_to_iri") which
+        will return a string.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>BaseURL</em>](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.to_uri_tuple"} module={"werkzeug.urls"} fullname={"BaseURL.to_uri_tuple"} parameters={[]} description={"Returns a BytesURL tuple that holds a URI.  This will\nencode all the information in the URL properly to ASCII using the\nrules a web browser would follow."}>
+      <Outline.Signature fullname="BaseURL.to_uri_tuple" id="werkzeug.urls.BaseURL.to_uri_tuple">
+        <Outline.Name>to\_uri\_tuple</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns a [<code>BytesURL</code>](#werkzeug.urls.BytesURL "werkzeug.urls.BytesURL") tuple that holds a URI.  This will
+        encode all the information in the URL properly to ASCII using the
+        rules a web browser would follow.
+
+        It’s usually more interesting to directly call [<code>iri\_to\_uri()</code>](#werkzeug.urls.iri_to_uri "werkzeug.urls.iri_to_uri") which
+        will return a string.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>BaseURL</em>](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BaseURL.to_url"} module={"werkzeug.urls"} fullname={"BaseURL.to_url"} parameters={[]} description={"Returns a URL string or bytes depending on the type of the\ninformation stored.  This is just a convenience function\nfor calling url_unparse() for this URL."}>
+      <Outline.Signature fullname="BaseURL.to_url" id="werkzeug.urls.BaseURL.to_url">
+        <Outline.Name>to\_url</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns a URL string or bytes depending on the type of the
+        information stored.  This is just a convenience function
+        for calling [<code>url\_unparse()</code>](#werkzeug.urls.url_unparse "werkzeug.urls.url_unparse") for this URL.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.urls.BaseURL.username"} module={"werkzeug.urls"} fullname={"BaseURL.username"} parameters={["args", "kwargs"]} description={"The username if it was part of the URL, None otherwise.\nThis undergoes URL decoding and will always be a string."}>
+      <Outline.Signature fullname="BaseURL.username" id="werkzeug.urls.BaseURL.username">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>username</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The username if it was part of the URL, <cite>None</cite> otherwise.
+        This undergoes URL decoding and will always be a string.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.urls.BytesURL"} module={"werkzeug.urls"} fullname={"BytesURL"} parameters={["args", "kwargs"]} description={"Represents a parsed URL in bytes."}>
+  <Outline.Signature fullname="BytesURL" id="werkzeug.urls.BytesURL">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>BytesURL</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents a parsed URL in bytes.
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use the <code>urllib.parse</code> library instead.
+    </Container>
+
+    Create new instance of \_URLTuple(scheme, netloc, path, query, fragment)
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [BaseURL](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BytesURL.decode"} module={"werkzeug.urls"} fullname={"BytesURL.decode"} parameters={["charset", "errors"]} description={"Decodes the URL to a tuple made out of strings.  The charset is\nonly being used for the path, query and fragment."}>
+      <Outline.Signature fullname="BytesURL.decode" id="werkzeug.urls.BytesURL.decode">
+        <Outline.Name>decode</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Decodes the URL to a tuple made out of strings.  The charset is
+        only being used for the path, query and fragment.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>URL</em>](#werkzeug.urls.URL "werkzeug.urls.URL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.BytesURL.encode_netloc"} module={"werkzeug.urls"} fullname={"BytesURL.encode_netloc"} parameters={[]} description={"Returns the netloc unchanged as bytes."}>
+      <Outline.Signature fullname="BytesURL.encode_netloc" id="werkzeug.urls.BytesURL.encode_netloc">
+        <Outline.Name>encode\_netloc</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns the netloc unchanged as bytes.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.urls.URL"} module={"werkzeug.urls"} fullname={"URL"} parameters={["args", "kwargs"]} description={"Represents a parsed URL.  This behaves like a regular tuple but\nalso has some extra attributes that give further insight into the\nURL."}>
+  <Outline.Signature fullname="URL" id="werkzeug.urls.URL">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>URL</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents a parsed URL.  This behaves like a regular tuple but
+    also has some extra attributes that give further insight into the
+    URL.
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use the <code>urllib.parse</code> library instead.
+    </Container>
+
+    Create new instance of \_URLTuple(scheme, netloc, path, query, fragment)
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [BaseURL](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.urls.URL.encode"} module={"werkzeug.urls"} fullname={"URL.encode"} parameters={["charset", "errors"]} description={"Encodes the URL to a tuple made out of bytes.  The charset is\nonly being used for the path, query and fragment."}>
+      <Outline.Signature fullname="URL.encode" id="werkzeug.urls.URL.encode">
+        <Outline.Name>encode</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Encodes the URL to a tuple made out of bytes.  The charset is
+        only being used for the path, query and fragment.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>BytesURL</em>](#werkzeug.urls.BytesURL "werkzeug.urls.BytesURL")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.iri_to_uri"} module={"werkzeug.urls"} fullname={"iri_to_uri"} parameters={["iri", "charset", "errors", "safe_conversion"]} description={"Convert an IRI to a URI. All non-ASCII and unsafe characters are\nquoted. If the URL has a domain, it is encoded to Punycode."}>
+  <Outline.Signature fullname="iri_to_uri" id="werkzeug.urls.iri_to_uri">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>iri\_to\_uri</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">iri</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">safe\_conversion</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Convert an IRI to a URI. All non-ASCII and unsafe characters are
+    quoted. If the URL has a domain, it is encoded to Punycode.
+
+    ```python
+    >>> iri_to_uri('http://\u2603.net/p\xe5th?q=\xe8ry%DF')
+    'http://xn--n3h.net/p%C3%A5th?q=%C3%A8ry%DF'
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>iri</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – The IRI to convert.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The encoding of the IRI.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Error handler to use during <code>bytes.encode</code>.
+          - <Outline.ParameterTarget>safe\_conversion</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Passing a tuple or bytes, and the <code>charset</code> and <code>errors</code> parameters, are
+      deprecated and will be removed in Werkzeug 3.0.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Which characters remain unquoted is specific to each part of the URL.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The <code>safe\_conversion</code> parameter is deprecated and will be removed in Werkzeug
+      2.4.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>All reserved characters remain unquoted. Previously, only some reserved
+      characters were left unquoted.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.9.6: </span>The <code>safe\_conversion</code> parameter was added.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.6.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.uri_to_iri"} module={"werkzeug.urls"} fullname={"uri_to_iri"} parameters={["uri", "charset", "errors"]} description={"Convert a URI to an IRI. All valid UTF-8 characters are unquoted,\nleaving all reserved and invalid characters quoted. If the URL has\na domain, it is decoded from Punycode."}>
+  <Outline.Signature fullname="uri_to_iri" id="werkzeug.urls.uri_to_iri">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>uri\_to\_iri</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">uri</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Convert a URI to an IRI. All valid UTF-8 characters are unquoted,
+    leaving all reserved and invalid characters quoted. If the URL has
+    a domain, it is decoded from Punycode.
+
+    ```python
+    >>> uri_to_iri("http://xn--n3h.net/p%C3%A5th?q=%C3%A8ry%DF")
+    'http://\u2603.net/p\xe5th?q=\xe8ry%DF'
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>uri</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – The URI to convert.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The encoding to encode unquoted bytes with.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Error handler to use during <code>bytes.encode</code>. By
+            default, invalid bytes are left quoted.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Passing a tuple or bytes, and the <code>charset</code> and <code>errors</code> parameters, are
+      deprecated and will be removed in Werkzeug 3.0.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Which characters remain quoted is specific to each part of the URL.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>All reserved and invalid characters remain quoted. Previously,
+      only some reserved characters were preserved, and invalid bytes
+      were replaced instead of left quoted.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.6.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_decode"} module={"werkzeug.urls"} fullname={"url_decode"} parameters={["s", "charset", "include_empty", "errors", "separator", "cls"]} description={"Parse a query string and return it as a MultiDict."}>
+  <Outline.Signature fullname="url_decode" id="werkzeug.urls.url_decode">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_decode</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">s</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">include\_empty</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span><span>=</span><span>'&'</span></Outline.Parameter>, <Outline.Parameter><span className="name">cls</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Parse a query string and return it as a <code>MultiDict</code>.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> (<em>t.AnyStr</em>) – The query string to parse.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Decode bytes to string with this charset. If not
+            given, bytes are returned as-is.
+          - <Outline.ParameterTarget>include\_empty</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Include keys with empty values in the dict.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Error handling behavior when decoding bytes.
+          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Separator character between pairs.
+          - <Outline.ParameterTarget>cls</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em><em>ds.MultiDict</em><em>] </em><em>| </em><em>None</em>) – Container to hold result instead of <code>MultiDict</code>.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          ds.MultiDict\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.parse\_qs</code> instead.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>The <code>decode\_keys</code> parameter was removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>In previous versions “;” and “&” could be used for url decoding.
+      Now only “&” is supported. If you want to use “;”, a different
+      <code>separator</code> can be provided.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>The <code>cls</code> parameter was added.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_decode_stream"} module={"werkzeug.urls"} fullname={"url_decode_stream"} parameters={["stream", "charset", "include_empty", "errors", "separator", "cls", "limit"]} description={"Works like url_decode() but decodes a stream.  The behavior\nof stream and limit follows functions like\nmake_line_iter().  The generator of pairs is\ndirectly fed to the cls so you can consume the data while it\u2019s\nparsed."}>
+  <Outline.Signature fullname="url_decode_stream" id="werkzeug.urls.url_decode_stream">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_decode\_stream</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">include\_empty</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span><span>=</span><span>b'&'</span></Outline.Parameter>, <Outline.Parameter><span className="name">cls</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Works like [<code>url\_decode()</code>](#werkzeug.urls.url_decode "werkzeug.urls.url_decode") but decodes a stream.  The behavior
+    of stream and limit follows functions like
+    [<code>make\_line\_iter()</code>](wsgi.mdx#werkzeug.wsgi.make_line_iter "werkzeug.wsgi.make_line_iter").  The generator of pairs is
+    directly fed to the <cite>cls</cite> so you can consume the data while it’s
+    parsed.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a stream with the encoded querystring
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset of the query string.  If set to <cite>None</cite>
+            no decoding will take place.
+          - <Outline.ParameterTarget>include\_empty</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Set to <cite>False</cite> if you don’t want empty values to
+            appear in the dict.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the decoding error behavior.
+          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – the pair separator to be used, defaults to <code>&</code>
+          - <Outline.ParameterTarget>cls</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em><em>ds.MultiDict</em><em>] </em><em>| </em><em>None</em>) – an optional dict class to use.  If this is not specified
+            or <cite>None</cite> the default <code>MultiDict</code> is used.
+          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the content length of the URL data.  Not necessary if
+            a limited stream is provided.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          ds.MultiDict\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 2.4. Use <code>urllib.parse.parse\_qs</code> instead.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>The <code>decode\_keys</code> and <code>return\_iterator</code> parameters were removed.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.8.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_encode"} module={"werkzeug.urls"} fullname={"url_encode"} parameters={["obj", "charset", "sort", "key", "separator"]} description={"URL encode a dict/MultiDict.  If a value is None it will not appear\nin the result string.  Per default only values are encoded into the target\ncharset strings."}>
+  <Outline.Signature fullname="url_encode" id="werkzeug.urls.url_encode">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_encode</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">obj</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">key</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span><span>=</span><span>'&'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    URL encode a dict/<cite>MultiDict</cite>.  If a value is <cite>None</cite> it will not appear
+    in the result string.  Per default only values are encoded into the target
+    charset strings.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>obj</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>t.Iterable</em><em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – the object to encode into a query string.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset of the query string.
+          - <Outline.ParameterTarget>sort</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – set to <cite>True</cite> if you want parameters to be sorted by <cite>key</cite>.
+          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the separator to be used for the pairs.
+          - <Outline.ParameterTarget>key</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em><em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – an optional function to be used for sorting.  For more details
+            check out the [<code>sorted()</code>](https://docs.python.org/3/library/functions.html#sorted "(in Python v3.11)") documentation.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 2.4. Use <code>urllib.parse.urlencode</code> instead.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>The <code>encode\_keys</code> parameter was removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>Added the <code>sort</code>, <code>key</code>, and <code>separator</code> parameters.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_encode_stream"} module={"werkzeug.urls"} fullname={"url_encode_stream"} parameters={["obj", "stream", "charset", "sort", "key", "separator"]} description={"Like url_encode() but writes the results to a stream\nobject.  If the stream is None a generator over all encoded\npairs is returned."}>
+  <Outline.Signature fullname="url_encode_stream" id="werkzeug.urls.url_encode_stream">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_encode\_stream</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">obj</span></Outline.Parameter>, <Outline.Parameter><span className="name">stream</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">key</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span><span>=</span><span>'&'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like [<code>url\_encode()</code>](#werkzeug.urls.url_encode "werkzeug.urls.url_encode") but writes the results to a stream
+    object.  If the stream is <cite>None</cite> a generator over all encoded
+    pairs is returned.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>obj</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>t.Iterable</em><em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – the object to encode into a query string.
+          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – a stream to write the encoded object into or <cite>None</cite> if
+            an iterator over the encoded pairs should be returned.  In
+            that case the separator argument is ignored.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset of the query string.
+          - <Outline.ParameterTarget>sort</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – set to <cite>True</cite> if you want parameters to be sorted by <cite>key</cite>.
+          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the separator to be used for the pairs.
+          - <Outline.ParameterTarget>key</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em><em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – an optional function to be used for sorting.  For more details
+            check out the [<code>sorted()</code>](https://docs.python.org/3/library/functions.html#sorted "(in Python v3.11)") documentation.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          None
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 2.4. Use <code>urllib.parse.urlencode</code> instead.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>The <code>encode\_keys</code> parameter was removed.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.8.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_fix"} module={"werkzeug.urls"} fullname={"url_fix"} parameters={["s", "charset"]} description={"Sometimes you get an URL by a user that just isn\u2019t a real URL because\nit contains unsafe characters like \u2018 \u2018 and so on. This function can fix\nsome of the problems in a similar way browsers handle data entered by the\nuser:"}>
+  <Outline.Signature fullname="url_fix" id="werkzeug.urls.url_fix">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_fix</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">s</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Sometimes you get an URL by a user that just isn’t a real URL because
+    it contains unsafe characters like ‘ ‘ and so on. This function can fix
+    some of the problems in a similar way browsers handle data entered by the
+    user:
+
+    ```python
+    >>> url_fix('http://de.wikipedia.org/wiki/Elf (Begriffskl\xe4rung)')
+    'http://de.wikipedia.org/wiki/Elf%20(Begriffskl%C3%A4rung)'
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the string with the URL to fix.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The target charset for the URL if the url was given
+            as a string.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_join"} module={"werkzeug.urls"} fullname={"url_join"} parameters={["base", "url", "allow_fragments"]} description={"Join a base URL and a possibly relative URL to form an absolute\ninterpretation of the latter."}>
+  <Outline.Signature fullname="url_join" id="werkzeug.urls.url_join">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_join</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">base</span></Outline.Parameter>, <Outline.Parameter><span className="name">url</span></Outline.Parameter>, <Outline.Parameter><span className="name">allow\_fragments</span><span>=</span><span>True</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Join a base URL and a possibly relative URL to form an absolute
+    interpretation of the latter.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>base</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – the base URL for the join operation.
+          - <Outline.ParameterTarget>url</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – the URL to join.
+          - <Outline.ParameterTarget>allow\_fragments</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – indicates whether fragments should be allowed.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 2.4. Use <code>urllib.parse.urljoin</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_parse"} module={"werkzeug.urls"} fullname={"url_parse"} parameters={["url", "scheme", "allow_fragments"]} description={"Parses a URL from a string into a URL tuple.  If the URL\nis lacking a scheme it can be provided as second argument. Otherwise,\nit is ignored.  Optionally fragments can be stripped from the URL\nby setting allow_fragments to False."}>
+  <Outline.Signature fullname="url_parse" id="werkzeug.urls.url_parse">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_parse</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">url</span></Outline.Parameter>, <Outline.Parameter><span className="name">scheme</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">allow\_fragments</span><span>=</span><span>True</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Parses a URL from a string into a [<code>URL</code>](#werkzeug.urls.URL "werkzeug.urls.URL") tuple.  If the URL
+    is lacking a scheme it can be provided as second argument. Otherwise,
+    it is ignored.  Optionally fragments can be stripped from the URL
+    by setting <cite>allow\_fragments</cite> to <cite>False</cite>.
+
+    The inverse of this function is [<code>url\_unparse()</code>](#werkzeug.urls.url_unparse "werkzeug.urls.url_unparse").
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>url</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the URL to parse.
+          - <Outline.ParameterTarget>scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the default schema to use if the URL is schemaless.
+          - <Outline.ParameterTarget>allow\_fragments</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if set to <cite>False</cite> a fragment will be removed
+            from the URL.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [BaseURL](#werkzeug.urls.BaseURL "werkzeug.urls.BaseURL")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.urlsplit</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_quote"} module={"werkzeug.urls"} fullname={"url_quote"} parameters={["string", "charset", "errors", "safe", "unsafe"]} description={"URL encode a single string with a given encoding."}>
+  <Outline.Signature fullname="url_quote" id="werkzeug.urls.url_quote">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_quote</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">string</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'strict'</span></Outline.Parameter>, <Outline.Parameter><span className="name">safe</span><span>=</span><span>'/:'</span></Outline.Parameter>, <Outline.Parameter><span className="name">unsafe</span><span>=</span><span>''</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    URL encode a single string with a given encoding.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> – the string to quote.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset to be used.
+          - <Outline.ParameterTarget>safe</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – an optional sequence of safe characters.
+          - <Outline.ParameterTarget>unsafe</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – an optional sequence of unsafe characters.
+          - <Outline.ParameterTarget>string</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.quote</code> instead.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.9.2: </span>The <cite>unsafe</cite> parameter was added.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_quote_plus"} module={"werkzeug.urls"} fullname={"url_quote_plus"} parameters={["string", "charset", "errors", "safe"]} description={"URL encode a single string with the given encoding and convert\nwhitespace to \u201c+\u201d."}>
+  <Outline.Signature fullname="url_quote_plus" id="werkzeug.urls.url_quote_plus">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_quote\_plus</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">string</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'strict'</span></Outline.Parameter>, <Outline.Parameter><span className="name">safe</span><span>=</span><span>''</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    URL encode a single string with the given encoding and convert
+    whitespace to “+”.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> – The string to quote.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The charset to be used.
+          - <Outline.ParameterTarget>safe</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – An optional sequence of safe characters.
+          - <Outline.ParameterTarget>string</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.quote\_plus</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_unparse"} module={"werkzeug.urls"} fullname={"url_unparse"} parameters={["components"]} description={"The reverse operation to url_parse().  This accepts arbitrary\nas well as URL tuples and returns a URL as a string."}>
+  <Outline.Signature fullname="url_unparse" id="werkzeug.urls.url_unparse">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_unparse</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">components</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    The reverse operation to [<code>url\_parse()</code>](#werkzeug.urls.url_parse "werkzeug.urls.url_parse").  This accepts arbitrary
+    as well as [<code>URL</code>](#werkzeug.urls.URL "werkzeug.urls.URL") tuples and returns a URL as a string.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>components</Outline.ParameterTarget> ([<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – the parsed URL as tuple which should be converted
+          into a URL string.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.urlunsplit</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_unquote"} module={"werkzeug.urls"} fullname={"url_unquote"} parameters={["s", "charset", "errors", "unsafe"]} description={"URL decode a single string with a given encoding.  If the charset\nis set to None no decoding is performed and raw bytes are\nreturned."}>
+  <Outline.Signature fullname="url_unquote" id="werkzeug.urls.url_unquote">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_unquote</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">s</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter>, <Outline.Parameter><span className="name">unsafe</span><span>=</span><span>''</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    URL decode a single string with a given encoding.  If the charset
+    is set to <cite>None</cite> no decoding is performed and raw bytes are
+    returned.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – the string to unquote.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset of the query string.  If set to <cite>None</cite>
+            no decoding will take place.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the error handling for the charset decoding.
+          - <Outline.ParameterTarget>unsafe</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.unquote</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.url_unquote_plus"} module={"werkzeug.urls"} fullname={"url_unquote_plus"} parameters={["s", "charset", "errors"]} description={"URL decode a single string with the given charset and decode \u201c+\u201d to\nwhitespace."}>
+  <Outline.Signature fullname="url_unquote_plus" id="werkzeug.urls.url_unquote_plus">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>url\_unquote\_plus</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">s</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>'utf-8'</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors</span><span>=</span><span>'replace'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    URL decode a single string with the given <cite>charset</cite> and decode “+” to
+    whitespace.
+
+    Per default encoding errors are ignored.  If you want a different behavior
+    you can set <cite>errors</cite> to <code>'replace'</code> or <code>'strict'</code>.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>s</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – The string to unquote.
+          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the charset of the query string.  If set to <cite>None</cite>
+            no decoding will take place.
+          - <Outline.ParameterTarget>errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The error handling for the <cite>charset</cite> decoding.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Use <code>urllib.parse.unquote\_plus</code> instead.
+    </Container>
+  </Outline.Content>
+</Outline>

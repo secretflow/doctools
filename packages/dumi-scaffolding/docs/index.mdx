@@ -1,0 +1,417 @@
+---
+toctree:
+- path: installation.mdx
+  subpages: []
+  title: Installation
+- path: tutorial.mdx
+  subpages: []
+  title: Werkzeug Tutorial
+- path: levels.mdx
+  subpages: []
+  title: API Levels
+- path: quickstart.mdx
+  subpages: []
+  title: Quickstart
+- path: serving.mdx
+  subpages: []
+  title: Serving WSGI Applications
+- path: test.mdx
+  subpages: []
+  title: Testing WSGI Applications
+- path: debug.mdx
+  subpages: []
+  title: Debugging Applications
+- path: wrappers.mdx
+  subpages: []
+  title: Request / Response Objects
+- path: routing.mdx
+  subpages: []
+  title: URL Routing
+- path: wsgi.mdx
+  subpages: []
+  title: WSGI Helpers
+- path: http.mdx
+  subpages: []
+  title: HTTP Utilities
+- path: datastructures.mdx
+  subpages: []
+  title: Data Structures
+- path: utils.mdx
+  subpages: []
+  title: Utilities
+- path: urls.mdx
+  subpages: []
+  title: URL Helpers
+- path: local.mdx
+  subpages: []
+  title: Context Locals
+- path: middleware/index.mdx
+  subpages:
+  - path: middleware/proxy_fix.mdx
+    subpages: []
+    title: X-Forwarded-For Proxy Fix
+  - path: middleware/shared_data.mdx
+    subpages: []
+    title: Serve Shared Static Files
+  - path: middleware/dispatcher.mdx
+    subpages: []
+    title: Application Dispatcher
+  - path: middleware/http_proxy.mdx
+    subpages: []
+    title: Basic HTTP Proxy
+  - path: middleware/lint.mdx
+    subpages: []
+    title: WSGI Protocol Linter
+  - path: middleware/profiler.mdx
+    subpages: []
+    title: Application Profiler
+  title: Middleware
+- path: exceptions.mdx
+  subpages: []
+  title: HTTP Exceptions
+- path: deployment/index.mdx
+  subpages:
+  - path: null
+    subpages:
+    - path: deployment/gunicorn.mdx
+      subpages: []
+      title: Gunicorn
+    - path: deployment/waitress.mdx
+      subpages: []
+      title: Waitress
+    - path: deployment/mod_wsgi.mdx
+      subpages: []
+      title: mod_wsgi
+    - path: deployment/uwsgi.mdx
+      subpages: []
+      title: uWSGI
+    - path: deployment/gevent.mdx
+      subpages: []
+      title: gevent
+    - path: deployment/eventlet.mdx
+      subpages: []
+      title: eventlet
+    - path: deployment/proxy_fix.mdx
+      subpages: []
+      title: Tell Werkzeug it is Behind a Proxy
+    - path: deployment/nginx.mdx
+      subpages: []
+      title: nginx
+    - path: deployment/apache-httpd.mdx
+      subpages: []
+      title: Apache httpd
+    title: ''
+  title: Deploying to Production
+- path: terms.mdx
+  subpages: []
+  title: Important Terms
+- path: request_data.mdx
+  subpages: []
+  title: Dealing with Request Data
+- path: license.mdx
+  subpages: []
+  title: BSD-3-Clause License
+- path: changes.mdx
+  subpages: []
+  title: Changes
+---
+
+:target{#werkzeug}
+
+# Werkzeug
+
+[![](_static/werkzeug-horizontal.png)](https://werkzeug.palletsprojects.com)
+
+<em>werkzeug</em> German noun: “tool”.
+Etymology: <em>werk</em> (“work”), <em>zeug</em> (“stuff”)
+
+Werkzeug is a comprehensive [WSGI](https://wsgi.readthedocs.io/en/latest/) web application library. It began as
+a simple collection of various utilities for WSGI applications and has
+become one of the most advanced WSGI utility libraries.
+
+Werkzeug doesn’t enforce any dependencies. It is up to the developer to
+choose a template engine, database adapter, and even how to handle
+requests.
+
+:target{#getting-started}
+
+## Getting Started
+
+<TableOfContents>
+
+
+  - [Installation](installation.mdx)
+    - [Python Version](installation.mdx#python-version)
+    - [Virtual environments](installation.mdx#virtual-environments)
+    - [Install Werkzeug](installation.mdx#install-werkzeug)
+  - [Werkzeug Tutorial](tutorial.mdx)
+    - [Introducing Shortly](tutorial.mdx#introducing-shortly)
+    - [Step 0: A Basic WSGI Introduction](tutorial.mdx#step-0-a-basic-wsgi-introduction)
+    - [Step 1: Creating the Folders](tutorial.mdx#step-1-creating-the-folders)
+    - [Step 2: The Base Structure](tutorial.mdx#step-2-the-base-structure)
+    - [Intermezzo: Running the Application](tutorial.mdx#intermezzo-running-the-application)
+    - [Step 3: The Environment](tutorial.mdx#step-3-the-environment)
+    - [Step 4: The Routing](tutorial.mdx#step-4-the-routing)
+    - [Step 5: The First View](tutorial.mdx#step-5-the-first-view)
+    - [Step 6: Redirect View](tutorial.mdx#step-6-redirect-view)
+    - [Step 7: Detail View](tutorial.mdx#step-7-detail-view)
+    - [Step 8: Templates](tutorial.mdx#step-8-templates)
+    - [Step 9: The Style](tutorial.mdx#step-9-the-style)
+    - [Bonus: Refinements](tutorial.mdx#bonus-refinements)
+  - [API Levels](levels.mdx)
+    - [Example](levels.mdx#example)
+    - [High or Low?](levels.mdx#high-or-low)
+  - [Quickstart](quickstart.mdx)
+  - [WSGI Environment](quickstart.mdx#wsgi-environment)
+  - [Enter Request](quickstart.mdx#enter-request)
+  - [Header Parsing](quickstart.mdx#header-parsing)
+  - [Responses](quickstart.mdx#responses)
+</TableOfContents>
+
+:target{#serving-and-testing}
+
+## Serving and Testing
+
+<TableOfContents>
+
+
+  - [Serving WSGI Applications](serving.mdx)
+    - [<code>run\_simple()</code>](serving.mdx#werkzeug.serving.run_simple)
+    - [<code>is\_running\_from\_reloader()</code>](serving.mdx#werkzeug.serving.is_running_from_reloader)
+    - [<code>make\_ssl\_devcert()</code>](serving.mdx#werkzeug.serving.make_ssl_devcert)
+    - [Reloader](serving.mdx#reloader)
+    - [Colored Logging](serving.mdx#colored-logging)
+    - [Virtual Hosts](serving.mdx#virtual-hosts)
+    - [Shutting Down The Server](serving.mdx#shutting-down-the-server)
+    - [Troubleshooting](serving.mdx#troubleshooting)
+    - [SSL](serving.mdx#ssl)
+    - [Unix Sockets](serving.mdx#unix-sockets)
+  - [Testing WSGI Applications](test.mdx)
+    - [Test Client](test.mdx#test-client)
+    - [Request Body](test.mdx#request-body)
+    - [Environment Builder](test.mdx#environment-builder)
+    - [API](test.mdx#api)
+  - [Debugging Applications](debug.mdx)
+    - [Enabling the Debugger](debug.mdx#enabling-the-debugger)
+    - [Using the Debugger](debug.mdx#using-the-debugger)
+    - [Debugger PIN](debug.mdx#debugger-pin)
+    - [Pasting Errors](debug.mdx#pasting-errors)
+</TableOfContents>
+
+:target{#reference}
+
+## Reference
+
+<TableOfContents>
+
+
+  - [Request / Response Objects](wrappers.mdx)
+    - [How they Work](wrappers.mdx#how-they-work)
+    - [Mutability and Reusability of Wrappers](wrappers.mdx#mutability-and-reusability-of-wrappers)
+    - [Wrapper Classes](wrappers.mdx#wrapper-classes)
+  - [URL Routing](routing.mdx)
+    - [Quickstart](routing.mdx#quickstart)
+    - [Rule Format](routing.mdx#rule-format)
+    - [Built-in Converters](routing.mdx#built-in-converters)
+    - [Maps, Rules and Adapters](routing.mdx#maps-rules-and-adapters)
+    - [Matchers](routing.mdx#matchers)
+    - [Rule Factories](routing.mdx#rule-factories)
+    - [Rule Templates](routing.mdx#rule-templates)
+    - [Custom Converters](routing.mdx#custom-converters)
+    - [Host Matching](routing.mdx#host-matching)
+    - [WebSockets](routing.mdx#websockets)
+    - [State Machine Matching](routing.mdx#state-machine-matching)
+  - [WSGI Helpers](wsgi.mdx)
+    - [Iterator / Stream Helpers](wsgi.mdx#iterator-stream-helpers)
+    - [Environ Helpers](wsgi.mdx#environ-helpers)
+    - [Convenience Helpers](wsgi.mdx#convenience-helpers)
+    - [Bytes, Strings, and Encodings](wsgi.mdx#bytes-strings-and-encodings)
+    - [Raw Request URI and Path Encoding](wsgi.mdx#raw-request-uri-and-path-encoding)
+  - [HTTP Utilities](http.mdx)
+    - [Datetime Functions](http.mdx#datetime-functions)
+    - [Header Parsing](http.mdx#header-parsing)
+    - [Header Utilities](http.mdx#header-utilities)
+    - [Cookies](http.mdx#cookies)
+    - [Conditional Response Helpers](http.mdx#conditional-response-helpers)
+    - [Constants](http.mdx#constants)
+    - [Form Data Parsing](http.mdx#module-werkzeug.formparser)
+  - [Data Structures](datastructures.mdx)
+    - [General Purpose](datastructures.mdx#general-purpose)
+    - [HTTP Related](datastructures.mdx#http-related)
+    - [Others](datastructures.mdx#others)
+  - [Utilities](utils.mdx)
+    - [General Helpers](utils.mdx#general-helpers)
+    - [URL Helpers](utils.mdx#url-helpers)
+    - [User Agent API](utils.mdx#module-werkzeug.user_agent)
+    - [Security Helpers](utils.mdx#module-werkzeug.security)
+    - [Logging](utils.mdx#logging)
+  - [URL Helpers](urls.mdx)
+    - [<code>BaseURL</code>](urls.mdx#werkzeug.urls.BaseURL)
+    - [<code>BytesURL</code>](urls.mdx#werkzeug.urls.BytesURL)
+    - [<code>URL</code>](urls.mdx#werkzeug.urls.URL)
+    - [<code>iri\_to\_uri()</code>](urls.mdx#werkzeug.urls.iri_to_uri)
+    - [<code>uri\_to\_iri()</code>](urls.mdx#werkzeug.urls.uri_to_iri)
+    - [<code>url\_decode()</code>](urls.mdx#werkzeug.urls.url_decode)
+    - [<code>url\_decode\_stream()</code>](urls.mdx#werkzeug.urls.url_decode_stream)
+    - [<code>url\_encode()</code>](urls.mdx#werkzeug.urls.url_encode)
+    - [<code>url\_encode\_stream()</code>](urls.mdx#werkzeug.urls.url_encode_stream)
+    - [<code>url\_fix()</code>](urls.mdx#werkzeug.urls.url_fix)
+    - [<code>url\_join()</code>](urls.mdx#werkzeug.urls.url_join)
+    - [<code>url\_parse()</code>](urls.mdx#werkzeug.urls.url_parse)
+    - [<code>url\_quote()</code>](urls.mdx#werkzeug.urls.url_quote)
+    - [<code>url\_quote\_plus()</code>](urls.mdx#werkzeug.urls.url_quote_plus)
+    - [<code>url\_unparse()</code>](urls.mdx#werkzeug.urls.url_unparse)
+    - [<code>url\_unquote()</code>](urls.mdx#werkzeug.urls.url_unquote)
+    - [<code>url\_unquote\_plus()</code>](urls.mdx#werkzeug.urls.url_unquote_plus)
+  - [Context Locals](local.mdx)
+  - [Proxy Objects](local.mdx#proxy-objects)
+    - [<code>LocalProxy</code>](local.mdx#werkzeug.local.LocalProxy)
+  - [Stacks and Namespaces](local.mdx#stacks-and-namespaces)
+    - [<code>LocalStack</code>](local.mdx#werkzeug.local.LocalStack)
+    - [<code>Local</code>](local.mdx#werkzeug.local.Local)
+  - [Releasing Data](local.mdx#releasing-data)
+    - [<code>LocalManager</code>](local.mdx#werkzeug.local.LocalManager)
+    - [<code>release\_local()</code>](local.mdx#werkzeug.local.release_local)
+  - [Middleware](middleware/index.mdx)
+    - [X-Forwarded-For Proxy Fix](middleware/proxy_fix.mdx)
+    - [Serve Shared Static Files](middleware/shared_data.mdx)
+    - [Application Dispatcher](middleware/dispatcher.mdx)
+    - [Basic HTTP Proxy](middleware/http_proxy.mdx)
+    - [WSGI Protocol Linter](middleware/lint.mdx)
+    - [Application Profiler](middleware/profiler.mdx)
+  - [HTTP Exceptions](exceptions.mdx)
+    - [Usage Example](exceptions.mdx#usage-example)
+    - [Error Classes](exceptions.mdx#error-classes)
+    - [Baseclass](exceptions.mdx#baseclass)
+    - [Special HTTP Exceptions](exceptions.mdx#special-http-exceptions)
+    - [Simple Aborting](exceptions.mdx#simple-aborting)
+    - [Custom Errors](exceptions.mdx#custom-errors)
+</TableOfContents>
+
+:target{#deployment}
+
+## Deployment
+
+<TableOfContents>
+
+
+  - [Deploying to Production](deployment/index.mdx)
+    - [Self-Hosted Options](deployment/index.mdx#self-hosted-options)
+      - [Gunicorn](deployment/gunicorn.mdx)
+      - [Waitress](deployment/waitress.mdx)
+      - [mod\_wsgi](deployment/mod_wsgi.mdx)
+      - [uWSGI](deployment/uwsgi.mdx)
+      - [gevent](deployment/gevent.mdx)
+      - [eventlet](deployment/eventlet.mdx)
+      - [Tell Werkzeug it is Behind a Proxy](deployment/proxy_fix.mdx)
+      - [nginx](deployment/nginx.mdx)
+      - [Apache httpd](deployment/apache-httpd.mdx)
+    - [Hosting Platforms](deployment/index.mdx#hosting-platforms)
+</TableOfContents>
+
+:target{#additional-information}
+
+## Additional Information
+
+<TableOfContents>
+
+
+  - [Important Terms](terms.mdx)
+    - [WSGI](terms.mdx#wsgi)
+    - [Response Object](terms.mdx#response-object)
+    - [View Function](terms.mdx#view-function)
+  - [Dealing with Request Data](request_data.mdx)
+    - [Missing EOF Marker on Input Stream](request_data.mdx#missing-eof-marker-on-input-stream)
+    - [When does Werkzeug Parse?](request_data.mdx#when-does-werkzeug-parse)
+    - [How does it Parse?](request_data.mdx#how-does-it-parse)
+    - [Limiting Request Data](request_data.mdx#limiting-request-data)
+    - [How to extend Parsing?](request_data.mdx#how-to-extend-parsing)
+  - [BSD-3-Clause License](license.mdx)
+  - [Changes](changes.mdx)
+    - [Version 2.3.6](changes.mdx#version-2-3-6)
+    - [Version 2.3.5](changes.mdx#version-2-3-5)
+    - [Version 2.3.4](changes.mdx#version-2-3-4)
+    - [Version 2.3.3](changes.mdx#version-2-3-3)
+    - [Version 2.3.2](changes.mdx#version-2-3-2)
+    - [Version 2.3.1](changes.mdx#version-2-3-1)
+    - [Version 2.3.0](changes.mdx#version-2-3-0)
+    - [Version 2.2.3](changes.mdx#version-2-2-3)
+    - [Version 2.2.2](changes.mdx#version-2-2-2)
+    - [Version 2.2.1](changes.mdx#version-2-2-1)
+    - [Version 2.2.0](changes.mdx#version-2-2-0)
+    - [Version 2.1.2](changes.mdx#version-2-1-2)
+    - [Version 2.1.1](changes.mdx#version-2-1-1)
+    - [Version 2.1.0](changes.mdx#version-2-1-0)
+    - [Version 2.0.3](changes.mdx#version-2-0-3)
+    - [Version 2.0.2](changes.mdx#version-2-0-2)
+    - [Version 2.0.1](changes.mdx#version-2-0-1)
+    - [Version 2.0.0](changes.mdx#version-2-0-0)
+    - [Version 1.0.1](changes.mdx#version-1-0-1)
+    - [Version 1.0.0](changes.mdx#version-1-0-0)
+    - [Version 0.16.1](changes.mdx#version-0-16-1)
+    - [Version 0.16.0](changes.mdx#version-0-16-0)
+    - [Version 0.15.6](changes.mdx#version-0-15-6)
+    - [Version 0.15.5](changes.mdx#version-0-15-5)
+    - [Version 0.15.4](changes.mdx#version-0-15-4)
+    - [Version 0.15.3](changes.mdx#version-0-15-3)
+    - [Version 0.15.2](changes.mdx#version-0-15-2)
+    - [Version 0.15.1](changes.mdx#version-0-15-1)
+    - [Version 0.15.0](changes.mdx#version-0-15-0)
+    - [Version 0.14.1](changes.mdx#version-0-14-1)
+    - [Version 0.14](changes.mdx#version-0-14)
+    - [Version 0.13](changes.mdx#version-0-13)
+    - [Version 0.12.2](changes.mdx#version-0-12-2)
+    - [Version 0.12.1](changes.mdx#version-0-12-1)
+    - [Version 0.12](changes.mdx#version-0-12)
+    - [Version 0.11.16](changes.mdx#version-0-11-16)
+    - [Version 0.11.15](changes.mdx#version-0-11-15)
+    - [Version 0.11.14](changes.mdx#version-0-11-14)
+    - [Version 0.11.13](changes.mdx#version-0-11-13)
+    - [Version 0.11.12](changes.mdx#version-0-11-12)
+    - [Version 0.11.11](changes.mdx#version-0-11-11)
+    - [Version 0.11.10](changes.mdx#version-0-11-10)
+    - [Version 0.11.9](changes.mdx#version-0-11-9)
+    - [Version 0.11.8](changes.mdx#version-0-11-8)
+    - [Version 0.11.7](changes.mdx#version-0-11-7)
+    - [Version 0.11.6](changes.mdx#version-0-11-6)
+    - [Version 0.11.5](changes.mdx#version-0-11-5)
+    - [Version 0.11.4](changes.mdx#version-0-11-4)
+    - [Version 0.11.3](changes.mdx#version-0-11-3)
+    - [Version 0.11.2](changes.mdx#version-0-11-2)
+    - [Version 0.11.1](changes.mdx#version-0-11-1)
+    - [Version 0.11](changes.mdx#version-0-11)
+    - [Version 0.10.5](changes.mdx#version-0-10-5)
+    - [Version 0.10.4](changes.mdx#version-0-10-4)
+    - [Version 0.10.3](changes.mdx#version-0-10-3)
+    - [Version 0.10.2](changes.mdx#version-0-10-2)
+    - [Version 0.10.1](changes.mdx#version-0-10-1)
+    - [Version 0.10](changes.mdx#version-0-10)
+    - [Version 0.9.7](changes.mdx#version-0-9-7)
+    - [Version 0.9.6](changes.mdx#version-0-9-6)
+    - [Version 0.9.7](changes.mdx#id1)
+    - [Version 0.9.5](changes.mdx#version-0-9-5)
+    - [Version 0.9.4](changes.mdx#version-0-9-4)
+    - [Version 0.9.3](changes.mdx#version-0-9-3)
+    - [Version 0.9.2](changes.mdx#version-0-9-2)
+    - [Version 0.9.1](changes.mdx#version-0-9-1)
+    - [Version 0.9](changes.mdx#version-0-9)
+    - [Version 0.8.4](changes.mdx#version-0-8-4)
+    - [Version 0.8.3](changes.mdx#version-0-8-3)
+    - [Version 0.8.2](changes.mdx#version-0-8-2)
+    - [Version 0.8.1](changes.mdx#version-0-8-1)
+    - [Version 0.8](changes.mdx#version-0-8)
+    - [Version 0.7.2](changes.mdx#version-0-7-2)
+    - [Version 0.7.1](changes.mdx#version-0-7-1)
+    - [Version 0.7](changes.mdx#version-0-7)
+    - [Version 0.6.2](changes.mdx#version-0-6-2)
+    - [Version 0.6.1](changes.mdx#version-0-6-1)
+    - [Version 0.6](changes.mdx#version-0-6)
+    - [Version 0.5.1](changes.mdx#version-0-5-1)
+    - [Version 0.5](changes.mdx#version-0-5)
+    - [Version 0.4.1](changes.mdx#version-0-4-1)
+    - [Version 0.4](changes.mdx#version-0-4)
+    - [Version 0.3.1](changes.mdx#version-0-3-1)
+    - [Version 0.3](changes.mdx#version-0-3)
+    - [Version 0.2](changes.mdx#version-0-2)
+    - [Version 0.1](changes.mdx#version-0-1)
+</TableOfContents>

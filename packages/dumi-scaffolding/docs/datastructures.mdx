@@ -1,0 +1,3001 @@
+:target{id="module-werkzeug.datastructures"}
+
+# Data Structures
+
+Werkzeug provides some subclasses of common Python objects to extend them
+with additional features.  Some of them are used to make them immutable, others
+are used to change some semantics to better work with HTTP.
+
+:target{#general-purpose}
+
+## General Purpose
+
+<Container type="info" title="Version changed">
+  <span>Changed in version 0.6: </span>The general purpose classes are now pickleable in each protocol as long
+  as the contained objects are pickleable.  This means that the
+  [<code>FileMultiDict</code>](#werkzeug.datastructures.FileMultiDict "werkzeug.datastructures.FileMultiDict") won’t be pickleable as soon as it contains a
+  file.
+</Container>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.TypeConversionDict"} module={"werkzeug.datastructures"} fullname={"TypeConversionDict"} description={"Works like a regular dict but the get() method can perform\ntype conversions.  MultiDict and CombinedMultiDict\nare subclasses of this class and provide the same feature."}>
+  <Outline.Signature fullname="TypeConversionDict" id="werkzeug.datastructures.TypeConversionDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>TypeConversionDict</Outline.Name>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Works like a regular dict but the [<code>get()</code>](#werkzeug.datastructures.TypeConversionDict.get "werkzeug.datastructures.TypeConversionDict.get") method can perform
+    type conversions.  [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") and [<code>CombinedMultiDict</code>](#werkzeug.datastructures.CombinedMultiDict "werkzeug.datastructures.CombinedMultiDict")
+    are subclasses of this class and provide the same feature.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.TypeConversionDict.get"} module={"werkzeug.datastructures"} fullname={"TypeConversionDict.get"} description={"Return the default value if the requested data doesn\u2019t exist.\nIf type is provided and is a callable it should convert the value,\nreturn it or raise a ValueError if that is not possible.  In\nthis case the function will return the default as if the value was not\nfound:"} parameters={["key", "default", "type"]}>
+      <Outline.Signature fullname="TypeConversionDict.get" id="werkzeug.datastructures.TypeConversionDict.get">
+        <Outline.Name>get</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">type</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the default value if the requested data doesn’t exist.
+        If <cite>type</cite> is provided and is a callable it should convert the value,
+        return it or raise a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") if that is not possible.  In
+        this case the function will return the default as if the value was not
+        found:
+
+        ```python
+        >>> d = TypeConversionDict(foo='42', bar='blub')
+        >>> d.get('foo', type=int)
+        42
+        >>> d.get('bar', -1, type=int)
+        -1
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – The default value to be returned if the key can’t
+                be looked up.  If not further specified <cite>None</cite> is
+                returned.
+              - <Outline.ParameterTarget>type</Outline.ParameterTarget> – A callable that is used to cast the value in the
+                [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").  If a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") is raised
+                by this callable the default value is returned.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ImmutableTypeConversionDict"} module={"werkzeug.datastructures"} fullname={"ImmutableTypeConversionDict"} description={"Works like a TypeConversionDict but does not support\nmodifications."}>
+  <Outline.Signature fullname="ImmutableTypeConversionDict" id="werkzeug.datastructures.ImmutableTypeConversionDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ImmutableTypeConversionDict</Outline.Name>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Works like a [<code>TypeConversionDict</code>](#werkzeug.datastructures.TypeConversionDict "werkzeug.datastructures.TypeConversionDict") but does not support
+    modifications.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ImmutableTypeConversionDict.copy"} module={"werkzeug.datastructures"} fullname={"ImmutableTypeConversionDict.copy"} description={"Return a shallow mutable copy of this object.  Keep in mind that\nthe standard library\u2019s copy() function is a no-op for this class\nlike for any other python immutable type (eg: tuple)."} parameters={[]}>
+      <Outline.Signature fullname="ImmutableTypeConversionDict.copy" id="werkzeug.datastructures.ImmutableTypeConversionDict.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a shallow mutable copy of this object.  Keep in mind that
+        the standard library’s [<code>copy()</code>](#werkzeug.datastructures.ImmutableTypeConversionDict.copy "werkzeug.datastructures.ImmutableTypeConversionDict.copy") function is a no-op for this class
+        like for any other python immutable type (eg: [<code>tuple</code>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")).
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.MultiDict"} module={"werkzeug.datastructures"} fullname={"MultiDict"} parameters={["mapping"]} description={"A MultiDict is a dictionary subclass customized to deal with\nmultiple values for the same key which is for example used by the parsing\nfunctions in the wrappers.  This is necessary because some HTML form\nelements pass multiple values for the same key."}>
+  <Outline.Signature fullname="MultiDict" id="werkzeug.datastructures.MultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>MultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") is a dictionary subclass customized to deal with
+    multiple values for the same key which is for example used by the parsing
+    functions in the wrappers.  This is necessary because some HTML form
+    elements pass multiple values for the same key.
+
+    [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") implements all standard dictionary methods.
+    Internally, it saves all values for a key as a list, but the standard dict
+    access methods will only return the first value for a key. If you want to
+    gain access to the other values, too, you have to use the <cite>list</cite> methods as
+    explained below.
+
+    Basic Usage:
+
+    ```python
+    >>> d = MultiDict([('a', 'b'), ('a', 'c')])
+    >>> d
+    MultiDict([('a', 'b'), ('a', 'c')])
+    >>> d['a']
+    'b'
+    >>> d.getlist('a')
+    ['b', 'c']
+    >>> 'a' in d
+    True
+    ```
+
+    It behaves like a normal dict thus all dict functions will only return the
+    first value when multiple values for one key are found.
+
+    From Werkzeug 0.3 onwards, the <cite>KeyError</cite> raised by this class is also a
+    subclass of the <code>BadRequest</code> HTTP exception and will
+    render a page for a <code>400 BAD REQUEST</code> if caught in a catch-all for HTTP
+    exceptions.
+
+    A [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") can be constructed from an iterable of
+    <code>(key, value)</code> tuples, a dict, a [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") or from Werkzeug 0.2
+    onwards some keyword parameters.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>mapping</Outline.ParameterTarget> – the initial value for the [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").  Either a
+          regular dict, an iterable of <code>(key, value)</code> tuples
+          or <cite>None</cite>.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.add"} module={"werkzeug.datastructures"} fullname={"MultiDict.add"} parameters={["key", "value"]} description={"Adds a new value for the key."}>
+      <Outline.Signature fullname="MultiDict.add" id="werkzeug.datastructures.MultiDict.add">
+        <Outline.Name>add</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">value</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Adds a new value for the key.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.6.</span>
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – the key for the value.
+              - <Outline.ParameterTarget>value</Outline.ParameterTarget> – the value to add.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.clear"} module={"werkzeug.datastructures"} fullname={"MultiDict.clear"} parameters={[]} description={"A MultiDict is a dictionary subclass customized to deal with\nmultiple values for the same key which is for example used by the parsing\nfunctions in the wrappers.  This is necessary because some HTML form\nelements pass multiple values for the same key."}>
+      <Outline.Signature fullname="MultiDict.clear" id="werkzeug.datastructures.MultiDict.clear">
+        <Outline.Name>clear</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>None.  Remove all items from D.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.copy"} module={"werkzeug.datastructures"} fullname={"MultiDict.copy"} parameters={[]} description={"Return a shallow copy of this object."}>
+      <Outline.Signature fullname="MultiDict.copy" id="werkzeug.datastructures.MultiDict.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a shallow copy of this object.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.deepcopy"} module={"werkzeug.datastructures"} fullname={"MultiDict.deepcopy"} parameters={["memo"]} description={"Return a deep copy of this object."}>
+      <Outline.Signature fullname="MultiDict.deepcopy" id="werkzeug.datastructures.MultiDict.deepcopy">
+        <Outline.Name>deepcopy</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">memo</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a deep copy of this object.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.fromkeys"} module={"werkzeug.datastructures"} fullname={"MultiDict.fromkeys"} parameters={["value"]} description={"Create a new dictionary with keys from iterable and values set to value."}>
+      <Outline.Signature fullname="MultiDict.fromkeys" id="werkzeug.datastructures.MultiDict.fromkeys">
+        <Outline.Name>fromkeys</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">value</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span>/</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Create a new dictionary with keys from iterable and values set to value.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.get"} module={"werkzeug.datastructures"} fullname={"MultiDict.get"} parameters={["key", "default", "type"]} description={"Return the default value if the requested data doesn\u2019t exist.\nIf type is provided and is a callable it should convert the value,\nreturn it or raise a ValueError if that is not possible.  In\nthis case the function will return the default as if the value was not\nfound:"}>
+      <Outline.Signature fullname="MultiDict.get" id="werkzeug.datastructures.MultiDict.get">
+        <Outline.Name>get</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">type</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the default value if the requested data doesn’t exist.
+        If <cite>type</cite> is provided and is a callable it should convert the value,
+        return it or raise a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") if that is not possible.  In
+        this case the function will return the default as if the value was not
+        found:
+
+        ```python
+        >>> d = TypeConversionDict(foo='42', bar='blub')
+        >>> d.get('foo', type=int)
+        42
+        >>> d.get('bar', -1, type=int)
+        -1
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – The default value to be returned if the key can’t
+                be looked up.  If not further specified <cite>None</cite> is
+                returned.
+              - <Outline.ParameterTarget>type</Outline.ParameterTarget> – A callable that is used to cast the value in the
+                [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").  If a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") is raised
+                by this callable the default value is returned.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.getlist"} module={"werkzeug.datastructures"} fullname={"MultiDict.getlist"} parameters={["key", "type"]} description={"Return the list of items for a given key. If that key is not in the\nMultiDict, the return value will be an empty list.  Just like get,\ngetlist accepts a type parameter.  All items will be converted\nwith the callable defined there."}>
+      <Outline.Signature fullname="MultiDict.getlist" id="werkzeug.datastructures.MultiDict.getlist">
+        <Outline.Name>getlist</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">type</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the list of items for a given key. If that key is not in the
+        <cite>MultiDict</cite>, the return value will be an empty list.  Just like <cite>get</cite>,
+        <cite>getlist</cite> accepts a <cite>type</cite> parameter.  All items will be converted
+        with the callable defined there.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>type</Outline.ParameterTarget> – A callable that is used to cast the value in the
+                [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").  If a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") is raised
+                by this callable the value will be removed from the list.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              a [<code>list</code>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)") of all the values for the key.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.items"} module={"werkzeug.datastructures"} fullname={"MultiDict.items"} parameters={["multi"]} description={"Return an iterator of (key, value) pairs."}>
+      <Outline.Signature fullname="MultiDict.items" id="werkzeug.datastructures.MultiDict.items">
+        <Outline.Name>items</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">multi</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return an iterator of <code>(key, value)</code> pairs.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>multi</Outline.ParameterTarget> – If set to <cite>True</cite> the iterator returned will have a pair
+              for each value of each key.  Otherwise it will only
+              contain pairs for the first value of each key.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.keys"} module={"werkzeug.datastructures"} fullname={"MultiDict.keys"} parameters={[]} description={"A MultiDict is a dictionary subclass customized to deal with\nmultiple values for the same key which is for example used by the parsing\nfunctions in the wrappers.  This is necessary because some HTML form\nelements pass multiple values for the same key."}>
+      <Outline.Signature fullname="MultiDict.keys" id="werkzeug.datastructures.MultiDict.keys">
+        <Outline.Name>keys</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a set-like object providing a view on D's keys</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.lists"} module={"werkzeug.datastructures"} fullname={"MultiDict.lists"} parameters={[]} description={"Return a iterator of (key, values) pairs, where values is the list\nof all values associated with the key."}>
+      <Outline.Signature fullname="MultiDict.lists" id="werkzeug.datastructures.MultiDict.lists">
+        <Outline.Name>lists</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a iterator of <code>(key, values)</code> pairs, where values is the list
+        of all values associated with the key.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.listvalues"} module={"werkzeug.datastructures"} fullname={"MultiDict.listvalues"} parameters={[]} description={"Return an iterator of all values associated with a key.  Zipping\nkeys() and this is the same as calling lists():"}>
+      <Outline.Signature fullname="MultiDict.listvalues" id="werkzeug.datastructures.MultiDict.listvalues">
+        <Outline.Name>listvalues</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return an iterator of all values associated with a key.  Zipping
+        [<code>keys()</code>](#werkzeug.datastructures.MultiDict.keys "werkzeug.datastructures.MultiDict.keys") and this is the same as calling [<code>lists()</code>](#werkzeug.datastructures.MultiDict.lists "werkzeug.datastructures.MultiDict.lists"):
+
+        ```python
+        >>> d = MultiDict({"foo": [1, 2, 3]})
+        >>> zip(d.keys(), d.listvalues()) == d.lists()
+        True
+        ```
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.pop"} module={"werkzeug.datastructures"} fullname={"MultiDict.pop"} parameters={["key", "default=no value"]} description={"Pop the first item for a list on the dict.  Afterwards the\nkey is removed from the dict, so additional values are discarded:"}>
+      <Outline.Signature fullname="MultiDict.pop" id="werkzeug.datastructures.MultiDict.pop">
+        <Outline.Name>pop</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default=no value</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Pop the first item for a list on the dict.  Afterwards the
+        key is removed from the dict, so additional values are discarded:
+
+        ```python
+        >>> d = MultiDict({"foo": [1, 2, 3]})
+        >>> d.pop("foo")
+        1
+        >>> "foo" in d
+        False
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – the key to pop.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – if provided the value to return if the key was
+                not in the dictionary.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.popitem"} module={"werkzeug.datastructures"} fullname={"MultiDict.popitem"} parameters={[]} description={"Pop an item from the dict."}>
+      <Outline.Signature fullname="MultiDict.popitem" id="werkzeug.datastructures.MultiDict.popitem">
+        <Outline.Name>popitem</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Pop an item from the dict.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.popitemlist"} module={"werkzeug.datastructures"} fullname={"MultiDict.popitemlist"} parameters={[]} description={"Pop a (key, list) tuple from the dict."}>
+      <Outline.Signature fullname="MultiDict.popitemlist" id="werkzeug.datastructures.MultiDict.popitemlist">
+        <Outline.Name>popitemlist</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Pop a <code>(key, list)</code> tuple from the dict.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.poplist"} module={"werkzeug.datastructures"} fullname={"MultiDict.poplist"} parameters={["key"]} description={"Pop the list for a key from the dict.  If the key is not in the dict\nan empty list is returned."}>
+      <Outline.Signature fullname="MultiDict.poplist" id="werkzeug.datastructures.MultiDict.poplist">
+        <Outline.Name>poplist</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Pop the list for a key from the dict.  If the key is not in the dict
+        an empty list is returned.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>If the key does no longer exist a list is returned instead of
+          raising an error.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.setdefault"} module={"werkzeug.datastructures"} fullname={"MultiDict.setdefault"} parameters={["key", "default"]} description={"Returns the value for the key if it is in the dict, otherwise it\nreturns default and sets that value for key."}>
+      <Outline.Signature fullname="MultiDict.setdefault" id="werkzeug.datastructures.MultiDict.setdefault">
+        <Outline.Name>setdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns the value for the key if it is in the dict, otherwise it
+        returns <cite>default</cite> and sets that value for <cite>key</cite>.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – The default value to be returned if the key is not
+                in the dict.  If not further specified it’s <cite>None</cite>.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.setlist"} module={"werkzeug.datastructures"} fullname={"MultiDict.setlist"} parameters={["key", "new_list"]} description={"Remove the old values for a key and add new ones.  Note that the list\nyou pass the values in will be shallow-copied before it is inserted in\nthe dictionary."}>
+      <Outline.Signature fullname="MultiDict.setlist" id="werkzeug.datastructures.MultiDict.setlist">
+        <Outline.Name>setlist</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">new\_list</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove the old values for a key and add new ones.  Note that the list
+        you pass the values in will be shallow-copied before it is inserted in
+        the dictionary.
+
+        ```python
+        >>> d = MultiDict()
+        >>> d.setlist('foo', ['1', '2'])
+        >>> d['foo']
+        '1'
+        >>> d.getlist('foo')
+        ['1', '2']
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key for which the values are set.
+              - <Outline.ParameterTarget>new\_list</Outline.ParameterTarget> – An iterable with the new values for the key.  Old values
+                are removed first.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.setlistdefault"} module={"werkzeug.datastructures"} fullname={"MultiDict.setlistdefault"} parameters={["key", "default_list"]} description={"Like setdefault but sets multiple values.  The list returned\nis not a copy, but the list that is actually used internally.  This\nmeans that you can put new values into the dict by appending items\nto the list:"}>
+      <Outline.Signature fullname="MultiDict.setlistdefault" id="werkzeug.datastructures.MultiDict.setlistdefault">
+        <Outline.Name>setlistdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_list</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Like <cite>setdefault</cite> but sets multiple values.  The list returned
+        is not a copy, but the list that is actually used internally.  This
+        means that you can put new values into the dict by appending items
+        to the list:
+
+        ```python
+        >>> d = MultiDict({"foo": 1})
+        >>> d.setlistdefault("foo").extend([2, 3])
+        >>> d.getlist("foo")
+        [1, 2, 3]
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>default\_list</Outline.ParameterTarget> – An iterable of default values.  It is either copied
+                (in case it was a list) or converted into a list
+                before returned.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              a [<code>list</code>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.to_dict"} module={"werkzeug.datastructures"} fullname={"MultiDict.to_dict"} parameters={["flat"]} description={"Return the contents as regular dict.  If flat is True the\nreturned dict will only have the first item present, if flat is\nFalse all values will be returned as lists."}>
+      <Outline.Signature fullname="MultiDict.to_dict" id="werkzeug.datastructures.MultiDict.to_dict">
+        <Outline.Name>to\_dict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">flat</span><span>=</span><span>True</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the contents as regular dict.  If <cite>flat</cite> is <cite>True</cite> the
+        returned dict will only have the first item present, if <cite>flat</cite> is
+        <cite>False</cite> all values will be returned as lists.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>flat</Outline.ParameterTarget> – If set to <cite>False</cite> the dict returned will have lists
+              with all the values in it.  Otherwise it will only
+              contain the first value for each key.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              a [<code>dict</code>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.update"} module={"werkzeug.datastructures"} fullname={"MultiDict.update"} parameters={["mapping"]} description={"update() extends rather than replaces existing key lists:"}>
+      <Outline.Signature fullname="MultiDict.update" id="werkzeug.datastructures.MultiDict.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        update() extends rather than replaces existing key lists:
+
+        ```python
+        >>> a = MultiDict({'x': 1})
+        >>> b = MultiDict({'x': 2, 'y': 3})
+        >>> a.update(b)
+        >>> a
+        MultiDict([('y', 3), ('x', 1), ('x', 2)])
+        ```
+
+        If the value list for a key in <code>other\_dict</code> is empty, no new values
+        will be added to the dict and the key will not be created:
+
+        ```python
+        >>> x = {'empty_list': []}
+        >>> y = MultiDict()
+        >>> y.update(x)
+        >>> y
+        MultiDict([])
+        ```
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.MultiDict.values"} module={"werkzeug.datastructures"} fullname={"MultiDict.values"} parameters={[]} description={"Returns an iterator of the first value on every key\u2019s value list."}>
+      <Outline.Signature fullname="MultiDict.values" id="werkzeug.datastructures.MultiDict.values">
+        <Outline.Name>values</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns an iterator of the first value on every key’s value list.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.OrderedMultiDict"} module={"werkzeug.datastructures"} fullname={"OrderedMultiDict"} parameters={["mapping"]} description={"Works like a regular MultiDict but preserves the\norder of the fields.  To convert the ordered multi dict into a\nlist you can use the items() method and pass it multi=True."}>
+  <Outline.Signature fullname="OrderedMultiDict" id="werkzeug.datastructures.OrderedMultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>OrderedMultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Works like a regular [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") but preserves the
+    order of the fields.  To convert the ordered multi dict into a
+    list you can use the <code>items()</code> method and pass it <code>multi=True</code>.
+
+    In general an [<code>OrderedMultiDict</code>](#werkzeug.datastructures.OrderedMultiDict "werkzeug.datastructures.OrderedMultiDict") is an order of magnitude
+    slower than a [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").
+
+    <Container type="admonition" title={"note"}>
+      Due to a limitation in Python you cannot convert an ordered
+      multi dict into a regular dict by using <code>dict(multidict)</code>.
+      Instead you have to use the <code>to\_dict()</code> method, otherwise
+      the internal bucket objects are exposed.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ImmutableMultiDict"} module={"werkzeug.datastructures"} fullname={"ImmutableMultiDict"} parameters={["mapping"]} description={"An immutable MultiDict."}>
+  <Outline.Signature fullname="ImmutableMultiDict" id="werkzeug.datastructures.ImmutableMultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ImmutableMultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An immutable [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict").
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ImmutableMultiDict.copy"} module={"werkzeug.datastructures"} fullname={"ImmutableMultiDict.copy"} parameters={[]} description={"Return a shallow mutable copy of this object.  Keep in mind that\nthe standard library\u2019s copy() function is a no-op for this class\nlike for any other python immutable type (eg: tuple)."}>
+      <Outline.Signature fullname="ImmutableMultiDict.copy" id="werkzeug.datastructures.ImmutableMultiDict.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a shallow mutable copy of this object.  Keep in mind that
+        the standard library’s [<code>copy()</code>](#werkzeug.datastructures.ImmutableMultiDict.copy "werkzeug.datastructures.ImmutableMultiDict.copy") function is a no-op for this class
+        like for any other python immutable type (eg: [<code>tuple</code>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")).
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ImmutableOrderedMultiDict"} module={"werkzeug.datastructures"} fullname={"ImmutableOrderedMultiDict"} parameters={["mapping"]} description={"An immutable OrderedMultiDict."}>
+  <Outline.Signature fullname="ImmutableOrderedMultiDict" id="werkzeug.datastructures.ImmutableOrderedMultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ImmutableOrderedMultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An immutable [<code>OrderedMultiDict</code>](#werkzeug.datastructures.OrderedMultiDict "werkzeug.datastructures.OrderedMultiDict").
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.6.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ImmutableOrderedMultiDict.copy"} module={"werkzeug.datastructures"} fullname={"ImmutableOrderedMultiDict.copy"} parameters={[]} description={"Return a shallow mutable copy of this object.  Keep in mind that\nthe standard library\u2019s copy() function is a no-op for this class\nlike for any other python immutable type (eg: tuple)."}>
+      <Outline.Signature fullname="ImmutableOrderedMultiDict.copy" id="werkzeug.datastructures.ImmutableOrderedMultiDict.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a shallow mutable copy of this object.  Keep in mind that
+        the standard library’s [<code>copy()</code>](#werkzeug.datastructures.ImmutableOrderedMultiDict.copy "werkzeug.datastructures.ImmutableOrderedMultiDict.copy") function is a no-op for this class
+        like for any other python immutable type (eg: [<code>tuple</code>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")).
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.CombinedMultiDict"} module={"werkzeug.datastructures"} fullname={"CombinedMultiDict"} parameters={["dicts"]} description={"A read only MultiDict that you can pass multiple MultiDict\ninstances as sequence and it will combine the return values of all wrapped\ndicts:"}>
+  <Outline.Signature fullname="CombinedMultiDict" id="werkzeug.datastructures.CombinedMultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>CombinedMultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">dicts</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A read only [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") that you can pass multiple [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict")
+    instances as sequence and it will combine the return values of all wrapped
+    dicts:
+
+    ```python
+    >>> from werkzeug.datastructures import CombinedMultiDict, MultiDict
+    >>> post = MultiDict([('foo', 'bar')])
+    >>> get = MultiDict([('blub', 'blah')])
+    >>> combined = CombinedMultiDict([get, post])
+    >>> combined['foo']
+    'bar'
+    >>> combined['blub']
+    'blah'
+    ```
+
+    This works for all read operations and will raise a <cite>TypeError</cite> for
+    methods that usually change data which isn’t possible.
+
+    From Werkzeug 0.3 onwards, the <cite>KeyError</cite> raised by this class is also a
+    subclass of the <code>BadRequest</code> HTTP exception and will
+    render a page for a <code>400 BAD REQUEST</code> if caught in a catch-all for HTTP
+    exceptions.
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ImmutableDict"} module={"werkzeug.datastructures"} fullname={"ImmutableDict"} description={"An immutable dict."}>
+  <Outline.Signature fullname="ImmutableDict" id="werkzeug.datastructures.ImmutableDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ImmutableDict</Outline.Name>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An immutable [<code>dict</code>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)").
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ImmutableDict.copy"} module={"werkzeug.datastructures"} fullname={"ImmutableDict.copy"} description={"Return a shallow mutable copy of this object.  Keep in mind that\nthe standard library\u2019s copy() function is a no-op for this class\nlike for any other python immutable type (eg: tuple)."} parameters={[]}>
+      <Outline.Signature fullname="ImmutableDict.copy" id="werkzeug.datastructures.ImmutableDict.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a shallow mutable copy of this object.  Keep in mind that
+        the standard library’s [<code>copy()</code>](#werkzeug.datastructures.ImmutableDict.copy "werkzeug.datastructures.ImmutableDict.copy") function is a no-op for this class
+        like for any other python immutable type (eg: [<code>tuple</code>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")).
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ImmutableList"} module={"werkzeug.datastructures"} fullname={"ImmutableList"} parameters={["iterable"]} description={"An immutable list."}>
+  <Outline.Signature fullname="ImmutableList" id="werkzeug.datastructures.ImmutableList">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ImmutableList</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">iterable</span><span>=</span><span>()</span></Outline.Parameter>, <Outline.Parameter><span>/</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An immutable [<code>list</code>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)").
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Private
+        </dt>
+
+        <dd className="field-body" />
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.FileMultiDict"} module={"werkzeug.datastructures"} fullname={"FileMultiDict"} parameters={["mapping"]} description={"A special MultiDict that has convenience methods to add\nfiles to it.  This is used for EnvironBuilder and generally\nuseful for unittesting."}>
+  <Outline.Signature fullname="FileMultiDict" id="werkzeug.datastructures.FileMultiDict">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>FileMultiDict</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">mapping</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A special [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict") that has convenience methods to add
+    files to it.  This is used for <code>EnvironBuilder</code> and generally
+    useful for unittesting.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.FileMultiDict.add_file"} module={"werkzeug.datastructures"} fullname={"FileMultiDict.add_file"} parameters={["name", "file", "filename", "content_type"]} description={"Adds a new file to the dict.  file can be a file name or\na file-like or a FileStorage object."}>
+      <Outline.Signature fullname="FileMultiDict.add_file" id="werkzeug.datastructures.FileMultiDict.add_file">
+        <Outline.Name>add\_file</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">name</span></Outline.Parameter>, <Outline.Parameter><span className="name">file</span></Outline.Parameter>, <Outline.Parameter><span className="name">filename</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">content\_type</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Adds a new file to the dict.  <cite>file</cite> can be a file name or
+        a <code>file</code>-like or a [<code>FileStorage</code>](#werkzeug.datastructures.FileStorage "werkzeug.datastructures.FileStorage") object.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>name</Outline.ParameterTarget> – the name of the field.
+              - <Outline.ParameterTarget>file</Outline.ParameterTarget> – a filename or <code>file</code>-like object
+              - <Outline.ParameterTarget>filename</Outline.ParameterTarget> – an optional filename
+              - <Outline.ParameterTarget>content\_type</Outline.ParameterTarget> – an optional content type
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+:target{#http-related}
+
+## HTTP Related
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.Headers"} module={"werkzeug.datastructures"} fullname={"Headers"} parameters={["defaults"]} description={"An object that stores some headers. It has a dict-like interface,\nbut is ordered, can store the same key multiple times, and iterating\nyields (key, value) pairs instead of only keys."}>
+  <Outline.Signature fullname="Headers" id="werkzeug.datastructures.Headers">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>Headers</Outline.Name><Outline.ParameterList><span>(</span>\[<Outline.Parameter><span className="name">defaults</span></Outline.Parameter>]<span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An object that stores some headers. It has a dict-like interface,
+    but is ordered, can store the same key multiple times, and iterating
+    yields <code>(key, value)</code> pairs instead of only keys.
+
+    This data structure is useful if you want a nicer way to handle WSGI
+    headers which are stored as tuples in a list.
+
+    From Werkzeug 0.3 onwards, the [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") raised by this class is
+    also a subclass of the <code>BadRequest</code> HTTP exception
+    and will render a page for a <code>400 BAD REQUEST</code> if caught in a
+    catch-all for HTTP exceptions.
+
+    Headers is mostly compatible with the Python [<code>wsgiref.headers.Headers</code>](https://docs.python.org/3/library/wsgiref.html#wsgiref.headers.Headers "(in Python v3.11)")
+    class, with the exception of <cite>\_\_getitem\_\_</cite>.  [<code>wsgiref</code>](https://docs.python.org/3/library/wsgiref.html#module-wsgiref "(in Python v3.11)") will return
+    <cite>None</cite> for <code>headers\['missing']</code>, whereas [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers") will raise
+    a [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)").
+
+    To create a new <code>Headers</code> object, pass it a list, dict, or
+    other <code>Headers</code> object with default values. These values are
+    validated the same way values added later are.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>defaults</Outline.ParameterTarget> – The list of default values for the [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers").
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1.0: </span>Default values are validated the same as values added later.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.9: </span>This data structure now stores unicode values similar to how the
+      multi dicts do it.  The main difference is that bytes can be set as
+      well which will automatically be latin1 decoded.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.9: </span>The <code>linked()</code> function was removed without replacement as it
+      was an API that does not support the changes to the encoding model.
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.add"} module={"werkzeug.datastructures"} fullname={"Headers.add"} parameters={["_key", "_value", "kw"]} description={"Add a new header tuple to the list."}>
+      <Outline.Signature fullname="Headers.add" id="werkzeug.datastructures.Headers.add">
+        <Outline.Name>add</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">\_key</span></Outline.Parameter>, <Outline.Parameter><span className="name">\_value</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Add a new header tuple to the list.
+
+        Keyword arguments can specify additional parameters for the header
+        value, with underscores converted to dashes:
+
+        ```default
+        >>> d = Headers()
+        >>> d.add('Content-Type', 'text/plain')
+        >>> d.add('Content-Disposition', 'attachment', filename='foo.png')
+        ```
+
+        The keyword argument dumping uses <code>dump\_options\_header()</code>
+        behind the scenes.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.4.1: </span>keyword arguments were added for [<code>wsgiref</code>](https://docs.python.org/3/library/wsgiref.html#module-wsgiref "(in Python v3.11)") compatibility.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.add_header"} module={"werkzeug.datastructures"} fullname={"Headers.add_header"} parameters={["_key", "_value", "_kw"]} description={"Add a new header tuple to the list."}>
+      <Outline.Signature fullname="Headers.add_header" id="werkzeug.datastructures.Headers.add_header">
+        <Outline.Name>add\_header</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">\_key</span></Outline.Parameter>, <Outline.Parameter><span className="name">\_value</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">\_kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Add a new header tuple to the list.
+
+        An alias for [<code>add()</code>](#werkzeug.datastructures.Headers.add "werkzeug.datastructures.Headers.add") for compatibility with the [<code>wsgiref</code>](https://docs.python.org/3/library/wsgiref.html#module-wsgiref "(in Python v3.11)")
+        [<code>add\_header()</code>](https://docs.python.org/3/library/wsgiref.html#wsgiref.headers.Headers.add_header "(in Python v3.11)") method.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.clear"} module={"werkzeug.datastructures"} fullname={"Headers.clear"} parameters={[]} description={"Clears all headers."}>
+      <Outline.Signature fullname="Headers.clear" id="werkzeug.datastructures.Headers.clear">
+        <Outline.Name>clear</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Clears all headers.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.extend"} module={"werkzeug.datastructures"} fullname={"Headers.extend"} parameters={["args", "kwargs"]} description={"Extend headers in this object with items from another object\ncontaining header items as well as keyword arguments."}>
+      <Outline.Signature fullname="Headers.extend" id="werkzeug.datastructures.Headers.extend">
+        <Outline.Name>extend</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Extend headers in this object with items from another object
+        containing header items as well as keyword arguments.
+
+        To replace existing keys instead of extending, use
+        [<code>update()</code>](#werkzeug.datastructures.Headers.update "werkzeug.datastructures.Headers.update") instead.
+
+        If provided, the first argument can be another [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers")
+        object, a [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict"), [<code>dict</code>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)"), or iterable of
+        pairs.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 1.0: </span>Support [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict"). Allow passing <code>kwargs</code>.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.get"} module={"werkzeug.datastructures"} fullname={"Headers.get"} parameters={["key", "default", "type", "as_bytes"]} description={"Return the default value if the requested data doesn\u2019t exist.\nIf type is provided and is a callable it should convert the value,\nreturn it or raise a ValueError if that is not possible.  In\nthis case the function will return the default as if the value was not\nfound:"}>
+      <Outline.Signature fullname="Headers.get" id="werkzeug.datastructures.Headers.get">
+        <Outline.Name>get</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">type</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">as\_bytes</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the default value if the requested data doesn’t exist.
+        If <cite>type</cite> is provided and is a callable it should convert the value,
+        return it or raise a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") if that is not possible.  In
+        this case the function will return the default as if the value was not
+        found:
+
+        ```python
+        >>> d = Headers([('Content-Length', '42')])
+        >>> d.get('Content-Length', type=int)
+        42
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – The default value to be returned if the key can’t
+                be looked up.  If not further specified <cite>None</cite> is
+                returned.
+              - <Outline.ParameterTarget>type</Outline.ParameterTarget> – A callable that is used to cast the value in the
+                [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers").  If a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") is raised
+                by this callable the default value is returned.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>The <code>as\_bytes</code> parameter is deprecated and will be removed
+          in Werkzeug 3.0.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.9: </span>The <code>as\_bytes</code> parameter was added.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.get_all"} module={"werkzeug.datastructures"} fullname={"Headers.get_all"} parameters={["name"]} description={"Return a list of all the values for the named field."}>
+      <Outline.Signature fullname="Headers.get_all" id="werkzeug.datastructures.Headers.get_all">
+        <Outline.Name>get\_all</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">name</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a list of all the values for the named field.
+
+        This method is compatible with the [<code>wsgiref</code>](https://docs.python.org/3/library/wsgiref.html#module-wsgiref "(in Python v3.11)")
+        [<code>get\_all()</code>](https://docs.python.org/3/library/wsgiref.html#wsgiref.headers.Headers.get_all "(in Python v3.11)") method.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.getlist"} module={"werkzeug.datastructures"} fullname={"Headers.getlist"} parameters={["key", "type", "as_bytes"]} description={"Return the list of items for a given key. If that key is not in the\nHeaders, the return value will be an empty list.  Just like\nget(), getlist() accepts a type parameter.  All items will\nbe converted with the callable defined there."}>
+      <Outline.Signature fullname="Headers.getlist" id="werkzeug.datastructures.Headers.getlist">
+        <Outline.Name>getlist</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">type</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">as\_bytes</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the list of items for a given key. If that key is not in the
+        [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers"), the return value will be an empty list.  Just like
+        [<code>get()</code>](#werkzeug.datastructures.Headers.get "werkzeug.datastructures.Headers.get"), [<code>getlist()</code>](#werkzeug.datastructures.Headers.getlist "werkzeug.datastructures.Headers.getlist") accepts a <cite>type</cite> parameter.  All items will
+        be converted with the callable defined there.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+              - <Outline.ParameterTarget>type</Outline.ParameterTarget> – A callable that is used to cast the value in the
+                [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers").  If a [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") is raised
+                by this callable the value will be removed from the list.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              a [<code>list</code>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)") of all the values for the key.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>The <code>as\_bytes</code> parameter is deprecated and will be removed
+          in Werkzeug 3.0.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.9: </span>The <code>as\_bytes</code> parameter was added.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.pop"} module={"werkzeug.datastructures"} fullname={"Headers.pop"} parameters={["key=None", "default=no value"]} description={"Removes and returns a key or index."}>
+      <Outline.Signature fullname="Headers.pop" id="werkzeug.datastructures.Headers.pop">
+        <Outline.Name>pop</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key=None</span></Outline.Parameter>, <Outline.Parameter><span className="name">default=no value</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Removes and returns a key or index.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be popped.  If this is an integer the item at
+              that position is removed, if it’s a string the value for
+              that key is.  If the key is omitted or <cite>None</cite> the last
+              item is removed.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              an item.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.popitem"} module={"werkzeug.datastructures"} fullname={"Headers.popitem"} parameters={[]} description={"Removes a key or index and returns a (key, value) item."}>
+      <Outline.Signature fullname="Headers.popitem" id="werkzeug.datastructures.Headers.popitem">
+        <Outline.Name>popitem</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Removes a key or index and returns a (key, value) item.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.remove"} module={"werkzeug.datastructures"} fullname={"Headers.remove"} parameters={["key"]} description={"Remove a key."}>
+      <Outline.Signature fullname="Headers.remove" id="werkzeug.datastructures.Headers.remove">
+        <Outline.Name>remove</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove a key.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be removed.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.set"} module={"werkzeug.datastructures"} fullname={"Headers.set"} parameters={["_key", "_value", "kw"]} description={"Remove all header tuples for key and add a new one.  The newly\nadded key either appears at the end of the list if there was no\nentry or replaces the first one."}>
+      <Outline.Signature fullname="Headers.set" id="werkzeug.datastructures.Headers.set">
+        <Outline.Name>set</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">\_key</span></Outline.Parameter>, <Outline.Parameter><span className="name">\_value</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove all header tuples for <cite>key</cite> and add a new one.  The newly
+        added key either appears at the end of the list if there was no
+        entry or replaces the first one.
+
+        Keyword arguments can specify additional parameters for the header
+        value, with underscores converted to dashes.  See [<code>add()</code>](#werkzeug.datastructures.Headers.add "werkzeug.datastructures.Headers.add") for
+        more information.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.6.1: </span>[<code>set()</code>](#werkzeug.datastructures.Headers.set "werkzeug.datastructures.Headers.set") now accepts the same arguments as [<code>add()</code>](#werkzeug.datastructures.Headers.add "werkzeug.datastructures.Headers.add").
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be inserted.
+              - <Outline.ParameterTarget>value</Outline.ParameterTarget> – The value to be inserted.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.setdefault"} module={"werkzeug.datastructures"} fullname={"Headers.setdefault"} parameters={["key", "default"]} description={"Return the first value for the key if it is in the headers,\notherwise set the header to the value given by default and\nreturn that."}>
+      <Outline.Signature fullname="Headers.setdefault" id="werkzeug.datastructures.Headers.setdefault">
+        <Outline.Name>setdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the first value for the key if it is in the headers,
+        otherwise set the header to the value given by <code>default</code> and
+        return that.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The header key to get.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – The value to set for the key if it is not in the
+                headers.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.setlist"} module={"werkzeug.datastructures"} fullname={"Headers.setlist"} parameters={["key", "values"]} description={"Remove any existing values for a header and add new ones."}>
+      <Outline.Signature fullname="Headers.setlist" id="werkzeug.datastructures.Headers.setlist">
+        <Outline.Name>setlist</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">values</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove any existing values for a header and add new ones.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The header key to set.
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> – An iterable of values to set for the key.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 1.0.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.setlistdefault"} module={"werkzeug.datastructures"} fullname={"Headers.setlistdefault"} parameters={["key", "default"]} description={"Return the list of values for the key if it is in the\nheaders, otherwise set the header to the list of values given\nby default and return that."}>
+      <Outline.Signature fullname="Headers.setlistdefault" id="werkzeug.datastructures.Headers.setlistdefault">
+        <Outline.Name>setlistdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the list of values for the key if it is in the
+        headers, otherwise set the header to the list of values given
+        by <code>default</code> and return that.
+
+        Unlike [<code>MultiDict.setlistdefault()</code>](#werkzeug.datastructures.MultiDict.setlistdefault "werkzeug.datastructures.MultiDict.setlistdefault"), modifying the returned
+        list will not affect the headers.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> – The header key to get.
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – An iterable of values to set for the key if it
+                is not in the headers.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 1.0.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.to_wsgi_list"} module={"werkzeug.datastructures"} fullname={"Headers.to_wsgi_list"} parameters={[]} description={"Convert the headers into a list suitable for WSGI."}>
+      <Outline.Signature fullname="Headers.to_wsgi_list" id="werkzeug.datastructures.Headers.to_wsgi_list">
+        <Outline.Name>to\_wsgi\_list</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Convert the headers into a list suitable for WSGI.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              list
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Headers.update"} module={"werkzeug.datastructures"} fullname={"Headers.update"} parameters={["args", "kwargs"]} description={"Replace headers in this object with items from another\nheaders object and keyword arguments."}>
+      <Outline.Signature fullname="Headers.update" id="werkzeug.datastructures.Headers.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Replace headers in this object with items from another
+        headers object and keyword arguments.
+
+        To extend existing keys instead of replacing, use [<code>extend()</code>](#werkzeug.datastructures.Headers.extend "werkzeug.datastructures.Headers.extend")
+        instead.
+
+        If provided, the first argument can be another [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers")
+        object, a [<code>MultiDict</code>](#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict"), [<code>dict</code>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)"), or iterable of
+        pairs.
+
+        <Container type="info" title="Version added">
+          <span>New in version 1.0.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.EnvironHeaders"} module={"werkzeug.datastructures"} fullname={"EnvironHeaders"} parameters={["environ"]} description={"Read only version of the headers from a WSGI environment.  This\nprovides the same interface as Headers and is constructed from\na WSGI environment.\nFrom Werkzeug 0.3 onwards, the KeyError raised by this class is also a\nsubclass of the BadRequest HTTP exception and will\nrender a page for a 400 BAD REQUEST if caught in a catch-all for\nHTTP exceptions."}>
+  <Outline.Signature fullname="EnvironHeaders" id="werkzeug.datastructures.EnvironHeaders">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>EnvironHeaders</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Read only version of the headers from a WSGI environment.  This
+    provides the same interface as <cite>Headers</cite> and is constructed from
+    a WSGI environment.
+    From Werkzeug 0.3 onwards, the <cite>KeyError</cite> raised by this class is also a
+    subclass of the <code>BadRequest</code> HTTP exception and will
+    render a page for a <code>400 BAD REQUEST</code> if caught in a catch-all for
+    HTTP exceptions.
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.HeaderSet"} module={"werkzeug.datastructures"} fullname={"HeaderSet"} parameters={["headers", "on_update"]} description={"Similar to the ETags class this implements a set-like structure.\nUnlike ETags this is case insensitive and used for vary, allow, and\ncontent-language headers."}>
+  <Outline.Signature fullname="HeaderSet" id="werkzeug.datastructures.HeaderSet">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>HeaderSet</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">headers</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">on\_update</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Similar to the [<code>ETags</code>](#werkzeug.datastructures.ETags "werkzeug.datastructures.ETags") class this implements a set-like structure.
+    Unlike [<code>ETags</code>](#werkzeug.datastructures.ETags "werkzeug.datastructures.ETags") this is case insensitive and used for vary, allow, and
+    content-language headers.
+
+    If not constructed using the <code>parse\_set\_header()</code> function the
+    instantiation works like this:
+
+    ```python
+    >>> hs = HeaderSet(['foo', 'bar', 'baz'])
+    >>> hs
+    HeaderSet(['foo', 'bar', 'baz'])
+    ```
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.add"} module={"werkzeug.datastructures"} fullname={"HeaderSet.add"} parameters={["header"]} description={"Add a new header to the set."}>
+      <Outline.Signature fullname="HeaderSet.add" id="werkzeug.datastructures.HeaderSet.add">
+        <Outline.Name>add</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">header</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Add a new header to the set.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.as_set"} module={"werkzeug.datastructures"} fullname={"HeaderSet.as_set"} parameters={["preserve_casing"]} description={"Return the set as real python set type.  When calling this, all\nthe items are converted to lowercase and the ordering is lost."}>
+      <Outline.Signature fullname="HeaderSet.as_set" id="werkzeug.datastructures.HeaderSet.as_set">
+        <Outline.Name>as\_set</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">preserve\_casing</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the set as real python set type.  When calling this, all
+        the items are converted to lowercase and the ordering is lost.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>preserve\_casing</Outline.ParameterTarget> – if set to <cite>True</cite> the items in the set returned
+              will have the original case like in the
+              [<code>HeaderSet</code>](#werkzeug.datastructures.HeaderSet "werkzeug.datastructures.HeaderSet"), otherwise they will
+              be lowercase.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.clear"} module={"werkzeug.datastructures"} fullname={"HeaderSet.clear"} parameters={[]} description={"Clear the set."}>
+      <Outline.Signature fullname="HeaderSet.clear" id="werkzeug.datastructures.HeaderSet.clear">
+        <Outline.Name>clear</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Clear the set.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.discard"} module={"werkzeug.datastructures"} fullname={"HeaderSet.discard"} parameters={["header"]} description={"Like remove() but ignores errors."}>
+      <Outline.Signature fullname="HeaderSet.discard" id="werkzeug.datastructures.HeaderSet.discard">
+        <Outline.Name>discard</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">header</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Like [<code>remove()</code>](#werkzeug.datastructures.HeaderSet.remove "werkzeug.datastructures.HeaderSet.remove") but ignores errors.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>header</Outline.ParameterTarget> – the header to be discarded.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.find"} module={"werkzeug.datastructures"} fullname={"HeaderSet.find"} parameters={["header"]} description={"Return the index of the header in the set or return -1 if not found."}>
+      <Outline.Signature fullname="HeaderSet.find" id="werkzeug.datastructures.HeaderSet.find">
+        <Outline.Name>find</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">header</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the index of the header in the set or return -1 if not found.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>header</Outline.ParameterTarget> – the header to be looked up.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.index"} module={"werkzeug.datastructures"} fullname={"HeaderSet.index"} parameters={["header"]} description={"Return the index of the header in the set or raise an\nIndexError."}>
+      <Outline.Signature fullname="HeaderSet.index" id="werkzeug.datastructures.HeaderSet.index">
+        <Outline.Name>index</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">header</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the index of the header in the set or raise an
+        [<code>IndexError</code>](https://docs.python.org/3/library/exceptions.html#IndexError "(in Python v3.11)").
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>header</Outline.ParameterTarget> – the header to be looked up.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.remove"} module={"werkzeug.datastructures"} fullname={"HeaderSet.remove"} parameters={["header"]} description={"Remove a header from the set.  This raises an KeyError if the\nheader is not in the set."}>
+      <Outline.Signature fullname="HeaderSet.remove" id="werkzeug.datastructures.HeaderSet.remove">
+        <Outline.Name>remove</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">header</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove a header from the set.  This raises an [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") if the
+        header is not in the set.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>In older versions a [<code>IndexError</code>](https://docs.python.org/3/library/exceptions.html#IndexError "(in Python v3.11)") was raised instead of a
+          [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") if the object was missing.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>header</Outline.ParameterTarget> – the header to be removed.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.to_header"} module={"werkzeug.datastructures"} fullname={"HeaderSet.to_header"} parameters={[]} description={"Convert the header set into an HTTP header string."}>
+      <Outline.Signature fullname="HeaderSet.to_header" id="werkzeug.datastructures.HeaderSet.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Convert the header set into an HTTP header string.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.HeaderSet.update"} module={"werkzeug.datastructures"} fullname={"HeaderSet.update"} parameters={["iterable"]} description={"Add all the headers from the iterable to the set."}>
+      <Outline.Signature fullname="HeaderSet.update" id="werkzeug.datastructures.HeaderSet.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">iterable</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Add all the headers from the iterable to the set.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>iterable</Outline.ParameterTarget> – updates the set with the items from the iterable.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.Accept"} module={"werkzeug.datastructures"} fullname={"Accept"} parameters={["values"]} description={"An Accept object is just a list subclass for lists of\n(value, quality) tuples.  It is automatically sorted by specificity\nand quality."}>
+  <Outline.Signature fullname="Accept" id="werkzeug.datastructures.Accept">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>Accept</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    An [<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") object is just a list subclass for lists of
+    <code>(value, quality)</code> tuples.  It is automatically sorted by specificity
+    and quality.
+
+    All [<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") objects work similar to a list but provide extra
+    functionality for working with the data.  Containment checks are
+    normalized to the rules of that header:
+
+    ```python
+    >>> a = CharsetAccept([('ISO-8859-1', 1), ('utf-8', 0.7)])
+    >>> a.best
+    'ISO-8859-1'
+    >>> 'iso-8859-1' in a
+    True
+    >>> 'UTF8' in a
+    True
+    >>> 'utf7' in a
+    False
+    ```
+
+    To get the quality for an item you can use normal item lookup:
+
+    ```python
+    >>> print a['utf-8']
+    0.7
+    >>> a['utf7']
+    0
+    ```
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 1.0.0: </span>[<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") internal values are no longer ordered
+      alphabetically for equal quality tags. Instead the initial
+      order is preserved.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>[<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") objects are forced immutable now.
+    </Container>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.Accept.best"} module={"werkzeug.datastructures"} fullname={"Accept.best"} parameters={["values"]} description={"The best match as value."}>
+      <Outline.Signature fullname="Accept.best" id="werkzeug.datastructures.Accept.best">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>best</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The best match as value.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.best_match"} module={"werkzeug.datastructures"} fullname={"Accept.best_match"} parameters={["matches", "default"]} description={"Returns the best match from a list of possible matches based\non the specificity and quality of the client. If two items have the\nsame quality and specificity, the one is returned that comes first."}>
+      <Outline.Signature fullname="Accept.best_match" id="werkzeug.datastructures.Accept.best_match">
+        <Outline.Name>best\_match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">matches</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns the best match from a list of possible matches based
+        on the specificity and quality of the client. If two items have the
+        same quality and specificity, the one is returned that comes first.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>matches</Outline.ParameterTarget> – a list of matches to check for
+              - <Outline.ParameterTarget>default</Outline.ParameterTarget> – the value that is returned if none match
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.find"} module={"werkzeug.datastructures"} fullname={"Accept.find"} parameters={["key"]} description={"Get the position of an entry or return -1."}>
+      <Outline.Signature fullname="Accept.find" id="werkzeug.datastructures.Accept.find">
+        <Outline.Name>find</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Get the position of an entry or return -1.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.index"} module={"werkzeug.datastructures"} fullname={"Accept.index"} parameters={["key"]} description={"Get the position of an entry or raise ValueError."}>
+      <Outline.Signature fullname="Accept.index" id="werkzeug.datastructures.Accept.index">
+        <Outline.Name>index</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Get the position of an entry or raise [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)").
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>key</Outline.ParameterTarget> – The key to be looked up.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>This used to raise [<code>IndexError</code>](https://docs.python.org/3/library/exceptions.html#IndexError "(in Python v3.11)"), which was inconsistent
+          with the list API.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.quality"} module={"werkzeug.datastructures"} fullname={"Accept.quality"} parameters={["key"]} description={"Returns the quality of the key."}>
+      <Outline.Signature fullname="Accept.quality" id="werkzeug.datastructures.Accept.quality">
+        <Outline.Name>quality</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns the quality of the key.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.6: </span>In previous versions you had to use the item-lookup syntax
+          (eg: <code>obj\[key]</code> instead of <code>obj.quality(key)</code>)
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.to_header"} module={"werkzeug.datastructures"} fullname={"Accept.to_header"} parameters={[]} description={"Convert the header set into an HTTP header string."}>
+      <Outline.Signature fullname="Accept.to_header" id="werkzeug.datastructures.Accept.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Convert the header set into an HTTP header string.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Accept.values"} module={"werkzeug.datastructures"} fullname={"Accept.values"} parameters={[]} description={"Iterate over all values."}>
+      <Outline.Signature fullname="Accept.values" id="werkzeug.datastructures.Accept.values">
+        <Outline.Name>values</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Iterate over all values.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.MIMEAccept"} module={"werkzeug.datastructures"} fullname={"MIMEAccept"} parameters={["values"]} description={"Like Accept but with special methods and behavior for\nmimetypes."}>
+  <Outline.Signature fullname="MIMEAccept" id="werkzeug.datastructures.MIMEAccept">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>MIMEAccept</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like [<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") but with special methods and behavior for
+    mimetypes.
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.MIMEAccept.accept_html"} module={"werkzeug.datastructures"} fullname={"MIMEAccept.accept_html"} parameters={["values"]} description={"True if this object accepts HTML."}>
+      <Outline.Signature fullname="MIMEAccept.accept_html" id="werkzeug.datastructures.MIMEAccept.accept_html">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>accept\_html</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        True if this object accepts HTML.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.MIMEAccept.accept_json"} module={"werkzeug.datastructures"} fullname={"MIMEAccept.accept_json"} parameters={["values"]} description={"True if this object accepts JSON."}>
+      <Outline.Signature fullname="MIMEAccept.accept_json" id="werkzeug.datastructures.MIMEAccept.accept_json">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>accept\_json</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        True if this object accepts JSON.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.MIMEAccept.accept_xhtml"} module={"werkzeug.datastructures"} fullname={"MIMEAccept.accept_xhtml"} parameters={["values"]} description={"True if this object accepts XHTML."}>
+      <Outline.Signature fullname="MIMEAccept.accept_xhtml" id="werkzeug.datastructures.MIMEAccept.accept_xhtml">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>accept\_xhtml</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        True if this object accepts XHTML.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.CharsetAccept"} module={"werkzeug.datastructures"} fullname={"CharsetAccept"} parameters={["values"]} description={"Like Accept but with normalization for charsets."}>
+  <Outline.Signature fullname="CharsetAccept" id="werkzeug.datastructures.CharsetAccept">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>CharsetAccept</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like [<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") but with normalization for charsets.
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.LanguageAccept"} module={"werkzeug.datastructures"} fullname={"LanguageAccept"} parameters={["values"]} description={"Like Accept but with normalization for language tags."}>
+  <Outline.Signature fullname="LanguageAccept" id="werkzeug.datastructures.LanguageAccept">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>LanguageAccept</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like [<code>Accept</code>](#werkzeug.datastructures.Accept "werkzeug.datastructures.Accept") but with normalization for language tags.
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.RequestCacheControl"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl"} parameters={["values", "on_update"]} description={"A cache control for requests.  This is immutable and gives access\nto all the request-relevant cache control headers."}>
+  <Outline.Signature fullname="RequestCacheControl" id="werkzeug.datastructures.RequestCacheControl">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>RequestCacheControl</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter>, <Outline.Parameter><span className="name">on\_update</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A cache control for requests.  This is immutable and gives access
+    to all the request-relevant cache control headers.
+
+    To get a header of the [<code>RequestCacheControl</code>](#werkzeug.datastructures.RequestCacheControl "werkzeug.datastructures.RequestCacheControl") object again you can
+    convert the object into a string or call the <code>to\_header()</code> method.  If
+    you plan to subclass it and add your own items have a look at the sourcecode
+    for that class.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1.0: </span>Setting int properties such as <code>max\_age</code> will convert the
+      value to an int.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5: </span>In previous versions a <cite>CacheControl</cite> class existed that was used
+      both for request and response.
+    </Container>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.RequestCacheControl.no_cache"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.no_cache"} parameters={["values", "on_update"]} description={"accessor for \u2018no-cache\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.no_cache" id="werkzeug.datastructures.RequestCacheControl.no_cache">
+        <Outline.Name>no\_cache</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-cache’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.RequestCacheControl.no_store"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.no_store"} parameters={["values", "on_update"]} description={"accessor for \u2018no-store\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.no_store" id="werkzeug.datastructures.RequestCacheControl.no_store">
+        <Outline.Name>no\_store</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-store’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.RequestCacheControl.max_age"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.max_age"} parameters={["values", "on_update"]} description={"accessor for \u2018max-age\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.max_age" id="werkzeug.datastructures.RequestCacheControl.max_age">
+        <Outline.Name>max\_age</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘max-age’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.RequestCacheControl.no_transform"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.no_transform"} parameters={["values", "on_update"]} description={"accessor for \u2018no-transform\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.no_transform" id="werkzeug.datastructures.RequestCacheControl.no_transform">
+        <Outline.Name>no\_transform</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-transform’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.RequestCacheControl.max_stale"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.max_stale"} parameters={["values", "on_update"]} description={"accessor for \u2018max-stale\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.max_stale" id="werkzeug.datastructures.RequestCacheControl.max_stale">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>max\_stale</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘max-stale’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.RequestCacheControl.min_fresh"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.min_fresh"} parameters={["values", "on_update"]} description={"accessor for \u2018min-fresh\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.min_fresh" id="werkzeug.datastructures.RequestCacheControl.min_fresh">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>min\_fresh</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘min-fresh’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.RequestCacheControl.only_if_cached"} module={"werkzeug.datastructures"} fullname={"RequestCacheControl.only_if_cached"} parameters={["values", "on_update"]} description={"accessor for \u2018only-if-cached\u2019"}>
+      <Outline.Signature fullname="RequestCacheControl.only_if_cached" id="werkzeug.datastructures.RequestCacheControl.only_if_cached">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>only\_if\_cached</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘only-if-cached’
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ResponseCacheControl"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl"} parameters={["values", "on_update"]} description={"A cache control for responses.  Unlike RequestCacheControl\nthis is mutable and gives access to response-relevant cache control\nheaders."}>
+  <Outline.Signature fullname="ResponseCacheControl" id="werkzeug.datastructures.ResponseCacheControl">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ResponseCacheControl</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">values</span><span>=</span><span>()</span></Outline.Parameter>, <Outline.Parameter><span className="name">on\_update</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A cache control for responses.  Unlike [<code>RequestCacheControl</code>](#werkzeug.datastructures.RequestCacheControl "werkzeug.datastructures.RequestCacheControl")
+    this is mutable and gives access to response-relevant cache control
+    headers.
+
+    To get a header of the [<code>ResponseCacheControl</code>](#werkzeug.datastructures.ResponseCacheControl "werkzeug.datastructures.ResponseCacheControl") object again you can
+    convert the object into a string or call the <code>to\_header()</code> method.  If
+    you plan to subclass it and add your own items have a look at the sourcecode
+    for that class.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1.1: </span><code>s\_maxage</code> converts the value to an int.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1.0: </span>Setting int properties such as <code>max\_age</code> will convert the
+      value to an int.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5: </span>In previous versions a <cite>CacheControl</cite> class existed that was used
+      both for request and response.
+    </Container>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.ResponseCacheControl.no_cache"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.no_cache"} parameters={["values", "on_update"]} description={"accessor for \u2018no-cache\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.no_cache" id="werkzeug.datastructures.ResponseCacheControl.no_cache">
+        <Outline.Name>no\_cache</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-cache’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.ResponseCacheControl.no_store"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.no_store"} parameters={["values", "on_update"]} description={"accessor for \u2018no-store\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.no_store" id="werkzeug.datastructures.ResponseCacheControl.no_store">
+        <Outline.Name>no\_store</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-store’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.ResponseCacheControl.max_age"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.max_age"} parameters={["values", "on_update"]} description={"accessor for \u2018max-age\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.max_age" id="werkzeug.datastructures.ResponseCacheControl.max_age">
+        <Outline.Name>max\_age</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘max-age’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.ResponseCacheControl.no_transform"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.no_transform"} parameters={["values", "on_update"]} description={"accessor for \u2018no-transform\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.no_transform" id="werkzeug.datastructures.ResponseCacheControl.no_transform">
+        <Outline.Name>no\_transform</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘no-transform’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.immutable"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.immutable"} parameters={["values", "on_update"]} description={"accessor for \u2018immutable\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.immutable" id="werkzeug.datastructures.ResponseCacheControl.immutable">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>immutable</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘immutable’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.must_revalidate"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.must_revalidate"} parameters={["values", "on_update"]} description={"accessor for \u2018must-revalidate\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.must_revalidate" id="werkzeug.datastructures.ResponseCacheControl.must_revalidate">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>must\_revalidate</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘must-revalidate’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.private"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.private"} parameters={["values", "on_update"]} description={"accessor for \u2018private\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.private" id="werkzeug.datastructures.ResponseCacheControl.private">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>private</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘private’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.proxy_revalidate"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.proxy_revalidate"} parameters={["values", "on_update"]} description={"accessor for \u2018proxy-revalidate\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.proxy_revalidate" id="werkzeug.datastructures.ResponseCacheControl.proxy_revalidate">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>proxy\_revalidate</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘proxy-revalidate’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.public"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.public"} parameters={["values", "on_update"]} description={"accessor for \u2018public\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.public" id="werkzeug.datastructures.ResponseCacheControl.public">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>public</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘public’
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ResponseCacheControl.s_maxage"} module={"werkzeug.datastructures"} fullname={"ResponseCacheControl.s_maxage"} parameters={["values", "on_update"]} description={"accessor for \u2018s-maxage\u2019"}>
+      <Outline.Signature fullname="ResponseCacheControl.s_maxage" id="werkzeug.datastructures.ResponseCacheControl.s_maxage">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>s\_maxage</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        accessor for ‘s-maxage’
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ETags"} module={"werkzeug.datastructures"} fullname={"ETags"} parameters={["strong_etags", "weak_etags", "star_tag"]} description={"A set that can be used to check if one etag is present in a collection\nof etags."}>
+  <Outline.Signature fullname="ETags" id="werkzeug.datastructures.ETags">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ETags</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">strong\_etags</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">weak\_etags</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">star\_tag</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A set that can be used to check if one etag is present in a collection
+    of etags.
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.as_set"} module={"werkzeug.datastructures"} fullname={"ETags.as_set"} parameters={["include_weak"]} description={"Convert the ETags object into a python set.  Per default all the\nweak etags are not part of this set."}>
+      <Outline.Signature fullname="ETags.as_set" id="werkzeug.datastructures.ETags.as_set">
+        <Outline.Name>as\_set</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">include\_weak</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Convert the <cite>ETags</cite> object into a python set.  Per default all the
+        weak etags are not part of this set.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.contains"} module={"werkzeug.datastructures"} fullname={"ETags.contains"} parameters={["etag"]} description={"Check if an etag is part of the set ignoring weak tags.\nIt is also possible to use the in operator."}>
+      <Outline.Signature fullname="ETags.contains" id="werkzeug.datastructures.ETags.contains">
+        <Outline.Name>contains</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Check if an etag is part of the set ignoring weak tags.
+        It is also possible to use the <code>in</code> operator.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.contains_raw"} module={"werkzeug.datastructures"} fullname={"ETags.contains_raw"} parameters={["etag"]} description={"When passed a quoted tag it will check if this tag is part of the\nset.  If the tag is weak it is checked against weak and strong tags,\notherwise strong only."}>
+      <Outline.Signature fullname="ETags.contains_raw" id="werkzeug.datastructures.ETags.contains_raw">
+        <Outline.Name>contains\_raw</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        When passed a quoted tag it will check if this tag is part of the
+        set.  If the tag is weak it is checked against weak and strong tags,
+        otherwise strong only.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.contains_weak"} module={"werkzeug.datastructures"} fullname={"ETags.contains_weak"} parameters={["etag"]} description={"Check if an etag is part of the set including weak and strong tags."}>
+      <Outline.Signature fullname="ETags.contains_weak" id="werkzeug.datastructures.ETags.contains_weak">
+        <Outline.Name>contains\_weak</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Check if an etag is part of the set including weak and strong tags.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.is_strong"} module={"werkzeug.datastructures"} fullname={"ETags.is_strong"} parameters={["etag"]} description={"Check if an etag is strong."}>
+      <Outline.Signature fullname="ETags.is_strong" id="werkzeug.datastructures.ETags.is_strong">
+        <Outline.Name>is\_strong</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Check if an etag is strong.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.is_weak"} module={"werkzeug.datastructures"} fullname={"ETags.is_weak"} parameters={["etag"]} description={"Check if an etag is weak."}>
+      <Outline.Signature fullname="ETags.is_weak" id="werkzeug.datastructures.ETags.is_weak">
+        <Outline.Name>is\_weak</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Check if an etag is weak.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ETags.to_header"} module={"werkzeug.datastructures"} fullname={"ETags.to_header"} parameters={[]} description={"Convert the etags set into a HTTP header string."}>
+      <Outline.Signature fullname="ETags.to_header" id="werkzeug.datastructures.ETags.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Convert the etags set into a HTTP header string.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.Authorization"} module={"werkzeug.datastructures"} fullname={"Authorization"} parameters={["auth_type", "data", "token"]} description={"Represents the parts of an Authorization request header."}>
+  <Outline.Signature fullname="Authorization" id="werkzeug.datastructures.Authorization">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>Authorization</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">auth\_type</span></Outline.Parameter>, <Outline.Parameter><span className="name">data</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">token</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents the parts of an <code>Authorization</code> request header.
+
+    [<code>Request.authorization</code>](wrappers.mdx#werkzeug.wrappers.Request.authorization "werkzeug.wrappers.Request.authorization") returns an instance if the header is set.
+
+    An instance can be used with the test [<code>Client</code>](test.mdx#werkzeug.test.Client "werkzeug.test.Client") request methods’ <code>auth</code>
+    parameter to send the header in test requests.
+
+    Depending on the auth scheme, either [<code>parameters</code>](#werkzeug.datastructures.Authorization.parameters "werkzeug.datastructures.Authorization.parameters") or [<code>token</code>](#werkzeug.datastructures.Authorization.token "werkzeug.datastructures.Authorization.token") will be
+    set. The <code>Basic</code> scheme’s token is decoded into the <code>username</code> and <code>password</code>
+    parameters.
+
+    For convenience, <code>auth\["key"]</code> and <code>auth.key</code> both access the key in the
+    [<code>parameters</code>](#werkzeug.datastructures.Authorization.parameters "werkzeug.datastructures.Authorization.parameters") dict, along with <code>auth.get("key")</code> and <code>"key" in auth</code>.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The <code>token</code> parameter and attribute was added to support auth schemes that use
+      a token instead of parameters, such as <code>Bearer</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The object is no longer a <code>dict</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>The object is an immutable dict.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>auth\_type</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>data</Outline.ParameterTarget> ([<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>token</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.clear"} module={"werkzeug.datastructures"} fullname={"Authorization.clear"} parameters={[]} description={"Represents the parts of an Authorization request header."}>
+      <Outline.Signature fullname="Authorization.clear" id="werkzeug.datastructures.Authorization.clear">
+        <Outline.Name>clear</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>None.  Remove all items from D.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.copy"} module={"werkzeug.datastructures"} fullname={"Authorization.copy"} parameters={[]} description={"Represents the parts of an Authorization request header."}>
+      <Outline.Signature fullname="Authorization.copy" id="werkzeug.datastructures.Authorization.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a shallow copy of D</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.from_header"} module={"werkzeug.datastructures"} fullname={"Authorization.from_header"} parameters={["value"]} description={"Parse an Authorization header value and return an instance, or None\nif the value is empty."}>
+      <Outline.Signature fullname="Authorization.from_header" id="werkzeug.datastructures.Authorization.from_header">
+        <Outline.Keyword>classmethod<span>{" "}</span></Outline.Keyword><Outline.Name>from\_header</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">value</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Parse an <code>Authorization</code> header value and return an instance, or <code>None</code>
+        if the value is empty.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The header value to parse.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              te.Self | None
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.3.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.items"} module={"werkzeug.datastructures"} fullname={"Authorization.items"} parameters={[]} description={"Represents the parts of an Authorization request header."}>
+      <Outline.Signature fullname="Authorization.items" id="werkzeug.datastructures.Authorization.items">
+        <Outline.Name>items</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a set-like object providing a view on D's items</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.keys"} module={"werkzeug.datastructures"} fullname={"Authorization.keys"} parameters={[]} description={"Represents the parts of an Authorization request header."}>
+      <Outline.Signature fullname="Authorization.keys" id="werkzeug.datastructures.Authorization.keys">
+        <Outline.Name>keys</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a set-like object providing a view on D's keys</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.Authorization.parameters"} module={"werkzeug.datastructures"} fullname={"Authorization.parameters"} parameters={["auth_type", "data", "token"]} description={"A dict of parameters parsed from the header. Either this or token\nwill have a value for a give scheme."}>
+      <Outline.Signature fullname="Authorization.parameters" id="werkzeug.datastructures.Authorization.parameters">
+        <Outline.Name>parameters</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A dict of parameters parsed from the header. Either this or [<code>token</code>](#werkzeug.datastructures.Authorization.token "werkzeug.datastructures.Authorization.token")
+        will have a value for a give scheme.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.pop"} module={"werkzeug.datastructures"} fullname={"Authorization.pop"} parameters={["k", "d"]} description={"If key is not found, d is returned if given, otherwise KeyError is raised"}>
+      <Outline.Signature fullname="Authorization.pop" id="werkzeug.datastructures.Authorization.pop">
+        <Outline.Name>pop</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">k</span></Outline.Parameter>\[, <Outline.Parameter><span className="name">d</span></Outline.Parameter>]<span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>v, remove specified key and return the corresponding value.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content>
+        If key is not found, d is returned if given, otherwise KeyError is raised
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.popitem"} module={"werkzeug.datastructures"} fullname={"Authorization.popitem"} parameters={[]} description={"Remove and return a (key, value) pair as a 2-tuple."}>
+      <Outline.Signature fullname="Authorization.popitem" id="werkzeug.datastructures.Authorization.popitem">
+        <Outline.Name>popitem</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove and return a (key, value) pair as a 2-tuple.
+
+        Pairs are returned in LIFO (last-in, first-out) order.
+        Raises KeyError if the dict is empty.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.setdefault"} module={"werkzeug.datastructures"} fullname={"Authorization.setdefault"} parameters={["key", "default"]} description={"Insert key with a value of default if key is not in the dictionary."}>
+      <Outline.Signature fullname="Authorization.setdefault" id="werkzeug.datastructures.Authorization.setdefault">
+        <Outline.Name>setdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span>/</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Insert key with a value of default if key is not in the dictionary.
+
+        Return the value for key if key is in the dictionary, else default.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.to_header"} module={"werkzeug.datastructures"} fullname={"Authorization.to_header"} parameters={[]} description={"Produce an Authorization header value representing this data."}>
+      <Outline.Signature fullname="Authorization.to_header" id="werkzeug.datastructures.Authorization.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Produce an <code>Authorization</code> header value representing this data.
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.0.</span>
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.Authorization.token"} module={"werkzeug.datastructures"} fullname={"Authorization.token"} parameters={["auth_type", "data", "token"]} description={"A token parsed from the header. Either this or parameters will have a\nvalue for a given scheme."}>
+      <Outline.Signature fullname="Authorization.token" id="werkzeug.datastructures.Authorization.token">
+        <Outline.Name>token</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A token parsed from the header. Either this or [<code>parameters</code>](#werkzeug.datastructures.Authorization.parameters "werkzeug.datastructures.Authorization.parameters") will have a
+        value for a given scheme.
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.3.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.Authorization.type"} module={"werkzeug.datastructures"} fullname={"Authorization.type"} parameters={["auth_type", "data", "token"]} description={"The authorization scheme, like Basic, Digest, or Bearer."}>
+      <Outline.Signature fullname="Authorization.type" id="werkzeug.datastructures.Authorization.type">
+        <Outline.Name>type</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The authorization scheme, like <code>Basic</code>, <code>Digest</code>, or <code>Bearer</code>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.update"} module={"werkzeug.datastructures"} fullname={"Authorization.update"} parameters={["E", "**F"]} description={"If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\nIf E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\nIn either case, this is followed by: for k in F:  D[k] = F[k]"}>
+      <Outline.Signature fullname="Authorization.update" id="werkzeug.datastructures.Authorization.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span>\[<Outline.Parameter><span className="name">E</span></Outline.Parameter>, ]<Outline.Parameter><span className="name">\*\*F</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>None.  Update D from dict/iterable E and F.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content>
+        If E is present and has a .keys() method, then does:  for k in E: D\[k] = E\[k]
+        If E is present and lacks a .keys() method, then does:  for k, v in E: D\[k] = v
+        In either case, this is followed by: for k in F:  D\[k] = F\[k]
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Authorization.values"} module={"werkzeug.datastructures"} fullname={"Authorization.values"} parameters={[]} description={"Represents the parts of an Authorization request header."}>
+      <Outline.Signature fullname="Authorization.values" id="werkzeug.datastructures.Authorization.values">
+        <Outline.Name>values</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>an object providing a view on D's values</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.WWWAuthenticate"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate"} parameters={["auth_type", "values", "token"]} description={"Represents the parts of a WWW-Authenticate response header."}>
+  <Outline.Signature fullname="WWWAuthenticate" id="werkzeug.datastructures.WWWAuthenticate">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>WWWAuthenticate</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">auth\_type</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">values</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">token</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents the parts of a <code>WWW-Authenticate</code> response header.
+
+    Set [<code>Response.www\_authenticate</code>](wrappers.mdx#werkzeug.wrappers.Response.www_authenticate "werkzeug.wrappers.Response.www_authenticate") to an instance of list of instances to set
+    values for this header in the response. Modifying this instance will modify the
+    header value.
+
+    Depending on the auth scheme, either [<code>parameters</code>](#werkzeug.datastructures.WWWAuthenticate.parameters "werkzeug.datastructures.WWWAuthenticate.parameters") or [<code>token</code>](#werkzeug.datastructures.WWWAuthenticate.token "werkzeug.datastructures.WWWAuthenticate.token") should be
+    set. The <code>Basic</code> scheme will encode <code>username</code> and <code>password</code> parameters to a
+    token.
+
+    For convenience, <code>auth\["key"]</code> and <code>auth.key</code> both act on the [<code>parameters</code>](#werkzeug.datastructures.WWWAuthenticate.parameters "werkzeug.datastructures.WWWAuthenticate.parameters")
+    dict, and can be used to get, set, or delete parameters. <code>auth.get("key")</code> and
+    <code>"key" in auth</code> are also provided.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The <code>token</code> parameter and attribute was added to support auth schemes that use
+      a token instead of parameters, such as <code>Bearer</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The object is no longer a <code>dict</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>The <code>on\_update</code> parameter was removed.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>auth\_type</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>token</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.auth_property"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.auth_property"} parameters={["name", "doc"]} description={"A static helper function for Authentication subclasses to add\nextra authentication system properties onto a class:"}>
+      <Outline.Signature fullname="WWWAuthenticate.auth_property" id="werkzeug.datastructures.WWWAuthenticate.auth_property">
+        <Outline.Keyword>static<span>{" "}</span></Outline.Keyword><Outline.Name>auth\_property</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">name</span></Outline.Parameter>, <Outline.Parameter><span className="name">doc</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A static helper function for Authentication subclasses to add
+        extra authentication system properties onto a class:
+
+        ```default
+        class FooAuthenticate(WWWAuthenticate):
+            special_realm = auth_property('special_realm')
+        ```
+
+        <Container type="warning" title="Deprecated">
+          <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>doc</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [property](https://docs.python.org/3/library/functions.html#property "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.clear"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.clear"} parameters={[]} description={"Represents the parts of a WWW-Authenticate response header."}>
+      <Outline.Signature fullname="WWWAuthenticate.clear" id="werkzeug.datastructures.WWWAuthenticate.clear">
+        <Outline.Name>clear</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>None.  Remove all items from D.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.copy"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.copy"} parameters={[]} description={"Represents the parts of a WWW-Authenticate response header."}>
+      <Outline.Signature fullname="WWWAuthenticate.copy" id="werkzeug.datastructures.WWWAuthenticate.copy">
+        <Outline.Name>copy</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a shallow copy of D</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.from_header"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.from_header"} parameters={["value"]} description={"Parse a WWW-Authenticate header value and return an instance, or None\nif the value is empty."}>
+      <Outline.Signature fullname="WWWAuthenticate.from_header" id="werkzeug.datastructures.WWWAuthenticate.from_header">
+        <Outline.Keyword>classmethod<span>{" "}</span></Outline.Keyword><Outline.Name>from\_header</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">value</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Parse a <code>WWW-Authenticate</code> header value and return an instance, or <code>None</code>
+        if the value is empty.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The header value to parse.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              te.Self | None
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.3.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.items"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.items"} parameters={[]} description={"Represents the parts of a WWW-Authenticate response header."}>
+      <Outline.Signature fullname="WWWAuthenticate.items" id="werkzeug.datastructures.WWWAuthenticate.items">
+        <Outline.Name>items</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a set-like object providing a view on D's items</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.keys"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.keys"} parameters={[]} description={"Represents the parts of a WWW-Authenticate response header."}>
+      <Outline.Signature fullname="WWWAuthenticate.keys" id="werkzeug.datastructures.WWWAuthenticate.keys">
+        <Outline.Name>keys</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>a set-like object providing a view on D's keys</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.WWWAuthenticate.parameters"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.parameters"} parameters={["auth_type", "values", "token"]} description={"A dict of parameters for the header. Only one of this or token should\nhave a value for a give scheme."}>
+      <Outline.Signature fullname="WWWAuthenticate.parameters" id="werkzeug.datastructures.WWWAuthenticate.parameters">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>parameters</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[dict](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>]</span></Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A dict of parameters for the header. Only one of this or [<code>token</code>](#werkzeug.datastructures.WWWAuthenticate.token "werkzeug.datastructures.WWWAuthenticate.token") should
+        have a value for a give scheme.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.pop"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.pop"} parameters={["k", "d"]} description={"If key is not found, d is returned if given, otherwise KeyError is raised"}>
+      <Outline.Signature fullname="WWWAuthenticate.pop" id="werkzeug.datastructures.WWWAuthenticate.pop">
+        <Outline.Name>pop</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">k</span></Outline.Parameter>\[, <Outline.Parameter><span className="name">d</span></Outline.Parameter>]<span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>v, remove specified key and return the corresponding value.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content>
+        If key is not found, d is returned if given, otherwise KeyError is raised
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.popitem"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.popitem"} parameters={[]} description={"Remove and return a (key, value) pair as a 2-tuple."}>
+      <Outline.Signature fullname="WWWAuthenticate.popitem" id="werkzeug.datastructures.WWWAuthenticate.popitem">
+        <Outline.Name>popitem</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Remove and return a (key, value) pair as a 2-tuple.
+
+        Pairs are returned in LIFO (last-in, first-out) order.
+        Raises KeyError if the dict is empty.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.WWWAuthenticate.qop"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.qop"} parameters={["auth_type", "values", "token"]} description={"The qop parameter as a set."}>
+      <Outline.Signature fullname="WWWAuthenticate.qop" id="werkzeug.datastructures.WWWAuthenticate.qop">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>qop</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[set](https://docs.python.org/3/library/stdtypes.html#set "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>]</span></Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The <code>qop</code> parameter as a set.
+
+        <Container type="warning" title="Deprecated">
+          <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. It will become the same as other
+          parameters, returning a string.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.set_basic"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.set_basic"} parameters={["realm"]} description={"Clear any existing data and set a Basic challenge."}>
+      <Outline.Signature fullname="WWWAuthenticate.set_basic" id="werkzeug.datastructures.WWWAuthenticate.set_basic">
+        <Outline.Name>set\_basic</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">realm</span><span>=</span><span>'authentication required'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Clear any existing data and set a <code>Basic</code> challenge.
+
+        <Container type="warning" title="Deprecated">
+          <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Create and assign an instance instead.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>realm</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.set_digest"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.set_digest"} parameters={["realm", "nonce", "qop", "opaque", "algorithm", "stale"]} description={"Clear any existing data and set a Digest challenge."}>
+      <Outline.Signature fullname="WWWAuthenticate.set_digest" id="werkzeug.datastructures.WWWAuthenticate.set_digest">
+        <Outline.Name>set\_digest</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">realm</span></Outline.Parameter>, <Outline.Parameter><span className="name">nonce</span></Outline.Parameter>, <Outline.Parameter><span className="name">qop</span><span>=</span><span>('auth',)</span></Outline.Parameter>, <Outline.Parameter><span className="name">opaque</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">algorithm</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">stale</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Clear any existing data and set a <code>Digest</code> challenge.
+
+        <Container type="warning" title="Deprecated">
+          <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. Create and assign an instance instead.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>realm</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>nonce</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>qop</Outline.ParameterTarget> (<em>t.Sequence</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) –&#x20;
+              - <Outline.ParameterTarget>opaque</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>algorithm</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>stale</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.setdefault"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.setdefault"} parameters={["key", "default"]} description={"Insert key with a value of default if key is not in the dictionary."}>
+      <Outline.Signature fullname="WWWAuthenticate.setdefault" id="werkzeug.datastructures.WWWAuthenticate.setdefault">
+        <Outline.Name>setdefault</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span>/</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Insert key with a value of default if key is not in the dictionary.
+
+        Return the value for key if key is in the dictionary, else default.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.WWWAuthenticate.stale"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.stale"} parameters={["auth_type", "values", "token"]} description={"The stale parameter as a boolean."}>
+      <Outline.Signature fullname="WWWAuthenticate.stale" id="werkzeug.datastructures.WWWAuthenticate.stale">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>stale</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The <code>stale</code> parameter as a boolean.
+
+        <Container type="warning" title="Deprecated">
+          <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0. It will become the same as other
+          parameters, returning a string.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.to_header"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.to_header"} parameters={[]} description={"Produce a WWW-Authenticate header value representing this data."}>
+      <Outline.Signature fullname="WWWAuthenticate.to_header" id="werkzeug.datastructures.WWWAuthenticate.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Produce a <code>WWW-Authenticate</code> header value representing this data.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.WWWAuthenticate.token"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.token"} parameters={["auth_type", "values", "token"]} description={"A dict of parameters for the header. Only one of this or token should\nhave a value for a give scheme."}>
+      <Outline.Signature fullname="WWWAuthenticate.token" id="werkzeug.datastructures.WWWAuthenticate.token">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>token</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A dict of parameters for the header. Only one of this or [<code>token</code>](#werkzeug.datastructures.WWWAuthenticate.token "werkzeug.datastructures.WWWAuthenticate.token") should
+        have a value for a give scheme.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.WWWAuthenticate.type"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.type"} parameters={["auth_type", "values", "token"]} description={"The authorization scheme, like Basic, Digest, or Bearer."}>
+      <Outline.Signature fullname="WWWAuthenticate.type" id="werkzeug.datastructures.WWWAuthenticate.type">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>type</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The authorization scheme, like <code>Basic</code>, <code>Digest</code>, or <code>Bearer</code>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.update"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.update"} parameters={["E", "**F"]} description={"If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\nIf E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\nIn either case, this is followed by: for k in F:  D[k] = F[k]"}>
+      <Outline.Signature fullname="WWWAuthenticate.update" id="werkzeug.datastructures.WWWAuthenticate.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span>\[<Outline.Parameter><span className="name">E</span></Outline.Parameter>, ]<Outline.Parameter><span className="name">\*\*F</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>None.  Update D from dict/iterable E and F.</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content>
+        If E is present and has a .keys() method, then does:  for k in E: D\[k] = E\[k]
+        If E is present and lacks a .keys() method, then does:  for k, v in E: D\[k] = v
+        In either case, this is followed by: for k in F:  D\[k] = F\[k]
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.WWWAuthenticate.values"} module={"werkzeug.datastructures"} fullname={"WWWAuthenticate.values"} parameters={[]} description={"Represents the parts of a WWW-Authenticate response header."}>
+      <Outline.Signature fullname="WWWAuthenticate.values" id="werkzeug.datastructures.WWWAuthenticate.values">
+        <Outline.Name>values</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>an object providing a view on D's values</Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content />
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.IfRange"} module={"werkzeug.datastructures"} fullname={"IfRange"} parameters={["etag", "date"]} description={"Very simple object that represents the If-Range header in parsed\nform.  It will either have neither a etag or date or one of either but\nnever both."}>
+  <Outline.Signature fullname="IfRange" id="werkzeug.datastructures.IfRange">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>IfRange</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">etag</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">date</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Very simple object that represents the <cite>If-Range</cite> header in parsed
+    form.  It will either have neither a etag or date or one of either but
+    never both.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.7.</span>
+    </Container>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.IfRange.date"} module={"werkzeug.datastructures"} fullname={"IfRange.date"} parameters={["etag", "date"]} description={"The date in parsed format or None."}>
+      <Outline.Signature fullname="IfRange.date" id="werkzeug.datastructures.IfRange.date">
+        <Outline.Name>date</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The date in parsed format or <cite>None</cite>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.IfRange.etag"} module={"werkzeug.datastructures"} fullname={"IfRange.etag"} parameters={["etag", "date"]} description={"The etag parsed and unquoted.  Ranges always operate on strong\netags so the weakness information is not necessary."}>
+      <Outline.Signature fullname="IfRange.etag" id="werkzeug.datastructures.IfRange.etag">
+        <Outline.Name>etag</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The etag parsed and unquoted.  Ranges always operate on strong
+        etags so the weakness information is not necessary.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.IfRange.to_header"} module={"werkzeug.datastructures"} fullname={"IfRange.to_header"} parameters={[]} description={"Converts the object back into an HTTP header."}>
+      <Outline.Signature fullname="IfRange.to_header" id="werkzeug.datastructures.IfRange.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Converts the object back into an HTTP header.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.Range"} module={"werkzeug.datastructures"} fullname={"Range"} parameters={["units", "ranges"]} description={"Represents a Range header. All methods only support only\nbytes as the unit. Stores a list of ranges if given, but the methods\nonly work if only one range is provided."}>
+  <Outline.Signature fullname="Range" id="werkzeug.datastructures.Range">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>Range</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">units</span></Outline.Parameter>, <Outline.Parameter><span className="name">ranges</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents a <code>Range</code> header. All methods only support only
+    bytes as the unit. Stores a list of ranges if given, but the methods
+    only work if only one range is provided.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Raises
+        </dt>
+
+        <dd className="field-body">
+          [<strong>ValueError</strong>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") – If the ranges provided are invalid.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>The ranges passed in are validated.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.7.</span>
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Range.make_content_range"} module={"werkzeug.datastructures"} fullname={"Range.make_content_range"} parameters={["length"]} description={"Creates a ContentRange object\nfrom the current range and given content length."}>
+      <Outline.Signature fullname="Range.make_content_range" id="werkzeug.datastructures.Range.make_content_range">
+        <Outline.Name>make\_content\_range</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">length</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Creates a [<code>ContentRange</code>](#werkzeug.datastructures.ContentRange "werkzeug.datastructures.ContentRange") object
+        from the current range and given content length.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Range.range_for_length"} module={"werkzeug.datastructures"} fullname={"Range.range_for_length"} parameters={["length"]} description={"If the range is for bytes, the length is not None and there is\nexactly one range and it is satisfiable it returns a (start, stop)\ntuple, otherwise None."}>
+      <Outline.Signature fullname="Range.range_for_length" id="werkzeug.datastructures.Range.range_for_length">
+        <Outline.Name>range\_for\_length</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">length</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        If the range is for bytes, the length is not None and there is
+        exactly one range and it is satisfiable it returns a <code>(start, stop)</code>
+        tuple, otherwise <cite>None</cite>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.Range.ranges"} module={"werkzeug.datastructures"} fullname={"Range.ranges"} parameters={["units", "ranges"]} description={"A list of (begin, end) tuples for the range header provided.\nThe ranges are non-inclusive."}>
+      <Outline.Signature fullname="Range.ranges" id="werkzeug.datastructures.Range.ranges">
+        <Outline.Name>ranges</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A list of <code>(begin, end)</code> tuples for the range header provided.
+        The ranges are non-inclusive.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Range.to_content_range_header"} module={"werkzeug.datastructures"} fullname={"Range.to_content_range_header"} parameters={["length"]} description={"Converts the object into Content-Range HTTP header,\nbased on given length"}>
+      <Outline.Signature fullname="Range.to_content_range_header" id="werkzeug.datastructures.Range.to_content_range_header">
+        <Outline.Name>to\_content\_range\_header</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">length</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Converts the object into <cite>Content-Range</cite> HTTP header,
+        based on given length
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.Range.to_header"} module={"werkzeug.datastructures"} fullname={"Range.to_header"} parameters={[]} description={"Converts the object back into an HTTP header."}>
+      <Outline.Signature fullname="Range.to_header" id="werkzeug.datastructures.Range.to_header">
+        <Outline.Name>to\_header</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Converts the object back into an HTTP header.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.Range.units"} module={"werkzeug.datastructures"} fullname={"Range.units"} parameters={["units", "ranges"]} description={"The units of this range.  Usually \u201cbytes\u201d."}>
+      <Outline.Signature fullname="Range.units" id="werkzeug.datastructures.Range.units">
+        <Outline.Name>units</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The units of this range.  Usually “bytes”.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.ContentRange"} module={"werkzeug.datastructures"} fullname={"ContentRange"} parameters={["units", "start", "stop", "length", "on_update"]} description={"Represents the content range header."}>
+  <Outline.Signature fullname="ContentRange" id="werkzeug.datastructures.ContentRange">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>ContentRange</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">units</span></Outline.Parameter>, <Outline.Parameter><span className="name">start</span></Outline.Parameter>, <Outline.Parameter><span className="name">stop</span></Outline.Parameter>, <Outline.Parameter><span className="name">length</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">on\_update</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Represents the content range header.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.7.</span>
+    </Container>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ContentRange.length"} module={"werkzeug.datastructures"} fullname={"ContentRange.length"} parameters={["units", "start", "stop", "length", "on_update"]} description={"The length of the range or None."}>
+      <Outline.Signature fullname="ContentRange.length" id="werkzeug.datastructures.ContentRange.length">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>length</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The length of the range or <cite>None</cite>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ContentRange.set"} module={"werkzeug.datastructures"} fullname={"ContentRange.set"} parameters={["start", "stop", "length", "units"]} description={"Simple method to update the ranges."}>
+      <Outline.Signature fullname="ContentRange.set" id="werkzeug.datastructures.ContentRange.set">
+        <Outline.Name>set</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">start</span></Outline.Parameter>, <Outline.Parameter><span className="name">stop</span></Outline.Parameter>, <Outline.Parameter><span className="name">length</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">units</span><span>=</span><span>'bytes'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Simple method to update the ranges.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ContentRange.start"} module={"werkzeug.datastructures"} fullname={"ContentRange.start"} parameters={["units", "start", "stop", "length", "on_update"]} description={"The start point of the range or None."}>
+      <Outline.Signature fullname="ContentRange.start" id="werkzeug.datastructures.ContentRange.start">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>start</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The start point of the range or <cite>None</cite>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ContentRange.stop"} module={"werkzeug.datastructures"} fullname={"ContentRange.stop"} parameters={["units", "start", "stop", "length", "on_update"]} description={"The stop point of the range (non-inclusive) or None.  Can only be\nNone if also start is None."}>
+      <Outline.Signature fullname="ContentRange.stop" id="werkzeug.datastructures.ContentRange.stop">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>stop</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The stop point of the range (non-inclusive) or <cite>None</cite>.  Can only be
+        <cite>None</cite> if also start is <cite>None</cite>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.ContentRange.units"} module={"werkzeug.datastructures"} fullname={"ContentRange.units"} parameters={["units", "start", "stop", "length", "on_update"]} description={"The units to use, usually \u201cbytes\u201d"}>
+      <Outline.Signature fullname="ContentRange.units" id="werkzeug.datastructures.ContentRange.units">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>units</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The units to use, usually “bytes”
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.ContentRange.unset"} module={"werkzeug.datastructures"} fullname={"ContentRange.unset"} parameters={[]} description={"Sets the units to None which indicates that the header should\nno longer be used."}>
+      <Outline.Signature fullname="ContentRange.unset" id="werkzeug.datastructures.ContentRange.unset">
+        <Outline.Name>unset</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Sets the units to <cite>None</cite> which indicates that the header should
+        no longer be used.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+:target{#others}
+
+## Others
+
+<Outline domain="py" objectType="class" target={"werkzeug.datastructures.FileStorage"} module={"werkzeug.datastructures"} fullname={"FileStorage"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The FileStorage class is a thin wrapper over incoming files.\nIt is used by the request object to represent uploaded files.  All the\nattributes of the wrapper stream are proxied by the file storage so\nit\u2019s possible to do storage.read() instead of the long form\nstorage.stream.read()."}>
+  <Outline.Signature fullname="FileStorage" id="werkzeug.datastructures.FileStorage">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.datastructures.</Outline.Prefix><Outline.Name>FileStorage</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">filename</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">name</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">content\_type</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">content\_length</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">headers</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    The [<code>FileStorage</code>](#werkzeug.datastructures.FileStorage "werkzeug.datastructures.FileStorage") class is a thin wrapper over incoming files.
+    It is used by the request object to represent uploaded files.  All the
+    attributes of the wrapper stream are proxied by the file storage so
+    it’s possible to do <code>storage.read()</code> instead of the long form
+    <code>storage.stream.read()</code>.
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.FileStorage.stream"} module={"werkzeug.datastructures"} fullname={"FileStorage.stream"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The input stream for the uploaded file.  This usually points to an\nopen temporary file."}>
+      <Outline.Signature fullname="FileStorage.stream" id="werkzeug.datastructures.FileStorage.stream">
+        <Outline.Name>stream</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The input stream for the uploaded file.  This usually points to an
+        open temporary file.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.FileStorage.filename"} module={"werkzeug.datastructures"} fullname={"FileStorage.filename"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The filename of the file on the client. Can be a str, or an\ninstance of os.PathLike."}>
+      <Outline.Signature fullname="FileStorage.filename" id="werkzeug.datastructures.FileStorage.filename">
+        <Outline.Name>filename</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The filename of the file on the client. Can be a <code>str</code>, or an
+        instance of <code>os.PathLike</code>.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.FileStorage.name"} module={"werkzeug.datastructures"} fullname={"FileStorage.name"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The name of the form field."}>
+      <Outline.Signature fullname="FileStorage.name" id="werkzeug.datastructures.FileStorage.name">
+        <Outline.Name>name</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The name of the form field.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.datastructures.FileStorage.headers"} module={"werkzeug.datastructures"} fullname={"FileStorage.headers"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The multipart headers as Headers object.  This usually contains\nirrelevant information but in combination with custom multipart requests\nthe raw headers might be interesting."}>
+      <Outline.Signature fullname="FileStorage.headers" id="werkzeug.datastructures.FileStorage.headers">
+        <Outline.Name>headers</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The multipart headers as [<code>Headers</code>](#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers") object.  This usually contains
+        irrelevant information but in combination with custom multipart requests
+        the raw headers might be interesting.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.6.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.FileStorage.close"} module={"werkzeug.datastructures"} fullname={"FileStorage.close"} parameters={[]} description={"Close the underlying file if possible."}>
+      <Outline.Signature fullname="FileStorage.close" id="werkzeug.datastructures.FileStorage.close">
+        <Outline.Name>close</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Close the underlying file if possible.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.FileStorage.content_length"} module={"werkzeug.datastructures"} fullname={"FileStorage.content_length"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The content-length sent in the header.  Usually not available"}>
+      <Outline.Signature fullname="FileStorage.content_length" id="werkzeug.datastructures.FileStorage.content_length">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>content\_length</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The content-length sent in the header.  Usually not available
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.FileStorage.content_type"} module={"werkzeug.datastructures"} fullname={"FileStorage.content_type"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The content-type sent in the header.  Usually not available"}>
+      <Outline.Signature fullname="FileStorage.content_type" id="werkzeug.datastructures.FileStorage.content_type">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>content\_type</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The content-type sent in the header.  Usually not available
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.FileStorage.mimetype"} module={"werkzeug.datastructures"} fullname={"FileStorage.mimetype"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"Like content_type, but without parameters (eg, without\ncharset, type etc.) and always lowercase.  For example if the content\ntype is text/HTML; charset=utf-8 the mimetype would be\n'text/html'."}>
+      <Outline.Signature fullname="FileStorage.mimetype" id="werkzeug.datastructures.FileStorage.mimetype">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>mimetype</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Like [<code>content\_type</code>](#werkzeug.datastructures.FileStorage.content_type "werkzeug.datastructures.FileStorage.content_type"), but without parameters (eg, without
+        charset, type etc.) and always lowercase.  For example if the content
+        type is <code>text/HTML; charset=utf-8</code> the mimetype would be
+        <code>'text/html'</code>.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.7.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.datastructures.FileStorage.mimetype_params"} module={"werkzeug.datastructures"} fullname={"FileStorage.mimetype_params"} parameters={["stream", "filename", "name", "content_type", "content_length", "headers"]} description={"The mimetype parameters as dict.  For example if the content\ntype is text/html; charset=utf-8 the params would be\n{'charset': 'utf-8'}."}>
+      <Outline.Signature fullname="FileStorage.mimetype_params" id="werkzeug.datastructures.FileStorage.mimetype_params">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>mimetype\_params</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The mimetype parameters as dict.  For example if the content
+        type is <code>text/html; charset=utf-8</code> the params would be
+        <code>\{'charset': 'utf-8'}</code>.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.7.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.datastructures.FileStorage.save"} module={"werkzeug.datastructures"} fullname={"FileStorage.save"} parameters={["dst", "buffer_size"]} description={"Save the file to a destination path or file object.  If the\ndestination is a file object you have to close it yourself after the\ncall.  The buffer size is the number of bytes held in memory during\nthe copy process.  It defaults to 16KB."}>
+      <Outline.Signature fullname="FileStorage.save" id="werkzeug.datastructures.FileStorage.save">
+        <Outline.Name>save</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">dst</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>16384</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Save the file to a destination path or file object.  If the
+        destination is a file object you have to close it yourself after the
+        call.  The buffer size is the number of bytes held in memory during
+        the copy process.  It defaults to 16KB.
+
+        For secure file saving also have a look at <code>secure\_filename()</code>.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>dst</Outline.ParameterTarget> – a filename, [<code>os.PathLike</code>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)"), or open file
+                object to write to.
+              - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> – Passed as the <code>length</code> parameter of
+                [<code>shutil.copyfileobj()</code>](https://docs.python.org/3/library/shutil.html#shutil.copyfileobj "(in Python v3.11)").
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 1.0: </span>Supports [<code>pathlib</code>](https://docs.python.org/3/library/pathlib.html#module-pathlib "(in Python v3.11)").
+        </Container>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>

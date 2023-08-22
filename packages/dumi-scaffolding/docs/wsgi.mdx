@@ -1,0 +1,874 @@
+:target{id="module-werkzeug.wsgi"}
+
+# WSGI Helpers
+
+The following classes and functions are designed to make working with
+the WSGI specification easier or operate on the WSGI layer. All the
+functionality from this module is available on the high-level
+[Request / Response Objects](wrappers.mdx).
+
+:target{#iterator-stream-helpers}
+
+## Iterator / Stream Helpers
+
+These classes and functions simplify working with the WSGI application
+iterator and the input stream.
+
+<Outline domain="py" objectType="class" target={"werkzeug.wsgi.ClosingIterator"} module={"werkzeug.wsgi"} fullname={"ClosingIterator"} parameters={["iterable", "callbacks"]} description={"The WSGI specification requires that all middlewares and gateways\nrespect the close callback of the iterable returned by the application.\nBecause it is useful to add another close action to a returned iterable\nand adding a custom iterable is a boring task this class can be used for\nthat:"}>
+  <Outline.Signature fullname="ClosingIterator" id="werkzeug.wsgi.ClosingIterator">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>ClosingIterator</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">iterable</span></Outline.Parameter>, <Outline.Parameter><span className="name">callbacks</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    The WSGI specification requires that all middlewares and gateways
+    respect the <cite>close</cite> callback of the iterable returned by the application.
+    Because it is useful to add another close action to a returned iterable
+    and adding a custom iterable is a boring task this class can be used for
+    that:
+
+    ```default
+    return ClosingIterator(app(environ, start_response), [cleanup_session,
+                                                          cleanup_locals])
+    ```
+
+    If there is just one close function it can be passed instead of the list.
+
+    A closing iterator is not needed if the application uses response objects
+    and finishes the processing if the response is started:
+
+    ```default
+    try:
+        return response(environ, start_response)
+    finally:
+        cleanup_session()
+        cleanup_locals()
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>iterable</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) –&#x20;
+          - <Outline.ParameterTarget>callbacks</Outline.ParameterTarget> (<em>None</em><em> | </em><em>(</em><em>t.Callable</em><em>\[</em><em>\[</em><em>]</em><em>, </em><em>None</em><em>] </em><em>| </em><em>t.Iterable</em><em>\[</em><em>t.Callable</em><em>\[</em><em>\[</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em><em>)</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.wsgi.FileWrapper"} module={"werkzeug.wsgi"} fullname={"FileWrapper"} parameters={["file", "buffer_size"]} description={"This class can be used to convert a file-like object into\nan iterable.  It yields buffer_size blocks until the file is fully\nread."}>
+  <Outline.Signature fullname="FileWrapper" id="werkzeug.wsgi.FileWrapper">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>FileWrapper</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">file</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>8192</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This class can be used to convert a <code>file</code>-like object into
+    an iterable.  It yields <cite>buffer\_size</cite> blocks until the file is fully
+    read.
+
+    You should not use this class directly but rather use the
+    [<code>wrap\_file()</code>](#werkzeug.wsgi.wrap_file "werkzeug.wsgi.wrap_file") function that uses the WSGI server’s file wrapper
+    support if it’s available.
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    If you’re using this object together with a <code>Response</code> you have
+    to use the <cite>direct\_passthrough</cite> mode.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a <code>file</code>-like object with a <code>read()</code> method.
+          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – number of bytes for one iteration.
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.wsgi.LimitedStream"} module={"werkzeug.wsgi"} fullname={"LimitedStream"} parameters={["stream", "limit", "is_max"]} description={"Wrap a stream so that it doesn\u2019t read more than a given limit. This is used to\nlimit wsgi.input to the Content-Length header value or\nRequest.max_content_length."}>
+  <Outline.Signature fullname="LimitedStream" id="werkzeug.wsgi.LimitedStream">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>LimitedStream</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span></Outline.Parameter>, <Outline.Parameter><span className="name">is\_max</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Wrap a stream so that it doesn’t read more than a given limit. This is used to
+    limit <code>wsgi.input</code> to the <code>Content-Length</code> header value or
+    [<code>Request.max\_content\_length</code>](wrappers.mdx#werkzeug.wrappers.Request.max_content_length "werkzeug.wrappers.Request.max_content_length").
+
+    When attempting to read after the limit has been reached, [<code>on\_exhausted()</code>](#werkzeug.wsgi.LimitedStream.on_exhausted "werkzeug.wsgi.LimitedStream.on_exhausted") is
+    called. When the limit is a maximum, this raises [<code>RequestEntityTooLarge</code>](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
+
+    If reading from the stream returns zero bytes or raises an error,
+    [<code>on\_disconnect()</code>](#werkzeug.wsgi.LimitedStream.on_disconnect "werkzeug.wsgi.LimitedStream.on_disconnect") is called, which raises [<code>ClientDisconnected</code>](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"). When the
+    limit is a maximum and zero bytes were read, no error is raised, since it may be the
+    end of the stream.
+
+    If the limit is reached before the underlying stream is exhausted (such as a file
+    that is too large, or an infinite stream), the remaining contents of the stream
+    cannot be read safely. Depending on how the server handles this, clients may show a
+    “connection reset” failure instead of seeing the 413 response.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – The stream to read from. Must be a readable binary IO object.
+          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The limit in bytes to not read past. Should be either the
+            <code>Content-Length</code> header value or <code>request.max\_content\_length</code>.
+          - <Outline.ParameterTarget>is\_max</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Whether the given <code>limit</code> is <code>request.max\_content\_length</code> instead
+            of the <code>Content-Length</code> header value. This changes how exhausted and
+            disconnect events are handled.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Handle <code>max\_content\_length</code> differently than <code>Content-Length</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Implements <code>io.RawIOBase</code> rather than <code>io.IOBase</code>.
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.exhaust"} module={"werkzeug.wsgi"} fullname={"LimitedStream.exhaust"} parameters={[]} description={"Exhaust the stream by reading until the limit is reached or the client\ndisconnects, returning the remaining data."}>
+      <Outline.Signature fullname="LimitedStream.exhaust" id="werkzeug.wsgi.LimitedStream.exhaust">
+        <Outline.Name>exhaust</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Exhaust the stream by reading until the limit is reached or the client
+        disconnects, returning the remaining data.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>Return the remaining data.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.2.3: </span>Handle case where wrapped stream returns fewer bytes than requested.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.wsgi.LimitedStream.is_exhausted"} module={"werkzeug.wsgi"} fullname={"LimitedStream.is_exhausted"} parameters={["stream", "limit", "is_max"]} description={"Whether the current stream position has reached the limit."}>
+      <Outline.Signature fullname="LimitedStream.is_exhausted" id="werkzeug.wsgi.LimitedStream.is_exhausted">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>is\_exhausted</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Whether the current stream position has reached the limit.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.on_disconnect"} module={"werkzeug.wsgi"} fullname={"LimitedStream.on_disconnect"} parameters={["error"]} description={"Called when an attempted read receives zero bytes before the limit was\nreached. This indicates that the client disconnected before sending the full\nrequest body."}>
+      <Outline.Signature fullname="LimitedStream.on_disconnect" id="werkzeug.wsgi.LimitedStream.on_disconnect">
+        <Outline.Name>on\_disconnect</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">error</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Called when an attempted read receives zero bytes before the limit was
+        reached. This indicates that the client disconnected before sending the full
+        request body.
+
+        The default behavior is to raise [<code>ClientDisconnected</code>](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"), unless the limit is
+        a maximum and no error was raised.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>Added the <code>error</code> parameter. Do nothing if the limit is a maximum and no
+          error was raised.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>Any return value is ignored.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>error</Outline.ParameterTarget> ([<em>Exception</em>](https://docs.python.org/3/library/exceptions.html#Exception "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.on_exhausted"} module={"werkzeug.wsgi"} fullname={"LimitedStream.on_exhausted"} parameters={[]} description={"Called when attempting to read after the limit has been reached."}>
+      <Outline.Signature fullname="LimitedStream.on_exhausted" id="werkzeug.wsgi.LimitedStream.on_exhausted">
+        <Outline.Name>on\_exhausted</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Called when attempting to read after the limit has been reached.
+
+        The default behavior is to do nothing, unless the limit is a maximum, in which
+        case it raises [<code>RequestEntityTooLarge</code>](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>Raises <code>RequestEntityTooLarge</code> if the limit is a maximum.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>Any return value is ignored.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.readable"} module={"werkzeug.wsgi"} fullname={"LimitedStream.readable"} parameters={[]} description={"Return whether object was opened for reading."}>
+      <Outline.Signature fullname="LimitedStream.readable" id="werkzeug.wsgi.LimitedStream.readable">
+        <Outline.Name>readable</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return whether object was opened for reading.
+
+        If False, read() will raise OSError.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.readall"} module={"werkzeug.wsgi"} fullname={"LimitedStream.readall"} parameters={[]} description={"Read until EOF, using multiple read() call."}>
+      <Outline.Signature fullname="LimitedStream.readall" id="werkzeug.wsgi.LimitedStream.readall">
+        <Outline.Name>readall</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Read until EOF, using multiple read() call.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.tell"} module={"werkzeug.wsgi"} fullname={"LimitedStream.tell"} parameters={[]} description={"Return the current stream position."}>
+      <Outline.Signature fullname="LimitedStream.tell" id="werkzeug.wsgi.LimitedStream.tell">
+        <Outline.Name>tell</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the current stream position.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.9.</span>
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.make_line_iter"} module={"werkzeug.wsgi"} fullname={"make_line_iter"} parameters={["stream", "limit", "buffer_size", "cap_at_buffer"]} description={"Safely iterates line-based over an input stream.  If the input stream\nis not a LimitedStream the limit parameter is mandatory."}>
+  <Outline.Signature fullname="make_line_iter" id="werkzeug.wsgi.make_line_iter">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>make\_line\_iter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>10240</span></Outline.Parameter>, <Outline.Parameter><span className="name">cap\_at\_buffer</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Safely iterates line-based over an input stream.  If the input stream
+    is not a [<code>LimitedStream</code>](#werkzeug.wsgi.LimitedStream "werkzeug.wsgi.LimitedStream") the <cite>limit</cite> parameter is mandatory.
+
+    This uses the stream’s <code>read()</code> method internally as opposite
+    to the <code>readline()</code> method that is unsafe and can only be used
+    in violation of the WSGI specification.  The same problem applies to the
+    <cite>\_\_iter\_\_</cite> function of the input stream which calls <code>readline()</code>
+    without arguments.
+
+    If you need line-by-line processing it’s strongly recommended to iterate
+    over the input stream using this helper function.
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.11: </span>added support for the <cite>cap\_at\_buffer</cite> parameter.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.9: </span>added support for iterators as input stream.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.8: </span>This function now ensures that the limit was reached.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em><em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – the stream or iterate to iterate over.
+          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the limit in bytes for the stream.  (Usually
+            content length.  Not necessary if the <cite>stream</cite>
+            is a [<code>LimitedStream</code>](#werkzeug.wsgi.LimitedStream "werkzeug.wsgi.LimitedStream").
+          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The optional buffer size.
+          - <Outline.ParameterTarget>cap\_at\_buffer</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if this is set chunks are split if they are longer
+            than the buffer size.  Internally this is implemented
+            that the buffer size might be exhausted by a factor
+            of two however.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          t.Iterator\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.make_chunk_iter"} module={"werkzeug.wsgi"} fullname={"make_chunk_iter"} parameters={["stream", "separator", "limit", "buffer_size", "cap_at_buffer"]} description={"Works like make_line_iter() but accepts a separator\nwhich divides chunks.  If you want newline based processing\nyou should use make_line_iter() instead as it\nsupports arbitrary newline markers."}>
+  <Outline.Signature fullname="make_chunk_iter" id="werkzeug.wsgi.make_chunk_iter">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>make\_chunk\_iter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>10240</span></Outline.Parameter>, <Outline.Parameter><span className="name">cap\_at\_buffer</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Works like [<code>make\_line\_iter()</code>](#werkzeug.wsgi.make_line_iter "werkzeug.wsgi.make_line_iter") but accepts a separator
+    which divides chunks.  If you want newline based processing
+    you should use [<code>make\_line\_iter()</code>](#werkzeug.wsgi.make_line_iter "werkzeug.wsgi.make_line_iter") instead as it
+    supports arbitrary newline markers.
+
+    <Container type="warning" title="Deprecated">
+      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.11: </span>added support for the <cite>cap\_at\_buffer</cite> parameter.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.9: </span>added support for iterators as input stream.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.8.</span>
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em><em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – the stream or iterate to iterate over.
+          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – the separator that divides chunks.
+          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the limit in bytes for the stream.  (Usually
+            content length.  Not necessary if the <cite>stream</cite>
+            is otherwise already limited).
+          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The optional buffer size.
+          - <Outline.ParameterTarget>cap\_at\_buffer</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if this is set chunks are split if they are longer
+            than the buffer size.  Internally this is implemented
+            that the buffer size might be exhausted by a factor
+            of two however.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          t.Iterator\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.wrap_file"} module={"werkzeug.wsgi"} fullname={"wrap_file"} parameters={["environ", "file", "buffer_size"]} description={"Wraps a file.  This uses the WSGI server\u2019s file wrapper if available\nor otherwise the generic FileWrapper."}>
+  <Outline.Signature fullname="wrap_file" id="werkzeug.wsgi.wrap_file">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>wrap\_file</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">file</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>8192</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Wraps a file.  This uses the WSGI server’s file wrapper if available
+    or otherwise the generic [<code>FileWrapper</code>](#werkzeug.wsgi.FileWrapper "werkzeug.wsgi.FileWrapper").
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.5.</span>
+    </Container>
+
+    If the file wrapper from the WSGI server is used it’s important to not
+    iterate over it from inside the application but to pass it through
+    unchanged.  If you want to pass out a file wrapper inside a response
+    object you have to set <code>Response.direct\_passthrough</code> to <cite>True</cite>.
+
+    More information about file wrappers are available in [<strong>PEP 333</strong>](https://peps.python.org/pep-0333/).
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a <code>file</code>-like object with a <code>read()</code> method.
+          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – number of bytes for one iteration.
+          - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          t.Iterable\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#environ-helpers}
+
+## Environ Helpers
+
+These functions operate on the WSGI environment.  They extract useful
+information or perform common manipulations:
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.get_host"} module={"werkzeug.wsgi"} fullname={"get_host"} parameters={["environ", "trusted_hosts"]} description={"Return the host for the given WSGI environment."}>
+  <Outline.Signature fullname="get_host" id="werkzeug.wsgi.get_host">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>get\_host</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">trusted\_hosts</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Return the host for the given WSGI environment.
+
+    The <code>Host</code> header is preferred, then <code>SERVER\_NAME</code> if it’s not
+    set. The returned host will only contain the port if it is different
+    than the standard port for the protocol.
+
+    Optionally, verify that the host is trusted using
+    [<code>host\_is\_trusted()</code>](#werkzeug.wsgi.host_is_trusted "werkzeug.wsgi.host_is_trusted") and raise a
+    [<code>SecurityError</code>](exceptions.mdx#werkzeug.exceptions.SecurityError "werkzeug.exceptions.SecurityError") if it is not.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – A WSGI environment dict.
+          - <Outline.ParameterTarget>trusted\_hosts</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – A list of trusted host names.
+        </dd>
+
+        <dt className="field-name">
+          Returns
+        </dt>
+
+        <dd className="field-body">
+          Host, with port if necessary.
+        </dd>
+
+        <dt className="field-name">
+          Raises
+        </dt>
+
+        <dd className="field-body">
+          [<strong>SecurityError</strong>](exceptions.mdx#werkzeug.exceptions.SecurityError "werkzeug.exceptions.SecurityError") – If the host is not
+          trusted.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.get_content_length"} module={"werkzeug.wsgi"} fullname={"get_content_length"} parameters={["environ"]} description={"Return the Content-Length header value as an int. If the header is not given\nor the Transfer-Encoding header is chunked, None is returned to indicate\na streaming request. If the value is not an integer, or negative, 0 is returned."}>
+  <Outline.Signature fullname="get_content_length" id="werkzeug.wsgi.get_content_length">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>get\_content\_length</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Return the <code>Content-Length</code> header value as an int. If the header is not given
+    or the <code>Transfer-Encoding</code> header is <code>chunked</code>, <code>None</code> is returned to indicate
+    a streaming request. If the value is not an integer, or negative, 0 is returned.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – The WSGI environ to get the content length from.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") | None
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.9.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.get_input_stream"} module={"werkzeug.wsgi"} fullname={"get_input_stream"} parameters={["environ", "safe_fallback", "max_content_length"]} description={"Return the WSGI input stream, wrapped so that it may be read safely without going\npast the Content-Length header value or max_content_length."}>
+  <Outline.Signature fullname="get_input_stream" id="werkzeug.wsgi.get_input_stream">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>get\_input\_stream</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">safe\_fallback</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">max\_content\_length</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Return the WSGI input stream, wrapped so that it may be read safely without going
+    past the <code>Content-Length</code> header value or <code>max\_content\_length</code>.
+
+    If <code>Content-Length</code> exceeds <code>max\_content\_length</code>, a
+    <code>RequestEntityTooLarge\`</code> <code>413 Content Too Large</code> error is raised.
+
+    If the WSGI server sets <code>environ\["wsgi.input\_terminated"]</code>, it indicates that the
+    server handles terminating the stream, so it is safe to read directly. For example,
+    a server that knows how to handle chunked requests safely would set this.
+
+    If <code>max\_content\_length</code> is set, it can be enforced on streams if
+    <code>wsgi.input\_terminated</code> is set. Otherwise, an empty stream is returned unless the
+    user explicitly disables this safe fallback.
+
+    If the limit is reached before the underlying stream is exhausted (such as a file
+    that is too large, or an infinite stream), the remaining contents of the stream
+    cannot be read safely. Depending on how the server handles this, clients may show a
+    “connection reset” failure instead of seeing the 413 response.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – The WSGI environ containing the stream.
+          - <Outline.ParameterTarget>safe\_fallback</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Return an empty stream when <code>Content-Length</code> is not set.
+            Disabling this allows infinite streams, which can be a denial-of-service risk.
+          - <Outline.ParameterTarget>max\_content\_length</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The maximum length that content-length or streaming
+            requests may not exceed.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          t.IO\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3.2: </span><code>max\_content\_length</code> is only applied to streaming requests if the server sets
+      <code>wsgi.input\_terminated</code>.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Check <code>max\_content\_length</code> and raise an error if it is exceeded.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.9.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.get_current_url"} module={"werkzeug.wsgi"} fullname={"get_current_url"} parameters={["environ", "root_only", "strip_querystring", "host_only", "trusted_hosts"]} description={"Recreate the URL for a request from the parts in a WSGI\nenvironment."}>
+  <Outline.Signature fullname="get_current_url" id="werkzeug.wsgi.get_current_url">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>get\_current\_url</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">root\_only</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">strip\_querystring</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">host\_only</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">trusted\_hosts</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Recreate the URL for a request from the parts in a WSGI
+    environment.
+
+    The URL is an IRI, not a URI, so it may contain Unicode characters.
+    Use [<code>iri\_to\_uri()</code>](urls.mdx#werkzeug.urls.iri_to_uri "werkzeug.urls.iri_to_uri") to convert it to ASCII.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – The WSGI environment to get the URL parts from.
+          - <Outline.ParameterTarget>root\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Only build the root path, don’t include the
+            remaining path or query string.
+          - <Outline.ParameterTarget>strip\_querystring</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Don’t include the query string.
+          - <Outline.ParameterTarget>host\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Only build the scheme and host.
+          - <Outline.ParameterTarget>trusted\_hosts</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – A list of trusted host names to validate the
+            host against.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.host_is_trusted"} module={"werkzeug.wsgi"} fullname={"host_is_trusted"} parameters={["hostname", "trusted_list"]} description={"Check if a host matches a list of trusted names."}>
+  <Outline.Signature fullname="host_is_trusted" id="werkzeug.wsgi.host_is_trusted">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>host\_is\_trusted</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">hostname</span></Outline.Parameter>, <Outline.Parameter><span className="name">trusted\_list</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Check if a host matches a list of trusted names.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>hostname</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The name to check.
+          - <Outline.ParameterTarget>trusted\_list</Outline.ParameterTarget> ([<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – A list of valid names to match. If a name
+            starts with a dot it will match all subdomains.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.9.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+:target{#convenience-helpers}
+
+## Convenience Helpers
+
+<Outline domain="py" objectType="function" target={"werkzeug.wsgi.responder"} module={"werkzeug.wsgi"} fullname={"responder"} parameters={["f"]} description={"Marks a function as responder.  Decorate a function with it and it\nwill automatically call the return value as WSGI application."}>
+  <Outline.Signature fullname="responder" id="werkzeug.wsgi.responder">
+    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>responder</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">f</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Marks a function as responder.  Decorate a function with it and it
+    will automatically call the return value as WSGI application.
+
+    Example:
+
+    ```default
+    @responder
+    def application(environ, start_response):
+        return Response('Hello World!')
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>f</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>...</em><em>, </em><em>WSGIApplication</em><em>]</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          WSGIApplication
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.testapp.test_app"} module={"werkzeug.testapp"} fullname={"test_app"} parameters={["req"]} description={"Simple test application that dumps the environment.  You can use\nit to check if Werkzeug is working properly:"}>
+  <Outline.Signature fullname="test_app" id="werkzeug.testapp.test_app">
+    <Outline.Prefix>werkzeug.testapp.</Outline.Prefix><Outline.Name>test\_app</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">req</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Simple test application that dumps the environment.  You can use
+    it to check if Werkzeug is working properly:
+
+    ```pycon
+    >>> from werkzeug.serving import run_simple
+    >>> from werkzeug.testapp import test_app
+    >>> run_simple('localhost', 3000, test_app)
+     * Running on http://localhost:3000/
+    ```
+
+    The application displays important information from the WSGI environment,
+    the Python interpreter and the installed libraries.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>req</Outline.ParameterTarget> ([<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [<em>Response</em>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.response.Response")
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#bytes-strings-and-encodings}
+
+## Bytes, Strings, and Encodings
+
+The values in HTTP requests come in as bytes representing (or encoded
+to) ASCII. The WSGI specification ([<strong>PEP 3333</strong>](https://peps.python.org/pep-3333/)) decided to always use
+the <code>str</code> type to represent values. To accomplish this, the raw bytes
+are decoded using the ISO-8859-1 charset to produce a string.
+
+Strings in the WSGI environment are restricted to ISO-8859-1 code
+points. If a string read from the environment might contain characters
+outside that charset, it must first be decoded to bytes as ISO-8859-1,
+then encoded to a string using the proper charset (typically UTF-8). The
+reverse is done when writing to the environ. This is known as the “WSGI
+encoding dance”.
+
+Werkzeug provides functions to deal with this automatically so that you
+don’t need to be aware of the inner workings. Use the functions on this
+page as well as [<code>EnvironHeaders()</code>](datastructures.mdx#werkzeug.datastructures.EnvironHeaders "werkzeug.datastructures.EnvironHeaders") to read
+data out of the WSGI environment.
+
+Applications should avoid manually creating or modifying a WSGI
+environment unless they take care of the proper encoding or decoding
+step. All high level interfaces in Werkzeug will apply the encoding and
+decoding as necessary.
+
+:target{#raw-request-uri-and-path-encoding}
+
+## Raw Request URI and Path Encoding
+
+The <code>PATH\_INFO</code> in the environ is the path value after
+percent-decoding. For example, the raw path <code>/hello%2fworld</code> would
+show up from the WSGI server to Werkzeug as <code>/hello/world</code>. This loses
+the information that the slash was a raw character as opposed to a path
+separator.
+
+The WSGI specification ([<strong>PEP 3333</strong>](https://peps.python.org/pep-3333/)) does not provide a way to get the
+original value, so it is impossible to route some types of data in the
+path. The most compatible way to work around this is to send problematic
+data in the query string instead of the path.
+
+However, many WSGI servers add a non-standard environ key with the raw
+path. To match this behavior, Werkzeug’s test client and development
+server will add the raw value to both the <code>REQUEST\_URI</code> and
+<code>RAW\_URI</code> keys. If you want to route based on this value, you can use
+middleware to replace <code>PATH\_INFO</code> in the environ before it reaches the
+application. However, keep in mind that these keys are non-standard and
+not guaranteed to be present.
