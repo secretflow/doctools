@@ -9,7 +9,7 @@
     "lint:black": "black --check src tests",
     "lint:ruff": "ruff check src tests",
     "lint:pyright": "pyright src",
-    "release": ": hatch publish ./dist"
+    "release": "hatch publish pyproject/dist"
   },
   "devDependencies": {
     "mdserver": "workspace:^"

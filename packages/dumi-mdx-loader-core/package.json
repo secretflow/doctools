@@ -33,7 +33,7 @@
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
     "lint:tsc": "tsc --noEmit",
-    "release": "pnpm publish"
+    "release": "pnpm publish -r --filter ."
   },
   "dependencies": {
     "@mdx-js/loader": "^2.3.0",

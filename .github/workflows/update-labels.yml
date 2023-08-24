@@ -2,7 +2,7 @@
 # Labels are defined in .github/workflows/config/labels.yml
 # See that file for specific instructions on making changes.
 
-name: 'Update GitHub labels'
+name: 'GitHub: Update labels'
 on:
   workflow_dispatch:
   push:

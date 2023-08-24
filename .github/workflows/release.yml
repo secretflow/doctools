@@ -1,20 +1,26 @@
 # https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
-name: Release
+name: 'Code: Release'
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['Code: CI']
+    branches: ['main']
+    types:
+      - completed
 
 permissions: {}
 
 jobs:
   release:
-    # prevents this action from running on forks
-    if: github.repository == 'secretflow/doctools'
+    # prevent this action from running on forks
+    if: |
+      github.repository == 'secretflow/doctools'
+      && github.event.workflow_run.conclusion == 'success'
+
     permissions:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
+
     name: Release
     runs-on: ubuntu-latest
 
@@ -26,6 +32,9 @@ jobs:
 
       - uses: ./.github/actions/ci-setup
 
+      - name: Authenticate with NPM
+        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+
       - name: Create release PR or publish packages
         id: changesets
         uses: changesets/action@v1
@@ -33,12 +42,12 @@ jobs:
           # run changeset version to consume all changesets and bump versions
           version: pnpm run version
           # publish with Nx. won't call changeset publish but does call changeset tag
-          publish: pnpm run release
+          publish: pnpm run release && pnpm exec changeset tag
           # commit message for the release commits
           commit: 'chore: stage changes for next release'
           # title of the release PR
           title: 'chore: release'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SF_BOT_TOKEN }}
           HATCH_INDEX_USER: __token__
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}

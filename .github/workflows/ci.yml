@@ -1,4 +1,4 @@
-name: CI
+name: 'Code: CI'
 
 on:
   pull_request:
@@ -90,14 +90,3 @@ jobs:
 
       - name: Test
         run: pnpm exec nx affected -t test:pytest
-
-  docker-image:
-    name: 'Build Docker image'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/build-push-action@v4
-        with:
-          push: false
-          file: ./docker/doctools.Dockerfile

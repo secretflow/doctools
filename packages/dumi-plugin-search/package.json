@@ -59,7 +59,7 @@
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
     "lint:tsc": "tsc -b",
-    "release": "pnpm publish"
+    "release": "pnpm publish -r --filter ."
   },
   "dependencies": {
     "@orama/orama": "^1.0.10",

@@ -28,7 +28,7 @@
     "lint:eslint": "eslint src",
     "lint:tsc": "tsc --noEmit",
     "coverage": "vitest run --coverage",
-    "release": "pnpm publish"
+    "release": "pnpm publish -r --filter ."
   },
   "private": false,
   "publishConfig": {
