@@ -1,0 +1,8 @@
+# artifacts
+**/build/*.js
+**/build/*.mjs
+**/build/*.cjs
+
+# protobuf
+**/*_pb.ts
+**/*_connect.ts

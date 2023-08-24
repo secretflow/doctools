@@ -1,0 +1,11 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "outDir": "../../build/loader"
+  },
+  "include": ["./**/*.mts", "./**/*.cts"],
+  "references": [{ "path": "../shared" }]
+}

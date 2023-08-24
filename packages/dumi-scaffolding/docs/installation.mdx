@@ -1,0 +1,103 @@
+:target{#installation}
+
+# Installation
+
+:target{#python-version}
+
+## Python Version
+
+We recommend using the latest version of Python. Werkzeug supports
+Python 3.8 and newer.
+
+:target{#optional-dependencies}
+
+### Optional dependencies
+
+These distributions will not be installed automatically. Werkzeug will
+detect and use them if you install them.
+
+- [Colorama](https://pypi.org/project/colorama/) provides request log highlighting when using the
+  development server on Windows. This works automatically on other
+  systems.
+- [Watchdog](https://pypi.org/project/watchdog/) provides a faster, more efficient reloader for the
+  development server.
+
+:target{#greenlet}
+
+### greenlet
+
+You may choose to use gevent or eventlet with your application. In this
+case, greenlet>=1.0 is required. When using PyPy, PyPy>=7.3.7 is
+required.
+
+These are not minimum supported versions, they only indicate the first
+versions that added necessary features. You should use the latest
+versions of each.
+
+:target{#virtual-environments}
+
+## Virtual environments
+
+Use a virtual environment to manage the dependencies for your project,
+both in development and in production.
+
+What problem does a virtual environment solve? The more Python
+projects you have, the more likely it is that you need to work with
+different versions of Python libraries, or even Python itself. Newer
+versions of libraries for one project can break compatibility in
+another project.
+
+Virtual environments are independent groups of Python libraries, one for
+each project. Packages installed for one project will not affect other
+projects or the operating system’s packages.
+
+Python comes bundled with the [`venv`](https://docs.python.org/3/library/venv.html#module-venv "(in Python v3.11)") module to create virtual
+environments.
+
+:target{#create-an-environment}
+
+### Create an environment
+
+Create a project folder and a `venv` folder within:
+
+```sh
+mkdir myproject
+cd myproject
+python3 -m venv venv
+```
+
+On Windows:
+
+```bat
+py -3 -m venv venv
+```
+
+:target{#activate-the-environment}
+
+### Activate the environment
+
+Before you work on your project, activate the corresponding environment:
+
+```sh
+. venv/bin/activate
+```
+
+On Windows:
+
+```bat
+venv\Scripts\activate
+```
+
+Your shell prompt will change to show the name of the activated
+environment.
+
+:target{#install-werkzeug}
+
+## Install Werkzeug
+
+Within the activated environment, use the following command to install
+Werkzeug:
+
+```sh
+pip install Werkzeug
+```

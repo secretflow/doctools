@@ -1,0 +1,63 @@
+{
+  "name": "@secretflow/dumi-plugin-mdx",
+  "license": "MIT",
+  "version": "0.0.1",
+  "description": "Dumi plugin to enable compiling .mdx files.",
+  "keywords": [],
+  "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-plugin-mdx",
+  "bugs": "https://github.com/secretflow/doctools/issues",
+  "author": "Tony Wu <tonywu6@protonmail.com>",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "types": "./dist/typing/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/typing/index.d.mts",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
+    },
+    "./esm": {
+      "types": "./dist/typing/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "setup": "tsup",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test:vitest": "vitest run",
+    "lint:eslint": "eslint src",
+    "lint:tsc": "tsc --noEmit",
+    "release": "pnpm publish"
+  },
+  "dependencies": {
+    "@secretflow/dumi-mdx-loader-core": "workspace:^",
+    "@secretflow/unified-toolkit": "workspace:^",
+    "rehype-katex": "^6.0.3",
+    "rehype-raw": "^6.1.1",
+    "remark-directive": "^2.0.1",
+    "remark-extract-frontmatter": "^3.2.0",
+    "remark-frontmatter": "^4.0.1",
+    "remark-gfm": "^3.0.1",
+    "remark-math": "^5.1.1",
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "tsup-utils": "workspace:^",
+    "@umijs/bundler-webpack": "^4.0.72",
+    "dumi": "^2.2.1"
+  },
+  "peerDependencies": {
+    "dumi": "^2.2.1"
+  }
+}

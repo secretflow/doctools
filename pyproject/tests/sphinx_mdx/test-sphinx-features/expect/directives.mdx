@@ -1,0 +1,128 @@
+:target{#directives}
+
+# Directives
+
+<Container type="info" title="Version added">
+  <span>New in version 2.5: </span>The <em>spam</em> parameter.
+</Container>
+
+<Container type="warning" title="Deprecated">
+  <span>Deprecated since version 3.1: </span>Use `spam()` instead.
+</Container>
+
+<Container type="info" title="See also:">
+  <DefinitionList>
+    <dl>
+      <dt>
+        <DefinitionList.Term><span>Module [`zipfile`](https://docs.python.org/3/library/zipfile.html#module-zipfile "(in Python v3.11)")</span></DefinitionList.Term>
+      </dt>
+
+      <dd>
+        Documentation of the [`zipfile`](https://docs.python.org/3/library/zipfile.html#module-zipfile "(in Python v3.11)") standard module.
+      </dd>
+
+      <dt>
+        <DefinitionList.Term><span>[GNU tar manual, Basic Tar Format](http://link)</span></DefinitionList.Term>
+      </dt>
+
+      <dd>
+        Documentation for tar archive files, including GNU tar extensions.
+      </dd>
+    </dl>
+  </DefinitionList>
+</Container>
+
+<Container type="info" title="See also:">
+  modules [`zipfile`](https://docs.python.org/3/library/zipfile.html#module-zipfile "(in Python v3.11)"), [`tarfile`](https://docs.python.org/3/library/tarfile.html#module-tarfile "(in Python v3.11)")
+</Container>
+
+<HorizontalList>
+  <table>
+    <tr>
+      <td>
+        - A list of
+        - short items
+      </td>
+
+      <td>
+        - that should be
+        - displayed
+      </td>
+
+      <td>
+        - horizontally
+      </td>
+    </tr>
+  </table>
+</HorizontalList>
+
+```c
+int main(void)
+{
+    printf("Hello, world!\n");
+    return 0;
+}
+```
+
+```c
+#include <stdio.h>
+int main() {
+  int dividend, divisor, quotient, remainder;
+  printf("Enter dividend: ");
+  scanf("%d", &dividend);
+  printf("Enter divisor: ");
+  scanf("%d", &divisor);
+  // Computes quotient
+  quotient = dividend / divisor;
+  // Computes remainder
+  remainder = dividend % divisor;
+  printf("Quotient = %d\n", quotient);
+  printf("Remainder = %d", remainder);
+  return 0;
+}
+```
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.absolute()))
+
+extensions = [
+    "sphinx_mdx",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+]
+
+master_doc = "index"
+exclude_patterns = ["_build"]
+
+smartquotes = False
+
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+```
+
+<DefinitionList>
+  <dl>
+    <dt>
+      <DefinitionList.Term><span id="term-environment">environment</span></DefinitionList.Term>
+    </dt>
+
+    <dd>
+      A structure where information about all documents under the root is
+      saved, and used for cross-referencing.  The environment is pickled
+      after the parsing stage, so that successive runs only need to read
+      and parse new and changed documents.
+    </dd>
+
+    <dt>
+      <DefinitionList.Term><span id="term-source-directory">source directory</span></DefinitionList.Term>
+    </dt>
+
+    <dd>
+      The directory which, including its subdirectories, contains all
+      source files for one Sphinx project.
+    </dd>
+  </dl>
+</DefinitionList>

@@ -1,0 +1,117 @@
+:target{id="module-werkzeug.urls"}
+
+# URL Helpers
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.iri_to_uri"} module={"werkzeug.urls"} fullname={"iri_to_uri"} parameters={["iri"]} description={"Convert an IRI to a URI. All non-ASCII and unsafe characters are\nquoted. If the URL has a domain, it is encoded to Punycode."}>
+  <Outline.Signature fullname="iri_to_uri" id="werkzeug.urls.iri_to_uri">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>iri\_to\_uri</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">iri</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Convert an IRI to a URI. All non-ASCII and unsafe characters are
+    quoted. If the URL has a domain, it is encoded to Punycode.
+
+    ```python
+    >>> iri_to_uri('http://\u2603.net/p\xe5th?q=\xe8ry%DF')
+    'http://xn--n3h.net/p%C3%A5th?q=%C3%A8ry%DF'
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>iri</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The IRI to convert.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 3.0: </span>Passing a tuple or bytes, the `charset` and `errors` parameters,
+      and the `safe_conversion` parameter, are removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Which characters remain unquoted is specific to each part of the URL.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>All reserved characters remain unquoted. Previously, only some reserved
+      characters were left unquoted.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.9.6: </span>The `safe_conversion` parameter was added.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.6.</span>
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.urls.uri_to_iri"} module={"werkzeug.urls"} fullname={"uri_to_iri"} parameters={["uri"]} description={"Convert a URI to an IRI. All valid UTF-8 characters are unquoted,\nleaving all reserved and invalid characters quoted. If the URL has\na domain, it is decoded from Punycode."}>
+  <Outline.Signature fullname="uri_to_iri" id="werkzeug.urls.uri_to_iri">
+    <Outline.Prefix>werkzeug.urls.</Outline.Prefix><Outline.Name>uri\_to\_iri</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">uri</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Convert a URI to an IRI. All valid UTF-8 characters are unquoted,
+    leaving all reserved and invalid characters quoted. If the URL has
+    a domain, it is decoded from Punycode.
+
+    ```python
+    >>> uri_to_iri("http://xn--n3h.net/p%C3%A5th?q=%C3%A8ry%DF")
+    'http://\u2603.net/p\xe5th?q=\xe8ry%DF'
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>uri</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The URI to convert.
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 3.0: </span>Passing a tuple or bytes, and the `charset` and `errors` parameters,
+      are removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Which characters remain quoted is specific to each part of the URL.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.15: </span>All reserved and invalid characters remain quoted. Previously,
+      only some reserved characters were preserved, and invalid bytes
+      were replaced instead of left quoted.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.6.</span>
+    </Container>
+  </Outline.Content>
+</Outline>

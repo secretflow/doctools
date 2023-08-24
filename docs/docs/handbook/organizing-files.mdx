@@ -1,0 +1,148 @@
+---
+sidebar_position: 5
+---
+
+import LargeType from '@site/src/components/LargeType';
+
+# 文件组织
+
+本文档回答如下问题：
+
+<LargeType>**我想要添加一份新文档，我要把它的文件放在哪里？**</LargeType>
+
+## 文件命名规范
+
+文档源码的文件名**必须**使用**短横线命名法（kebab case）**，仅允许使用小写字母、数字和短横线，并且不允许使用短横线开头或者结尾：
+
+- ✅ `intro.md`
+- ✅ `tutorial-part1.md`
+- ✅ `tutorial-part-1.md`
+- ❌ `tutorial_part_1.md`
+- ❌ `TutorialPart1.md`
+- ❌ `tutorialPart1.md`
+- ❌ `指南.md`
+- ❌ `Getting Started.md`
+- ❌ `-intro.md`
+
+正则表达式：`^[a-z0-9]+(?:-[a-z0-9]+)*$`
+
+:::tip
+
+名称为 `index` 的文件是特殊的（无论后缀是什么），它代表了一个目录的首页。
+
+使用浏览器访问 `path/to/index.md` 文件时，路径将会是 `path/to`，而不是 `path/to/index`。
+
+:::
+
+:::warning
+
+在未来，我们在把文档编译为网页时，会将 URL 路径正常化（normalize），使其符合命名规范。为了避免 URL 与实际源码路径不一致而造成的麻烦，我们强烈建议你遵循命名规范。
+
+:::
+
+## 文档源码格式
+
+除非有显式的文件后缀，否则下文中的文件约定均允许以下 3 种文件格式：
+
+- `.md` — [Markdown] + [MyST]
+- `.rst` — [reStructuredText]
+- `.ipynb` — [Jupyter Notebook]
+
+[Markdown]: https://commonmark.org/
+[MyST]: https://myst-parser.readthedocs.io/en/latest/
+[reStructuredText]: https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html
+[Jupyter Notebook]: https://jupyter.org/
+
+作者**可以**按照实际需要，选择任何一种格式来书写任何一篇文档（比如你甚至可以写 `index.ipynb`）。
+
+没有其他的文件格式受到支持。
+
+## 目录结构约定
+
+在章节最后有一个[完整的示例](#directory-full-example)。
+
+### `/docs/source/`
+
+文档的源码**必须**放在仓库根目录下的 `/docs/source/` 目录中。
+
+除非注明，下文的约定都是针对 `/docs/source/` 目录下的文件。
+
+### `./conf.py`
+
+`conf.py` 是 [Sphinx] 的配置文件。
+
+[Sphinx]: https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+更多信息见 [conf.py 参考](development/conf-py)。
+
+### `./index`
+
+文档首页。必选。
+
+包括项目名、功能和特性的简介、文档库的大纲，以及任何开发者想要在首页体现的信息。
+
+更多信息见 [写作指引](writing-guide/index-page)。
+
+### `./intro/index`
+
+关于项目的更详细的概览/介绍文档。可选。
+
+更多信息见 [写作指引](writing-guide/intro/index-page)。
+
+### `./intro/install`
+
+关于项目的安装文档。
+
+### 完整示例
+
+```
+docs/
+├── build
+├── locales/
+│   ├── en
+│   └── zh_CN
+└── source/
+    ├── conf.py
+    ├── index
+    ├── intro/
+    │   ├── index
+    │   ├── install
+    │   └── tutorial/
+    │       ├── index
+    │       ├── part-1
+    │       ├── part-2
+    │       └── ...
+    ├── faq/
+    │   ├── index
+    │   └── ...
+    ├── topic/
+    │   ├── index
+    │   ├── hylomorphic-stasis/
+    │   │   ├── index
+    │   │   ├── subclassing-engines
+    │   │   ├── tutorial/
+    │   │   │   ├── index
+    │   │   │   ├── part-1
+    │   │   │   ├── part-2
+    │   │   │   └── ...
+    │   │   ├── how-to/
+    │   │   │   ├── optimize-performance
+    │   │   │   ├── recover-from-exception
+    │   │   │   └── ...
+    │   │   └── ...
+    │   ├── development/
+    │   │   └── ...
+    │   └── ...
+    ├── reference/
+    │   ├── index
+    │   ├── stasis-api
+    │   ├── errors
+    │   ├── extensions
+    │   └── ...
+    ├── releases/
+    │   ├── 1.0.0
+    │   ├── 1.0.1
+    │   └── ...
+    └── misc/
+        └── ...
+```

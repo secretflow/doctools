@@ -1,0 +1,1863 @@
+:target{id="module-werkzeug.routing"}
+
+# URL Routing
+
+When it comes to combining multiple controller or view functions (however
+you want to call them), you need a dispatcher.  A simple way would be
+applying regular expression tests on `PATH_INFO` and call registered
+callback functions that return the value.
+
+Werkzeug provides a much more powerful system, similar to [Routes](https://routes.readthedocs.io/en/latest/).  All the
+objects mentioned on this page must be imported from [`werkzeug.routing`](#module-werkzeug.routing "werkzeug.routing"), not
+from `werkzeug`!
+
+:target{#quickstart}
+
+## Quickstart
+
+Here is a simple example which could be the URL definition for a blog:
+
+```default
+from werkzeug.routing import Map, Rule, NotFound, RequestRedirect
+
+url_map = Map([
+    Rule('/', endpoint='blog/index'),
+    Rule('/<int:year>/', endpoint='blog/archive'),
+    Rule('/<int:year>/<int:month>/', endpoint='blog/archive'),
+    Rule('/<int:year>/<int:month>/<int:day>/', endpoint='blog/archive'),
+    Rule('/<int:year>/<int:month>/<int:day>/<slug>',
+         endpoint='blog/show_post'),
+    Rule('/about', endpoint='blog/about_me'),
+    Rule('/feeds/', endpoint='blog/feeds'),
+    Rule('/feeds/<feed_name>.rss', endpoint='blog/show_feed')
+])
+
+def application(environ, start_response):
+    urls = url_map.bind_to_environ(environ)
+    try:
+        endpoint, args = urls.match()
+    except HTTPException, e:
+        return e(environ, start_response)
+    start_response('200 OK', [('Content-Type', 'text/plain')])
+    return [f'Rule points to {endpoint!r} with arguments {args!r}'.encode()]
+```
+
+So what does that do?  First of all we create a new [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") which stores
+a bunch of URL rules.  Then we pass it a list of [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") objects.
+
+Each [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") object is instantiated with a string that represents a rule
+and an endpoint which will be the alias for what view the rule represents.
+Multiple rules can have the same endpoint, but should have different arguments
+to allow URL construction.
+
+The format for the URL rules is straightforward, but explained in detail below.
+
+Inside the WSGI application we bind the url\_map to the current request which will
+return a new [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter").  This url\_map adapter can then be used to match
+or build domains for the current request.
+
+The [`MapAdapter.match()`](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method can then either return a tuple in the form
+`(endpoint, args)` or raise one of the three exceptions
+[`NotFound`](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound"), [`MethodNotAllowed`](exceptions.mdx#werkzeug.exceptions.MethodNotAllowed "werkzeug.exceptions.MethodNotAllowed"),
+or `RequestRedirect`.  For more details about those
+exceptions have a look at the documentation of the [`MapAdapter.match()`](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method.
+
+:target{#rule-format}
+
+## Rule Format
+
+Rule strings are URL paths with placeholders for variable parts in the
+format `<converter(arguments):name>`. `converter` and `arguments`
+(with parentheses) are optional. If no converter is given, the
+`default` converter is used (`string` by default). The available
+converters are discussed below.
+
+Rules that end with a slash are “branches”, others are “leaves”. If
+`strict_slashes` is enabled (the default), visiting a branch URL
+without a trailing slash will redirect to the URL with a slash appended.
+
+Many HTTP servers merge consecutive slashes into one when receiving
+requests. If `merge_slashes` is enabled (the default), rules will
+merge slashes in non-variable parts when matching and building. Visiting
+a URL with consecutive slashes will redirect to the URL with slashes
+merged. If you want to disable `merge_slashes` for a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") or
+[`Map`](#werkzeug.routing.Map "werkzeug.routing.Map"), you’ll also need to configure your web server
+appropriately.
+
+:target{#built-in-converters}
+
+## Built-in Converters
+
+Converters for common types of URL variables are built-in. The available
+converters can be overridden or extended through [`Map.converters`](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.UnicodeConverter"} module={"werkzeug.routing"} fullname={"UnicodeConverter"} parameters={["map", "minlength", "maxlength", "length"]} description={"This converter is the default converter and accepts any string but\nonly one path segment.  Thus the string can not include a slash."}>
+  <Outline.Signature fullname="UnicodeConverter" id="werkzeug.routing.UnicodeConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>UnicodeConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span className="name">minlength</span><span>=</span><span>1</span></Outline.Parameter>, <Outline.Parameter><span className="name">maxlength</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">length</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This converter is the default converter and accepts any string but
+    only one path segment.  Thus the string can not include a slash.
+
+    This is the default validator.
+
+    Example:
+
+    ```default
+    Rule('/pages/<page>'),
+    Rule('/<string(length=2):lang_code>')
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>minlength</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – the minimum length of the string.  Must be greater
+            or equal 1.
+          - <Outline.ParameterTarget>maxlength</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the maximum length of the string.
+          - <Outline.ParameterTarget>length</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the exact length of the string.
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.PathConverter"} module={"werkzeug.routing"} fullname={"PathConverter"} parameters={["map", "args", "kwargs"]} description={"Like the default UnicodeConverter, but it also matches\nslashes.  This is useful for wikis and similar applications:"}>
+  <Outline.Signature fullname="PathConverter" id="werkzeug.routing.PathConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>PathConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like the default [`UnicodeConverter`](#werkzeug.routing.UnicodeConverter "werkzeug.routing.UnicodeConverter"), but it also matches
+    slashes.  This is useful for wikis and similar applications:
+
+    ```default
+    Rule('/<path:wikipage>')
+    Rule('/<path:wikipage>/edit')
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.AnyConverter"} module={"werkzeug.routing"} fullname={"AnyConverter"} parameters={["map", "items"]} description={"Matches one of the items provided.  Items can either be Python\nidentifiers or strings:"}>
+  <Outline.Signature fullname="AnyConverter" id="werkzeug.routing.AnyConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>AnyConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span>\*</span><span className="name">items</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Matches one of the items provided.  Items can either be Python
+    identifiers or strings:
+
+    ```default
+    Rule('/<any(about, help, imprint, class, "foo,bar"):page_name>')
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>items</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – this function accepts the possible items as positional
+            arguments.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.2: </span>Value is validated when building a URL.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.IntegerConverter"} module={"werkzeug.routing"} fullname={"IntegerConverter"} parameters={["map", "fixed_digits", "min", "max", "signed"]} description={"This converter only accepts integer values:"}>
+  <Outline.Signature fullname="IntegerConverter" id="werkzeug.routing.IntegerConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>IntegerConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span className="name">fixed\_digits</span><span>=</span><span>0</span></Outline.Parameter>, <Outline.Parameter><span className="name">min</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">max</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">signed</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This converter only accepts integer values:
+
+    ```default
+    Rule("/page/<int:page>")
+    ```
+
+    By default it only accepts unsigned, positive values. The `signed`
+    parameter will enable signed, negative values.
+
+    ```default
+    Rule("/page/<int(signed=True):page>")
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>fixed\_digits</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The number of fixed digits in the URL. If you
+            set this to `4` for example, the rule will only match if the
+            URL looks like `/0001/`. The default is variable length.
+          - <Outline.ParameterTarget>min</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The minimal value.
+          - <Outline.ParameterTarget>max</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The maximal value.
+          - <Outline.ParameterTarget>signed</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Allow signed (negative) values.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.15: </span>The `signed` parameter.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.FloatConverter"} module={"werkzeug.routing"} fullname={"FloatConverter"} parameters={["map", "min", "max", "signed"]} description={"This converter only accepts floating point values:"}>
+  <Outline.Signature fullname="FloatConverter" id="werkzeug.routing.FloatConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>FloatConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span className="name">min</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">max</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">signed</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This converter only accepts floating point values:
+
+    ```default
+    Rule("/probability/<float:probability>")
+    ```
+
+    By default it only accepts unsigned, positive values. The `signed`
+    parameter will enable signed, negative values.
+
+    ```default
+    Rule("/offset/<float(signed=True):offset>")
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>min</Outline.ParameterTarget> ([<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – The minimal value.
+          - <Outline.ParameterTarget>max</Outline.ParameterTarget> ([<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – The maximal value.
+          - <Outline.ParameterTarget>signed</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Allow signed (negative) values.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.15: </span>The `signed` parameter.
+    </Container>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.UUIDConverter"} module={"werkzeug.routing"} fullname={"UUIDConverter"} parameters={["map", "args", "kwargs"]} description={"This converter only accepts UUID strings:"}>
+  <Outline.Signature fullname="UUIDConverter" id="werkzeug.routing.UUIDConverter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>UUIDConverter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This converter only accepts UUID strings:
+
+    ```default
+    Rule('/object/<uuid:identifier>')
+    ```
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.10.</span>
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#maps-rules-and-adapters}
+
+## Maps, Rules and Adapters
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.Map"} module={"werkzeug.routing"} fullname={"Map"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"The map class stores all the URL rules and some configuration\nparameters.  Some of the configuration values are only stored on the\nMap instance since those affect all rules, others are just defaults\nand can be overridden for each rule.  Note that you have to specify all\narguments besides the rules as keyword arguments!"}>
+  <Outline.Signature fullname="Map" id="werkzeug.routing.Map">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Map</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rules</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_subdomain</span><span>=</span><span>''</span></Outline.Parameter>, <Outline.Parameter><span className="name">strict\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">merge\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">redirect\_defaults</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">converters</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_parameters</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_key</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">host\_matching</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    The map class stores all the URL rules and some configuration
+    parameters.  Some of the configuration values are only stored on the
+    <cite>Map</cite> instance since those affect all rules, others are just defaults
+    and can be overridden for each rule.  Note that you have to specify all
+    arguments besides the <cite>rules</cite> as keyword arguments!
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")<em>] </em><em>| </em><em>None</em>) – sequence of url rules for this map.
+          - <Outline.ParameterTarget>default\_subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The default subdomain for rules without a
+            subdomain defined.
+          - <Outline.ParameterTarget>strict\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – If a rule ends with a slash but the matched
+            URL does not, redirect to the URL with a trailing slash.
+          - <Outline.ParameterTarget>merge\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Merge consecutive slashes when matching or
+            building URLs. Matches will redirect to the normalized URL.
+            Slashes in variable parts are not merged.
+          - <Outline.ParameterTarget>redirect\_defaults</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – This will redirect to the default rule if it
+            wasn’t visited that way. This helps creating
+            unique URLs.
+          - <Outline.ParameterTarget>converters</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em><em>BaseConverter</em><em>]</em><em>] </em><em>| </em><em>None</em>) – A dict of converters that adds additional converters
+            to the list of converters. If you redefine one
+            converter this will override the original one.
+          - <Outline.ParameterTarget>sort\_parameters</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – If set to <cite>True</cite> the url parameters are sorted.
+            See <cite>url\_encode</cite> for more details.
+          - <Outline.ParameterTarget>sort\_key</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>t.Any</em><em>]</em><em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – The sort key function for <cite>url\_encode</cite>.
+          - <Outline.ParameterTarget>host\_matching</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if set to <cite>True</cite> it enables the host matching
+            feature and disables the subdomain one.  If
+            enabled the <cite>host</cite> parameter to rules is used
+            instead of the <cite>subdomain</cite> one.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 3.0: </span>The `charset` and `encoding_errors` parameters were removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 1.0: </span>If `url_scheme` is `ws` or `wss`, only WebSocket rules will match.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 1.0: </span>The `merge_slashes` parameter was added.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.7: </span>The `encoding_errors` and `host_matching` parameters were added.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>The `sort_parameters` and `sort_key`  paramters were added.
+    </Container>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.converters"} module={"werkzeug.routing"} fullname={"Map.converters"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"The dictionary of converters.  This can be modified after the class\nwas created, but will only affect rules added after the\nmodification.  If the rules are defined with the list passed to the\nclass, the converters parameter to the constructor has to be used\ninstead."}>
+      <Outline.Signature fullname="Map.converters" id="werkzeug.routing.Map.converters">
+        <Outline.Name>converters</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The dictionary of converters.  This can be modified after the class
+        was created, but will only affect rules added after the
+        modification.  If the rules are defined with the list passed to the
+        class, the <cite>converters</cite> parameter to the constructor has to be used
+        instead.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.add"} module={"werkzeug.routing"} fullname={"Map.add"} parameters={["rulefactory"]} description={"Add a new rule or factory to the map and bind it.  Requires that the\nrule is not bound to another map."}>
+      <Outline.Signature fullname="Map.add" id="werkzeug.routing.Map.add">
+        <Outline.Name>add</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rulefactory</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Add a new rule or factory to the map and bind it.  Requires that the
+        rule is not bound to another map.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>rulefactory</Outline.ParameterTarget> ([<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")) – a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") or [`RuleFactory`](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.bind"} module={"werkzeug.routing"} fullname={"Map.bind"} parameters={["server_name", "script_name", "subdomain", "url_scheme", "default_method", "path_info", "query_args"]} description={"Return a new MapAdapter with the details specified to the\ncall.  Note that script_name will default to '/' if not further\nspecified or None.  The server_name at least is a requirement\nbecause the HTTP RFC requires absolute URLs for redirects and so all\nredirect exceptions raised by Werkzeug will contain the full canonical\nURL."}>
+      <Outline.Signature fullname="Map.bind" id="werkzeug.routing.Map.bind">
+        <Outline.Name>bind</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">server\_name</span></Outline.Parameter>, <Outline.Parameter><span className="name">script\_name</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">subdomain</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">url\_scheme</span><span>=</span><span>'http'</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_method</span><span>=</span><span>'GET'</span></Outline.Parameter>, <Outline.Parameter><span className="name">path\_info</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a new [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") with the details specified to the
+        call.  Note that <cite>script\_name</cite> will default to `'/'` if not further
+        specified or <cite>None</cite>.  The <cite>server\_name</cite> at least is a requirement
+        because the HTTP RFC requires absolute URLs for redirects and so all
+        redirect exceptions raised by Werkzeug will contain the full canonical
+        URL.
+
+        If no path\_info is passed to `match()` it will use the default path
+        info passed to bind.  While this doesn’t really make sense for
+        manual bind calls, it’s useful if you bind a map to a WSGI
+        environment which already contains the path info.
+
+        <cite>subdomain</cite> will default to the <cite>default\_subdomain</cite> for this map if
+        no defined. If there is no <cite>default\_subdomain</cite> you cannot use the
+        subdomain feature.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 1.0: </span>If `url_scheme` is `ws` or `wss`, only WebSocket rules
+          will match.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.15: </span>`path_info` defaults to `'/'` if `None`.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.8: </span>`query_args` can be a string.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.7: </span>Added `query_args`.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>server\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>script\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>url\_scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>default\_method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>MapAdapter</em>](#werkzeug.routing.MapAdapter "werkzeug.routing.map.MapAdapter")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.bind_to_environ"} module={"werkzeug.routing"} fullname={"Map.bind_to_environ"} parameters={["environ", "server_name", "subdomain"]} description={"Like bind() but you can pass it an WSGI environment and it\nwill fetch the information from that dictionary.  Note that because of\nlimitations in the protocol there is no way to get the current\nsubdomain and real server_name from the environment.  If you don\u2019t\nprovide it, Werkzeug will use SERVER_NAME and SERVER_PORT (or\nHTTP_HOST if provided) as used server_name with disabled subdomain\nfeature."}>
+      <Outline.Signature fullname="Map.bind_to_environ" id="werkzeug.routing.Map.bind_to_environ">
+        <Outline.Name>bind\_to\_environ</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">server\_name</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">subdomain</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Like [`bind()`](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") but you can pass it an WSGI environment and it
+        will fetch the information from that dictionary.  Note that because of
+        limitations in the protocol there is no way to get the current
+        subdomain and real <cite>server\_name</cite> from the environment.  If you don’t
+        provide it, Werkzeug will use <cite>SERVER\_NAME</cite> and <cite>SERVER\_PORT</cite> (or
+        <cite>HTTP\_HOST</cite> if provided) as used <cite>server\_name</cite> with disabled subdomain
+        feature.
+
+        If <cite>subdomain</cite> is <cite>None</cite> but an environment and a server name is
+        provided it will calculate the current subdomain automatically.
+        Example: <cite>server\_name</cite> is `'example.com'` and the <cite>SERVER\_NAME</cite>
+        in the wsgi <cite>environ</cite> is `'staging.dev.example.com'` the calculated
+        subdomain will be `'staging.dev'`.
+
+        If the object passed as environ has an environ attribute, the value of
+        this attribute is used instead.  This allows you to pass request
+        objects.  Additionally <cite>PATH\_INFO</cite> added as a default of the
+        [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") so that you don’t have to pass the path info to
+        the match method.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 1.0.0: </span>If the passed server name specifies port 443, it will match
+          if the incoming scheme is `https` without a port.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 1.0.0: </span>A warning is shown when the passed server name does not
+          match the incoming WSGI server name.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.8: </span>This will no longer raise a ValueError when an unexpected server
+          name was passed.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>previously this method accepted a bogus <cite>calculate\_subdomain</cite>
+          parameter that did not have any effect.  It was removed because
+          of that.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em><em> | </em>[<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.Request")) – a WSGI environment.
+              - <Outline.ParameterTarget>server\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – an optional server name hint (see above).
+              - <Outline.ParameterTarget>subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – optionally the current subdomain (see above).
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [MapAdapter](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.default_converters"} module={"werkzeug.routing"} fullname={"Map.default_converters"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"A dict of default converters to be used."}>
+      <Outline.Signature fullname="Map.default_converters" id="werkzeug.routing.Map.default_converters">
+        <Outline.Name>default\_converters</Outline.Name><Outline.Keyword><span>{" "}</span><span>=</span><span>{" "}</span>\{'any': \<class 'werkzeug.routing.converters.AnyConverter'>, 'default': \<class 'werkzeug.routing.converters.UnicodeConverter'>, 'float': \<class 'werkzeug.routing.converters.FloatConverter'>, 'int': \<class 'werkzeug.routing.converters.IntegerConverter'>, 'path': \<class 'werkzeug.routing.converters.PathConverter'>, 'string': \<class 'werkzeug.routing.converters.UnicodeConverter'>, 'uuid': \<class 'werkzeug.routing.converters.UUIDConverter'>}</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A dict of default converters to be used.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.is_endpoint_expecting"} module={"werkzeug.routing"} fullname={"Map.is_endpoint_expecting"} parameters={["endpoint", "arguments"]} description={"Iterate over all rules and check if the endpoint expects\nthe arguments provided.  This is for example useful if you have\nsome URLs that expect a language code and others that do not and\nyou want to wrap the builder a bit so that the current language\ncode is automatically added if not provided but endpoints expect\nit."}>
+      <Outline.Signature fullname="Map.is_endpoint_expecting" id="werkzeug.routing.Map.is_endpoint_expecting">
+        <Outline.Name>is\_endpoint\_expecting</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">endpoint</span></Outline.Parameter>, <Outline.Parameter><span>\*</span><span className="name">arguments</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Iterate over all rules and check if the endpoint expects
+        the arguments provided.  This is for example useful if you have
+        some URLs that expect a language code and others that do not and
+        you want to wrap the builder a bit so that the current language
+        code is automatically added if not provided but endpoints expect
+        it.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the endpoint to check.
+              - <Outline.ParameterTarget>arguments</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – this function accepts one or more arguments
+                as positional arguments.  Each one of them is
+                checked.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.iter_rules"} module={"werkzeug.routing"} fullname={"Map.iter_rules"} parameters={["endpoint"]} description={"Iterate over all rules or the rules of an endpoint."}>
+      <Outline.Signature fullname="Map.iter_rules" id="werkzeug.routing.Map.iter_rules">
+        <Outline.Name>iter\_rules</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">endpoint</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Iterate over all rules or the rules of an endpoint.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – if provided only the rules for that endpoint
+              are returned.
+            </dd>
+
+            <dt className="field-name">
+              Returns
+            </dt>
+
+            <dd className="field-body">
+              an iterator
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>Iterator</em>](https://docs.python.org/3/library/typing.html#typing.Iterator "(in Python v3.11)")\[[<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")]
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.lock_class"} module={"werkzeug.routing"} fullname={"Map.lock_class"} parameters={[]} description={"The type of lock to use when updating."}>
+      <Outline.Signature fullname="Map.lock_class" id="werkzeug.routing.Map.lock_class">
+        <Outline.Name>lock\_class</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The type of lock to use when updating.
+
+        <Container type="info" title="Version added">
+          <span>New in version 1.0.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Map.update"} module={"werkzeug.routing"} fullname={"Map.update"} parameters={[]} description={"Called before matching and building to keep the compiled rules\nin the correct order after things changed."}>
+      <Outline.Signature fullname="Map.update" id="werkzeug.routing.Map.update">
+        <Outline.Name>update</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Called before matching and building to keep the compiled rules
+        in the correct order after things changed.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.MapAdapter"} module={"werkzeug.routing"} fullname={"MapAdapter"} parameters={["map", "server_name", "script_name", "subdomain", "url_scheme", "path_info", "default_method", "query_args"]} description={"Returned by Map.bind() or Map.bind_to_environ() and does\nthe URL matching and building based on runtime information."}>
+  <Outline.Signature fullname="MapAdapter" id="werkzeug.routing.MapAdapter">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>MapAdapter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter>, <Outline.Parameter><span className="name">server\_name</span></Outline.Parameter>, <Outline.Parameter><span className="name">script\_name</span></Outline.Parameter>, <Outline.Parameter><span className="name">subdomain</span></Outline.Parameter>, <Outline.Parameter><span className="name">url\_scheme</span></Outline.Parameter>, <Outline.Parameter><span className="name">path\_info</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_method</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Returned by [`Map.bind()`](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") or [`Map.bind_to_environ()`](#werkzeug.routing.Map.bind_to_environ "werkzeug.routing.Map.bind_to_environ") and does
+    the URL matching and building based on runtime information.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) –&#x20;
+          - <Outline.ParameterTarget>server\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>script\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>url\_scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>default\_method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.allowed_methods"} module={"werkzeug.routing"} fullname={"MapAdapter.allowed_methods"} parameters={["path_info"]} description={"Returns the valid methods that match for a given path."}>
+      <Outline.Signature fullname="MapAdapter.allowed_methods" id="werkzeug.routing.MapAdapter.allowed_methods">
+        <Outline.Name>allowed\_methods</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns the valid methods that match for a given path.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.7.</span>
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.build"} module={"werkzeug.routing"} fullname={"MapAdapter.build"} parameters={["endpoint", "values", "method", "force_external", "append_unknown", "url_scheme"]} description={"Building URLs works pretty much the other way round.  Instead of\nmatch you call build and pass it the endpoint and a dict of\narguments for the placeholders."}>
+      <Outline.Signature fullname="MapAdapter.build" id="werkzeug.routing.MapAdapter.build">
+        <Outline.Name>build</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">endpoint</span></Outline.Parameter>, <Outline.Parameter><span className="name">values</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">force\_external</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">append\_unknown</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">url\_scheme</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Building URLs works pretty much the other way round.  Instead of
+        <cite>match</cite> you call <cite>build</cite> and pass it the endpoint and a dict of
+        arguments for the placeholders.
+
+        The <cite>build</cite> function also accepts an argument called <cite>force\_external</cite>
+        which, if you set it to <cite>True</cite> will force external URLs. Per default
+        external URLs (include the server name) will only be used if the
+        target URL is on a different subdomain.
+
+        ```python
+        >>> m = Map([
+        ...     Rule('/', endpoint='index'),
+        ...     Rule('/downloads/', endpoint='downloads/index'),
+        ...     Rule('/downloads/<int:id>', endpoint='downloads/show')
+        ... ])
+        >>> urls = m.bind("example.com", "/")
+        >>> urls.build("index", {})
+        '/'
+        >>> urls.build("downloads/show", {'id': 42})
+        '/downloads/42'
+        >>> urls.build("downloads/show", {'id': 42}, force_external=True)
+        'http://example.com/downloads/42'
+        ```
+
+        Because URLs cannot contain non ASCII data you will always get
+        bytes back.  Non ASCII characters are urlencoded with the
+        charset defined on the map instance.
+
+        Additional values are converted to strings and appended to the URL as
+        URL querystring parameters:
+
+        ```python
+        >>> urls.build("index", {'q': 'My Searchstring'})
+        '/?q=My+Searchstring'
+        ```
+
+        When processing those additional values, lists are furthermore
+        interpreted as multiple values (as per
+        [`werkzeug.datastructures.MultiDict`](datastructures.mdx#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict")):
+
+        ```python
+        >>> urls.build("index", {'q': ['a', 'b', 'c']})
+        '/?q=a&q=b&q=c'
+        ```
+
+        Passing a `MultiDict` will also add multiple values:
+
+        ```python
+        >>> urls.build("index", MultiDict((('p', 'z'), ('q', 'a'), ('q', 'b'))))
+        '/?p=z&q=a&q=b'
+        ```
+
+        If a rule does not exist when building a <cite>BuildError</cite> exception is
+        raised.
+
+        The build method accepts an argument called <cite>method</cite> which allows you
+        to specify the method you want to have an URL built for if you have
+        different methods for the same endpoint specified.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the endpoint of the URL to build.
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – the values for the URL to build.  Unhandled values are
+                appended to the URL as query parameters.
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the HTTP method for the rule if there are different
+                URLs for different methods on the same endpoint.
+              - <Outline.ParameterTarget>force\_external</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – enforce full canonical external URLs. If the URL
+                scheme is not provided, this will generate
+                a protocol-relative URL.
+              - <Outline.ParameterTarget>append\_unknown</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – unknown parameters are appended to the generated
+                URL as query string argument.  Disable this
+                if you want the builder to ignore those.
+              - <Outline.ParameterTarget>url\_scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Scheme to use in place of the bound
+                `url_scheme`.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.0: </span>Added the `url_scheme` parameter.
+        </Container>
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.6: </span>Added the `append_unknown` parameter.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.dispatch"} module={"werkzeug.routing"} fullname={"MapAdapter.dispatch"} parameters={["view_func", "path_info", "method", "catch_http_exceptions"]} description={"Does the complete dispatching process.  view_func is called with\nthe endpoint and a dict with the values for the view.  It should\nlook up the view function, call it, and return a response object\nor WSGI application.  http exceptions are not caught by default\nso that applications can display nicer error messages by just\ncatching them by hand.  If you want to stick with the default\nerror messages you can pass it catch_http_exceptions=True and\nit will catch the http exceptions."}>
+      <Outline.Signature fullname="MapAdapter.dispatch" id="werkzeug.routing.MapAdapter.dispatch">
+        <Outline.Name>dispatch</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">view\_func</span></Outline.Parameter>, <Outline.Parameter><span className="name">path\_info</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">catch\_http\_exceptions</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Does the complete dispatching process.  <cite>view\_func</cite> is called with
+        the endpoint and a dict with the values for the view.  It should
+        look up the view function, call it, and return a response object
+        or WSGI application.  http exceptions are not caught by default
+        so that applications can display nicer error messages by just
+        catching them by hand.  If you want to stick with the default
+        error messages you can pass it `catch_http_exceptions=True` and
+        it will catch the http exceptions.
+
+        Here a small example for the dispatch usage:
+
+        ```default
+        from werkzeug.wrappers import Request, Response
+        from werkzeug.wsgi import responder
+        from werkzeug.routing import Map, Rule
+
+        def on_index(request):
+            return Response('Hello from the index')
+
+        url_map = Map([Rule('/', endpoint='index')])
+        views = {'index': on_index}
+
+        @responder
+        def application(environ, start_response):
+            request = Request(environ)
+            urls = url_map.bind_to_environ(environ)
+            return urls.dispatch(lambda e, v: views[e](request, **v),
+                                 catch_http_exceptions=True)
+        ```
+
+        Keep in mind that this method might return exception objects, too, so
+        use `Response.force_type` to get a response object.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>view\_func</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em><em>]</em><em>, </em><em>WSGIApplication</em><em>]</em>) – a function that is called with the endpoint as
+                first argument and the value dict as second.  Has
+                to dispatch to the actual view function with this
+                information.  (see above)
+              - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the path info to use for matching.  Overrides the
+                path info specified on binding.
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the HTTP method used for matching.  Overrides the
+                method specified on binding.
+              - <Outline.ParameterTarget>catch\_http\_exceptions</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – set to <cite>True</cite> to catch any of the
+                werkzeug `HTTPException`s.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              WSGIApplication
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.get_default_redirect"} module={"werkzeug.routing"} fullname={"MapAdapter.get_default_redirect"} parameters={["rule", "method", "values", "query_args"]} description={"A helper that returns the URL to redirect to if it finds one.\nThis is used for default redirecting only."}>
+      <Outline.Signature fullname="MapAdapter.get_default_redirect" id="werkzeug.routing.MapAdapter.get_default_redirect">
+        <Outline.Name>get\_default\_redirect</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rule</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span></Outline.Parameter>, <Outline.Parameter><span className="name">values</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A helper that returns the URL to redirect to if it finds one.
+        This is used for default redirecting only.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Internal
+            </dt>
+
+            <dd className="field-body" />
+
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>rule</Outline.ParameterTarget> ([<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")) –&#x20;
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>MutableMapping</em>](https://docs.python.org/3/library/typing.html#typing.MutableMapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>]</em>) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)") | None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.get_host"} module={"werkzeug.routing"} fullname={"MapAdapter.get_host"} parameters={["domain_part"]} description={"Figures out the full host name for the given domain part.  The\ndomain part is a subdomain in case host matching is disabled or\na full host name."}>
+      <Outline.Signature fullname="MapAdapter.get_host" id="werkzeug.routing.MapAdapter.get_host">
+        <Outline.Name>get\_host</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">domain\_part</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Figures out the full host name for the given domain part.  The
+        domain part is a subdomain in case host matching is disabled or
+        a full host name.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>domain\_part</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.make_alias_redirect_url"} module={"werkzeug.routing"} fullname={"MapAdapter.make_alias_redirect_url"} parameters={["path", "endpoint", "values", "method", "query_args"]} description={"Internally called to make an alias redirect URL."}>
+      <Outline.Signature fullname="MapAdapter.make_alias_redirect_url" id="werkzeug.routing.MapAdapter.make_alias_redirect_url">
+        <Outline.Name>make\_alias\_redirect\_url</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path</span></Outline.Parameter>, <Outline.Parameter><span className="name">endpoint</span></Outline.Parameter>, <Outline.Parameter><span className="name">values</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Internally called to make an alias redirect URL.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>]</em>) –&#x20;
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.make_redirect_url"} module={"werkzeug.routing"} fullname={"MapAdapter.make_redirect_url"} parameters={["path_info", "query_args", "domain_part"]} description={"Creates a redirect URL."}>
+      <Outline.Signature fullname="MapAdapter.make_redirect_url" id="werkzeug.routing.MapAdapter.make_redirect_url">
+        <Outline.Name>make\_redirect\_url</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">domain\_part</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Creates a redirect URL.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Internal
+            </dt>
+
+            <dd className="field-body" />
+
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>domain\_part</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={null} module={"werkzeug.routing"} fullname={"MapAdapter.match"} parameters={["path_info", "method", "return_rule", "query_args", "websocket"]} description={"The usage is simple: you just pass the match method the current\npath info as well as the method (which defaults to GET).  The\nfollowing things can then happen:"}>
+      <Outline.Signature fullname="MapAdapter.match" id="werkzeug.routing.MapAdapter.match">
+        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>False</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>]</span></Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Signature fullname="MapAdapter.match">
+        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>True</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[werkzeug.routing.rules.Rule](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")<span>,</span><span>{" "}</span>[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>]</span></Outline.ReturnType>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The usage is simple: you just pass the match method the current
+        path info as well as the method (which defaults to <cite>GET</cite>).  The
+        following things can then happen:
+
+        - you receive a <cite>NotFound</cite> exception that indicates that no URL is
+          matching.  A <cite>NotFound</cite> exception is also a WSGI application you
+          can call to get a default page not found page (happens to be the
+          same object as <cite>werkzeug.exceptions.NotFound</cite>)
+        - you receive a <cite>MethodNotAllowed</cite> exception that indicates that there
+          is a match for this URL but not for the current request method.
+          This is useful for RESTful applications.
+        - you receive a <cite>RequestRedirect</cite> exception with a <cite>new\_url</cite>
+          attribute.  This exception is used to notify you about a request
+          Werkzeug requests from your WSGI application.  This is for example the
+          case if you request `/foo` although the correct URL is `/foo/`
+          You can use the <cite>RequestRedirect</cite> instance as response-like object
+          similar to all other subclasses of <cite>HTTPException</cite>.
+        - you receive a `WebsocketMismatch` exception if the only
+          match is a WebSocket rule but the bind is an HTTP request, or
+          if the match is an HTTP rule but the bind is a WebSocket
+          request.
+        - you get a tuple in the form `(endpoint, arguments)` if there is
+          a match (unless <cite>return\_rule</cite> is True, in which case you get a tuple
+          in the form `(rule, arguments)`)
+
+        If the path info is not passed to the match method the default path
+        info of the map is used (defaults to the root URL if not defined
+        explicitly).
+
+        All of the exceptions raised are subclasses of <cite>HTTPException</cite> so they
+        can be used as WSGI responses. They will all render generic error or
+        redirect pages.
+
+        Here is a small example for matching:
+
+        ```python
+        >>> m = Map([
+        ...     Rule('/', endpoint='index'),
+        ...     Rule('/downloads/', endpoint='downloads/index'),
+        ...     Rule('/downloads/<int:id>', endpoint='downloads/show')
+        ... ])
+        >>> urls = m.bind("example.com", "/")
+        >>> urls.match("/", "GET")
+        ('index', {})
+        >>> urls.match("/downloads/42")
+        ('downloads/show', {'id': 42})
+        ```
+
+        And here is what happens on redirect and missing URLs:
+
+        ```python
+        >>> urls.match("/downloads")
+        Traceback (most recent call last):
+          ...
+        RequestRedirect: http://example.com/downloads/
+        >>> urls.match("/missing")
+        Traceback (most recent call last):
+          ...
+        NotFound: 404 Not Found
+        ```
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> – the path info to use for matching.  Overrides the
+                path info specified on binding.
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> – the HTTP method used for matching.  Overrides the
+                method specified on binding.
+              - <Outline.ParameterTarget>return\_rule</Outline.ParameterTarget> – return the rule that matched instead of just the
+                endpoint (defaults to <cite>False</cite>).
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> – optional query arguments that are used for
+                automatic redirects as string or dictionary.  It’s
+                currently not possible to use the query arguments
+                for URL matching.
+              - <Outline.ParameterTarget>websocket</Outline.ParameterTarget> – Match WebSocket instead of HTTP requests. A
+                websocket request has a `ws` or `wss`
+                `url_scheme`. This overrides that detection.
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 1.0: </span>Added `websocket`.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.8: </span>`query_args` can be a string.
+        </Container>
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.7: </span>Added `query_args`.
+        </Container>
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.6: </span>Added `return_rule`.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.MapAdapter.test"} module={"werkzeug.routing"} fullname={"MapAdapter.test"} parameters={["path_info", "method"]} description={"Test if a rule would match.  Works like match but returns True\nif the URL matches, or False if it does not exist."}>
+      <Outline.Signature fullname="MapAdapter.test" id="werkzeug.routing.MapAdapter.test">
+        <Outline.Name>test</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Test if a rule would match.  Works like <cite>match</cite> but returns <cite>True</cite>
+        if the URL matches, or <cite>False</cite> if it does not exist.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the path info to use for matching.  Overrides the
+                path info specified on binding.
+              - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the HTTP method used for matching.  Overrides the
+                method specified on binding.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.Rule"} module={"werkzeug.routing"} fullname={"Rule"} parameters={["string", "defaults", "subdomain", "methods", "build_only", "endpoint", "strict_slashes", "merge_slashes", "redirect_to", "alias", "host", "websocket"]} description={"A Rule represents one URL pattern.  There are some options for Rule\nthat change the way it behaves and are passed to the Rule constructor.\nNote that besides the rule-string all arguments must be keyword arguments\nin order to not break the application on Werkzeug upgrades."}>
+  <Outline.Signature fullname="Rule" id="werkzeug.routing.Rule">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Rule</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">string</span></Outline.Parameter>, <Outline.Parameter><span className="name">defaults</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">subdomain</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">methods</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">build\_only</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">endpoint</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">strict\_slashes</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">merge\_slashes</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">redirect\_to</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">alias</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">host</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A Rule represents one URL pattern.  There are some options for <cite>Rule</cite>
+    that change the way it behaves and are passed to the <cite>Rule</cite> constructor.
+    Note that besides the rule-string all arguments <em>must</em> be keyword arguments
+    in order to not break the application on Werkzeug upgrades.
+
+    <DefinitionList>
+      <dl>
+        <dt>
+          <DefinitionList.Term><span><cite>string</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          Rule strings basically are just normal URL paths with placeholders in
+          the format `<converter(arguments):name>` where the converter and the
+          arguments are optional.  If no converter is defined the <cite>default</cite>
+          converter is used which means <cite>string</cite> in the normal configuration.
+
+          URL rules that end with a slash are branch URLs, others are leaves.
+          If you have <cite>strict\_slashes</cite> enabled (which is the default), all
+          branch URLs that are matched without a trailing slash will trigger a
+          redirect to the same URL with the missing slash appended.
+
+          The converters are defined on the <cite>Map</cite>.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>endpoint</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          The endpoint for this rule. This can be anything. A reference to a
+          function, a string, a number etc.  The preferred way is using a string
+          because the endpoint is used for URL generation.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>defaults</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          An optional dict with defaults for other rules with the same endpoint.
+          This is a bit tricky but useful if you want to have unique URLs:
+
+          ```default
+          url_map = Map([
+              Rule('/all/', defaults={'page': 1}, endpoint='all_entries'),
+              Rule('/all/page/<int:page>', endpoint='all_entries')
+          ])
+          ```
+
+          If a user now visits `http://example.com/all/page/1` they will be
+          redirected to `http://example.com/all/`.  If <cite>redirect\_defaults</cite> is
+          disabled on the <cite>Map</cite> instance this will only affect the URL
+          generation.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>subdomain</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          The subdomain rule string for this rule. If not specified the rule
+          only matches for the <cite>default\_subdomain</cite> of the map.  If the map is
+          not bound to a subdomain this feature is disabled.
+
+          Can be useful if you want to have user profiles on different subdomains
+          and all subdomains are forwarded to your application:
+
+          ```default
+          url_map = Map([
+              Rule('/', subdomain='<username>', endpoint='user/homepage'),
+              Rule('/stats', subdomain='<username>', endpoint='user/stats')
+          ])
+          ```
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>methods</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          A sequence of http methods this rule applies to.  If not specified, all
+          methods are allowed. For example this can be useful if you want different
+          endpoints for <cite>POST</cite> and <cite>GET</cite>.  If methods are defined and the path
+          matches but the method matched against is not in this list or in the
+          list of another rule for that path the error raised is of the type
+          <cite>MethodNotAllowed</cite> rather than <cite>NotFound</cite>.  If <cite>GET</cite> is present in the
+          list of methods and <cite>HEAD</cite> is not, <cite>HEAD</cite> is added automatically.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>strict\_slashes</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          Override the <cite>Map</cite> setting for <cite>strict\_slashes</cite> only for this rule. If
+          not specified the <cite>Map</cite> setting is used.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>merge\_slashes</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          Override `Map.merge_slashes` for this rule.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>build\_only</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          Set this to True and the rule will never match but will create a URL
+          that can be build. This is useful if you have resources on a subdomain
+          or folder that are not handled by the WSGI application (like static data)
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>redirect\_to</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          If given this must be either a string or callable.  In case of a
+          callable it’s called with the url adapter that triggered the match and
+          the values of the URL as keyword arguments and has to return the target
+          for the redirect, otherwise it has to be a string with placeholders in
+          rule syntax:
+
+          ```default
+          def foo_with_slug(adapter, id):
+              # ask the database for the slug for the old id.  this of
+              # course has nothing to do with werkzeug.
+              return f'foo/{Foo.get_slug_for_id(id)}'
+
+          url_map = Map([
+              Rule('/foo/<slug>', endpoint='foo'),
+              Rule('/some/old/url/<slug>', redirect_to='foo/<slug>'),
+              Rule('/other/old/url/<int:id>', redirect_to=foo_with_slug)
+          ])
+          ```
+
+          When the rule is matched the routing system will raise a
+          <cite>RequestRedirect</cite> exception with the target for the redirect.
+
+          Keep in mind that the URL will be joined against the URL root of the
+          script so don’t use a leading slash on the target URL unless you
+          really mean root of that domain.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>alias</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          If enabled this rule serves as an alias for another rule with the same
+          endpoint and arguments.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>host</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          If provided and the URL map has host matching enabled this can be
+          used to provide a match rule for the whole host.  This also means
+          that the subdomain feature is disabled.
+        </dd>
+
+        <dt>
+          <DefinitionList.Term><span><cite>websocket</cite></span></DefinitionList.Term>
+        </dt>
+
+        <dd>
+          If `True`, this rule is only matches for WebSocket (`ws://`,
+          `wss://`) requests. By default, rules will only match for HTTP
+          requests.
+        </dd>
+      </dl>
+    </DefinitionList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>Percent-encoded newlines (`%0a`), which are decoded by WSGI
+      servers, are considered when routing instead of terminating the
+      match early.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 1.0: </span>Added `websocket`.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 1.0: </span>Added `merge_slashes`.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.7: </span>Added `alias` and `host`.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.6.1: </span>`HEAD` is added to `methods` if `GET` is present.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>string</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>defaults</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>methods</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>build\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>strict\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>merge\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>redirect\_to</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>t.Callable</em><em>\[</em><em>...</em><em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>alias</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>host</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>websocket</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.Rule.empty"} module={"werkzeug.routing"} fullname={"Rule.empty"} parameters={[]} description={"Return an unbound copy of this rule."}>
+      <Outline.Signature fullname="Rule.empty" id="werkzeug.routing.Rule.empty">
+        <Outline.Name>empty</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return an unbound copy of this rule.
+
+        This can be useful if want to reuse an already bound URL for another
+        map.  See `get_empty_kwargs` to override what keyword arguments are
+        provided to the new copy.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+:target{#matchers}
+
+## Matchers
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.StateMachineMatcher"} module={"werkzeug.routing"} fullname={"StateMachineMatcher"} parameters={["merge_slashes"]} description={"merge_slashes (bool) \u2013 "}>
+  <Outline.Signature fullname="StateMachineMatcher" id="werkzeug.routing.StateMachineMatcher">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>StateMachineMatcher</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">merge\_slashes</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>merge\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#rule-factories}
+
+## Rule Factories
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.RuleFactory"} module={"werkzeug.routing"} fullname={"RuleFactory"} description={"As soon as you have more complex URL setups it\u2019s a good idea to use rule\nfactories to avoid repetitive tasks.  Some of them are builtin, others can\nbe added by subclassing RuleFactory and overriding get_rules."}>
+  <Outline.Signature fullname="RuleFactory" id="werkzeug.routing.RuleFactory">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>RuleFactory</Outline.Name>
+  </Outline.Signature>
+
+  <Outline.Content>
+    As soon as you have more complex URL setups it’s a good idea to use rule
+    factories to avoid repetitive tasks.  Some of them are builtin, others can
+    be added by subclassing <cite>RuleFactory</cite> and overriding <cite>get\_rules</cite>.
+
+    <Outline domain="py" objectType="method" target={"werkzeug.routing.RuleFactory.get_rules"} module={"werkzeug.routing"} fullname={"RuleFactory.get_rules"} description={"Subclasses of RuleFactory have to override this method and return\nan iterable of rules."} parameters={["map"]}>
+      <Outline.Signature fullname="RuleFactory.get_rules" id="werkzeug.routing.RuleFactory.get_rules">
+        <Outline.Name>get\_rules</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">map</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Subclasses of <cite>RuleFactory</cite> have to override this method and return
+        an iterable of rules.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              t.Iterable\[[Rule](#werkzeug.routing.Rule "werkzeug.routing.Rule")]
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.Subdomain"} module={"werkzeug.routing"} fullname={"Subdomain"} parameters={["subdomain", "rules"]} description={"All URLs provided by this factory have the subdomain set to a\nspecific domain. For example if you want to use the subdomain for\nthe current language this can be a good setup:"}>
+  <Outline.Signature fullname="Subdomain" id="werkzeug.routing.Subdomain">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Subdomain</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">subdomain</span></Outline.Parameter>, <Outline.Parameter><span className="name">rules</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    All URLs provided by this factory have the subdomain set to a
+    specific domain. For example if you want to use the subdomain for
+    the current language this can be a good setup:
+
+    ```default
+    url_map = Map([
+        Rule('/', endpoint='#select_language'),
+        Subdomain('<string(length=2):lang_code>', [
+            Rule('/', endpoint='index'),
+            Rule('/about', endpoint='about'),
+            Rule('/help', endpoint='help')
+        ])
+    ])
+    ```
+
+    All the rules except for the `'#select_language'` endpoint will now
+    listen on a two letter long subdomain that holds the language code
+    for the current request.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")<em>]</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.Submount"} module={"werkzeug.routing"} fullname={"Submount"} parameters={["path", "rules"]} description={"Like Subdomain but prefixes the URL rule with a given string:"}>
+  <Outline.Signature fullname="Submount" id="werkzeug.routing.Submount">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Submount</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path</span></Outline.Parameter>, <Outline.Parameter><span className="name">rules</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Like <cite>Subdomain</cite> but prefixes the URL rule with a given string:
+
+    ```default
+    url_map = Map([
+        Rule('/', endpoint='index'),
+        Submount('/blog', [
+            Rule('/', endpoint='blog/index'),
+            Rule('/entry/<entry_slug>', endpoint='blog/show')
+        ])
+    ])
+    ```
+
+    Now the rule `'blog/show'` matches `/blog/entry/<entry_slug>`.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")<em>]</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.EndpointPrefix"} module={"werkzeug.routing"} fullname={"EndpointPrefix"} parameters={["prefix", "rules"]} description={"Prefixes all endpoints (which must be strings for this factory) with\nanother string. This can be useful for sub applications:"}>
+  <Outline.Signature fullname="EndpointPrefix" id="werkzeug.routing.EndpointPrefix">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>EndpointPrefix</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">prefix</span></Outline.Parameter>, <Outline.Parameter><span className="name">rules</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Prefixes all endpoints (which must be strings for this factory) with
+    another string. This can be useful for sub applications:
+
+    ```default
+    url_map = Map([
+        Rule('/', endpoint='index'),
+        EndpointPrefix('blog/', [Submount('/blog', [
+            Rule('/', endpoint='index'),
+            Rule('/entry/<entry_slug>', endpoint='show')
+        ])])
+    ])
+    ```
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>prefix</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")<em>]</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#rule-templates}
+
+## Rule Templates
+
+<Outline domain="py" objectType="class" target={"werkzeug.routing.RuleTemplate"} module={"werkzeug.routing"} fullname={"RuleTemplate"} parameters={["rules"]} description={"Returns copies of the rules wrapped and expands string templates in\nthe endpoint, rule, defaults or subdomain sections."}>
+  <Outline.Signature fullname="RuleTemplate" id="werkzeug.routing.RuleTemplate">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>RuleTemplate</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rules</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Returns copies of the rules wrapped and expands string templates in
+    the endpoint, rule, defaults or subdomain sections.
+
+    Here a small example for such a rule template:
+
+    ```default
+    from werkzeug.routing import Map, Rule, RuleTemplate
+
+    resource = RuleTemplate([
+        Rule('/$name/', endpoint='$name.list'),
+        Rule('/$name/<int:id>', endpoint='$name.show')
+    ])
+
+    url_map = Map([resource(name='user'), resource(name='page')])
+    ```
+
+    When a rule template is called the keyword arguments are used to
+    replace the placeholders in all the string parameters.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.Rule")<em>]</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+:target{#custom-converters}
+
+## Custom Converters
+
+You can add custom converters that add behaviors not provided by the
+built-in converters. To make a custom converter, subclass
+`BaseConverter` then pass the new class to the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map")
+`converters` parameter, or add it to
+[`url_map.converters`](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
+
+The converter should have a `regex` attribute with a regular
+expression to match with. If the converter can take arguments in a URL
+rule, it should accept them in its `__init__` method. The entire
+regex expression will be matched as a group and used as the value for
+conversion.
+
+If a custom converter can match a forward slash, `/`, it should have
+the attribute `part_isolating` set to `False`. This will ensure
+that rules using the custom converter are correctly matched.
+
+It can implement a `to_python` method to convert the matched string to
+some other object. This can also do extra validation that wasn’t
+possible with the `regex` attribute, and should raise a
+`werkzeug.routing.ValidationError` in that case. Raising any other
+errors will cause a 500 error.
+
+It can implement a `to_url` method to convert a Python object to a
+string when building a URL. Any error raised here will be converted to a
+`werkzeug.routing.BuildError` and eventually cause a 500 error.
+
+This example implements a `BooleanConverter` that will match the
+strings `"yes"`, `"no"`, and `"maybe"`, returning a random value
+for `"maybe"`.
+
+```default
+from random import randrange
+from werkzeug.routing import BaseConverter, ValidationError
+
+class BooleanConverter(BaseConverter):
+    regex = r"(?:yes|no|maybe)"
+
+    def __init__(self, url_map, maybe=False):
+        super().__init__(url_map)
+        self.maybe = maybe
+
+    def to_python(self, value):
+        if value == "maybe":
+            if self.maybe:
+                return not randrange(2)
+            raise ValidationError
+        return value == 'yes'
+
+    def to_url(self, value):
+        return "yes" if value else "no"
+
+from werkzeug.routing import Map, Rule
+
+url_map = Map([
+    Rule("/vote/<bool:werkzeug_rocks>", endpoint="vote"),
+    Rule("/guess/<bool(maybe=True):foo>", endpoint="guess")
+], converters={'bool': BooleanConverter})
+```
+
+If you want to change the default converter, assign a different
+converter to the `"default"` key.
+
+:target{#host-matching}
+
+## Host Matching
+
+<Container type="info" title="Version added">
+  <span>New in version 0.7.</span>
+</Container>
+
+Starting with Werkzeug 0.7 it’s also possible to do matching on the whole
+host names instead of just the subdomain.  To enable this feature you need
+to pass `host_matching=True` to the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") constructor and provide
+the <cite>host</cite> argument to all routes:
+
+```default
+url_map = Map([
+    Rule('/', endpoint='www_index', host='www.example.com'),
+    Rule('/', endpoint='help_index', host='help.example.com')
+], host_matching=True)
+```
+
+Variable parts are of course also possible in the host section:
+
+```default
+url_map = Map([
+    Rule('/', endpoint='www_index', host='www.example.com'),
+    Rule('/', endpoint='user_index', host='<user>.example.com')
+], host_matching=True)
+```
+
+:target{#websockets}
+
+## WebSockets
+
+<Container type="info" title="Version added">
+  <span>New in version 1.0.</span>
+</Container>
+
+If a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") is created with `websocket=True`, it will only
+match if the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") is bound to a request with a `url_scheme` of
+`ws` or `wss`.
+
+<Container type="note">
+  Werkzeug has no further WebSocket support beyond routing. This
+  functionality is mostly of use to ASGI projects.
+</Container>
+
+```python
+url_map = Map([
+    Rule("/ws", endpoint="comm", websocket=True),
+])
+adapter = map.bind("example.org", "/ws", url_scheme="ws")
+assert adapter.match() == ("comm", {})
+```
+
+If the only match is a WebSocket rule and the bind is HTTP (or the
+only match is HTTP and the bind is WebSocket) a
+`WebsocketMismatch` (derives from
+[`BadRequest`](exceptions.mdx#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest")) exception is raised.
+
+As WebSocket URLs have a different scheme, rules are always built with a
+scheme and host, `force_external=True` is implied.
+
+```python
+url = adapter.build("comm")
+assert url == "ws://example.org/ws"
+```
+
+:target{#state-machine-matching}
+
+## State Machine Matching
+
+The default matching algorithm uses a state machine that transitions
+between parts of the request path to find a match. To understand how
+this works consider this rule:
+
+```default
+/resource/<id>
+```
+
+Firstly this rule is decomposed into two `RulePart`. The first is a
+static part with a content equal to `resource`, the second is
+dynamic and requires a regex match to `[^/]+`.
+
+A state machine is then created with an initial state that represents
+the rule’s first `/`. This initial state has a single, static
+transition to the next state which represents the rule’s second
+`/`. This second state has a single dynamic transition to the final
+state which includes the rule.
+
+To match a path the matcher starts and the initial state and follows
+transitions that work. Clearly a trial path of `/resource/2` has the
+parts `""`, `resource`, and `2` which match the transitions and
+hence a rule will match. Whereas `/other/2` will not match as there
+is no transition for the `other` part from the initial state.
+
+The only diversion from this rule is if a `RulePart` is not
+part-isolating i.e. it will match `/`. In this case the `RulePart`
+is considered final and represents a transition that must include all
+the subsequent parts of the trial path.

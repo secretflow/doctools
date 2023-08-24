@@ -1,0 +1,63 @@
+{
+  "name": "@secretflow/dumi-theme-sphinx-mdx",
+  "license": "MIT",
+  "version": "0.0.1",
+  "description": "Dumi theme for SecretFlow's documentation.",
+  "keywords": [],
+  "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-theme-sphinx-mdx",
+  "bugs": "https://github.com/secretflow/doctools/issues",
+  "author": "Tony Wu <tonywu6@protonmail.com>",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "module": "./dist/exports/index.js",
+  "types": "./dist/typing/exports/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/typing/exports/index.d.ts",
+      "import": "./dist/exports/index.js",
+      "default": "./dist/exports/index.js"
+    }
+  },
+  "scripts": {
+    "setup": "tsup",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint:eslint": "eslint src",
+    "lint:tsc": "tsc --noEmit",
+    "release": "pnpm publish"
+  },
+  "dependencies": {
+    "@mdx-js/react": "^2.3.0",
+    "@secretflow/dumi-plugin-mdx": "workspace:^",
+    "@secretflow/dumi-plugin-search": "workspace:^",
+    "antd": "^5.7.0",
+    "graphviz-react": "^1.2.5",
+    "katex": "^0.16.8",
+    "mermaid": "^10.2.4",
+    "styled-components": "^5.3.11"
+  },
+  "devDependencies": {
+    "tsup-utils": "workspace:^",
+    "@types/react": "^18.2.15",
+    "@types/styled-components": "^5.1.26",
+    "@umijs/renderer-react": "^4.0.72",
+    "antd": "^5.5.0",
+    "dumi": "^2.2.1",
+    "globby": "^13.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "peerDependencies": {
+    "dumi": "^2.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

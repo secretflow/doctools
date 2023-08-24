@@ -1,0 +1,59 @@
+# This file defines our GitHub Labels
+#
+# FOR MAINTAINERS:
+# To make changes to labels, update this file and submit a pull request. Changes will
+# effect thru the update-labels action as soon as they are merged to main.
+#
+# IMPORTANT:
+# To rename a label, add the old name to the `aliases` field. This ensures currently
+# labeled issues and PRs are updated accordingly, otherwise the label will be DELETED
+# from affected issues/PRs.
+
+# generic tags
+
+- name: good first issue
+  color: 7057ff
+
+- name: wontfix
+  color: d3d3d3
+
+# classification
+
+- name: 'kind: bug'
+  color: ee0701
+  aliases: [bug]
+  description: Something isn't working | 缺陷
+
+- name: 'kind: task'
+  color: d3d3d3
+  aliases:
+    - PR(chore)
+  description: Routine maintenance not related to any issues or topics
+
+- name: 'area: docs'
+  color: d4c5f9
+  aliases:
+    - docs
+    - documentation
+    - PR(documentation)
+  description: Changes affecting documentation | 文档相关
+
+- name: 'area: examples'
+  color: d4c5f9
+  description: Improvement to usage examples | 示例/教程相关
+
+- name: 'area: ci'
+  color: d4c5f9
+  aliases:
+    - ci
+  description: changes to CI/CD tooling and automated workflows
+
+# statuses
+
+- name: 'needs: triage'
+  color: fef2c0
+  description: 新问题的标记，请在初步处理后去掉
+
+- name: 'needs: reproduction'
+  color: fef2c0
+  description: 需要最小复现示例

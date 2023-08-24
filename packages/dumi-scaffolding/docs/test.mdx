@@ -1,0 +1,1377 @@
+:target{#testing-wsgi-applications}
+
+# Testing WSGI Applications
+
+:target{#test-client}
+
+## Test Client
+
+Werkzeug provides a [`Client`](#werkzeug.test.Client "werkzeug.test.Client") to simulate requests to a WSGI
+application without starting a server. The client has methods for making
+different types of requests, as well as managing cookies across
+requests.
+
+```python
+>>> from werkzeug.test import Client
+>>> from werkzeug.testapp import test_app
+>>> c = Client(test_app)
+>>> response = c.get("/")
+>>> response.status_code
+200
+>>> response.headers
+Headers([('Content-Type', 'text/html; charset=utf-8'), ('Content-Length', '5211')])
+>>> response.get_data(as_text=True)
+'<!doctype html>...'
+```
+
+The client’s request methods return instances of [`TestResponse`](#werkzeug.test.TestResponse "werkzeug.test.TestResponse").
+This provides extra attributes and methods on top of
+[`Response`](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response") that are useful for testing.
+
+:target{#request-body}
+
+## Request Body
+
+By passing a dict to `data`, the client will construct a request body
+with file and form data. It will set the content type to
+`application/x-www-form-urlencoded` if there are no files, or
+`multipart/form-data` there are.
+
+```python
+import io
+
+response = client.post(data={
+    "name": "test",
+    "file": (BytesIO("file contents".encode("utf8")), "test.txt")
+})
+```
+
+Pass a string, bytes, or file-like object to `data` to use that as the
+raw request body. In that case, you should set the content type
+appropriately. For example, to post YAML:
+
+```python
+response = client.post(
+    data="a: value\nb: 1\n", content_type="application/yaml"
+)
+```
+
+A shortcut when testing JSON APIs is to pass a dict to `json` instead
+of using `data`. This will automatically call `json.dumps()` and
+set the content type to `application/json`. Additionally, if the
+app returns JSON, `response.json` will automatically call
+`json.loads()`.
+
+```python
+response = client.post("/api", json={"a": "value", "b": 1})
+obj = response.json()
+```
+
+:target{#environment-builder}
+
+## Environment Builder
+
+[`EnvironBuilder`](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder") is used to construct a WSGI environ dict. The
+test client uses this internally to prepare its requests. The arguments
+passed to the client request methods are the same as the builder.
+
+Sometimes, it can be useful to construct a WSGI environment manually.
+An environ builder or dict can be passed to the test client request
+methods in place of other arguments to use a custom environ.
+
+```Python
+from werkzeug.test import EnvironBuilder
+builder = EnvironBuilder(...)
+# build an environ dict
+environ = builder.get_environ()
+# build an environ dict wrapped in a request
+request = builder.get_request()
+```
+
+The test client responses make this available through
+[`TestResponse.request`](#werkzeug.test.TestResponse.request "werkzeug.test.TestResponse.request") and `response.request.environ`.
+
+:target{#api}
+
+## API
+
+<Outline domain="py" objectType="class" target={"werkzeug.test.Client"} module={"werkzeug.test"} fullname={"Client"} parameters={["application", "response_wrapper", "use_cookies", "allow_subdomain_redirects"]} description={"Simulate sending requests to a WSGI application without running a WSGI or HTTP\nserver."}>
+  <Outline.Signature fullname="Client" id="werkzeug.test.Client">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>Client</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">application</span></Outline.Parameter>, <Outline.Parameter><span className="name">response\_wrapper</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">use\_cookies</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">allow\_subdomain\_redirects</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Simulate sending requests to a WSGI application without running a WSGI or HTTP
+    server.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>application</Outline.ParameterTarget> (<em>WSGIApplication</em>) – The WSGI application to make requests to.
+          - <Outline.ParameterTarget>response\_wrapper</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em>[<em>Response</em>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response")<em>] </em><em>| </em><em>None</em>) – A [`Response`](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response") class to wrap response data with.
+            Defaults to [`TestResponse`](#werkzeug.test.TestResponse "werkzeug.test.TestResponse"). If it’s not a subclass of `TestResponse`,
+            one will be created.
+          - <Outline.ParameterTarget>use\_cookies</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Persist cookies from `Set-Cookie` response headers to the
+            `Cookie` header in subsequent requests. Domain and path matching is supported,
+            but other cookie parameters are ignored.
+          - <Outline.ParameterTarget>allow\_subdomain\_redirects</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Allow requests to follow redirects to subdomains.
+            Enable this if the application handles subdomains and redirects between them.
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.3: </span>Simplify cookie implementation, support domain and path matching.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>All data is available as properties on the returned response object. The
+      response cannot be returned as a tuple.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.0: </span>`response_wrapper` is always a subclass of \:class:`TestResponse`.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>Added the `use_cookies` parameter.
+    </Container>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.get_cookie"} module={"werkzeug.test"} fullname={"Client.get_cookie"} parameters={["key", "domain", "path"]} description={"Return a Cookie if it exists. Cookies are uniquely identified by\n(domain, path, key)."}>
+      <Outline.Signature fullname="Client.get_cookie" id="werkzeug.test.Client.get_cookie">
+        <Outline.Name>get\_cookie</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">domain</span><span>=</span><span>'localhost'</span></Outline.Parameter>, <Outline.Parameter><span className="name">path</span><span>=</span><span>'/'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return a [`Cookie`](#werkzeug.test.Cookie "werkzeug.test.Cookie") if it exists. Cookies are uniquely identified by
+        `(domain, path, key)`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The decoded form of the key for the cookie.
+              - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The domain the cookie was set for.
+              - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The path the cookie was set for.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>Cookie</em>](#werkzeug.test.Cookie "werkzeug.test.Cookie") | None
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.3.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.set_cookie"} module={"werkzeug.test"} fullname={"Client.set_cookie"} parameters={["key", "value", "domain", "origin_only", "path", "kwargs"]} description={"Set a cookie to be sent in subsequent requests."}>
+      <Outline.Signature fullname="Client.set_cookie" id="werkzeug.test.Client.set_cookie">
+        <Outline.Name>set\_cookie</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">value</span><span>=</span><span>''</span></Outline.Parameter>, <Outline.Parameter><span>\*</span></Outline.Parameter>, <Outline.Parameter><span className="name">domain</span><span>=</span><span>'localhost'</span></Outline.Parameter>, <Outline.Parameter><span className="name">origin\_only</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">path</span><span>=</span><span>'/'</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Set a cookie to be sent in subsequent requests.
+
+        This is a convenience to skip making a test request to a route that would set
+        the cookie. To test the cookie, make a test request to a route that uses the
+        cookie value.
+
+        The client uses `domain`, `origin_only`, and `path` to determine which
+        cookies to send with a request. It does not use other cookie parameters that
+        browsers use, since they’re not applicable in tests.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The key part of the cookie.
+              - <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The value part of the cookie.
+              - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Send this cookie with requests that match this domain. If
+                `origin_only` is true, it must be an exact match, otherwise it may be a
+                suffix match.
+              - <Outline.ParameterTarget>origin\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Whether the domain must be an exact match to the request.
+              - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Send this cookie with requests that match this path either exactly
+                or as a prefix.
+              - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) – Passed to [`dump_cookie()`](http.mdx#werkzeug.http.dump_cookie "werkzeug.http.dump_cookie").
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 3.0: </span>The parameter `server_name` is removed. The first parameter is
+          `key`. Use the `domain` and `origin_only` parameters instead.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>The `origin_only` parameter was added.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>The `domain` parameter defaults to `localhost`.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.delete_cookie"} module={"werkzeug.test"} fullname={"Client.delete_cookie"} parameters={["key", "domain", "path"]} description={"Delete a cookie if it exists. Cookies are uniquely identified by\n(domain, path, key)."}>
+      <Outline.Signature fullname="Client.delete_cookie" id="werkzeug.test.Client.delete_cookie">
+        <Outline.Name>delete\_cookie</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span>\*</span></Outline.Parameter>, <Outline.Parameter><span className="name">domain</span><span>=</span><span>'localhost'</span></Outline.Parameter>, <Outline.Parameter><span className="name">path</span><span>=</span><span>'/'</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Delete a cookie if it exists. Cookies are uniquely identified by
+        `(domain, path, key)`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The decoded form of the key for the cookie.
+              - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The domain the cookie was set for.
+              - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The path the cookie was set for.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 3.0: </span>The `server_name` parameter is removed. The first parameter is
+          `key`. Use the `domain` parameter instead.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 3.0: </span>The `secure`, `httponly` and `samesite` parameters are removed.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.3: </span>The `domain` parameter defaults to `localhost`.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.open"} module={"werkzeug.test"} fullname={"Client.open"} parameters={["args", "buffered", "follow_redirects", "kwargs"]} description={"Generate an environ dict from the given arguments, make a\nrequest to the application using it, and return the response."}>
+      <Outline.Signature fullname="Client.open" id="werkzeug.test.Client.open">
+        <Outline.Name>open</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffered</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">follow\_redirects</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Generate an environ dict from the given arguments, make a
+        request to the application using it, and return the response.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) – Passed to [`EnvironBuilder`](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder") to create the
+                environ for the request. If a single arg is passed, it can
+                be an existing [`EnvironBuilder`](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder") or an environ dict.
+              - <Outline.ParameterTarget>buffered</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Convert the iterator returned by the app into
+                a list. If the iterator has a `close()` method, it is
+                called automatically.
+              - <Outline.ParameterTarget>follow\_redirects</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Make additional requests to follow HTTP
+                redirects until a non-redirect status is returned.
+                [`TestResponse.history`](#werkzeug.test.TestResponse.history "werkzeug.test.TestResponse.history") lists the intermediate
+                responses.
+              - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.1: </span>Removed the `as_tuple` parameter.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.0: </span>The request input stream is closed when calling
+          `response.close()`. Input streams for redirects are
+          automatically closed.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>If a dict is provided as file in the dict for the `data`
+          parameter the content type has to be called `content_type`
+          instead of `mimetype`. This change was made for
+          consistency with `werkzeug.FileWrapper`.
+        </Container>
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.5: </span>Added the `follow_redirects` parameter.
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.get"} module={"werkzeug.test"} fullname={"Client.get"} parameters={["args", "kw"]} description={"Call open() with method set to GET."}>
+      <Outline.Signature fullname="Client.get" id="werkzeug.test.Client.get">
+        <Outline.Name>get</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `GET`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.post"} module={"werkzeug.test"} fullname={"Client.post"} parameters={["args", "kw"]} description={"Call open() with method set to POST."}>
+      <Outline.Signature fullname="Client.post" id="werkzeug.test.Client.post">
+        <Outline.Name>post</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `POST`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.put"} module={"werkzeug.test"} fullname={"Client.put"} parameters={["args", "kw"]} description={"Call open() with method set to PUT."}>
+      <Outline.Signature fullname="Client.put" id="werkzeug.test.Client.put">
+        <Outline.Name>put</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `PUT`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.delete"} module={"werkzeug.test"} fullname={"Client.delete"} parameters={["args", "kw"]} description={"Call open() with method set to DELETE."}>
+      <Outline.Signature fullname="Client.delete" id="werkzeug.test.Client.delete">
+        <Outline.Name>delete</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `DELETE`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.patch"} module={"werkzeug.test"} fullname={"Client.patch"} parameters={["args", "kw"]} description={"Call open() with method set to PATCH."}>
+      <Outline.Signature fullname="Client.patch" id="werkzeug.test.Client.patch">
+        <Outline.Name>patch</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `PATCH`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.options"} module={"werkzeug.test"} fullname={"Client.options"} parameters={["args", "kw"]} description={"Call open() with method set to OPTIONS."}>
+      <Outline.Signature fullname="Client.options" id="werkzeug.test.Client.options">
+        <Outline.Name>options</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `OPTIONS`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.head"} module={"werkzeug.test"} fullname={"Client.head"} parameters={["args", "kw"]} description={"Call open() with method set to HEAD."}>
+      <Outline.Signature fullname="Client.head" id="werkzeug.test.Client.head">
+        <Outline.Name>head</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `HEAD`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.Client.trace"} module={"werkzeug.test"} fullname={"Client.trace"} parameters={["args", "kw"]} description={"Call open() with method set to TRACE."}>
+      <Outline.Signature fullname="Client.trace" id="werkzeug.test.Client.trace">
+        <Outline.Name>trace</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Call [`open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open") with `method` set to `TRACE`.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>args</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>kw</Outline.ParameterTarget> ([<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.test.TestResponse"} module={"werkzeug.test"} fullname={"TestResponse"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"Response subclass that provides extra\ninformation about requests made with the test Client."}>
+  <Outline.Signature fullname="TestResponse" id="werkzeug.test.TestResponse">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>TestResponse</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">response</span></Outline.Parameter>, <Outline.Parameter><span className="name">status</span></Outline.Parameter>, <Outline.Parameter><span className="name">headers</span></Outline.Parameter>, <Outline.Parameter><span className="name">request</span></Outline.Parameter>, <Outline.Parameter><span className="name">history</span><span>=</span><span>()</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    [`Response`](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response") subclass that provides extra
+    information about requests made with the test [`Client`](#werkzeug.test.Client "werkzeug.test.Client").
+
+    Test client requests will always return an instance of this class.
+    If a custom response class is passed to the client, it is
+    subclassed along with this to support test information.
+
+    If the test request included large files, or if the application is
+    serving a file, call `close()` to close any open files and
+    prevent Python showing a `ResourceWarning`.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.2: </span>Set the `default_mimetype` to None to prevent a mimetype being
+      assumed if missing.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>Response instances cannot be treated as tuples.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 2.0: </span>Test client methods always return instances of this class.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>response</Outline.ParameterTarget> ([<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em>[<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) –&#x20;
+          - <Outline.ParameterTarget>status</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.headers.Headers")) –&#x20;
+          - <Outline.ParameterTarget>request</Outline.ParameterTarget> ([<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")) –&#x20;
+          - <Outline.ParameterTarget>history</Outline.ParameterTarget> ([<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>werkzeug.test.TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<em>, </em><em>...</em><em>]</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.TestResponse.default_mimetype"} module={"werkzeug.test"} fullname={"TestResponse.default_mimetype"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"the default mimetype if none is provided."}>
+      <Outline.Signature fullname="TestResponse.default_mimetype" id="werkzeug.test.TestResponse.default_mimetype">
+        <Outline.Name>default\_mimetype</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword><Outline.Keyword><span>{" "}</span><span>=</span><span>{" "}</span>None</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        the default mimetype if none is provided.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.TestResponse.request"} module={"werkzeug.test"} fullname={"TestResponse.request"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"A request object with the environ used to make the request that\nresulted in this response."}>
+      <Outline.Signature fullname="TestResponse.request" id="werkzeug.test.TestResponse.request">
+        <Outline.Name>request</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[Request](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A request object with the environ used to make the request that
+        resulted in this response.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.TestResponse.history"} module={"werkzeug.test"} fullname={"TestResponse.history"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"A list of intermediate responses. Populated when the test request\nis made with follow_redirects enabled."}>
+      <Outline.Signature fullname="TestResponse.history" id="werkzeug.test.TestResponse.history">
+        <Outline.Name>history</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[werkzeug.test.TestResponse](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<span>,</span><span>{" "}</span><span>...</span><span>]</span></Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A list of intermediate responses. Populated when the test request
+        is made with `follow_redirects` enabled.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.TestResponse.text"} module={"werkzeug.test"} fullname={"TestResponse.text"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"The response data as text. A shortcut for\nresponse.get_data(as_text=True)."}>
+      <Outline.Signature fullname="TestResponse.text" id="werkzeug.test.TestResponse.text">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>text</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The response data as text. A shortcut for
+        `response.get_data(as_text=True)`.
+
+        <Container type="info" title="Version added">
+          <span>New in version 2.1.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.test.Cookie"} module={"werkzeug.test"} fullname={"Cookie"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"A cookie key, value, and parameters."}>
+  <Outline.Signature fullname="Cookie" id="werkzeug.test.Cookie">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>Cookie</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">key</span></Outline.Parameter>, <Outline.Parameter><span className="name">value</span></Outline.Parameter>, <Outline.Parameter><span className="name">decoded\_key</span></Outline.Parameter>, <Outline.Parameter><span className="name">decoded\_value</span></Outline.Parameter>, <Outline.Parameter><span className="name">expires</span></Outline.Parameter>, <Outline.Parameter><span className="name">max\_age</span></Outline.Parameter>, <Outline.Parameter><span className="name">domain</span></Outline.Parameter>, <Outline.Parameter><span className="name">origin\_only</span></Outline.Parameter>, <Outline.Parameter><span className="name">path</span></Outline.Parameter>, <Outline.Parameter><span className="name">secure</span></Outline.Parameter>, <Outline.Parameter><span className="name">http\_only</span></Outline.Parameter>, <Outline.Parameter><span className="name">same\_site</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    A cookie key, value, and parameters.
+
+    The class itself is not a public API. Its attributes are documented for inspection
+    with [`Client.get_cookie()`](#werkzeug.test.Client.get_cookie "werkzeug.test.Client.get_cookie") only.
+
+    <Container type="info" title="Version added">
+      <span>New in version 2.3.</span>
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>decoded\_key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>decoded\_value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>expires</Outline.ParameterTarget> ([<em>datetime</em>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>max\_age</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>origin\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>secure</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>http\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>same\_site</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.key"} module={"werkzeug.test"} fullname={"Cookie.key"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The cookie key, encoded as a client would see it."}>
+      <Outline.Signature fullname="Cookie.key" id="werkzeug.test.Cookie.key">
+        <Outline.Name>key</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The cookie key, encoded as a client would see it.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.value"} module={"werkzeug.test"} fullname={"Cookie.value"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The cookie key, encoded as a client would see it."}>
+      <Outline.Signature fullname="Cookie.value" id="werkzeug.test.Cookie.value">
+        <Outline.Name>value</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The cookie key, encoded as a client would see it.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.decoded_key"} module={"werkzeug.test"} fullname={"Cookie.decoded_key"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The cookie key, decoded as the application would set and see it."}>
+      <Outline.Signature fullname="Cookie.decoded_key" id="werkzeug.test.Cookie.decoded_key">
+        <Outline.Name>decoded\_key</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The cookie key, decoded as the application would set and see it.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.decoded_value"} module={"werkzeug.test"} fullname={"Cookie.decoded_value"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The cookie value, decoded as the application would set and see it."}>
+      <Outline.Signature fullname="Cookie.decoded_value" id="werkzeug.test.Cookie.decoded_value">
+        <Outline.Name>decoded\_value</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The cookie value, decoded as the application would set and see it.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.expires"} module={"werkzeug.test"} fullname={"Cookie.expires"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The time at which the cookie is no longer valid."}>
+      <Outline.Signature fullname="Cookie.expires" id="werkzeug.test.Cookie.expires">
+        <Outline.Name>expires</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[datetime](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The time at which the cookie is no longer valid.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.max_age"} module={"werkzeug.test"} fullname={"Cookie.max_age"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The number of seconds from when the cookie was set at which it is\nno longer valid."}>
+      <Outline.Signature fullname="Cookie.max_age" id="werkzeug.test.Cookie.max_age">
+        <Outline.Name>max\_age</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The number of seconds from when the cookie was set at which it is
+        no longer valid.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.domain"} module={"werkzeug.test"} fullname={"Cookie.domain"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The domain that the cookie was set for, or the request domain if not set."}>
+      <Outline.Signature fullname="Cookie.domain" id="werkzeug.test.Cookie.domain">
+        <Outline.Name>domain</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The domain that the cookie was set for, or the request domain if not set.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.origin_only"} module={"werkzeug.test"} fullname={"Cookie.origin_only"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"Whether the cookie will be sent for exact domain matches only. This is True\nif the Domain parameter was not present."}>
+      <Outline.Signature fullname="Cookie.origin_only" id="werkzeug.test.Cookie.origin_only">
+        <Outline.Name>origin\_only</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Whether the cookie will be sent for exact domain matches only. This is `True`
+        if the `Domain` parameter was not present.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.path"} module={"werkzeug.test"} fullname={"Cookie.path"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The path that the cookie was set for."}>
+      <Outline.Signature fullname="Cookie.path" id="werkzeug.test.Cookie.path">
+        <Outline.Name>path</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The path that the cookie was set for.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.secure"} module={"werkzeug.test"} fullname={"Cookie.secure"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The Secure parameter."}>
+      <Outline.Signature fullname="Cookie.secure" id="werkzeug.test.Cookie.secure">
+        <Outline.Name>secure</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The `Secure` parameter.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.http_only"} module={"werkzeug.test"} fullname={"Cookie.http_only"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The HttpOnly parameter."}>
+      <Outline.Signature fullname="Cookie.http_only" id="werkzeug.test.Cookie.http_only">
+        <Outline.Name>http\_only</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The `HttpOnly` parameter.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.same_site"} module={"werkzeug.test"} fullname={"Cookie.same_site"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The SameSite parameter."}>
+      <Outline.Signature fullname="Cookie.same_site" id="werkzeug.test.Cookie.same_site">
+        <Outline.Name>same\_site</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The `SameSite` parameter.
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="class" target={"werkzeug.test.EnvironBuilder"} module={"werkzeug.test"} fullname={"EnvironBuilder"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"This class can be used to conveniently create a WSGI environment\nfor testing purposes.  It can be used to quickly create WSGI environments\nor request objects from arbitrary data."}>
+  <Outline.Signature fullname="EnvironBuilder" id="werkzeug.test.EnvironBuilder">
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>EnvironBuilder</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path</span><span>=</span><span>'/'</span></Outline.Parameter>, <Outline.Parameter><span className="name">base\_url</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_string</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>'GET'</span></Outline.Parameter>, <Outline.Parameter><span className="name">input\_stream</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">content\_type</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">content\_length</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">errors\_stream</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">multithread</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">multiprocess</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">run\_once</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">headers</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">data</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">environ\_base</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">environ\_overrides</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">mimetype</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">json</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">auth</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This class can be used to conveniently create a WSGI environment
+    for testing purposes.  It can be used to quickly create WSGI environments
+    or request objects from arbitrary data.
+
+    The signature of this class is also used in some other places as of
+    Werkzeug 0.5 ([`create_environ()`](#werkzeug.test.create_environ "werkzeug.test.create_environ"), `Response.from_values()`,
+    [`Client.open()`](#werkzeug.test.Client.open "werkzeug.test.Client.open")).  Because of this most of the functionality is
+    available through the constructor alone.
+
+    Files and regular form data can be manipulated independently of each
+    other with the [`form`](#werkzeug.test.EnvironBuilder.form "werkzeug.test.EnvironBuilder.form") and [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files") attributes, but are
+    passed with the same argument to the constructor: <cite>data</cite>.
+
+    <cite>data</cite> can be any of these values:
+
+    - a <cite>str</cite> or <cite>bytes</cite> object: The object is converted into an
+      [`input_stream`](#werkzeug.test.EnvironBuilder.input_stream "werkzeug.test.EnvironBuilder.input_stream"), the [`content_length`](#werkzeug.test.EnvironBuilder.content_length "werkzeug.test.EnvironBuilder.content_length") is set and you have to
+      provide a [`content_type`](#werkzeug.test.EnvironBuilder.content_type "werkzeug.test.EnvironBuilder.content_type").
+    - a <cite>dict</cite> or `MultiDict`: The keys have to be strings. The values
+      have to be either any of the following objects, or a list of any of the
+      following objects:
+      - a `file`-like object:  These are converted into
+        `FileStorage` objects automatically.
+      - a <cite>tuple</cite>:  The `add_file()` method is called
+        with the key and the unpacked <cite>tuple</cite> items as positional
+        arguments.
+      - a <cite>str</cite>:  The string is set as form data for the associated key.
+    - a file-like object: The object content is loaded in memory and then
+      handled like a regular <cite>str</cite> or a <cite>bytes</cite>.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the path of the request.  In the WSGI environment this will
+            end up as <cite>PATH\_INFO</cite>.  If the <cite>query\_string</cite> is not defined
+            and there is a question mark in the <cite>path</cite> everything after
+            it is used as query string.
+          - <Outline.ParameterTarget>base\_url</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the base URL is a URL that is used to extract the WSGI
+            URL scheme, host (server name + server port) and the
+            script root (<cite>SCRIPT\_NAME</cite>).
+          - <Outline.ParameterTarget>query\_string</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – an optional string or dict with URL parameters.
+          - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the HTTP method to use, defaults to <cite>GET</cite>.
+          - <Outline.ParameterTarget>input\_stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – an optional input stream.  Do not specify this and
+            <cite>data</cite>.  As soon as an input stream is set you can’t
+            modify [`args`](#werkzeug.test.EnvironBuilder.args "werkzeug.test.EnvironBuilder.args") and [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files") unless you
+            set the [`input_stream`](#werkzeug.test.EnvironBuilder.input_stream "werkzeug.test.EnvironBuilder.input_stream") to <cite>None</cite> again.
+          - <Outline.ParameterTarget>content\_type</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The content type for the request.  As of 0.5 you
+            don’t have to provide this when specifying files
+            and form data via <cite>data</cite>.
+          - <Outline.ParameterTarget>content\_length</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The content length for the request.  You don’t
+            have to specify this when providing data via
+            <cite>data</cite>.
+          - <Outline.ParameterTarget>errors\_stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – an optional error stream that is used for
+            <cite>wsgi.errors</cite>.  Defaults to `stderr`.
+          - <Outline.ParameterTarget>multithread</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – controls <cite>wsgi.multithread</cite>.  Defaults to <cite>False</cite>.
+          - <Outline.ParameterTarget>multiprocess</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – controls <cite>wsgi.multiprocess</cite>.  Defaults to <cite>False</cite>.
+          - <Outline.ParameterTarget>run\_once</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – controls <cite>wsgi.run\_once</cite>.  Defaults to <cite>False</cite>.
+          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers")<em> | </em><em>t.Iterable</em><em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>] </em><em>| </em><em>None</em>) – an optional list or `Headers` object of headers.
+          - <Outline.ParameterTarget>data</Outline.ParameterTarget> (<em>None</em><em> | </em><em>(</em><em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em> | </em><em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em><em>)</em>) – a string or dict of form data or a file-object.
+            See explanation above.
+          - <Outline.ParameterTarget>json</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – An object to be serialized and assigned to `data`.
+            Defaults the content type to `"application/json"`.
+            Serialized with the function assigned to [`json_dumps`](#werkzeug.test.EnvironBuilder.json_dumps "werkzeug.test.EnvironBuilder.json_dumps").
+          - <Outline.ParameterTarget>environ\_base</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – an optional dict of environment defaults.
+          - <Outline.ParameterTarget>environ\_overrides</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – an optional dict of environment overrides.
+          - <Outline.ParameterTarget>auth</Outline.ParameterTarget> ([<em>Authorization</em>](datastructures.mdx#werkzeug.datastructures.Authorization "werkzeug.datastructures.Authorization")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – An authorization object to use for the
+            `Authorization` header value. A `(username, password)` tuple
+            is a shortcut for `Basic` authorization.
+          - <Outline.ParameterTarget>mimetype</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 3.0: </span>The `charset` parameter was removed.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.1: </span>`CONTENT_TYPE` and `CONTENT_LENGTH` are not duplicated as
+      header keys in the environ.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.0: </span>`REQUEST_URI` and `RAW_URI` is the full raw URI including
+      the query string, not only the path.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 2.0: </span>The default [`request_class`](#werkzeug.test.EnvironBuilder.request_class "werkzeug.test.EnvironBuilder.request_class") is `Request` instead of
+      `BaseRequest`.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 2.0: </span>Added the `auth` parameter.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.15: </span>The `json` param and [`json_dumps()`](#werkzeug.test.EnvironBuilder.json_dumps "werkzeug.test.EnvironBuilder.json_dumps") method.
+    </Container>
+
+    <Container type="info" title="Version added">
+      <span>New in version 0.15: </span>The environ has keys `REQUEST_URI` and `RAW_URI` containing
+      the path before percent-decoding. This is not part of the WSGI
+      PEP, but many WSGI servers include it.
+    </Container>
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.6: </span>`path` and `base_url` can now be unicode strings that are
+      encoded with `iri_to_uri()`.
+    </Container>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.EnvironBuilder.server_protocol"} module={"werkzeug.test"} fullname={"EnvironBuilder.server_protocol"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"the server protocol to use.  defaults to HTTP/1.1"}>
+      <Outline.Signature fullname="EnvironBuilder.server_protocol" id="werkzeug.test.EnvironBuilder.server_protocol">
+        <Outline.Name>server\_protocol</Outline.Name><Outline.Keyword><span>{" "}</span><span>=</span><span>{" "}</span>'HTTP/1.1'</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        the server protocol to use.  defaults to HTTP/1.1
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.EnvironBuilder.wsgi_version"} module={"werkzeug.test"} fullname={"EnvironBuilder.wsgi_version"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"the wsgi version to use.  defaults to (1, 0)"}>
+      <Outline.Signature fullname="EnvironBuilder.wsgi_version" id="werkzeug.test.EnvironBuilder.wsgi_version">
+        <Outline.Name>wsgi\_version</Outline.Name><Outline.Keyword><span>{" "}</span><span>=</span><span>{" "}</span>(1, 0)</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        the wsgi version to use.  defaults to (1, 0)
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="attribute" target={"werkzeug.test.EnvironBuilder.request_class"} module={"werkzeug.test"} fullname={"EnvironBuilder.request_class"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The default request class used by get_request()."}>
+      <Outline.Signature fullname="EnvironBuilder.request_class" id="werkzeug.test.EnvironBuilder.request_class">
+        <Outline.Name>request\_class</Outline.Name>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The default request class used by [`get_request()`](#werkzeug.test.EnvironBuilder.get_request "werkzeug.test.EnvironBuilder.get_request").
+
+        alias of [`Request`](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.EnvironBuilder.json_dumps"} module={"werkzeug.test"} fullname={"EnvironBuilder.json_dumps"} parameters={["obj", "skipkeys", "ensure_ascii", "check_circular", "allow_nan", "cls", "indent", "separators", "default", "sort_keys", "kw"]} description={"The serialization function used when json is passed."}>
+      <Outline.Signature fullname="EnvironBuilder.json_dumps" id="werkzeug.test.EnvironBuilder.json_dumps">
+        <Outline.Keyword>static<span>{" "}</span></Outline.Keyword><Outline.Name>json\_dumps</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">obj</span></Outline.Parameter>, <Outline.Parameter><span>\*</span></Outline.Parameter>, <Outline.Parameter><span className="name">skipkeys</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">ensure\_ascii</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">check\_circular</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">allow\_nan</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">cls</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">indent</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">separators</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">default</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_keys</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kw</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The serialization function used when `json` is passed.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.EnvironBuilder.from_environ"} module={"werkzeug.test"} fullname={"EnvironBuilder.from_environ"} parameters={["environ", "kwargs"]} description={"Turn an environ dict back into a builder. Any extra kwargs\noverride the args extracted from the environ."}>
+      <Outline.Signature fullname="EnvironBuilder.from_environ" id="werkzeug.test.EnvironBuilder.from_environ">
+        <Outline.Keyword>classmethod<span>{" "}</span></Outline.Keyword><Outline.Name>from\_environ</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Turn an environ dict back into a builder. Any extra kwargs
+        override the args extracted from the environ.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 2.0: </span>Path and query values are passed through the WSGI decoding
+          dance to avoid double encoding.
+        </Container>
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.15.</span>
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) –&#x20;
+              - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [EnvironBuilder](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.base_url"} module={"werkzeug.test"} fullname={"EnvironBuilder.base_url"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The base URL is used to extract the URL scheme, host name,\nport, and root path."}>
+      <Outline.Signature fullname="EnvironBuilder.base_url" id="werkzeug.test.EnvironBuilder.base_url">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>base\_url</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The base URL is used to extract the URL scheme, host name,
+        port, and root path.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.content_type"} module={"werkzeug.test"} fullname={"EnvironBuilder.content_type"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The content type for the request.  Reflected from and to\nthe headers.  Do not set if you set files or\nform for auto detection."}>
+      <Outline.Signature fullname="EnvironBuilder.content_type" id="werkzeug.test.EnvironBuilder.content_type">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>content\_type</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The content type for the request.  Reflected from and to
+        the `headers`.  Do not set if you set [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files") or
+        [`form`](#werkzeug.test.EnvironBuilder.form "werkzeug.test.EnvironBuilder.form") for auto detection.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.mimetype"} module={"werkzeug.test"} fullname={"EnvironBuilder.mimetype"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The mimetype (content type without charset etc.)"}>
+      <Outline.Signature fullname="EnvironBuilder.mimetype" id="werkzeug.test.EnvironBuilder.mimetype">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>mimetype</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The mimetype (content type without charset etc.)
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.14.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.mimetype_params"} module={"werkzeug.test"} fullname={"EnvironBuilder.mimetype_params"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The mimetype parameters as dict.  For example if the\ncontent type is text/html; charset=utf-8 the params would be\n{'charset': 'utf-8'}."}>
+      <Outline.Signature fullname="EnvironBuilder.mimetype_params" id="werkzeug.test.EnvironBuilder.mimetype_params">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>mimetype\_params</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>]</span></Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The mimetype parameters as dict.  For example if the
+        content type is `text/html; charset=utf-8` the params would be
+        `{'charset': 'utf-8'}`.
+
+        <Container type="info" title="Version added">
+          <span>New in version 0.14.</span>
+        </Container>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.content_length"} module={"werkzeug.test"} fullname={"EnvironBuilder.content_length"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The content length as integer.  Reflected from and to the\nheaders.  Do not set if you set files or\nform for auto detection."}>
+      <Outline.Signature fullname="EnvironBuilder.content_length" id="werkzeug.test.EnvironBuilder.content_length">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>content\_length</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The content length as integer.  Reflected from and to the
+        `headers`.  Do not set if you set [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files") or
+        [`form`](#werkzeug.test.EnvironBuilder.form "werkzeug.test.EnvironBuilder.form") for auto detection.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.form"} module={"werkzeug.test"} fullname={"EnvironBuilder.form"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"A MultiDict of form values."}>
+      <Outline.Signature fullname="EnvironBuilder.form" id="werkzeug.test.EnvironBuilder.form">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>form</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[MultiDict](datastructures.mdx#werkzeug.datastructures.MultiDict "werkzeug.datastructures.structures.MultiDict")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A `MultiDict` of form values.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.files"} module={"werkzeug.test"} fullname={"EnvironBuilder.files"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"A FileMultiDict of uploaded files. Use\nadd_file() to add new files."}>
+      <Outline.Signature fullname="EnvironBuilder.files" id="werkzeug.test.EnvironBuilder.files">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>files</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[FileMultiDict](datastructures.mdx#werkzeug.datastructures.FileMultiDict "werkzeug.datastructures.file_storage.FileMultiDict")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        A `FileMultiDict` of uploaded files. Use
+        `add_file()` to add new files.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.input_stream"} module={"werkzeug.test"} fullname={"EnvironBuilder.input_stream"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"An optional input stream. This is mutually exclusive with\nsetting form and files, setting it will clear\nthose. Do not provide this if the method is not POST or\nanother method that has a body."}>
+      <Outline.Signature fullname="EnvironBuilder.input_stream" id="werkzeug.test.EnvironBuilder.input_stream">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>input\_stream</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[IO](https://docs.python.org/3/library/typing.html#typing.IO "(in Python v3.11)")<span>\[</span>[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        An optional input stream. This is mutually exclusive with
+        setting [`form`](#werkzeug.test.EnvironBuilder.form "werkzeug.test.EnvironBuilder.form") and [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files"), setting it will clear
+        those. Do not provide this if the method is not `POST` or
+        another method that has a body.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.query_string"} module={"werkzeug.test"} fullname={"EnvironBuilder.query_string"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The query string.  If you set this to a string\nargs will no longer be available."}>
+      <Outline.Signature fullname="EnvironBuilder.query_string" id="werkzeug.test.EnvironBuilder.query_string">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>query\_string</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The query string.  If you set this to a string
+        [`args`](#werkzeug.test.EnvironBuilder.args "werkzeug.test.EnvironBuilder.args") will no longer be available.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.args"} module={"werkzeug.test"} fullname={"EnvironBuilder.args"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The URL arguments as MultiDict."}>
+      <Outline.Signature fullname="EnvironBuilder.args" id="werkzeug.test.EnvironBuilder.args">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>args</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[MultiDict](datastructures.mdx#werkzeug.datastructures.MultiDict "werkzeug.datastructures.structures.MultiDict")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The URL arguments as `MultiDict`.
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.server_name"} module={"werkzeug.test"} fullname={"EnvironBuilder.server_name"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The server name (read-only, use host to set)"}>
+      <Outline.Signature fullname="EnvironBuilder.server_name" id="werkzeug.test.EnvironBuilder.server_name">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>server\_name</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The server name (read-only, use `host` to set)
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.server_port"} module={"werkzeug.test"} fullname={"EnvironBuilder.server_port"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"The server port as integer (read-only, use host to set)"}>
+      <Outline.Signature fullname="EnvironBuilder.server_port" id="werkzeug.test.EnvironBuilder.server_port">
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>server\_port</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[int](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")</Outline.Keyword>
+      </Outline.Signature>
+
+      <Outline.Content>
+        The server port as integer (read-only, use `host` to set)
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.EnvironBuilder.close"} module={"werkzeug.test"} fullname={"EnvironBuilder.close"} parameters={[]} description={"Closes all files.  If you put real file objects into the\nfiles dict you can call this method to automatically close\nthem all in one go."}>
+      <Outline.Signature fullname="EnvironBuilder.close" id="werkzeug.test.EnvironBuilder.close">
+        <Outline.Name>close</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Closes all files.  If you put real `file` objects into the
+        [`files`](#werkzeug.test.EnvironBuilder.files "werkzeug.test.EnvironBuilder.files") dict you can call this method to automatically close
+        them all in one go.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              None
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.EnvironBuilder.get_environ"} module={"werkzeug.test"} fullname={"EnvironBuilder.get_environ"} parameters={[]} description={"Return the built environ."}>
+      <Outline.Signature fullname="EnvironBuilder.get_environ" id="werkzeug.test.EnvironBuilder.get_environ">
+        <Outline.Name>get\_environ</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Return the built environ.
+
+        <Container type="info" title="Version changed">
+          <span>Changed in version 0.15: </span>The content type and length headers are set based on
+          input stream detection. Previously this only set the WSGI
+          keys.
+        </Container>
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              WSGIEnvironment
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+
+    <Outline domain="py" objectType="method" target={"werkzeug.test.EnvironBuilder.get_request"} module={"werkzeug.test"} fullname={"EnvironBuilder.get_request"} parameters={["cls"]} description={"Returns a request with the data.  If the request class is not\nspecified request_class is used."}>
+      <Outline.Signature fullname="EnvironBuilder.get_request" id="werkzeug.test.EnvironBuilder.get_request">
+        <Outline.Name>get\_request</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">cls</span><span>=</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+      </Outline.Signature>
+
+      <Outline.Content>
+        Returns a request with the data.  If the request class is not
+        specified [`request_class`](#werkzeug.test.EnvironBuilder.request_class "werkzeug.test.EnvironBuilder.request_class") is used.
+
+        <FieldList>
+          <dl>
+            <dt className="field-name">
+              Parameters
+            </dt>
+
+            <dd className="field-body">
+              <Outline.ParameterTarget>cls</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em>[<em>werkzeug.wrappers.request.Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")<em>] </em><em>| </em><em>None</em>) – The request wrapper to use.
+            </dd>
+
+            <dt className="field-name">
+              Return type
+            </dt>
+
+            <dd className="field-body">
+              [<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")
+            </dd>
+          </dl>
+        </FieldList>
+      </Outline.Content>
+    </Outline>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.test.create_environ"} module={"werkzeug.test"} fullname={"create_environ"} parameters={["args", "kwargs"]} description={"Create a new WSGI environ dict based on the values passed.  The first\nparameter should be the path of the request which defaults to \u2018/\u2019.  The\nsecond one can either be an absolute path (in that case the host is\nlocalhost:80) or a full path to the request with scheme, netloc port and\nthe path to the script."}>
+  <Outline.Signature fullname="create_environ" id="werkzeug.test.create_environ">
+    <Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>create\_environ</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span>\*</span><span className="name">args</span></Outline.Parameter>, <Outline.Parameter><span>\*\*</span><span className="name">kwargs</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Create a new WSGI environ dict based on the values passed.  The first
+    parameter should be the path of the request which defaults to ‘/’.  The
+    second one can either be an absolute path (in that case the host is
+    localhost:80) or a full path to the request with scheme, netloc port and
+    the path to the script.
+
+    This accepts the same arguments as the [`EnvironBuilder`](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder")
+    constructor.
+
+    <Container type="info" title="Version changed">
+      <span>Changed in version 0.5: </span>This function is now a thin wrapper over [`EnvironBuilder`](#werkzeug.test.EnvironBuilder "werkzeug.test.EnvironBuilder") which
+      was added in 0.5.  The <cite>headers</cite>, <cite>environ\_base</cite>, <cite>environ\_overrides</cite>
+      and <cite>charset</cite> parameters were added.
+    </Container>
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          WSGIEnvironment
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"werkzeug.test.run_wsgi_app"} module={"werkzeug.test"} fullname={"run_wsgi_app"} parameters={["app", "environ", "buffered"]} description={"Return a tuple in the form (app_iter, status, headers) of the\napplication output.  This works best if you pass it an application that\nreturns an iterator all the time."}>
+  <Outline.Signature fullname="run_wsgi_app" id="werkzeug.test.run_wsgi_app">
+    <Outline.Prefix>werkzeug.test.</Outline.Prefix><Outline.Name>run\_wsgi\_app</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">app</span></Outline.Parameter>, <Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffered</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    Return a tuple in the form (app\_iter, status, headers) of the
+    application output.  This works best if you pass it an application that
+    returns an iterator all the time.
+
+    Sometimes applications may use the <cite>write()</cite> callable returned
+    by the <cite>start\_response</cite> function.  This tries to resolve such edge
+    cases automatically.  But if you don’t get the expected output you
+    should set <cite>buffered</cite> to <cite>True</cite> which enforces buffering.
+
+    If passed an invalid WSGI application the behavior of this function is
+    undefined.  Never pass non-conforming WSGI applications to this function.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>app</Outline.ParameterTarget> (<em>WSGIApplication</em>) – the application to execute.
+          - <Outline.ParameterTarget>buffered</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – set to <cite>True</cite> to enforce buffering.
+          - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) –&#x20;
+        </dd>
+
+        <dt className="field-name">
+          Returns
+        </dt>
+
+        <dd className="field-body">
+          tuple in the form `(app_iter, status, headers)`
+        </dd>
+
+        <dt className="field-name">
+          Return type
+        </dt>
+
+        <dd className="field-body">
+          [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[t.Iterable\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")], [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [Headers](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers")]
+        </dd>
+      </dl>
+    </FieldList>
+  </Outline.Content>
+</Outline>
