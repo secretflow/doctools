@@ -25,7 +25,7 @@ development headers installed. You will get an error if they are not.
 How to install them depends on the OS and package manager that you use.
 
 Create a virtualenv, install your application, then install
-<code>mod\_wsgi</code>.
+`mod_wsgi`.
 
 ```text
 $ cd hello-app
@@ -39,14 +39,14 @@ $ pip install mod_wsgi
 
 ## Running
 
-The only argument to <code>mod\_wsgi-express</code> specifies a script containing
-your application, which must be called <code>application</code>. You can
+The only argument to `mod_wsgi-express` specifies a script containing
+your application, which must be called `application`. You can
 write a small script to import your app with this name, or to create it
 if using the app factory pattern.
 
 <figure id="id2">
   <figcaption>
-    <code>wsgi.py</code>
+    `wsgi.py`
   </figcaption>
 
   ```python
@@ -58,7 +58,7 @@ if using the app factory pattern.
 
 <figure id="id3">
   <figcaption>
-    <code>wsgi.py</code>
+    `wsgi.py`
   </figcaption>
 
   ```python
@@ -68,14 +68,14 @@ if using the app factory pattern.
   ```
 </figure>
 
-Now run the <code>mod\_wsgi-express start-server</code> command.
+Now run the `mod_wsgi-express start-server` command.
 
 ```text
 $ mod_wsgi-express start-server wsgi.py --processes 4
 ```
 
-The <code>--processes</code> option specifies the number of worker processes to
-run; a starting value could be <code>CPU \* 2</code>.
+The `--processes` option specifies the number of worker processes to
+run; a starting value could be `CPU * 2`.
 
 Logs for each request aren’t show in the terminal. If an error occurs,
 its information is written to the error log file shown when starting the
@@ -90,7 +90,7 @@ root to bind to privileged ports like 80 and 443. However, it must be
 configured to drop permissions to a different user and group for the
 worker processes.
 
-For example, if you created a <code>hello</code> user and group, you should
+For example, if you created a `hello` user and group, you should
 install your virtualenv and application as that user, then tell
 mod\_wsgi to drop to that user after starting.
 

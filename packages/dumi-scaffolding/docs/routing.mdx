@@ -4,12 +4,12 @@
 
 When it comes to combining multiple controller or view functions (however
 you want to call them), you need a dispatcher.  A simple way would be
-applying regular expression tests on <code>PATH\_INFO</code> and call registered
+applying regular expression tests on `PATH_INFO` and call registered
 callback functions that return the value.
 
 Werkzeug provides a much more powerful system, similar to [Routes](https://routes.readthedocs.io/en/latest/).  All the
-objects mentioned on this page must be imported from [<code>werkzeug.routing</code>](#module-werkzeug.routing "werkzeug.routing"), not
-from <code>werkzeug</code>!
+objects mentioned on this page must be imported from [`werkzeug.routing`](#module-werkzeug.routing "werkzeug.routing"), not
+from `werkzeug`!
 
 :target{#quickstart}
 
@@ -42,10 +42,10 @@ def application(environ, start_response):
     return [f'Rule points to {endpoint!r} with arguments {args!r}'.encode()]
 ```
 
-So what does that do?  First of all we create a new [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map") which stores
-a bunch of URL rules.  Then we pass it a list of [<code>Rule</code>](#werkzeug.routing.Rule "werkzeug.routing.Rule") objects.
+So what does that do?  First of all we create a new [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") which stores
+a bunch of URL rules.  Then we pass it a list of [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") objects.
 
-Each [<code>Rule</code>](#werkzeug.routing.Rule "werkzeug.routing.Rule") object is instantiated with a string that represents a rule
+Each [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") object is instantiated with a string that represents a rule
 and an endpoint which will be the alias for what view the rule represents.
 Multiple rules can have the same endpoint, but should have different arguments
 to allow URL construction.
@@ -53,35 +53,35 @@ to allow URL construction.
 The format for the URL rules is straightforward, but explained in detail below.
 
 Inside the WSGI application we bind the url\_map to the current request which will
-return a new [<code>MapAdapter</code>](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter").  This url\_map adapter can then be used to match
+return a new [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter").  This url\_map adapter can then be used to match
 or build domains for the current request.
 
-The [<code>MapAdapter.match()</code>](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method can then either return a tuple in the form
-<code>(endpoint, args)</code> or raise one of the three exceptions
-[<code>NotFound</code>](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound"), [<code>MethodNotAllowed</code>](exceptions.mdx#werkzeug.exceptions.MethodNotAllowed "werkzeug.exceptions.MethodNotAllowed"),
-or <code>RequestRedirect</code>.  For more details about those
-exceptions have a look at the documentation of the [<code>MapAdapter.match()</code>](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method.
+The [`MapAdapter.match()`](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method can then either return a tuple in the form
+`(endpoint, args)` or raise one of the three exceptions
+[`NotFound`](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound"), [`MethodNotAllowed`](exceptions.mdx#werkzeug.exceptions.MethodNotAllowed "werkzeug.exceptions.MethodNotAllowed"),
+or `RequestRedirect`.  For more details about those
+exceptions have a look at the documentation of the [`MapAdapter.match()`](#werkzeug.routing.MapAdapter.match "werkzeug.routing.MapAdapter.match") method.
 
 :target{#rule-format}
 
 ## Rule Format
 
 Rule strings are URL paths with placeholders for variable parts in the
-format <code>\<converter(arguments)\:name></code>. <code>converter</code> and <code>arguments</code>
+format `<converter(arguments):name>`. `converter` and `arguments`
 (with parentheses) are optional. If no converter is given, the
-<code>default</code> converter is used (<code>string</code> by default). The available
+`default` converter is used (`string` by default). The available
 converters are discussed below.
 
 Rules that end with a slash are “branches”, others are “leaves”. If
-<code>strict\_slashes</code> is enabled (the default), visiting a branch URL
+`strict_slashes` is enabled (the default), visiting a branch URL
 without a trailing slash will redirect to the URL with a slash appended.
 
 Many HTTP servers merge consecutive slashes into one when receiving
-requests. If <code>merge\_slashes</code> is enabled (the default), rules will
+requests. If `merge_slashes` is enabled (the default), rules will
 merge slashes in non-variable parts when matching and building. Visiting
 a URL with consecutive slashes will redirect to the URL with slashes
-merged. If you want to disable <code>merge\_slashes</code> for a [<code>Rule</code>](#werkzeug.routing.Rule "werkzeug.routing.Rule") or
-[<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map"), you’ll also need to configure your web server
+merged. If you want to disable `merge_slashes` for a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") or
+[`Map`](#werkzeug.routing.Map "werkzeug.routing.Map"), you’ll also need to configure your web server
 appropriately.
 
 :target{#built-in-converters}
@@ -89,7 +89,7 @@ appropriately.
 ## Built-in Converters
 
 Converters for common types of URL variables are built-in. The available
-converters can be overridden or extended through [<code>Map.converters</code>](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
+converters can be overridden or extended through [`Map.converters`](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
 
 <Outline domain="py" objectType="class" target={"werkzeug.routing.UnicodeConverter"} module={"werkzeug.routing"} fullname={"UnicodeConverter"} parameters={["map", "minlength", "maxlength", "length"]} description={"This converter is the default converter and accepts any string but\nonly one path segment.  Thus the string can not include a slash."}>
   <Outline.Signature fullname="UnicodeConverter" id="werkzeug.routing.UnicodeConverter">
@@ -116,7 +116,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>minlength</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – the minimum length of the string.  Must be greater
             or equal 1.
           - <Outline.ParameterTarget>maxlength</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the maximum length of the string.
@@ -133,7 +133,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
   </Outline.Signature>
 
   <Outline.Content>
-    Like the default [<code>UnicodeConverter</code>](#werkzeug.routing.UnicodeConverter "werkzeug.routing.UnicodeConverter"), but it also matches
+    Like the default [`UnicodeConverter`](#werkzeug.routing.UnicodeConverter "werkzeug.routing.UnicodeConverter"), but it also matches
     slashes.  This is useful for wikis and similar applications:
 
     ```default
@@ -148,7 +148,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
           - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
         </dd>
@@ -177,7 +177,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>items</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – this function accepts the possible items as positional
             arguments.
         </dd>
@@ -202,7 +202,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     Rule("/page/<int:page>")
     ```
 
-    By default it only accepts unsigned, positive values. The <code>signed</code>
+    By default it only accepts unsigned, positive values. The `signed`
     parameter will enable signed, negative values.
 
     ```default
@@ -216,10 +216,10 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>fixed\_digits</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The number of fixed digits in the URL. If you
-            set this to <code>4</code> for example, the rule will only match if the
-            URL looks like <code>/0001/</code>. The default is variable length.
+            set this to `4` for example, the rule will only match if the
+            URL looks like `/0001/`. The default is variable length.
           - <Outline.ParameterTarget>min</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The minimal value.
           - <Outline.ParameterTarget>max</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The maximal value.
           - <Outline.ParameterTarget>signed</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Allow signed (negative) values.
@@ -228,7 +228,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     </FieldList>
 
     <Container type="info" title="Version added">
-      <span>New in version 0.15: </span>The <code>signed</code> parameter.
+      <span>New in version 0.15: </span>The `signed` parameter.
     </Container>
   </Outline.Content>
 </Outline>
@@ -245,7 +245,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     Rule("/probability/<float:probability>")
     ```
 
-    By default it only accepts unsigned, positive values. The <code>signed</code>
+    By default it only accepts unsigned, positive values. The `signed`
     parameter will enable signed, negative values.
 
     ```default
@@ -259,7 +259,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – The [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>min</Outline.ParameterTarget> ([<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – The minimal value.
           - <Outline.ParameterTarget>max</Outline.ParameterTarget> ([<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – The maximal value.
           - <Outline.ParameterTarget>signed</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Allow signed (negative) values.
@@ -268,7 +268,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     </FieldList>
 
     <Container type="info" title="Version added">
-      <span>New in version 0.15: </span>The <code>signed</code> parameter.
+      <span>New in version 0.15: </span>The `signed` parameter.
     </Container>
   </Outline.Content>
 </Outline>
@@ -296,7 +296,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map").
+          - <Outline.ParameterTarget>map</Outline.ParameterTarget> ([<em>Map</em>](#werkzeug.routing.Map "werkzeug.routing.Map")) – the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map").
           - <Outline.ParameterTarget>args</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
           - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
         </dd>
@@ -309,9 +309,9 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
 ## Maps, Rules and Adapters
 
-<Outline domain="py" objectType="class" target={"werkzeug.routing.Map"} module={"werkzeug.routing"} fullname={"Map"} parameters={["rules", "default_subdomain", "charset", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "encoding_errors", "host_matching"]} description={"The map class stores all the URL rules and some configuration\nparameters.  Some of the configuration values are only stored on the\nMap instance since those affect all rules, others are just defaults\nand can be overridden for each rule.  Note that you have to specify all\narguments besides the rules as keyword arguments!"}>
+<Outline domain="py" objectType="class" target={"werkzeug.routing.Map"} module={"werkzeug.routing"} fullname={"Map"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"The map class stores all the URL rules and some configuration\nparameters.  Some of the configuration values are only stored on the\nMap instance since those affect all rules, others are just defaults\nand can be overridden for each rule.  Note that you have to specify all\narguments besides the rules as keyword arguments!"}>
   <Outline.Signature fullname="Map" id="werkzeug.routing.Map">
-    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Map</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rules</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_subdomain</span><span>=</span><span>''</span></Outline.Parameter>, <Outline.Parameter><span className="name">charset</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">strict\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">merge\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">redirect\_defaults</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">converters</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_parameters</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_key</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">encoding\_errors</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">host\_matching</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+    <Outline.Keyword>class<span>{" "}</span></Outline.Keyword><Outline.Prefix>werkzeug.routing.</Outline.Prefix><Outline.Name>Map</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">rules</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">default\_subdomain</span><span>=</span><span>''</span></Outline.Parameter>, <Outline.Parameter><span className="name">strict\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">merge\_slashes</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">redirect\_defaults</span><span>=</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">converters</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_parameters</span><span>=</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">sort\_key</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">host\_matching</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
   </Outline.Signature>
 
   <Outline.Content>
@@ -331,7 +331,6 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
           - <Outline.ParameterTarget>rules</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")<em>] </em><em>| </em><em>None</em>) – sequence of url rules for this map.
           - <Outline.ParameterTarget>default\_subdomain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The default subdomain for rules without a
             subdomain defined.
-          - <Outline.ParameterTarget>charset</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – charset of the url. defaults to <code>"utf-8"</code>
           - <Outline.ParameterTarget>strict\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – If a rule ends with a slash but the matched
             URL does not, redirect to the URL with a trailing slash.
           - <Outline.ParameterTarget>merge\_slashes</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Merge consecutive slashes when matching or
@@ -346,7 +345,6 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
           - <Outline.ParameterTarget>sort\_parameters</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – If set to <cite>True</cite> the url parameters are sorted.
             See <cite>url\_encode</cite> for more details.
           - <Outline.ParameterTarget>sort\_key</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>t.Any</em><em>]</em><em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – The sort key function for <cite>url\_encode</cite>.
-          - <Outline.ParameterTarget>encoding\_errors</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the error method to use for decoding
           - <Outline.ParameterTarget>host\_matching</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if set to <cite>True</cite> it enables the host matching
             feature and disables the subdomain one.  If
             enabled the <cite>host</cite> parameter to rules is used
@@ -356,27 +354,26 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.3: </span>The <code>charset</code> and <code>encoding\_errors</code> parameters are deprecated and will be
-      removed in Werkzeug 3.0.
+      <span>Changed in version 3.0: </span>The `charset` and `encoding_errors` parameters were removed.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0: </span>If <code>url\_scheme</code> is <code>ws</code> or <code>wss</code>, only WebSocket rules will match.
+      <span>Changed in version 1.0: </span>If `url_scheme` is `ws` or `wss`, only WebSocket rules will match.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0: </span>The <code>merge\_slashes</code> parameter was added.
+      <span>Changed in version 1.0: </span>The `merge_slashes` parameter was added.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.7: </span>The <code>encoding\_errors</code> and <code>host\_matching</code> parameters were added.
+      <span>Changed in version 0.7: </span>The `encoding_errors` and `host_matching` parameters were added.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.5: </span>The <code>sort\_parameters</code> and <code>sort\_key</code>  paramters were added.
+      <span>Changed in version 0.5: </span>The `sort_parameters` and `sort_key`  paramters were added.
     </Container>
 
-    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.converters"} module={"werkzeug.routing"} fullname={"Map.converters"} parameters={["rules", "default_subdomain", "charset", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "encoding_errors", "host_matching"]} description={"The dictionary of converters.  This can be modified after the class\nwas created, but will only affect rules added after the\nmodification.  If the rules are defined with the list passed to the\nclass, the converters parameter to the constructor has to be used\ninstead."}>
+    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.converters"} module={"werkzeug.routing"} fullname={"Map.converters"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"The dictionary of converters.  This can be modified after the class\nwas created, but will only affect rules added after the\nmodification.  If the rules are defined with the list passed to the\nclass, the converters parameter to the constructor has to be used\ninstead."}>
       <Outline.Signature fullname="Map.converters" id="werkzeug.routing.Map.converters">
         <Outline.Name>converters</Outline.Name>
       </Outline.Signature>
@@ -406,7 +403,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             </dt>
 
             <dd className="field-body">
-              <Outline.ParameterTarget>rulefactory</Outline.ParameterTarget> ([<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")) – a [<code>Rule</code>](#werkzeug.routing.Rule "werkzeug.routing.Rule") or [<code>RuleFactory</code>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")
+              <Outline.ParameterTarget>rulefactory</Outline.ParameterTarget> ([<em>RuleFactory</em>](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")) – a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") or [`RuleFactory`](#werkzeug.routing.RuleFactory "werkzeug.routing.RuleFactory")
             </dd>
 
             <dt className="field-name">
@@ -427,14 +424,14 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
       </Outline.Signature>
 
       <Outline.Content>
-        Return a new [<code>MapAdapter</code>](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") with the details specified to the
-        call.  Note that <cite>script\_name</cite> will default to <code>'/'</code> if not further
+        Return a new [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") with the details specified to the
+        call.  Note that <cite>script\_name</cite> will default to `'/'` if not further
         specified or <cite>None</cite>.  The <cite>server\_name</cite> at least is a requirement
         because the HTTP RFC requires absolute URLs for redirects and so all
         redirect exceptions raised by Werkzeug will contain the full canonical
         URL.
 
-        If no path\_info is passed to <code>match()</code> it will use the default path
+        If no path\_info is passed to `match()` it will use the default path
         info passed to bind.  While this doesn’t really make sense for
         manual bind calls, it’s useful if you bind a map to a WSGI
         environment which already contains the path info.
@@ -444,20 +441,20 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         subdomain feature.
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 1.0: </span>If <code>url\_scheme</code> is <code>ws</code> or <code>wss</code>, only WebSocket rules
+          <span>Changed in version 1.0: </span>If `url_scheme` is `ws` or `wss`, only WebSocket rules
           will match.
         </Container>
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 0.15: </span><code>path\_info</code> defaults to <code>'/'</code> if <code>None</code>.
+          <span>Changed in version 0.15: </span>`path_info` defaults to `'/'` if `None`.
         </Container>
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 0.8: </span><code>query\_args</code> can be a string.
+          <span>Changed in version 0.8: </span>`query_args` can be a string.
         </Container>
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 0.7: </span>Added <code>query\_args</code>.
+          <span>Changed in version 0.7: </span>Added `query_args`.
         </Container>
 
         <FieldList>
@@ -473,7 +470,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
               - <Outline.ParameterTarget>url\_scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
               - <Outline.ParameterTarget>default\_method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
               - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
-              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
             </dd>
 
             <dt className="field-name">
@@ -481,7 +478,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             </dt>
 
             <dd className="field-body">
-              [MapAdapter](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter")
+              [<em>MapAdapter</em>](#werkzeug.routing.MapAdapter "werkzeug.routing.map.MapAdapter")
             </dd>
           </dl>
         </FieldList>
@@ -494,7 +491,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
       </Outline.Signature>
 
       <Outline.Content>
-        Like [<code>bind()</code>](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") but you can pass it an WSGI environment and it
+        Like [`bind()`](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") but you can pass it an WSGI environment and it
         will fetch the information from that dictionary.  Note that because of
         limitations in the protocol there is no way to get the current
         subdomain and real <cite>server\_name</cite> from the environment.  If you don’t
@@ -504,19 +501,19 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
         If <cite>subdomain</cite> is <cite>None</cite> but an environment and a server name is
         provided it will calculate the current subdomain automatically.
-        Example: <cite>server\_name</cite> is <code>'example.com'</code> and the <cite>SERVER\_NAME</cite>
-        in the wsgi <cite>environ</cite> is <code>'staging.dev.example.com'</code> the calculated
-        subdomain will be <code>'staging.dev'</code>.
+        Example: <cite>server\_name</cite> is `'example.com'` and the <cite>SERVER\_NAME</cite>
+        in the wsgi <cite>environ</cite> is `'staging.dev.example.com'` the calculated
+        subdomain will be `'staging.dev'`.
 
         If the object passed as environ has an environ attribute, the value of
         this attribute is used instead.  This allows you to pass request
         objects.  Additionally <cite>PATH\_INFO</cite> added as a default of the
-        [<code>MapAdapter</code>](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") so that you don’t have to pass the path info to
+        [`MapAdapter`](#werkzeug.routing.MapAdapter "werkzeug.routing.MapAdapter") so that you don’t have to pass the path info to
         the match method.
 
         <Container type="info" title="Version changed">
           <span>Changed in version 1.0.0: </span>If the passed server name specifies port 443, it will match
-          if the incoming scheme is <code>https</code> without a port.
+          if the incoming scheme is `https` without a port.
         </Container>
 
         <Container type="info" title="Version changed">
@@ -559,7 +556,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
       </Outline.Content>
     </Outline>
 
-    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.default_converters"} module={"werkzeug.routing"} fullname={"Map.default_converters"} parameters={["rules", "default_subdomain", "charset", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "encoding_errors", "host_matching"]} description={"A dict of default converters to be used."}>
+    <Outline domain="py" objectType="attribute" target={"werkzeug.routing.Map.default_converters"} module={"werkzeug.routing"} fullname={"Map.default_converters"} parameters={["rules", "default_subdomain", "strict_slashes", "merge_slashes", "redirect_defaults", "converters", "sort_parameters", "sort_key", "host_matching"]} description={"A dict of default converters to be used."}>
       <Outline.Signature fullname="Map.default_converters" id="werkzeug.routing.Map.default_converters">
         <Outline.Name>default\_converters</Outline.Name><Outline.Keyword><span>{" "}</span><span>=</span><span>{" "}</span>\{'any': \<class 'werkzeug.routing.converters.AnyConverter'>, 'default': \<class 'werkzeug.routing.converters.UnicodeConverter'>, 'float': \<class 'werkzeug.routing.converters.FloatConverter'>, 'int': \<class 'werkzeug.routing.converters.IntegerConverter'>, 'path': \<class 'werkzeug.routing.converters.PathConverter'>, 'string': \<class 'werkzeug.routing.converters.UnicodeConverter'>, 'uuid': \<class 'werkzeug.routing.converters.UUIDConverter'>}</Outline.Keyword>
       </Outline.Signature>
@@ -639,7 +636,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             </dt>
 
             <dd className="field-body">
-              t.Iterator\[[Rule](#werkzeug.routing.Rule "werkzeug.routing.Rule")]
+              [<em>Iterator</em>](https://docs.python.org/3/library/typing.html#typing.Iterator "(in Python v3.11)")\[[<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")]
             </dd>
           </dl>
         </FieldList>
@@ -691,7 +688,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
   </Outline.Signature>
 
   <Outline.Content>
-    Returned by [<code>Map.bind()</code>](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") or [<code>Map.bind\_to\_environ()</code>](#werkzeug.routing.Map.bind_to_environ "werkzeug.routing.Map.bind_to_environ") and does
+    Returned by [`Map.bind()`](#werkzeug.routing.Map.bind "werkzeug.routing.Map.bind") or [`Map.bind_to_environ()`](#werkzeug.routing.Map.bind_to_environ "werkzeug.routing.Map.bind_to_environ") and does
     the URL matching and building based on runtime information.
 
     <FieldList>
@@ -740,7 +737,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             </dt>
 
             <dd className="field-body">
-              t.Iterable\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
+              [<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")]
             </dd>
           </dl>
         </FieldList>
@@ -791,14 +788,14 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
         When processing those additional values, lists are furthermore
         interpreted as multiple values (as per
-        [<code>werkzeug.datastructures.MultiDict</code>](datastructures.mdx#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict")):
+        [`werkzeug.datastructures.MultiDict`](datastructures.mdx#werkzeug.datastructures.MultiDict "werkzeug.datastructures.MultiDict")):
 
         ```python
         >>> urls.build("index", {'q': ['a', 'b', 'c']})
         '/?q=a&q=b&q=c'
         ```
 
-        Passing a <code>MultiDict</code> will also add multiple values:
+        Passing a `MultiDict` will also add multiple values:
 
         ```python
         >>> urls.build("index", MultiDict((('p', 'z'), ('q', 'a'), ('q', 'b'))))
@@ -820,7 +817,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
             <dd className="field-body">
               - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the endpoint of the URL to build.
-              - <Outline.ParameterTarget>values</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>None</em>) – the values for the URL to build.  Unhandled values are
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – the values for the URL to build.  Unhandled values are
                 appended to the URL as query parameters.
               - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the HTTP method for the rule if there are different
                 URLs for different methods on the same endpoint.
@@ -831,7 +828,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
                 URL as query string argument.  Disable this
                 if you want the builder to ignore those.
               - <Outline.ParameterTarget>url\_scheme</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Scheme to use in place of the bound
-                <code>url\_scheme</code>.
+                `url_scheme`.
             </dd>
 
             <dt className="field-name">
@@ -845,11 +842,11 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </FieldList>
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 2.0: </span>Added the <code>url\_scheme</code> parameter.
+          <span>Changed in version 2.0: </span>Added the `url_scheme` parameter.
         </Container>
 
         <Container type="info" title="Version added">
-          <span>New in version 0.6: </span>Added the <code>append\_unknown</code> parameter.
+          <span>New in version 0.6: </span>Added the `append_unknown` parameter.
         </Container>
       </Outline.Content>
     </Outline>
@@ -866,7 +863,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         or WSGI application.  http exceptions are not caught by default
         so that applications can display nicer error messages by just
         catching them by hand.  If you want to stick with the default
-        error messages you can pass it <code>catch\_http\_exceptions=True</code> and
+        error messages you can pass it `catch_http_exceptions=True` and
         it will catch the http exceptions.
 
         Here a small example for the dispatch usage:
@@ -891,7 +888,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         ```
 
         Keep in mind that this method might return exception objects, too, so
-        use <code>Response.force\_type</code> to get a response object.
+        use `Response.force_type` to get a response object.
 
         <FieldList>
           <dl>
@@ -909,7 +906,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
               - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the HTTP method used for matching.  Overrides the
                 method specified on binding.
               - <Outline.ParameterTarget>catch\_http\_exceptions</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – set to <cite>True</cite> to catch any of the
-                werkzeug <code>HTTPException</code>s.
+                werkzeug `HTTPException`s.
             </dd>
 
             <dt className="field-name">
@@ -946,10 +943,10 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             </dt>
 
             <dd className="field-body">
-              - <Outline.ParameterTarget>rule</Outline.ParameterTarget> ([<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.Rule")) –&#x20;
+              - <Outline.ParameterTarget>rule</Outline.ParameterTarget> ([<em>Rule</em>](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")) –&#x20;
               - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-              - <Outline.ParameterTarget>values</Outline.ParameterTarget> (<em>t.MutableMapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em>) –&#x20;
-              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>MutableMapping</em>](https://docs.python.org/3/library/typing.html#typing.MutableMapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>]</em>) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
             </dd>
 
             <dt className="field-name">
@@ -1013,9 +1010,9 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
             <dd className="field-body">
               - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
               - <Outline.ParameterTarget>endpoint</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-              - <Outline.ParameterTarget>values</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em>) –&#x20;
+              - <Outline.ParameterTarget>values</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>]</em>) –&#x20;
               - <Outline.ParameterTarget>method</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
             </dd>
 
             <dt className="field-name">
@@ -1052,7 +1049,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
             <dd className="field-body">
               - <Outline.ParameterTarget>path\_info</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> (<em>t.Mapping</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+              - <Outline.ParameterTarget>query\_args</Outline.ParameterTarget> ([<em>Mapping</em>](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
               - <Outline.ParameterTarget>domain\_part</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
             </dd>
 
@@ -1070,11 +1067,11 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
     <Outline domain="py" objectType="method" target={null} module={"werkzeug.routing"} fullname={"MapAdapter.match"} parameters={["path_info", "method", "return_rule", "query_args", "websocket"]} description={"The usage is simple: you just pass the match method the current\npath info as well as the method (which defaults to GET).  The\nfollowing things can then happen:"}>
       <Outline.Signature fullname="MapAdapter.match" id="werkzeug.routing.MapAdapter.match">
-        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>False</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">t.Mapping<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>t.Any<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>t.Mapping<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>t.Any<span>]</span><span>]</span></Outline.ReturnType>
+        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>False</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>False</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>]</span></Outline.ReturnType>
       </Outline.Signature>
 
       <Outline.Signature fullname="MapAdapter.match">
-        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>True</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">t.Mapping<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>t.Any<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[Rule](#werkzeug.routing.Rule "werkzeug.routing.Rule")<span>,</span><span>{" "}</span>t.Mapping<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>t.Any<span>]</span><span>]</span></Outline.ReturnType>
+        <Outline.Name>match</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">path\_info</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>:</span><span>{" "}</span><span className="name">[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">return\_rule</span><span>:</span><span>{" "}</span><span className="name">[Literal](https://docs.python.org/3/library/typing.html#typing.Literal "(in Python v3.11)")<span>\[</span><span>True</span><span>]</span></span><span>{" "}</span><span>=</span><span>{" "}</span><span>True</span></Outline.Parameter>, <Outline.Parameter><span className="name">query\_args</span><span>:</span><span>{" "}</span><span className="name">[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">websocket</span><span>:</span><span>{" "}</span><span className="name">[bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</span><span>{" "}</span><span>=</span><span>{" "}</span><span>None</span></Outline.Parameter><span>)</span></Outline.ParameterList><Outline.ReturnType><span>{" \u2192 "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[werkzeug.routing.rules.Rule](#werkzeug.routing.Rule "werkzeug.routing.rules.Rule")<span>,</span><span>{" "}</span>[Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping "(in Python v3.11)")<span>\[</span>[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<span>,</span><span>{" "}</span>[Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<span>]</span><span>]</span></Outline.ReturnType>
       </Outline.Signature>
 
       <Outline.Content>
@@ -1092,16 +1089,16 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         - you receive a <cite>RequestRedirect</cite> exception with a <cite>new\_url</cite>
           attribute.  This exception is used to notify you about a request
           Werkzeug requests from your WSGI application.  This is for example the
-          case if you request <code>/foo</code> although the correct URL is <code>/foo/</code>
+          case if you request `/foo` although the correct URL is `/foo/`
           You can use the <cite>RequestRedirect</cite> instance as response-like object
           similar to all other subclasses of <cite>HTTPException</cite>.
-        - you receive a <code>WebsocketMismatch</code> exception if the only
+        - you receive a `WebsocketMismatch` exception if the only
           match is a WebSocket rule but the bind is an HTTP request, or
           if the match is an HTTP rule but the bind is a WebSocket
           request.
-        - you get a tuple in the form <code>(endpoint, arguments)</code> if there is
+        - you get a tuple in the form `(endpoint, arguments)` if there is
           a match (unless <cite>return\_rule</cite> is True, in which case you get a tuple
-          in the form <code>(rule, arguments)</code>)
+          in the form `(rule, arguments)`)
 
         If the path info is not passed to the match method the default path
         info of the map is used (defaults to the root URL if not defined
@@ -1157,26 +1154,26 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
                 currently not possible to use the query arguments
                 for URL matching.
               - <Outline.ParameterTarget>websocket</Outline.ParameterTarget> – Match WebSocket instead of HTTP requests. A
-                websocket request has a <code>ws</code> or <code>wss</code>
-                <code>url\_scheme</code>. This overrides that detection.
+                websocket request has a `ws` or `wss`
+                `url_scheme`. This overrides that detection.
             </dd>
           </dl>
         </FieldList>
 
         <Container type="info" title="Version added">
-          <span>New in version 1.0: </span>Added <code>websocket</code>.
+          <span>New in version 1.0: </span>Added `websocket`.
         </Container>
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 0.8: </span><code>query\_args</code> can be a string.
+          <span>Changed in version 0.8: </span>`query_args` can be a string.
         </Container>
 
         <Container type="info" title="Version added">
-          <span>New in version 0.7: </span>Added <code>query\_args</code>.
+          <span>New in version 0.7: </span>Added `query_args`.
         </Container>
 
         <Container type="info" title="Version added">
-          <span>New in version 0.6: </span>Added <code>return\_rule</code>.
+          <span>New in version 0.6: </span>Added `return_rule`.
         </Container>
       </Outline.Content>
     </Outline>
@@ -1236,7 +1233,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
         <dd>
           Rule strings basically are just normal URL paths with placeholders in
-          the format <code>\<converter(arguments)\:name></code> where the converter and the
+          the format `<converter(arguments):name>` where the converter and the
           arguments are optional.  If no converter is defined the <cite>default</cite>
           converter is used which means <cite>string</cite> in the normal configuration.
 
@@ -1273,8 +1270,8 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
           ])
           ```
 
-          If a user now visits <code>http\://example.com/all/page/1</code> they will be
-          redirected to <code>http\://example.com/all/</code>.  If <cite>redirect\_defaults</cite> is
+          If a user now visits `http://example.com/all/page/1` they will be
+          redirected to `http://example.com/all/`.  If <cite>redirect\_defaults</cite> is
           disabled on the <cite>Map</cite> instance this will only affect the URL
           generation.
         </dd>
@@ -1327,7 +1324,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd>
-          Override <code>Map.merge\_slashes</code> for this rule.
+          Override `Map.merge_slashes` for this rule.
         </dd>
 
         <dt>
@@ -1396,33 +1393,33 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         </dt>
 
         <dd>
-          If <code>True</code>, this rule is only matches for WebSocket (<code>ws\://</code>,
-          <code>wss\://</code>) requests. By default, rules will only match for HTTP
+          If `True`, this rule is only matches for WebSocket (`ws://`,
+          `wss://`) requests. By default, rules will only match for HTTP
           requests.
         </dd>
       </dl>
     </DefinitionList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.1: </span>Percent-encoded newlines (<code>%0a</code>), which are decoded by WSGI
+      <span>Changed in version 2.1: </span>Percent-encoded newlines (`%0a`), which are decoded by WSGI
       servers, are considered when routing instead of terminating the
       match early.
     </Container>
 
     <Container type="info" title="Version added">
-      <span>New in version 1.0: </span>Added <code>websocket</code>.
+      <span>New in version 1.0: </span>Added `websocket`.
     </Container>
 
     <Container type="info" title="Version added">
-      <span>New in version 1.0: </span>Added <code>merge\_slashes</code>.
+      <span>New in version 1.0: </span>Added `merge_slashes`.
     </Container>
 
     <Container type="info" title="Version added">
-      <span>New in version 0.7: </span>Added <code>alias</code> and <code>host</code>.
+      <span>New in version 0.7: </span>Added `alias` and `host`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.6.1: </span><code>HEAD</code> is added to <code>methods</code> if <code>GET</code> is present.
+      <span>Changed in version 0.6.1: </span>`HEAD` is added to `methods` if `GET` is present.
     </Container>
 
     <FieldList>
@@ -1457,7 +1454,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
         Return an unbound copy of this rule.
 
         This can be useful if want to reuse an already bound URL for another
-        map.  See <code>get\_empty\_kwargs</code> to override what keyword arguments are
+        map.  See `get_empty_kwargs` to override what keyword arguments are
         provided to the new copy.
 
         <FieldList>
@@ -1568,7 +1565,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     ])
     ```
 
-    All the rules except for the <code>'#select\_language'</code> endpoint will now
+    All the rules except for the `'#select_language'` endpoint will now
     listen on a two letter long subdomain that holds the language code
     for the current request.
 
@@ -1605,7 +1602,7 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
     ])
     ```
 
-    Now the rule <code>'blog/show'</code> matches <code>/blog/entry/\<entry\_slug></code>.
+    Now the rule `'blog/show'` matches `/blog/entry/<entry_slug>`.
 
     <FieldList>
       <dl>
@@ -1705,33 +1702,33 @@ converters can be overridden or extended through [<code>Map.converters</code>](#
 
 You can add custom converters that add behaviors not provided by the
 built-in converters. To make a custom converter, subclass
-<code>BaseConverter</code> then pass the new class to the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map")
-<code>converters</code> parameter, or add it to
-[<code>url\_map.converters</code>](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
+`BaseConverter` then pass the new class to the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map")
+`converters` parameter, or add it to
+[`url_map.converters`](#werkzeug.routing.Map.converters "werkzeug.routing.Map.converters").
 
-The converter should have a <code>regex</code> attribute with a regular
+The converter should have a `regex` attribute with a regular
 expression to match with. If the converter can take arguments in a URL
-rule, it should accept them in its <code>\_\_init\_\_</code> method. The entire
+rule, it should accept them in its `__init__` method. The entire
 regex expression will be matched as a group and used as the value for
 conversion.
 
-If a custom converter can match a forward slash, <code>/</code>, it should have
-the attribute <code>part\_isolating</code> set to <code>False</code>. This will ensure
+If a custom converter can match a forward slash, `/`, it should have
+the attribute `part_isolating` set to `False`. This will ensure
 that rules using the custom converter are correctly matched.
 
-It can implement a <code>to\_python</code> method to convert the matched string to
+It can implement a `to_python` method to convert the matched string to
 some other object. This can also do extra validation that wasn’t
-possible with the <code>regex</code> attribute, and should raise a
-<code>werkzeug.routing.ValidationError</code> in that case. Raising any other
+possible with the `regex` attribute, and should raise a
+`werkzeug.routing.ValidationError` in that case. Raising any other
 errors will cause a 500 error.
 
-It can implement a <code>to\_url</code> method to convert a Python object to a
+It can implement a `to_url` method to convert a Python object to a
 string when building a URL. Any error raised here will be converted to a
-<code>werkzeug.routing.BuildError</code> and eventually cause a 500 error.
+`werkzeug.routing.BuildError` and eventually cause a 500 error.
 
-This example implements a <code>BooleanConverter</code> that will match the
-strings <code>"yes"</code>, <code>"no"</code>, and <code>"maybe"</code>, returning a random value
-for <code>"maybe"</code>.
+This example implements a `BooleanConverter` that will match the
+strings `"yes"`, `"no"`, and `"maybe"`, returning a random value
+for `"maybe"`.
 
 ```default
 from random import randrange
@@ -1763,7 +1760,7 @@ url_map = Map([
 ```
 
 If you want to change the default converter, assign a different
-converter to the <code>"default"</code> key.
+converter to the `"default"` key.
 
 :target{#host-matching}
 
@@ -1775,7 +1772,7 @@ converter to the <code>"default"</code> key.
 
 Starting with Werkzeug 0.7 it’s also possible to do matching on the whole
 host names instead of just the subdomain.  To enable this feature you need
-to pass <code>host\_matching=True</code> to the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map") constructor and provide
+to pass `host_matching=True` to the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") constructor and provide
 the <cite>host</cite> argument to all routes:
 
 ```default
@@ -1802,9 +1799,9 @@ url_map = Map([
   <span>New in version 1.0.</span>
 </Container>
 
-If a [<code>Rule</code>](#werkzeug.routing.Rule "werkzeug.routing.Rule") is created with <code>websocket=True</code>, it will only
-match if the [<code>Map</code>](#werkzeug.routing.Map "werkzeug.routing.Map") is bound to a request with a <code>url\_scheme</code> of
-<code>ws</code> or <code>wss</code>.
+If a [`Rule`](#werkzeug.routing.Rule "werkzeug.routing.Rule") is created with `websocket=True`, it will only
+match if the [`Map`](#werkzeug.routing.Map "werkzeug.routing.Map") is bound to a request with a `url_scheme` of
+`ws` or `wss`.
 
 <Container type="note">
   Werkzeug has no further WebSocket support beyond routing. This
@@ -1821,11 +1818,11 @@ assert adapter.match() == ("comm", {})
 
 If the only match is a WebSocket rule and the bind is HTTP (or the
 only match is HTTP and the bind is WebSocket) a
-<code>WebsocketMismatch</code> (derives from
-[<code>BadRequest</code>](exceptions.mdx#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest")) exception is raised.
+`WebsocketMismatch` (derives from
+[`BadRequest`](exceptions.mdx#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest")) exception is raised.
 
 As WebSocket URLs have a different scheme, rules are always built with a
-scheme and host, <code>force\_external=True</code> is implied.
+scheme and host, `force_external=True` is implied.
 
 ```python
 url = adapter.build("comm")
@@ -1844,23 +1841,23 @@ this works consider this rule:
 /resource/<id>
 ```
 
-Firstly this rule is decomposed into two <code>RulePart</code>. The first is a
-static part with a content equal to <code>resource</code>, the second is
-dynamic and requires a regex match to <code>\[^/]+</code>.
+Firstly this rule is decomposed into two `RulePart`. The first is a
+static part with a content equal to `resource`, the second is
+dynamic and requires a regex match to `[^/]+`.
 
 A state machine is then created with an initial state that represents
-the rule’s first <code>/</code>. This initial state has a single, static
+the rule’s first `/`. This initial state has a single, static
 transition to the next state which represents the rule’s second
-<code>/</code>. This second state has a single dynamic transition to the final
+`/`. This second state has a single dynamic transition to the final
 state which includes the rule.
 
 To match a path the matcher starts and the initial state and follows
-transitions that work. Clearly a trial path of <code>/resource/2</code> has the
-parts <code>""</code>, <code>resource</code>, and <code>2</code> which match the transitions and
-hence a rule will match. Whereas <code>/other/2</code> will not match as there
-is no transition for the <code>other</code> part from the initial state.
+transitions that work. Clearly a trial path of `/resource/2` has the
+parts `""`, `resource`, and `2` which match the transitions and
+hence a rule will match. Whereas `/other/2` will not match as there
+is no transition for the `other` part from the initial state.
 
-The only diversion from this rule is if a <code>RulePart</code> is not
-part-isolating i.e. it will match <code>/</code>. In this case the <code>RulePart</code>
+The only diversion from this rule is if a `RulePart` is not
+part-isolating i.e. it will match `/`. In this case the `RulePart`
 is considered final and represents a transition that must include all
 the subsequent parts of the trial path.

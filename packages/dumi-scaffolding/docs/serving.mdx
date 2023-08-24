@@ -7,7 +7,7 @@ you usually don’t want to have a full-blown webserver like Apache up and
 running, but instead a simple standalone one.  Because of that Werkzeug comes
 with a builtin development server.
 
-The easiest way is creating a small <code>start-myproject.py</code> file that runs the
+The easiest way is creating a small `start-myproject.py` file that runs the
 application using the builtin server:
 
 ```default
@@ -43,10 +43,10 @@ additional files (like configuration files) you want to observe.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>hostname</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The host to bind to, for example <code>'localhost'</code>.
+          - <Outline.ParameterTarget>hostname</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The host to bind to, for example `'localhost'`.
             Can be a domain, IPv4 or IPv6 address, or file path starting
-            with <code>unix://</code> for a Unix socket.
-          - <Outline.ParameterTarget>port</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The port to bind to, for example <code>8080</code>. Using <code>0</code>
+            with `unix://` for a Unix socket.
+          - <Outline.ParameterTarget>port</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The port to bind to, for example `8080`. Using `0`
             tells the OS to pick a random free port.
           - <Outline.ParameterTarget>application</Outline.ParameterTarget> (<em>WSGIApplication</em>) – The WSGI application to run.
           - <Outline.ParameterTarget>use\_reloader</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Use a reloader process to restart the server
@@ -61,30 +61,30 @@ additional files (like configuration files) you want to observe.
             in addition to Python modules. For example, watch a
             configuration file.
           - <Outline.ParameterTarget>exclude\_patterns</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) – The reloader will ignore changes to any
-            files matching these [<code>fnmatch</code>](https://docs.python.org/3/library/fnmatch.html#module-fnmatch "(in Python v3.11)") patterns. For example,
+            files matching these [`fnmatch`](https://docs.python.org/3/library/fnmatch.html#module-fnmatch "(in Python v3.11)") patterns. For example,
             ignore cache files.
           - <Outline.ParameterTarget>reloader\_interval</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – How often the reloader tries to check for
             changes.
-          - <Outline.ParameterTarget>reloader\_type</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The reloader to use. The <code>'stat'</code> reloader
+          - <Outline.ParameterTarget>reloader\_type</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The reloader to use. The `'stat'` reloader
             is built in, but may require significant CPU to watch files. The
-            <code>'watchdog'</code> reloader is much more efficient but requires
-            installing the <code>watchdog</code> package first.
+            `'watchdog'` reloader is much more efficient but requires
+            installing the `watchdog` package first.
           - <Outline.ParameterTarget>threaded</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Handle concurrent requests using threads. Cannot be
-            used with <code>processes</code>.
+            used with `processes`.
           - <Outline.ParameterTarget>processes</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Handle concurrent requests using up to this number
-            of processes. Cannot be used with <code>threaded</code>.
+            of processes. Cannot be used with `threaded`.
           - <Outline.ParameterTarget>request\_handler</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em><em>WSGIRequestHandler</em><em>] </em><em>| </em><em>None</em>) – Use a different
-            <code>BaseHTTPRequestHandler</code> subclass to
+            `BaseHTTPRequestHandler` subclass to
             handle requests.
           - <Outline.ParameterTarget>static\_files</Outline.ParameterTarget> ([<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>] </em><em>| </em><em>None</em>) – A dict mapping URL prefixes to directories to
             serve static files from using
-            <code>SharedDataMiddleware</code>.
+            `SharedDataMiddleware`.
           - <Outline.ParameterTarget>passthrough\_errors</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Don’t catch unhandled exceptions at the
-            server level, let the server crash instead. If <code>use\_debugger</code>
+            server level, let the server crash instead. If `use_debugger`
             is enabled, the debugger will still catch such errors.
           - <Outline.ParameterTarget>ssl\_context</Outline.ParameterTarget> (<em>\_TSSLContextArg</em><em> | </em><em>None</em>) – Configure TLS to serve over HTTPS. Can be an
-            [<code>ssl.SSLContext</code>](https://docs.python.org/3/library/ssl.html#ssl.SSLContext "(in Python v3.11)") object, a <code>(cert\_file, key\_file)</code>
-            tuple to create a typical context, or the string <code>'adhoc'</code> to
+            [`ssl.SSLContext`](https://docs.python.org/3/library/ssl.html#ssl.SSLContext "(in Python v3.11)") object, a `(cert_file, key_file)`
+            tuple to create a typical context, or the string `'adhoc'` to
             generate a temporary self-signed certificate.
         </dd>
 
@@ -104,7 +104,7 @@ additional files (like configuration files) you want to observe.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.1: </span>Running on <code>0.0.0.0</code> or <code>::</code> shows the loopback IP in
+      <span>Changed in version 2.1: </span>Running on `0.0.0.0` or `::` shows the loopback IP in
       addition to a real IP.
     </Container>
 
@@ -113,23 +113,23 @@ additional files (like configuration files) you want to observe.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>Running on <code>0.0.0.0</code> or <code>::</code> shows a real IP address that
+      <span>Changed in version 2.0: </span>Running on `0.0.0.0` or `::` shows a real IP address that
       was bound as well as a warning not to run the development server
       in production.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>The <code>exclude\_patterns</code> parameter was added.
+      <span>Changed in version 2.0: </span>The `exclude_patterns` parameter was added.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15: </span>Bind to a Unix socket by passing a <code>hostname</code> that starts with
-      <code>unix://</code>.
+      <span>Changed in version 0.15: </span>Bind to a Unix socket by passing a `hostname` that starts with
+      `unix://`.
     </Container>
 
     <Container type="info" title="Version changed">
       <span>Changed in version 0.10: </span>Improved the reloader and added support for changing the backend
-      through the <code>reloader\_type</code> parameter.
+      through the `reloader_type` parameter.
     </Container>
 
     <Container type="info" title="Version changed">
@@ -137,16 +137,16 @@ additional files (like configuration files) you want to observe.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.8: </span><code>ssl\_context</code> can be a tuple of paths to the certificate and
+      <span>Changed in version 0.8: </span>`ssl_context` can be a tuple of paths to the certificate and
       private key files.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.6: </span>The <code>ssl\_context</code> parameter was added.
+      <span>Changed in version 0.6: </span>The `ssl_context` parameter was added.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.5: </span>The <code>static\_files</code> and <code>passthrough\_errors</code> parameters were
+      <span>Changed in version 0.5: </span>The `static_files` and `passthrough_errors` parameters were
       added.
     </Container>
   </Outline.Content>
@@ -186,12 +186,12 @@ additional files (like configuration files) you want to observe.
 
   <Outline.Content>
     Creates an SSL key for development.  This should be used instead of
-    the <code>'adhoc'</code> key which generates a new cert on each server start.
+    the `'adhoc'` key which generates a new cert on each server start.
     It accepts a path for where it should store the key and cert and
     either a host or CN.  If a host is given it will use the CN
-    <code>\*.host/CN=host</code>.
+    `*.host/CN=host`.
 
-    For more information see [<code>run\_simple()</code>](#werkzeug.serving.run_simple "werkzeug.serving.run_simple").
+    For more information see [`run_simple()`](#werkzeug.serving.run_simple "werkzeug.serving.run_simple").
 
     <Container type="info" title="Version added">
       <span>New in version 0.9.</span>
@@ -205,7 +205,7 @@ additional files (like configuration files) you want to observe.
 
         <dd className="field-body">
           - <Outline.ParameterTarget>base\_path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the path to the certificate and key.  The extension
-            <code>.crt</code> is added for the certificate, <code>.key</code> is
+            `.crt` is added for the certificate, `.key` is
             added for the key.
           - <Outline.ParameterTarget>host</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – the name of the host.  This can be used as an alternative
             for the <cite>cn</cite>.
@@ -242,23 +242,23 @@ additional files (like configuration files) you want to observe.
 The Werkzeug reloader constantly monitors modules and paths of your web
 application, and restarts the server if any of the observed files change.
 
-Since version 0.10, there are two backends the reloader supports: <code>stat</code> and
-<code>watchdog</code>.
+Since version 0.10, there are two backends the reloader supports: `stat` and
+`watchdog`.
 
-- The default <code>stat</code> backend simply checks the <code>mtime</code> of all files in a
+- The default `stat` backend simply checks the `mtime` of all files in a
   regular interval. This is sufficient for most cases, however, it is known to
   drain a laptop’s battery.
-- The <code>watchdog</code> backend uses filesystem events, and is much faster than
-  <code>stat</code>. It requires the [watchdog](https://pypi.org/project/watchdog/)
+- The `watchdog` backend uses filesystem events, and is much faster than
+  `stat`. It requires the [watchdog](https://pypi.org/project/watchdog/)
   module to be installed. The recommended way to achieve this is to add
-  <code>Werkzeug\[watchdog]</code> to your requirements file.
+  `Werkzeug[watchdog]` to your requirements file.
 
-If <code>watchdog</code> is installed and available it will automatically be used
-instead of the builtin <code>stat</code> reloader.
+If `watchdog` is installed and available it will automatically be used
+instead of the builtin `stat` reloader.
 
 To switch between the backends you can use the <cite>reloader\_type</cite> parameter of the
-[<code>run\_simple()</code>](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") function. <code>'stat'</code> sets it to the default stat based
-polling and <code>'watchdog'</code> forces it to the watchdog backend.
+[`run_simple()`](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") function. `'stat'` sets it to the default stat based
+polling and `'watchdog'` forces it to the watchdog backend.
 
 <Container type="note">
   Some edge cases, like modules that failed to import correctly, are not
@@ -295,7 +295,7 @@ You can find the hosts file on the following location:
 >       </td>
 >
 >       <td>
->         <code>%SystemRoot%\system32\drivers\etc\hosts</code>
+>         `%SystemRoot%\system32\drivers\etc\hosts`
 >       </td>
 >     </tr>
 >
@@ -305,7 +305,7 @@ You can find the hosts file on the following location:
 >       </td>
 >
 >       <td>
->         <code>/etc/hosts</code>
+>         `/etc/hosts`
 >       </td>
 >     </tr>
 >   </tbody>
@@ -321,7 +321,7 @@ You can open the file with your favorite text editor and add a new name after
 Save the changes and after a while you should be able to access the
 development server on these host names as well.  You can use the
 [URL Routing](routing.mdx) system to dispatch between different hosts or parse
-<code>request.host</code> yourself.
+`request.host` yourself.
 
 :target{#shutting-down-the-server}
 
@@ -333,7 +333,7 @@ authentication could temporarily start a server to listen for a
 response, record the user’s token, then stop the server.
 
 One method to do this could be to start a server in a
-[<code>multiprocessing</code>](https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing "(in Python v3.11)") process, then terminate the process after a value
+[`multiprocessing`](https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing "(in Python v3.11)") process, then terminate the process after a value
 is passed back to the parent.
 
 ```python
@@ -361,8 +361,8 @@ if __name__ == "__main__":
 That example uses Werkzeug’s development server, but any production
 server that can be started as a Python process could use the same
 technique and should be preferred for security. Another method could be
-to start a [<code>subprocess</code>](https://docs.python.org/3/library/subprocess.html#module-subprocess "(in Python v3.11)") process and send the value back over
-<code>stdout</code>.
+to start a [`subprocess`](https://docs.python.org/3/library/subprocess.html#module-subprocess "(in Python v3.11)") process and send the value back over
+`stdout`.
 
 :target{#troubleshooting}
 
@@ -386,7 +386,7 @@ in the [hosts file](https://en.wikipedia.org/wiki/Hosts_file) by removing this l
 ```
 
 Alternatively you can also disable ipv6 support in your browser.  For example
-if Firefox shows this behavior you can disable it by going to <code>about\:config</code>
+if Firefox shows this behavior you can disable it by going to `about:config`
 and disabling the <cite>network.dns.disableIPv6</cite> key.  This however is not
 recommended as of Werkzeug 0.6.1!
 
@@ -394,7 +394,7 @@ Starting with Werkzeug 0.6.1, the server will now switch between ipv4 and
 ipv6 based on your operating system’s configuration.  This means if that
 you disabled ipv6 support in your browser but your operating system is
 preferring ipv6, you will be unable to connect to your server.  In that
-situation, you can either remove the localhost entry for <code>::1</code> or
+situation, you can either remove the localhost entry for `::1` or
 explicitly bind the hostname to an ipv4 address (<cite>127.0.0.1</cite>)
 
 :target{#ssl}
@@ -424,8 +424,8 @@ name of your server on generation or a <cite>CN</cite>.
    >>> make_ssl_devcert('/path/to/the/key', host='localhost')
    ('/path/to/the/key.crt', '/path/to/the/key.key')
    ```
-2. Now this tuple can be passed as <code>ssl\_context</code> to the
-   [<code>run\_simple()</code>](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") method:
+2. Now this tuple can be passed as `ssl_context` to the
+   [`run_simple()`](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") method:
    ```default
    run_simple('localhost', 4000, application,
               ssl_context=('/path/to/the/key.crt',
@@ -438,7 +438,7 @@ You will have to acknowledge the certificate in your browser once then.
 
 ### Loading Contexts by Hand
 
-You can use a <code>ssl.SSLContext</code> object instead of a tuple for full
+You can use a `ssl.SSLContext` object instead of a tuple for full
 control over the TLS configuration.
 
 ```python
@@ -453,7 +453,7 @@ run_simple('localhost', 4000, application, ssl_context=ctx)
 ### Generating Certificates
 
 A key and certificate can be created in advance using the openssl tool
-instead of the [<code>make\_ssl\_devcert()</code>](#werkzeug.serving.make_ssl_devcert "werkzeug.serving.make_ssl_devcert").  This requires that you have
+instead of the [`make_ssl_devcert()`](#werkzeug.serving.make_ssl_devcert "werkzeug.serving.make_ssl_devcert").  This requires that you have
 the <cite>openssl</cite> command installed on your system:
 
 ```default
@@ -485,8 +485,8 @@ This feature requires the cryptography library to be installed.
 ## Unix Sockets
 
 The dev server can bind to a Unix socket instead of a TCP socket.
-[<code>run\_simple()</code>](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") will bind to a Unix socket if the <code>hostname</code>
-parameter starts with <code>'unix://'</code>.
+[`run_simple()`](#werkzeug.serving.run_simple "werkzeug.serving.run_simple") will bind to a Unix socket if the `hostname`
+parameter starts with `'unix://'`.
 
 ```default
 from werkzeug.serving import run_simple

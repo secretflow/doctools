@@ -8,8 +8,8 @@
   </Outline.Signature>
 
   <Outline.Content>
-    This function installs a [<code>handler</code>](#signal.handler "signal.handler") for every signal known by the
-    [<code>signal</code>](#module-signal "signal") module.  See the section [<span>List of signals</span>](#list-of-signals) for more information.
+    This function installs a [`handler`](#signal.handler "signal.handler") for every signal known by the
+    [`signal`](#module-signal "signal") module.  See the section [<span>List of signals</span>](#list-of-signals) for more information.
   </Outline.Content>
 </Outline>
 
@@ -19,12 +19,12 @@
   </Outline.Signature>
 
   <Outline.Content>
-    This function is called when a signal is received.  The <code>signal</code> argument
-    is the signal number, and the <code>frame</code> argument is the current stack frame
-    (or [<code>None</code>](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)") if the signal is not associated with a stack frame).
+    This function is called when a signal is received.  The `signal` argument
+    is the signal number, and the `frame` argument is the current stack frame
+    (or [`None`](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)") if the signal is not associated with a stack frame).
 
     The default handler prints a message to the standard error stream and
-    raises a [<code>SystemExit</code>](https://docs.python.org/3/library/exceptions.html#SystemExit "(in Python v3.11)") exception with the signal number as the exit
+    raises a [`SystemExit`](https://docs.python.org/3/library/exceptions.html#SystemExit "(in Python v3.11)") exception with the signal number as the exit
     code.  See the section [<span>List of signals</span>](#list-of-signals) for more information.
   </Outline.Content>
 </Outline>
@@ -33,7 +33,7 @@
 
 ## List of signals
 
-The [<code>signal</code>](#module-signal "signal") module defines a number of signals, which are listed in the
+The [`signal`](#module-signal "signal") module defines a number of signals, which are listed in the
 following table.  The table also shows the default action for each signal.
 
 <table>
@@ -56,18 +56,18 @@ following table.  The table also shows the default action for each signal.
   <tbody>
     <tr>
       <td>
-        <code>signal.SIGABRT</code>
+        `signal.SIGABRT`
       </td>
 
       <td colSpan={2}>
         Abnormal termination of the program, such as a call to
-        <code>abort()</code>.
+        `abort()`.
       </td>
     </tr>
 
     <tr>
       <td>
-        <code>signal.SIGALRM</code>
+        `signal.SIGALRM`
       </td>
 
       <td colSpan={2}>
@@ -77,12 +77,12 @@ following table.  The table also shows the default action for each signal.
 
     <tr>
       <td>
-        <code>signal.SIGBUS</code>
+        `signal.SIGBUS`
       </td>
 
       <td colSpan={2}>
         Abnormal termination of the program, such as a
-        <code>SIGBUS</code>.
+        `SIGBUS`.
       </td>
     </tr>
   </tbody>
@@ -98,6 +98,6 @@ In Python, <code data-language="python">1 + 2</code> is equal to <code data-lang
 
 <kbd>Control-x Control-f</kbd>
 
-... is installed in <code>/usr/lib/python3.x/site-packages</code> ...
+... is installed in `/usr/lib/python3.x/site-packages` ...
 
 Start ‣ Programs

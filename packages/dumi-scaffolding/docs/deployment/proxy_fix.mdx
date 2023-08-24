@@ -10,7 +10,7 @@ From the WSGI server and application’s perspectives, requests are now
 coming from the HTTP server to the local address, rather than from
 the remote address to the external server address.
 
-HTTP servers should set <code>X-Forwarded-</code> headers to pass on the real
+HTTP servers should set `X-Forwarded-` headers to pass on the real
 values to the application. The application can then be told to trust and
 use those values by wrapping it with the
 [X-Forwarded-For Proxy Fix](../middleware/proxy_fix.mdx) middleware provided by Werkzeug.

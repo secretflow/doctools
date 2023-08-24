@@ -1,118 +1,152 @@
 ---
-toctree:
-- path: installation.mdx
-  subpages: []
+sitemap:
+- children: []
+  filepath: installation.mdx
+  hidden: false
   title: Installation
-- path: tutorial.mdx
-  subpages: []
+- children: []
+  filepath: tutorial.mdx
+  hidden: false
   title: Werkzeug Tutorial
-- path: levels.mdx
-  subpages: []
+- children: []
+  filepath: levels.mdx
+  hidden: false
   title: API Levels
-- path: quickstart.mdx
-  subpages: []
+- children: []
+  filepath: quickstart.mdx
+  hidden: false
   title: Quickstart
-- path: serving.mdx
-  subpages: []
+- children: []
+  filepath: serving.mdx
+  hidden: false
   title: Serving WSGI Applications
-- path: test.mdx
-  subpages: []
+- children: []
+  filepath: test.mdx
+  hidden: false
   title: Testing WSGI Applications
-- path: debug.mdx
-  subpages: []
+- children: []
+  filepath: debug.mdx
+  hidden: false
   title: Debugging Applications
-- path: wrappers.mdx
-  subpages: []
+- children: []
+  filepath: wrappers.mdx
+  hidden: false
   title: Request / Response Objects
-- path: routing.mdx
-  subpages: []
+- children: []
+  filepath: routing.mdx
+  hidden: false
   title: URL Routing
-- path: wsgi.mdx
-  subpages: []
+- children: []
+  filepath: wsgi.mdx
+  hidden: false
   title: WSGI Helpers
-- path: http.mdx
-  subpages: []
+- children: []
+  filepath: http.mdx
+  hidden: false
   title: HTTP Utilities
-- path: datastructures.mdx
-  subpages: []
+- children: []
+  filepath: datastructures.mdx
+  hidden: false
   title: Data Structures
-- path: utils.mdx
-  subpages: []
+- children: []
+  filepath: utils.mdx
+  hidden: false
   title: Utilities
-- path: urls.mdx
-  subpages: []
+- children: []
+  filepath: urls.mdx
+  hidden: false
   title: URL Helpers
-- path: local.mdx
-  subpages: []
+- children: []
+  filepath: local.mdx
+  hidden: false
   title: Context Locals
-- path: middleware/index.mdx
-  subpages:
-  - path: middleware/proxy_fix.mdx
-    subpages: []
+- children:
+  - children: []
+    filepath: middleware/proxy_fix.mdx
+    hidden: false
     title: X-Forwarded-For Proxy Fix
-  - path: middleware/shared_data.mdx
-    subpages: []
+  - children: []
+    filepath: middleware/shared_data.mdx
+    hidden: false
     title: Serve Shared Static Files
-  - path: middleware/dispatcher.mdx
-    subpages: []
+  - children: []
+    filepath: middleware/dispatcher.mdx
+    hidden: false
     title: Application Dispatcher
-  - path: middleware/http_proxy.mdx
-    subpages: []
+  - children: []
+    filepath: middleware/http_proxy.mdx
+    hidden: false
     title: Basic HTTP Proxy
-  - path: middleware/lint.mdx
-    subpages: []
+  - children: []
+    filepath: middleware/lint.mdx
+    hidden: false
     title: WSGI Protocol Linter
-  - path: middleware/profiler.mdx
-    subpages: []
+  - children: []
+    filepath: middleware/profiler.mdx
+    hidden: false
     title: Application Profiler
+  filepath: middleware/index.mdx
+  hidden: false
   title: Middleware
-- path: exceptions.mdx
-  subpages: []
+- children: []
+  filepath: exceptions.mdx
+  hidden: false
   title: HTTP Exceptions
-- path: deployment/index.mdx
-  subpages:
-  - path: null
-    subpages:
-    - path: deployment/gunicorn.mdx
-      subpages: []
-      title: Gunicorn
-    - path: deployment/waitress.mdx
-      subpages: []
-      title: Waitress
-    - path: deployment/mod_wsgi.mdx
-      subpages: []
-      title: mod_wsgi
-    - path: deployment/uwsgi.mdx
-      subpages: []
-      title: uWSGI
-    - path: deployment/gevent.mdx
-      subpages: []
-      title: gevent
-    - path: deployment/eventlet.mdx
-      subpages: []
-      title: eventlet
-    - path: deployment/proxy_fix.mdx
-      subpages: []
-      title: Tell Werkzeug it is Behind a Proxy
-    - path: deployment/nginx.mdx
-      subpages: []
-      title: nginx
-    - path: deployment/apache-httpd.mdx
-      subpages: []
-      title: Apache httpd
-    title: ''
+- children:
+  - children: []
+    filepath: deployment/gunicorn.mdx
+    hidden: false
+    title: Gunicorn
+  - children: []
+    filepath: deployment/waitress.mdx
+    hidden: false
+    title: Waitress
+  - children: []
+    filepath: deployment/mod_wsgi.mdx
+    hidden: false
+    title: mod_wsgi
+  - children: []
+    filepath: deployment/uwsgi.mdx
+    hidden: false
+    title: uWSGI
+  - children: []
+    filepath: deployment/gevent.mdx
+    hidden: false
+    title: gevent
+  - children: []
+    filepath: deployment/eventlet.mdx
+    hidden: false
+    title: eventlet
+  - children: []
+    filepath: deployment/proxy_fix.mdx
+    hidden: false
+    title: Tell Werkzeug it is Behind a Proxy
+  - children: []
+    filepath: deployment/nginx.mdx
+    hidden: false
+    title: nginx
+  - children: []
+    filepath: deployment/apache-httpd.mdx
+    hidden: false
+    title: Apache httpd
+  filepath: deployment/index.mdx
+  hidden: false
   title: Deploying to Production
-- path: terms.mdx
-  subpages: []
+- children: []
+  filepath: terms.mdx
+  hidden: false
   title: Important Terms
-- path: request_data.mdx
-  subpages: []
+- children: []
+  filepath: request_data.mdx
+  hidden: false
   title: Dealing with Request Data
-- path: license.mdx
-  subpages: []
+- children: []
+  filepath: license.mdx
+  hidden: false
   title: BSD-3-Clause License
-- path: changes.mdx
-  subpages: []
+- children: []
+  filepath: changes.mdx
+  hidden: false
   title: Changes
 ---
 
@@ -120,7 +154,7 @@ toctree:
 
 # Werkzeug
 
-[![](_static/werkzeug-horizontal.png)](https://werkzeug.palletsprojects.com)
+[![](_assets/werkzeug-horizontal.png)](https://werkzeug.palletsprojects.com)
 
 <em>werkzeug</em> German noun: “tool”.
 Etymology: <em>werk</em> (“work”), <em>zeug</em> (“stuff”)
@@ -176,9 +210,9 @@ requests.
 
 
   - [Serving WSGI Applications](serving.mdx)
-    - [<code>run\_simple()</code>](serving.mdx#werkzeug.serving.run_simple)
-    - [<code>is\_running\_from\_reloader()</code>](serving.mdx#werkzeug.serving.is_running_from_reloader)
-    - [<code>make\_ssl\_devcert()</code>](serving.mdx#werkzeug.serving.make_ssl_devcert)
+    - [`run_simple()`](serving.mdx#werkzeug.serving.run_simple)
+    - [`is_running_from_reloader()`](serving.mdx#werkzeug.serving.is_running_from_reloader)
+    - [`make_ssl_devcert()`](serving.mdx#werkzeug.serving.make_ssl_devcert)
     - [Reloader](serving.mdx#reloader)
     - [Colored Logging](serving.mdx#colored-logging)
     - [Virtual Hosts](serving.mdx#virtual-hosts)
@@ -246,32 +280,17 @@ requests.
     - [Security Helpers](utils.mdx#module-werkzeug.security)
     - [Logging](utils.mdx#logging)
   - [URL Helpers](urls.mdx)
-    - [<code>BaseURL</code>](urls.mdx#werkzeug.urls.BaseURL)
-    - [<code>BytesURL</code>](urls.mdx#werkzeug.urls.BytesURL)
-    - [<code>URL</code>](urls.mdx#werkzeug.urls.URL)
-    - [<code>iri\_to\_uri()</code>](urls.mdx#werkzeug.urls.iri_to_uri)
-    - [<code>uri\_to\_iri()</code>](urls.mdx#werkzeug.urls.uri_to_iri)
-    - [<code>url\_decode()</code>](urls.mdx#werkzeug.urls.url_decode)
-    - [<code>url\_decode\_stream()</code>](urls.mdx#werkzeug.urls.url_decode_stream)
-    - [<code>url\_encode()</code>](urls.mdx#werkzeug.urls.url_encode)
-    - [<code>url\_encode\_stream()</code>](urls.mdx#werkzeug.urls.url_encode_stream)
-    - [<code>url\_fix()</code>](urls.mdx#werkzeug.urls.url_fix)
-    - [<code>url\_join()</code>](urls.mdx#werkzeug.urls.url_join)
-    - [<code>url\_parse()</code>](urls.mdx#werkzeug.urls.url_parse)
-    - [<code>url\_quote()</code>](urls.mdx#werkzeug.urls.url_quote)
-    - [<code>url\_quote\_plus()</code>](urls.mdx#werkzeug.urls.url_quote_plus)
-    - [<code>url\_unparse()</code>](urls.mdx#werkzeug.urls.url_unparse)
-    - [<code>url\_unquote()</code>](urls.mdx#werkzeug.urls.url_unquote)
-    - [<code>url\_unquote\_plus()</code>](urls.mdx#werkzeug.urls.url_unquote_plus)
+    - [`iri_to_uri()`](urls.mdx#werkzeug.urls.iri_to_uri)
+    - [`uri_to_iri()`](urls.mdx#werkzeug.urls.uri_to_iri)
   - [Context Locals](local.mdx)
   - [Proxy Objects](local.mdx#proxy-objects)
-    - [<code>LocalProxy</code>](local.mdx#werkzeug.local.LocalProxy)
+    - [`LocalProxy`](local.mdx#werkzeug.local.LocalProxy)
   - [Stacks and Namespaces](local.mdx#stacks-and-namespaces)
-    - [<code>LocalStack</code>](local.mdx#werkzeug.local.LocalStack)
-    - [<code>Local</code>](local.mdx#werkzeug.local.Local)
+    - [`LocalStack`](local.mdx#werkzeug.local.LocalStack)
+    - [`Local`](local.mdx#werkzeug.local.Local)
   - [Releasing Data](local.mdx#releasing-data)
-    - [<code>LocalManager</code>](local.mdx#werkzeug.local.LocalManager)
-    - [<code>release\_local()</code>](local.mdx#werkzeug.local.release_local)
+    - [`LocalManager`](local.mdx#werkzeug.local.LocalManager)
+    - [`release_local()`](local.mdx#werkzeug.local.release_local)
   - [Middleware](middleware/index.mdx)
     - [X-Forwarded-For Proxy Fix](middleware/proxy_fix.mdx)
     - [Serve Shared Static Files](middleware/shared_data.mdx)
@@ -328,6 +347,9 @@ requests.
     - [How to extend Parsing?](request_data.mdx#how-to-extend-parsing)
   - [BSD-3-Clause License](license.mdx)
   - [Changes](changes.mdx)
+    - [Version 3.0.0](changes.mdx#version-3-0-0)
+    - [Version 2.3.8](changes.mdx#version-2-3-8)
+    - [Version 2.3.7](changes.mdx#version-2-3-7)
     - [Version 2.3.6](changes.mdx#version-2-3-6)
     - [Version 2.3.5](changes.mdx#version-2-3-5)
     - [Version 2.3.4](changes.mdx#version-2-3-4)

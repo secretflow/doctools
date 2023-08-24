@@ -65,19 +65,19 @@ iterator and the input stream.
   </Outline.Signature>
 
   <Outline.Content>
-    This class can be used to convert a <code>file</code>-like object into
+    This class can be used to convert a `file`-like object into
     an iterable.  It yields <cite>buffer\_size</cite> blocks until the file is fully
     read.
 
     You should not use this class directly but rather use the
-    [<code>wrap\_file()</code>](#werkzeug.wsgi.wrap_file "werkzeug.wsgi.wrap_file") function that uses the WSGI server’s file wrapper
+    [`wrap_file()`](#werkzeug.wsgi.wrap_file "werkzeug.wsgi.wrap_file") function that uses the WSGI server’s file wrapper
     support if it’s available.
 
     <Container type="info" title="Version added">
       <span>New in version 0.5.</span>
     </Container>
 
-    If you’re using this object together with a <code>Response</code> you have
+    If you’re using this object together with a `Response` you have
     to use the <cite>direct\_passthrough</cite> mode.
 
     <FieldList>
@@ -87,7 +87,7 @@ iterator and the input stream.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a <code>file</code>-like object with a <code>read()</code> method.
+          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a `file`-like object with a `read()` method.
           - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – number of bytes for one iteration.
         </dd>
       </dl>
@@ -102,14 +102,14 @@ iterator and the input stream.
 
   <Outline.Content>
     Wrap a stream so that it doesn’t read more than a given limit. This is used to
-    limit <code>wsgi.input</code> to the <code>Content-Length</code> header value or
-    [<code>Request.max\_content\_length</code>](wrappers.mdx#werkzeug.wrappers.Request.max_content_length "werkzeug.wrappers.Request.max_content_length").
+    limit `wsgi.input` to the `Content-Length` header value or
+    [`Request.max_content_length`](wrappers.mdx#werkzeug.wrappers.Request.max_content_length "werkzeug.wrappers.Request.max_content_length").
 
-    When attempting to read after the limit has been reached, [<code>on\_exhausted()</code>](#werkzeug.wsgi.LimitedStream.on_exhausted "werkzeug.wsgi.LimitedStream.on_exhausted") is
-    called. When the limit is a maximum, this raises [<code>RequestEntityTooLarge</code>](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
+    When attempting to read after the limit has been reached, [`on_exhausted()`](#werkzeug.wsgi.LimitedStream.on_exhausted "werkzeug.wsgi.LimitedStream.on_exhausted") is
+    called. When the limit is a maximum, this raises [`RequestEntityTooLarge`](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
 
     If reading from the stream returns zero bytes or raises an error,
-    [<code>on\_disconnect()</code>](#werkzeug.wsgi.LimitedStream.on_disconnect "werkzeug.wsgi.LimitedStream.on_disconnect") is called, which raises [<code>ClientDisconnected</code>](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"). When the
+    [`on_disconnect()`](#werkzeug.wsgi.LimitedStream.on_disconnect "werkzeug.wsgi.LimitedStream.on_disconnect") is called, which raises [`ClientDisconnected`](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"). When the
     limit is a maximum and zero bytes were read, no error is raised, since it may be the
     end of the stream.
 
@@ -127,20 +127,20 @@ iterator and the input stream.
         <dd className="field-body">
           - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – The stream to read from. Must be a readable binary IO object.
           - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The limit in bytes to not read past. Should be either the
-            <code>Content-Length</code> header value or <code>request.max\_content\_length</code>.
-          - <Outline.ParameterTarget>is\_max</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Whether the given <code>limit</code> is <code>request.max\_content\_length</code> instead
-            of the <code>Content-Length</code> header value. This changes how exhausted and
+            `Content-Length` header value or `request.max_content_length`.
+          - <Outline.ParameterTarget>is\_max</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Whether the given `limit` is `request.max_content_length` instead
+            of the `Content-Length` header value. This changes how exhausted and
             disconnect events are handled.
         </dd>
       </dl>
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.3: </span>Handle <code>max\_content\_length</code> differently than <code>Content-Length</code>.
+      <span>Changed in version 2.3: </span>Handle `max_content_length` differently than `Content-Length`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.3: </span>Implements <code>io.RawIOBase</code> rather than <code>io.IOBase</code>.
+      <span>Changed in version 2.3: </span>Implements `io.RawIOBase` rather than `io.IOBase`.
     </Container>
 
     <Outline domain="py" objectType="method" target={"werkzeug.wsgi.LimitedStream.exhaust"} module={"werkzeug.wsgi"} fullname={"LimitedStream.exhaust"} parameters={[]} description={"Exhaust the stream by reading until the limit is reached or the client\ndisconnects, returning the remaining data."}>
@@ -194,11 +194,11 @@ iterator and the input stream.
         reached. This indicates that the client disconnected before sending the full
         request body.
 
-        The default behavior is to raise [<code>ClientDisconnected</code>](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"), unless the limit is
+        The default behavior is to raise [`ClientDisconnected`](exceptions.mdx#werkzeug.exceptions.ClientDisconnected "werkzeug.exceptions.ClientDisconnected"), unless the limit is
         a maximum and no error was raised.
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 2.3: </span>Added the <code>error</code> parameter. Do nothing if the limit is a maximum and no
+          <span>Changed in version 2.3: </span>Added the `error` parameter. Do nothing if the limit is a maximum and no
           error was raised.
         </Container>
 
@@ -237,10 +237,10 @@ iterator and the input stream.
         Called when attempting to read after the limit has been reached.
 
         The default behavior is to do nothing, unless the limit is a maximum, in which
-        case it raises [<code>RequestEntityTooLarge</code>](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
+        case it raises [`RequestEntityTooLarge`](exceptions.mdx#werkzeug.exceptions.RequestEntityTooLarge "werkzeug.exceptions.RequestEntityTooLarge").
 
         <Container type="info" title="Version changed">
-          <span>Changed in version 2.3: </span>Raises <code>RequestEntityTooLarge</code> if the limit is a maximum.
+          <span>Changed in version 2.3: </span>Raises `RequestEntityTooLarge` if the limit is a maximum.
         </Container>
 
         <Container type="info" title="Version changed">
@@ -335,128 +335,6 @@ iterator and the input stream.
   </Outline.Content>
 </Outline>
 
-<Outline domain="py" objectType="function" target={"werkzeug.wsgi.make_line_iter"} module={"werkzeug.wsgi"} fullname={"make_line_iter"} parameters={["stream", "limit", "buffer_size", "cap_at_buffer"]} description={"Safely iterates line-based over an input stream.  If the input stream\nis not a LimitedStream the limit parameter is mandatory."}>
-  <Outline.Signature fullname="make_line_iter" id="werkzeug.wsgi.make_line_iter">
-    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>make\_line\_iter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>10240</span></Outline.Parameter>, <Outline.Parameter><span className="name">cap\_at\_buffer</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
-  </Outline.Signature>
-
-  <Outline.Content>
-    Safely iterates line-based over an input stream.  If the input stream
-    is not a [<code>LimitedStream</code>](#werkzeug.wsgi.LimitedStream "werkzeug.wsgi.LimitedStream") the <cite>limit</cite> parameter is mandatory.
-
-    This uses the stream’s <code>read()</code> method internally as opposite
-    to the <code>readline()</code> method that is unsafe and can only be used
-    in violation of the WSGI specification.  The same problem applies to the
-    <cite>\_\_iter\_\_</cite> function of the input stream which calls <code>readline()</code>
-    without arguments.
-
-    If you need line-by-line processing it’s strongly recommended to iterate
-    over the input stream using this helper function.
-
-    <Container type="warning" title="Deprecated">
-      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
-    </Container>
-
-    <Container type="info" title="Version added">
-      <span>New in version 0.11: </span>added support for the <cite>cap\_at\_buffer</cite> parameter.
-    </Container>
-
-    <Container type="info" title="Version added">
-      <span>New in version 0.9: </span>added support for iterators as input stream.
-    </Container>
-
-    <Container type="info" title="Version changed">
-      <span>Changed in version 0.8: </span>This function now ensures that the limit was reached.
-    </Container>
-
-    <FieldList>
-      <dl>
-        <dt className="field-name">
-          Parameters
-        </dt>
-
-        <dd className="field-body">
-          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em><em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – the stream or iterate to iterate over.
-          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the limit in bytes for the stream.  (Usually
-            content length.  Not necessary if the <cite>stream</cite>
-            is a [<code>LimitedStream</code>](#werkzeug.wsgi.LimitedStream "werkzeug.wsgi.LimitedStream").
-          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The optional buffer size.
-          - <Outline.ParameterTarget>cap\_at\_buffer</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if this is set chunks are split if they are longer
-            than the buffer size.  Internally this is implemented
-            that the buffer size might be exhausted by a factor
-            of two however.
-        </dd>
-
-        <dt className="field-name">
-          Return type
-        </dt>
-
-        <dd className="field-body">
-          t.Iterator\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
-        </dd>
-      </dl>
-    </FieldList>
-  </Outline.Content>
-</Outline>
-
-<Outline domain="py" objectType="function" target={"werkzeug.wsgi.make_chunk_iter"} module={"werkzeug.wsgi"} fullname={"make_chunk_iter"} parameters={["stream", "separator", "limit", "buffer_size", "cap_at_buffer"]} description={"Works like make_line_iter() but accepts a separator\nwhich divides chunks.  If you want newline based processing\nyou should use make_line_iter() instead as it\nsupports arbitrary newline markers."}>
-  <Outline.Signature fullname="make_chunk_iter" id="werkzeug.wsgi.make_chunk_iter">
-    <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>make\_chunk\_iter</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">stream</span></Outline.Parameter>, <Outline.Parameter><span className="name">separator</span></Outline.Parameter>, <Outline.Parameter><span className="name">limit</span><span>=</span><span>None</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>10240</span></Outline.Parameter>, <Outline.Parameter><span className="name">cap\_at\_buffer</span><span>=</span><span>False</span></Outline.Parameter><span>)</span></Outline.ParameterList>
-  </Outline.Signature>
-
-  <Outline.Content>
-    Works like [<code>make\_line\_iter()</code>](#werkzeug.wsgi.make_line_iter "werkzeug.wsgi.make_line_iter") but accepts a separator
-    which divides chunks.  If you want newline based processing
-    you should use [<code>make\_line\_iter()</code>](#werkzeug.wsgi.make_line_iter "werkzeug.wsgi.make_line_iter") instead as it
-    supports arbitrary newline markers.
-
-    <Container type="warning" title="Deprecated">
-      <span>Deprecated since version 2.3: </span>Will be removed in Werkzeug 3.0.
-    </Container>
-
-    <Container type="info" title="Version changed">
-      <span>Changed in version 0.11: </span>added support for the <cite>cap\_at\_buffer</cite> parameter.
-    </Container>
-
-    <Container type="info" title="Version changed">
-      <span>Changed in version 0.9: </span>added support for iterators as input stream.
-    </Container>
-
-    <Container type="info" title="Version added">
-      <span>New in version 0.8.</span>
-    </Container>
-
-    <FieldList>
-      <dl>
-        <dt className="field-name">
-          Parameters
-        </dt>
-
-        <dd className="field-body">
-          - <Outline.ParameterTarget>stream</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>] </em><em>| </em><em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – the stream or iterate to iterate over.
-          - <Outline.ParameterTarget>separator</Outline.ParameterTarget> ([<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")) – the separator that divides chunks.
-          - <Outline.ParameterTarget>limit</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – the limit in bytes for the stream.  (Usually
-            content length.  Not necessary if the <cite>stream</cite>
-            is otherwise already limited).
-          - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – The optional buffer size.
-          - <Outline.ParameterTarget>cap\_at\_buffer</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – if this is set chunks are split if they are longer
-            than the buffer size.  Internally this is implemented
-            that the buffer size might be exhausted by a factor
-            of two however.
-        </dd>
-
-        <dt className="field-name">
-          Return type
-        </dt>
-
-        <dd className="field-body">
-          t.Iterator\[[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")]
-        </dd>
-      </dl>
-    </FieldList>
-  </Outline.Content>
-</Outline>
-
 <Outline domain="py" objectType="function" target={"werkzeug.wsgi.wrap_file"} module={"werkzeug.wsgi"} fullname={"wrap_file"} parameters={["environ", "file", "buffer_size"]} description={"Wraps a file.  This uses the WSGI server\u2019s file wrapper if available\nor otherwise the generic FileWrapper."}>
   <Outline.Signature fullname="wrap_file" id="werkzeug.wsgi.wrap_file">
     <Outline.Prefix>werkzeug.wsgi.</Outline.Prefix><Outline.Name>wrap\_file</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">environ</span></Outline.Parameter>, <Outline.Parameter><span className="name">file</span></Outline.Parameter>, <Outline.Parameter><span className="name">buffer\_size</span><span>=</span><span>8192</span></Outline.Parameter><span>)</span></Outline.ParameterList>
@@ -464,7 +342,7 @@ iterator and the input stream.
 
   <Outline.Content>
     Wraps a file.  This uses the WSGI server’s file wrapper if available
-    or otherwise the generic [<code>FileWrapper</code>](#werkzeug.wsgi.FileWrapper "werkzeug.wsgi.FileWrapper").
+    or otherwise the generic [`FileWrapper`](#werkzeug.wsgi.FileWrapper "werkzeug.wsgi.FileWrapper").
 
     <Container type="info" title="Version added">
       <span>New in version 0.5.</span>
@@ -473,7 +351,7 @@ iterator and the input stream.
     If the file wrapper from the WSGI server is used it’s important to not
     iterate over it from inside the application but to pass it through
     unchanged.  If you want to pass out a file wrapper inside a response
-    object you have to set <code>Response.direct\_passthrough</code> to <cite>True</cite>.
+    object you have to set `Response.direct_passthrough` to <cite>True</cite>.
 
     More information about file wrappers are available in [<strong>PEP 333</strong>](https://peps.python.org/pep-0333/).
 
@@ -484,7 +362,7 @@ iterator and the input stream.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a <code>file</code>-like object with a <code>read()</code> method.
+          - <Outline.ParameterTarget>file</Outline.ParameterTarget> (<em>t.IO</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) – a `file`-like object with a `read()` method.
           - <Outline.ParameterTarget>buffer\_size</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – number of bytes for one iteration.
           - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) –&#x20;
         </dd>
@@ -516,13 +394,13 @@ information or perform common manipulations:
   <Outline.Content>
     Return the host for the given WSGI environment.
 
-    The <code>Host</code> header is preferred, then <code>SERVER\_NAME</code> if it’s not
+    The `Host` header is preferred, then `SERVER_NAME` if it’s not
     set. The returned host will only contain the port if it is different
     than the standard port for the protocol.
 
     Optionally, verify that the host is trusted using
-    [<code>host\_is\_trusted()</code>](#werkzeug.wsgi.host_is_trusted "werkzeug.wsgi.host_is_trusted") and raise a
-    [<code>SecurityError</code>](exceptions.mdx#werkzeug.exceptions.SecurityError "werkzeug.exceptions.SecurityError") if it is not.
+    [`host_is_trusted()`](#werkzeug.wsgi.host_is_trusted "werkzeug.wsgi.host_is_trusted") and raise a
+    [`SecurityError`](exceptions.mdx#werkzeug.exceptions.SecurityError "werkzeug.exceptions.SecurityError") if it is not.
 
     <FieldList>
       <dl>
@@ -570,8 +448,8 @@ information or perform common manipulations:
   </Outline.Signature>
 
   <Outline.Content>
-    Return the <code>Content-Length</code> header value as an int. If the header is not given
-    or the <code>Transfer-Encoding</code> header is <code>chunked</code>, <code>None</code> is returned to indicate
+    Return the `Content-Length` header value as an int. If the header is not given
+    or the `Transfer-Encoding` header is `chunked`, `None` is returned to indicate
     a streaming request. If the value is not an integer, or negative, 0 is returned.
 
     <FieldList>
@@ -607,17 +485,17 @@ information or perform common manipulations:
 
   <Outline.Content>
     Return the WSGI input stream, wrapped so that it may be read safely without going
-    past the <code>Content-Length</code> header value or <code>max\_content\_length</code>.
+    past the `Content-Length` header value or `max_content_length`.
 
-    If <code>Content-Length</code> exceeds <code>max\_content\_length</code>, a
-    <code>RequestEntityTooLarge\`</code> <code>413 Content Too Large</code> error is raised.
+    If `Content-Length` exceeds `max_content_length`, a
+    `` RequestEntityTooLarge` `` `413 Content Too Large` error is raised.
 
-    If the WSGI server sets <code>environ\["wsgi.input\_terminated"]</code>, it indicates that the
+    If the WSGI server sets `environ["wsgi.input_terminated"]`, it indicates that the
     server handles terminating the stream, so it is safe to read directly. For example,
     a server that knows how to handle chunked requests safely would set this.
 
-    If <code>max\_content\_length</code> is set, it can be enforced on streams if
-    <code>wsgi.input\_terminated</code> is set. Otherwise, an empty stream is returned unless the
+    If `max_content_length` is set, it can be enforced on streams if
+    `wsgi.input_terminated` is set. Otherwise, an empty stream is returned unless the
     user explicitly disables this safe fallback.
 
     If the limit is reached before the underlying stream is exhausted (such as a file
@@ -633,7 +511,7 @@ information or perform common manipulations:
 
         <dd className="field-body">
           - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – The WSGI environ containing the stream.
-          - <Outline.ParameterTarget>safe\_fallback</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Return an empty stream when <code>Content-Length</code> is not set.
+          - <Outline.ParameterTarget>safe\_fallback</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Return an empty stream when `Content-Length` is not set.
             Disabling this allows infinite streams, which can be a denial-of-service risk.
           - <Outline.ParameterTarget>max\_content\_length</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – The maximum length that content-length or streaming
             requests may not exceed.
@@ -650,12 +528,12 @@ information or perform common manipulations:
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.3.2: </span><code>max\_content\_length</code> is only applied to streaming requests if the server sets
-      <code>wsgi.input\_terminated</code>.
+      <span>Changed in version 2.3.2: </span>`max_content_length` is only applied to streaming requests if the server sets
+      `wsgi.input_terminated`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.3: </span>Check <code>max\_content\_length</code> and raise an error if it is exceeded.
+      <span>Changed in version 2.3: </span>Check `max_content_length` and raise an error if it is exceeded.
     </Container>
 
     <Container type="info" title="Version added">
@@ -674,7 +552,7 @@ information or perform common manipulations:
     environment.
 
     The URL is an IRI, not a URI, so it may contain Unicode characters.
-    Use [<code>iri\_to\_uri()</code>](urls.mdx#werkzeug.urls.iri_to_uri "werkzeug.urls.iri_to_uri") to convert it to ASCII.
+    Use [`iri_to_uri()`](urls.mdx#werkzeug.urls.iri_to_uri "werkzeug.urls.iri_to_uri") to convert it to ASCII.
 
     <FieldList>
       <dl>
@@ -830,7 +708,7 @@ information or perform common manipulations:
 
 The values in HTTP requests come in as bytes representing (or encoded
 to) ASCII. The WSGI specification ([<strong>PEP 3333</strong>](https://peps.python.org/pep-3333/)) decided to always use
-the <code>str</code> type to represent values. To accomplish this, the raw bytes
+the `str` type to represent values. To accomplish this, the raw bytes
 are decoded using the ISO-8859-1 charset to produce a string.
 
 Strings in the WSGI environment are restricted to ISO-8859-1 code
@@ -842,7 +720,7 @@ encoding dance”.
 
 Werkzeug provides functions to deal with this automatically so that you
 don’t need to be aware of the inner workings. Use the functions on this
-page as well as [<code>EnvironHeaders()</code>](datastructures.mdx#werkzeug.datastructures.EnvironHeaders "werkzeug.datastructures.EnvironHeaders") to read
+page as well as [`EnvironHeaders()`](datastructures.mdx#werkzeug.datastructures.EnvironHeaders "werkzeug.datastructures.EnvironHeaders") to read
 data out of the WSGI environment.
 
 Applications should avoid manually creating or modifying a WSGI
@@ -854,9 +732,9 @@ decoding as necessary.
 
 ## Raw Request URI and Path Encoding
 
-The <code>PATH\_INFO</code> in the environ is the path value after
-percent-decoding. For example, the raw path <code>/hello%2fworld</code> would
-show up from the WSGI server to Werkzeug as <code>/hello/world</code>. This loses
+The `PATH_INFO` in the environ is the path value after
+percent-decoding. For example, the raw path `/hello%2fworld` would
+show up from the WSGI server to Werkzeug as `/hello/world`. This loses
 the information that the slash was a raw character as opposed to a path
 separator.
 
@@ -867,8 +745,8 @@ data in the query string instead of the path.
 
 However, many WSGI servers add a non-standard environ key with the raw
 path. To match this behavior, Werkzeug’s test client and development
-server will add the raw value to both the <code>REQUEST\_URI</code> and
-<code>RAW\_URI</code> keys. If you want to route based on this value, you can use
-middleware to replace <code>PATH\_INFO</code> in the environ before it reaches the
+server will add the raw value to both the `REQUEST_URI` and
+`RAW_URI` keys. If you want to route based on this value, you can use
+middleware to replace `PATH_INFO` in the environ before it reaches the
 application. However, keep in mind that these keys are non-standard and
 not guaranteed to be present.

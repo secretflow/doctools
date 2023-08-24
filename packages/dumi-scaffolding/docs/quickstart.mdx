@@ -12,7 +12,7 @@ understanding of [<strong>PEP 3333</strong>](https://peps.python.org/pep-3333/) 
 
 The WSGI environment contains all the information the user request transmits
 to the application.  It is passed to the WSGI application but you can also
-create a WSGI environ dict using the <code>create\_environ()</code> helper:
+create a WSGI environ dict using the `create_environ()` helper:
 
 ```python
 >>> from werkzeug.test import create_environ
@@ -38,7 +38,7 @@ access the form data besides parsing that data by hand.
 
 # Enter Request
 
-For access to the request data the <code>Request</code> object is much more fun.
+For access to the request data the `Request` object is much more fun.
 It wraps the <cite>environ</cite> and provides a read-only access to the data from
 there:
 
@@ -72,7 +72,7 @@ This way we can also access URL arguments (the query string) and data that
 was transmitted in a POST/PUT request.
 
 For testing purposes we can create a request object from supplied data
-using the <code>from\_values()</code> method:
+using the `from_values()` method:
 
 ```python
 >>> from io import StringIO
@@ -114,10 +114,10 @@ def store_file(request):
         handle_the_error()
 ```
 
-The files are represented as <code>FileStorage</code> objects which provide
+The files are represented as `FileStorage` objects which provide
 some common operations to work with them.
 
-Request headers can be accessed by using the <code>headers</code>
+Request headers can be accessed by using the `headers`
 attribute:
 
 ```python
@@ -270,7 +270,7 @@ code or provide a message as well:
 ```
 
 As you can see attributes work in both directions.  So you can set both
-<code>status</code> and <code>status\_code</code> and the
+`status` and `status_code` and the
 change will be reflected to the other.
 
 Also common headers are exposed as attributes or with methods to set /
@@ -333,7 +333,7 @@ Cookies can be set as well:
 >>> response.set_cookie('name2', 'value2')
 ```
 
-If headers appear multiple times you can use the <code>getlist()</code>
+If headers appear multiple times you can use the `getlist()`
 method to get all values for a header:
 
 ```python
@@ -346,7 +346,7 @@ response conditional against a request.  Which means that if the request
 can assure that it has the information already, no data besides the headers
 is sent over the network which saves traffic.  For that you should set at
 least an etag (which is used for comparison) and the date header and then
-call <code>make\_conditional</code> with the request object.
+call `make_conditional` with the request object.
 
 The response is modified accordingly (status code changed, response body
 removed, entity headers removed etc.)

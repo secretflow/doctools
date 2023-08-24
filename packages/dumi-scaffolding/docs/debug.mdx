@@ -29,8 +29,8 @@ interactive debug console to execute code in any frame.
 ## Enabling the Debugger
 
 Enable the debugger by wrapping the application with the
-[<code>DebuggedApplication</code>](#werkzeug.debug.DebuggedApplication "werkzeug.debug.DebuggedApplication") middleware. Alternatively, you can pass
-<code>use\_debugger=True</code> to <code>run\_simple()</code> and it will do that for you.
+[`DebuggedApplication`](#werkzeug.debug.DebuggedApplication "werkzeug.debug.DebuggedApplication") middleware. Alternatively, you can pass
+`use_debugger=True` to `run_simple()` and it will do that for you.
 
 <Outline domain="py" objectType="class" target={"werkzeug.debug.DebuggedApplication"} module={"werkzeug.debug"} fullname={"DebuggedApplication"} parameters={["app", "evalex", "request_key", "console_path", "console_init_func", "show_hidden_frames", "pin_security", "pin_logging"]} description={"Enables debugging support for a given application:"}>
   <Outline.Signature fullname="DebuggedApplication" id="werkzeug.debug.DebuggedApplication">
@@ -46,11 +46,11 @@ Enable the debugger by wrapping the application with the
     app = DebuggedApplication(app, evalex=True)
     ```
 
-    The <code>evalex</code> argument allows evaluating expressions in any frame
+    The `evalex` argument allows evaluating expressions in any frame
     of a traceback. This works by preserving each frame with its local
     state. Some state, such as context globals, cannot be restored with
-    the frame by default. When <code>evalex</code> is enabled,
-    <code>environ\["werkzeug.debug.preserve\_context"]</code> will be a callable
+    the frame by default. When `evalex` is enabled,
+    `environ["werkzeug.debug.preserve_context"]` will be a callable
     that takes a context manager, and can be called multiple times.
     Each context manager will be entered before evaluating code in the
     frame, then exited again, so they can perform setup and cleanup for
@@ -83,7 +83,7 @@ Enable the debugger by wrapping the application with the
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.2: </span>Added the <code>werkzeug.debug.preserve\_context</code> environ key.
+      <span>Changed in version 2.2: </span>Added the `werkzeug.debug.preserve_context` environ key.
     </Container>
   </Outline.Content>
 </Outline>
@@ -101,12 +101,12 @@ bottom of the traceback. Frames that represent user code, as opposed to
 built-ins or installed packages, are highlighted blue. Clicking a
 frame will show more lines for context, clicking again will hide them.
 
-If you have the <code>evalex</code> feature enabled you can get a console for
+If you have the `evalex` feature enabled you can get a console for
 every frame in the traceback by hovering over a frame and clicking the
 console icon that appears at the right. Once clicked a console opens
 where you can execute Python code in:
 
-![a screenshot of the interactive debugger](_static/debug-screenshot.png)
+![a screenshot of the interactive debugger](_assets/debug-screenshot.png)
 
 Inside the interactive consoles you can execute any kind of Python code.
 Unlike regular Python consoles the output of the object reprs is colored
@@ -115,7 +115,7 @@ than what the console decides to display a small plus sign is added to
 the repr and a click will expand the repr.
 
 To display all variables that are defined in the current frame you can
-use the <code>dump()</code> function. You can call it without arguments to get a
+use the `dump()` function. You can call it without arguments to get a
 detailed list of all variables and their values, or with an object as
 argument to get a detailed list of all the attributes it has.
 
@@ -131,9 +131,9 @@ PIN based authentication is enabled by default.
 The first time a console is opened, a dialog will prompt for a PIN that
 is printed to the command line. The PIN is generated in a stable way
 that is specific to the project. An explicit PIN can be provided through
-the environment variable <code>WERKZEUG\_DEBUG\_PIN</code>. This can be set to a
+the environment variable `WERKZEUG_DEBUG_PIN`. This can be set to a
 number and will become the PIN. This variable can also be set to the
-value <code>off</code> to disable the PIN check entirely.
+value `off` to disable the PIN check entirely.
 
 If an incorrect PIN is entered too many times the server needs to be
 restarted.

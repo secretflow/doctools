@@ -19,11 +19,11 @@ documentation to understand what features are available.
 ## Installing
 
 uWSGI has multiple ways to install it. The most straightforward is to
-install the <code>pyuwsgi</code> package, which provides precompiled wheels for
+install the `pyuwsgi` package, which provides precompiled wheels for
 common platforms. However, it does not provide SSL support, which can be
 provided with a reverse proxy instead.
 
-Create a virtualenv, install your application, then install <code>pyuwsgi</code>.
+Create a virtualenv, install your application, then install `pyuwsgi`.
 
 ```text
 $ cd hello-app
@@ -33,8 +33,8 @@ $ pip install .  # install your application
 $ pip install pyuwsgi
 ```
 
-If you have a compiler available, you can install the <code>uwsgi</code> package
-instead. Or install the <code>pyuwsgi</code> package from sdist instead of wheel.
+If you have a compiler available, you can install the `uwsgi` package
+instead. Or install the `pyuwsgi` package from sdist instead of wheel.
 Either method will include SSL support.
 
 ```text
@@ -70,7 +70,7 @@ Python file to create the app, then point uWSGI at that.
 
 <figure id="id2">
   <figcaption>
-    <code>wsgi.py</code>
+    `wsgi.py`
   </figcaption>
 
   ```python
@@ -84,10 +84,10 @@ Python file to create the app, then point uWSGI at that.
 $ uwsgi --http 127.0.0.1:8000 --master -p 4 -w wsgi:app
 ```
 
-The <code>--http</code> option starts an HTTP server at 127.0.0.1 port 8000. The
-<code>--master</code> option specifies the standard worker manager. The <code>-p</code>
-option starts 4 worker processes; a starting value could be <code>CPU \* 2</code>.
-The <code>-w</code> option tells uWSGI how to import your application
+The `--http` option starts an HTTP server at 127.0.0.1 port 8000. The
+`--master` option specifies the standard worker manager. The `-p`
+option starts 4 worker processes; a starting value could be `CPU * 2`.
+The `-w` option tells uWSGI how to import your application
 
 :target{#binding-externally}
 
@@ -106,14 +106,14 @@ a standard HTTP proxy. That configuration is beyond the scope of this
 doc, see the links for more information.
 
 You can bind to all external IPs on a non-privileged port using the
-<code>--http 0.0.0.0:8000</code> option. Don’t do this when using a reverse proxy
+`--http 0.0.0.0:8000` option. Don’t do this when using a reverse proxy
 setup, otherwise it will be possible to bypass the proxy.
 
 ```text
 $ uwsgi --http 0.0.0.0:8000 --master -p 4 -w wsgi:app
 ```
 
-<code>0.0.0.0</code> is not a valid address to navigate to, you’d use a specific
+`0.0.0.0` is not a valid address to navigate to, you’d use a specific
 IP address in your browser.
 
 :target{#async-with-gevent}
@@ -122,12 +122,12 @@ IP address in your browser.
 
 The default sync worker is appropriate for many use cases. If you need
 asynchronous support, uWSGI provides a [gevent](https://www.gevent.org/) worker. This is not the
-same as Python’s <code>async/await</code>, or the ASGI server spec. You must
+same as Python’s `async/await`, or the ASGI server spec. You must
 actually use gevent in your own code to see any benefit to using the
 worker.
 
 When using gevent, greenlet>=1.0 is required, otherwise context locals
-such as <code>request</code> will not work as expected. When using PyPy,
+such as `request` will not work as expected. When using PyPy,
 PyPy>=7.3.7 is required.
 
 ```text

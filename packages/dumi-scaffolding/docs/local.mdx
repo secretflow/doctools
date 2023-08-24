@@ -15,22 +15,22 @@ current thread, asyncio task, or greenlet. You won’t accidentally get
 or overwrite another worker’s data.
 
 The current approach for storing per-context data in Python is the
-<code>contextvars</code> module. Context vars store data per thread, async
-task, or greenlet. This replaces the older [<code>threading.local</code>](https://docs.python.org/3/library/threading.html#threading.local "(in Python v3.11)")
+`contextvars` module. Context vars store data per thread, async
+task, or greenlet. This replaces the older [`threading.local`](https://docs.python.org/3/library/threading.html#threading.local "(in Python v3.11)")
 which only handled threads.
 
-Werkzeug provides wrappers around [<code>ContextVar</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to
+Werkzeug provides wrappers around [`ContextVar`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to
 make it easier to work with.
 
 :target{#proxy-objects}
 
 # Proxy Objects
 
-[<code>LocalProxy</code>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") allows treating a context var as an object directly
+[`LocalProxy`](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") allows treating a context var as an object directly
 instead of needing to use and check
-[<code>ContextVar.get()</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar.get "(in Python v3.11)"). If the context
+[`ContextVar.get()`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar.get "(in Python v3.11)"). If the context
 var is set, the local proxy will look and behave like the object the var
-is set to. If it’s not set, a <code>RuntimeError</code> is raised for most
+is set to. If it’s not set, a `RuntimeError` is raised for most
 operations.
 
 ```python
@@ -55,13 +55,13 @@ def check_auth():
         raise Unauthorized()
 ```
 
-Accessing <code>request</code> will point to the specific request that each
-server worker is handling. You can treat <code>request</code> just like an actual
-<code>Request</code> object.
+Accessing `request` will point to the specific request that each
+server worker is handling. You can treat `request` just like an actual
+`Request` object.
 
-<code>bool(proxy)</code> will always return <code>False</code> if the var is not set. If
+`bool(proxy)` will always return `False` if the var is not set. If
 you need access to the object directly instead of the proxy, you can get
-it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._get_current_object "werkzeug.local.LocalProxy._get_current_object") method.
+it with the [`_get_current_object()`](#werkzeug.local.LocalProxy._get_current_object "werkzeug.local.LocalProxy._get_current_object") method.
 
 <Outline domain="py" objectType="class" target={"werkzeug.local.LocalProxy"} module={"werkzeug.local"} fullname={"LocalProxy"} parameters={["local", "name", "unbound_message"]} description={"A proxy to the object bound to a context-local object. All\noperations on the proxy are forwarded to the bound object. If no\nobject is bound, a RuntimeError is raised."}>
   <Outline.Signature fullname="LocalProxy" id="werkzeug.local.LocalProxy">
@@ -71,7 +71,7 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
   <Outline.Content>
     A proxy to the object bound to a context-local object. All
     operations on the proxy are forwarded to the bound object. If no
-    object is bound, a <code>RuntimeError</code> is raised.
+    object is bound, a `RuntimeError` is raised.
 
     <FieldList>
       <dl>
@@ -89,7 +89,7 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
       </dl>
     </FieldList>
 
-    Proxy a [<code>ContextVar</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to make it easier to
+    Proxy a [`ContextVar`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to make it easier to
     access. Pass a name to proxy that attribute.
 
     ```python
@@ -98,7 +98,7 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
     session = LocalProxy(_request_var, "session")
     ```
 
-    Proxy an attribute on a [<code>Local</code>](#werkzeug.local.Local "werkzeug.local.Local") namespace by calling the
+    Proxy an attribute on a [`Local`](#werkzeug.local.Local "werkzeug.local.Local") namespace by calling the
     local with the attribute name:
 
     ```python
@@ -106,7 +106,7 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
     user = data("user")
     ```
 
-    Proxy the top item on a [<code>LocalStack</code>](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") by calling the local.
+    Proxy the top item on a [`LocalStack`](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") by calling the local.
     Pass a name to proxy that attribute.
 
     ```default
@@ -123,9 +123,9 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
     session = LocalProxy(lambda: request.session)
     ```
 
-    <code>\_\_repr\_\_</code> and <code>\_\_class\_\_</code> are proxied, so <code>repr(x)</code> and
-    <code>isinstance(x, cls)</code> will look like the proxied object. Use
-    <code>issubclass(type(x), LocalProxy)</code> to check if an object is a
+    `__repr__` and `__class__` are proxied, so `repr(x)` and
+    `isinstance(x, cls)` will look like the proxied object. Use
+    `issubclass(type(x), LocalProxy)` to check if an object is a
     proxy.
 
     ```python
@@ -135,21 +135,21 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
     ```
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.2.2: </span><code>\_\_wrapped\_\_</code> is set when wrapping an object, not only when
+      <span>Changed in version 2.2.2: </span>`__wrapped__` is set when wrapping an object, not only when
       wrapping a function, to prevent doctest from failing.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.2: </span>Can proxy a <code>ContextVar</code> or <code>LocalStack</code> directly.
+      <span>Changed in version 2.2: </span>Can proxy a `ContextVar` or `LocalStack` directly.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.2: </span>The <code>name</code> parameter can be used with any proxied object, not
-      only <code>Local</code>.
+      <span>Changed in version 2.2: </span>The `name` parameter can be used with any proxied object, not
+      only `Local`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.2: </span>Added the <code>unbound\_message</code> parameter.
+      <span>Changed in version 2.2: </span>Added the `unbound_message` parameter.
     </Container>
 
     <Container type="info" title="Version changed">
@@ -168,7 +168,7 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
 
       <Outline.Content>
         Return the current object this proxy is bound to. If the proxy is
-        unbound, this raises a <code>RuntimeError</code>.
+        unbound, this raises a `RuntimeError`.
 
         This should be used if you need to pass the object to something that
         doesn’t understand the proxy. It can also be useful for performance
@@ -183,18 +183,18 @@ it with the [<code>\_get\_current\_object()</code>](#werkzeug.local.LocalProxy._
 
 # Stacks and Namespaces
 
-[<code>ContextVar</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") stores one value at a time. You may
+[`ContextVar`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") stores one value at a time. You may
 find that you need to store a stack of items, or a namespace with
 multiple attributes. A list or dict can be used for these, but using
 them as context var values requires some extra care. Werkzeug provides
-[<code>LocalStack</code>](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") which wraps a list, and [<code>Local</code>](#werkzeug.local.Local "werkzeug.local.Local") which wraps a
+[`LocalStack`](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") which wraps a list, and [`Local`](#werkzeug.local.Local "werkzeug.local.Local") which wraps a
 dict.
 
 There is some amount of performance penalty associated with these
-objects. Because lists and dicts are mutable, [<code>LocalStack</code>](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") and
-[<code>Local</code>](#werkzeug.local.Local "werkzeug.local.Local") need to do extra work to ensure data isn’t shared between
+objects. Because lists and dicts are mutable, [`LocalStack`](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") and
+[`Local`](#werkzeug.local.Local "werkzeug.local.Local") need to do extra work to ensure data isn’t shared between
 nested contexts. If possible, design your application to use
-[<code>LocalProxy</code>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") around a context var directly.
+[`LocalProxy`](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") around a context var directly.
 
 <Outline domain="py" objectType="class" target={"werkzeug.local.LocalStack"} module={"werkzeug.local"} fullname={"LocalStack"} parameters={["context_var"]} description={"Create a stack of context-local data. This wraps a\nContextVar containing a list value."}>
   <Outline.Signature fullname="LocalStack" id="werkzeug.local.LocalStack">
@@ -203,7 +203,7 @@ nested contexts. If possible, design your application to use
 
   <Outline.Content>
     Create a stack of context-local data. This wraps a
-    <code>ContextVar</code> containing a [<code>list</code>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)") value.
+    `ContextVar` containing a [`list`](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)") value.
 
     This may incur a performance penalty compared to using individual
     context vars, as it has to copy data to avoid mutating the list
@@ -216,7 +216,7 @@ nested contexts. If possible, design your application to use
         </dt>
 
         <dd className="field-body">
-          <Outline.ParameterTarget>context\_var</Outline.ParameterTarget> – The [<code>ContextVar</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to use as
+          <Outline.ParameterTarget>context\_var</Outline.ParameterTarget> (<em>ContextVar</em><em>\[</em>[<em>list</em>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")<em>\[</em><em>T</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The [`ContextVar`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to use as
           storage for this local. If not given, one will be created.
           Context vars not created at the global scope may interfere with
           garbage collection.
@@ -225,7 +225,7 @@ nested contexts. If possible, design your application to use
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>Uses <code>ContextVar</code> instead of a custom storage implementation.
+      <span>Changed in version 2.0: </span>Uses `ContextVar` instead of a custom storage implementation.
     </Container>
 
     <Container type="info" title="Version added">
@@ -238,7 +238,7 @@ nested contexts. If possible, design your application to use
       </Outline.Signature>
 
       <Outline.Content>
-        Create a [<code>LocalProxy</code>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") that accesses the top of this
+        Create a [`LocalProxy`](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") that accesses the top of this
         local stack.
 
         <FieldList>
@@ -259,7 +259,7 @@ nested contexts. If possible, design your application to use
             </dt>
 
             <dd className="field-body">
-              [LocalProxy](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy")
+              [<em>LocalProxy</em>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy")
             </dd>
           </dl>
         </FieldList>
@@ -273,7 +273,7 @@ nested contexts. If possible, design your application to use
 
       <Outline.Content>
         Remove the top item from the stack and return it. If the
-        stack is empty, return <code>None</code>.
+        stack is empty, return `None`.
 
         <FieldList>
           <dl>
@@ -282,7 +282,7 @@ nested contexts. If possible, design your application to use
             </dt>
 
             <dd className="field-body">
-              T | None
+              <em>T</em> | None
             </dd>
           </dl>
         </FieldList>
@@ -312,7 +312,7 @@ nested contexts. If possible, design your application to use
             </dt>
 
             <dd className="field-body">
-              [list](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")\[T]
+              [list](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")\[\~T]
             </dd>
           </dl>
         </FieldList>
@@ -339,7 +339,7 @@ nested contexts. If possible, design your application to use
 
   <Outline.Content>
     Create a namespace of context-local data. This wraps a
-    <code>ContextVar</code> containing a [<code>dict</code>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)") value.
+    `ContextVar` containing a [`dict`](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)") value.
 
     This may incur a performance penalty compared to using individual
     context vars, as it has to copy data to avoid mutating the dict
@@ -352,7 +352,7 @@ nested contexts. If possible, design your application to use
         </dt>
 
         <dd className="field-body">
-          <Outline.ParameterTarget>context\_var</Outline.ParameterTarget> (<em>ContextVar</em><em>\[</em>[<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The [<code>ContextVar</code>](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to use as
+          <Outline.ParameterTarget>context\_var</Outline.ParameterTarget> (<em>ContextVar</em><em>\[</em>[<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The [`ContextVar`](https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar "(in Python v3.11)") to use as
           storage for this local. If not given, one will be created.
           Context vars not created at the global scope may interfere with
           garbage collection.
@@ -361,7 +361,7 @@ nested contexts. If possible, design your application to use
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>Uses <code>ContextVar</code> instead of a custom storage implementation.
+      <span>Changed in version 2.0: </span>Uses `ContextVar` instead of a custom storage implementation.
     </Container>
 
     <Outline domain="py" objectType="method" target={"werkzeug.local.Local.__call__"} module={"werkzeug.local"} fullname={"Local.__call__"} parameters={["name", "unbound_message"]} description={"Create a LocalProxy that access an attribute on this\nlocal namespace."}>
@@ -370,7 +370,7 @@ nested contexts. If possible, design your application to use
       </Outline.Signature>
 
       <Outline.Content>
-        Create a [<code>LocalProxy</code>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") that access an attribute on this
+        Create a [`LocalProxy`](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy") that access an attribute on this
         local namespace.
 
         <FieldList>
@@ -390,7 +390,7 @@ nested contexts. If possible, design your application to use
             </dt>
 
             <dd className="field-body">
-              [LocalProxy](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy")
+              [<em>LocalProxy</em>](#werkzeug.local.LocalProxy "werkzeug.local.LocalProxy")
             </dd>
           </dl>
         </FieldList>
@@ -403,7 +403,7 @@ nested contexts. If possible, design your application to use
 
 # Releasing Data
 
-A previous implementation of <code>Local</code> used internal data structures
+A previous implementation of `Local` used internal data structures
 which could not be cleaned up automatically when each context ended.
 Instead, the following utilities could be used to release the data.
 
@@ -420,7 +420,7 @@ Instead, the following utilities could be used to release the data.
 
   <Outline.Content>
     Manage releasing the data for the current context in one or more
-    [<code>Local</code>](#werkzeug.local.Local "werkzeug.local.Local") and [<code>LocalStack</code>](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") objects.
+    [`Local`](#werkzeug.local.Local "werkzeug.local.Local") and [`LocalStack`](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") objects.
 
     This should not be needed for modern use cases, and may be removed
     in the future.
@@ -438,15 +438,15 @@ Instead, the following utilities could be used to release the data.
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.1: </span>The <code>ident\_func</code> was removed.
+      <span>Changed in version 2.1: </span>The `ident_func` was removed.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.7: </span>The <code>ident\_func</code> parameter was added.
+      <span>Changed in version 0.7: </span>The `ident_func` parameter was added.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.6.1: </span>The [<code>release\_local()</code>](#werkzeug.local.release_local "werkzeug.local.release_local") function can be used instead of a
+      <span>Changed in version 0.6.1: </span>The [`release_local()`](#werkzeug.local.release_local "werkzeug.local.release_local") function can be used instead of a
       manager.
     </Container>
 
@@ -457,7 +457,7 @@ Instead, the following utilities could be used to release the data.
 
       <Outline.Content>
         Release the data in the locals for this context. Call this at
-        the end of each request or use [<code>make\_middleware()</code>](#werkzeug.local.LocalManager.make_middleware "werkzeug.local.LocalManager.make_middleware").
+        the end of each request or use [`make_middleware()`](#werkzeug.local.LocalManager.make_middleware "werkzeug.local.LocalManager.make_middleware").
 
         <FieldList>
           <dl>
@@ -510,7 +510,7 @@ Instead, the following utilities could be used to release the data.
       </Outline.Signature>
 
       <Outline.Content>
-        Like [<code>make\_middleware()</code>](#werkzeug.local.LocalManager.make_middleware "werkzeug.local.LocalManager.make_middleware") but used as a decorator on the
+        Like [`make_middleware()`](#werkzeug.local.LocalManager.make_middleware "werkzeug.local.LocalManager.make_middleware") but used as a decorator on the
         WSGI application function.
 
         ```python
@@ -549,8 +549,8 @@ Instead, the following utilities could be used to release the data.
   </Outline.Signature>
 
   <Outline.Content>
-    Release the data for the current context in a [<code>Local</code>](#werkzeug.local.Local "werkzeug.local.Local") or
-    [<code>LocalStack</code>](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") without using a [<code>LocalManager</code>](#werkzeug.local.LocalManager "werkzeug.local.LocalManager").
+    Release the data for the current context in a [`Local`](#werkzeug.local.Local "werkzeug.local.Local") or
+    [`LocalStack`](#werkzeug.local.LocalStack "werkzeug.local.LocalStack") without using a [`LocalManager`](#werkzeug.local.LocalManager "werkzeug.local.LocalManager").
 
     This should not be needed for modern use cases, and may be removed
     in the future.

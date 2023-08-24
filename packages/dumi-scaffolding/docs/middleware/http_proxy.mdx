@@ -33,7 +33,7 @@
     <DefinitionList>
       <dl>
         <dt>
-          <DefinitionList.Term><span><code>target</code>:</span></DefinitionList.Term>
+          <DefinitionList.Term><span>`target`:</span></DefinitionList.Term>
         </dt>
 
         <dd>
@@ -41,23 +41,23 @@
         </dd>
 
         <dt>
-          <DefinitionList.Term><span><code>remove\_prefix</code>:</span></DefinitionList.Term>
+          <DefinitionList.Term><span>`remove_prefix`:</span></DefinitionList.Term>
         </dt>
 
         <dd>
           Whether to remove the prefix from the URL before dispatching it
-          to the target. The default is <code>False</code>.
+          to the target. The default is `False`.
         </dd>
 
         <dt>
-          <DefinitionList.Term><span><code>host</code>:</span></DefinitionList.Term>
+          <DefinitionList.Term><span>`host`:</span></DefinitionList.Term>
         </dt>
 
         <dd>
           <DefinitionList>
             <dl>
               <dt>
-                <DefinitionList.Term><span><code>"\<auto>"</code> (default):</span></DefinitionList.Term>
+                <DefinitionList.Term><span>`"<auto>"` (default):</span></DefinitionList.Term>
               </dt>
 
               <dd>
@@ -66,7 +66,7 @@
               </dd>
 
               <dt>
-                <DefinitionList.Term><span><code>None</code>:</span></DefinitionList.Term>
+                <DefinitionList.Term><span>`None`:</span></DefinitionList.Term>
               </dt>
 
               <dd>
@@ -85,28 +85,28 @@
         </dd>
 
         <dt>
-          <DefinitionList.Term><span><code>headers</code>:</span></DefinitionList.Term>
+          <DefinitionList.Term><span>`headers`:</span></DefinitionList.Term>
         </dt>
 
         <dd>
           A dictionary of headers to be sent with the request to the
-          target. The default is <code>\{}</code>.
+          target. The default is `{}`.
         </dd>
 
         <dt>
-          <DefinitionList.Term><span><code>ssl\_context</code>:</span></DefinitionList.Term>
+          <DefinitionList.Term><span>`ssl_context`:</span></DefinitionList.Term>
         </dt>
 
         <dd>
-          A [<code>ssl.SSLContext</code>](https://docs.python.org/3/library/ssl.html#ssl.SSLContext "(in Python v3.11)") defining how to verify requests if the
-          target is HTTPS. The default is <code>None</code>.
+          A [`ssl.SSLContext`](https://docs.python.org/3/library/ssl.html#ssl.SSLContext "(in Python v3.11)") defining how to verify requests if the
+          target is HTTPS. The default is `None`.
         </dd>
       </dl>
     </DefinitionList>
 
-    In the example above, everything under <code>"/static/"</code> is proxied to
+    In the example above, everything under `"/static/"` is proxied to
     the server on port 5001. The host header is rewritten to the target,
-    and the <code>"/static/"</code> prefix is removed from the URLs.
+    and the `"/static/"` prefix is removed from the URLs.
 
     <FieldList>
       <dl>

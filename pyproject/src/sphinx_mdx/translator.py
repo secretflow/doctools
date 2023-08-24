@@ -509,10 +509,7 @@ class MDXTranslator(SphinxTranslator):
             # download link (already wrapped in <a />)
             self.append_child(node, md.text(node.astext()))
         else:
-            # regular inline code
-            self.enter_nesting(node, mdx.inline("code"))
-            self.append_child(node, md.text(node.astext()))
-            self.leave_nesting(node)
+            self.append_child(node, md.inline_code(node.astext()))
         raise nodes.SkipNode
 
     def visit_subscript(self, node: nodes.subscript):

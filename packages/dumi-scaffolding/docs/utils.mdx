@@ -14,7 +14,7 @@ Various utility functions shipped with Werkzeug.
   </Outline.Signature>
 
   <Outline.Content>
-    A <code>property()</code> that is only evaluated once. Subsequent access
+    A `property()` that is only evaluated once. Subsequent access
     returns the cached value. Setting the property sets the cached
     value. Deleting the property clears the cached value, accessing it
     again will evaluate it again.
@@ -33,16 +33,16 @@ Various utility functions shipped with Werkzeug.
     del e.value  # clears cache
     ```
 
-    If the class defines <code>\_\_slots\_\_</code>, it must add <code>\_cache\_\{name}</code> as
-    a slot. Alternatively, it can add <code>\_\_dict\_\_</code>, but that’s usually
+    If the class defines `__slots__`, it must add `_cache_{name}` as
+    a slot. Alternatively, it can add `__dict__`, but that’s usually
     not desirable.
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.1: </span>Works with <code>\_\_slots\_\_</code>.
+      <span>Changed in version 2.1: </span>Works with `__slots__`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span><code>del obj.name</code> clears the cached value.
+      <span>Changed in version 2.0: </span>`del obj.name` clears the cached value.
     </Container>
 
     <FieldList>
@@ -82,11 +82,28 @@ Various utility functions shipped with Werkzeug.
 
     If you pass it a second value it’s used as default if the key does not
     exist, the third one can be a converter that takes a value and converts
-    it.  If it raises [<code>ValueError</code>](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") or [<code>TypeError</code>](https://docs.python.org/3/library/exceptions.html#TypeError "(in Python v3.11)") the default value
+    it.  If it raises [`ValueError`](https://docs.python.org/3/library/exceptions.html#ValueError "(in Python v3.11)") or [`TypeError`](https://docs.python.org/3/library/exceptions.html#TypeError "(in Python v3.11)") the default value
     is used. If no default value is provided <cite>None</cite> is used.
 
     Per default the property is read only.  You have to explicitly enable it
-    by passing <code>read\_only=False</code> to the constructor.
+    by passing `read_only=False` to the constructor.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>default</Outline.ParameterTarget> (<em>\_TAccessorValue</em><em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>load\_func</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>, </em><em>\_TAccessorValue</em><em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>dump\_func</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>\_TAccessorValue</em><em>]</em><em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>read\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>doc</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
   </Outline.Content>
 </Outline>
 
@@ -97,6 +114,23 @@ Various utility functions shipped with Werkzeug.
 
   <Outline.Content>
     Like <cite>environ\_property</cite> but for headers.
+
+    <FieldList>
+      <dl>
+        <dt className="field-name">
+          Parameters
+        </dt>
+
+        <dd className="field-body">
+          - <Outline.ParameterTarget>name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
+          - <Outline.ParameterTarget>default</Outline.ParameterTarget> (<em>\_TAccessorValue</em><em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>load\_func</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>, </em><em>\_TAccessorValue</em><em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>dump\_func</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>\_TAccessorValue</em><em>]</em><em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>read\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>doc</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+        </dd>
+      </dl>
+    </FieldList>
   </Outline.Content>
 </Outline>
 
@@ -118,7 +152,7 @@ Various utility functions shipped with Werkzeug.
 
     <Container type="info" title="Version added">
       <span>New in version 0.6: </span>The location can now be a unicode string that is encoded using
-      the <code>iri\_to\_uri()</code> function.
+      the `iri_to_uri()` function.
     </Container>
 
     <FieldList>
@@ -131,7 +165,7 @@ Various utility functions shipped with Werkzeug.
           - <Outline.ParameterTarget>location</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – the location the response should redirect to.
           - <Outline.ParameterTarget>code</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – the redirect status code. defaults to 302.
           - <Outline.ParameterTarget>Response</Outline.ParameterTarget> (<em>class</em>) – a Response class to use when instantiating a
-            response. The default is [<code>werkzeug.wrappers.Response</code>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response") if
+            response. The default is [`werkzeug.wrappers.Response`](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response") if
             unspecified.
         </dd>
 
@@ -155,9 +189,9 @@ Various utility functions shipped with Werkzeug.
   <Outline.Content>
     Redirect to the current URL with a slash appended.
 
-    If the current URL is <code>/user/42</code>, the redirect URL will be
-    <code>42/</code>. When joined to the current URL during response
-    processing or by the browser, this will produce <code>/user/42/</code>.
+    If the current URL is `/user/42`, the redirect URL will be
+    `42/`. When joined to the current URL during response
+    processing or by the browser, this will produce `/user/42/`.
 
     The behavior is undefined if the path ends with a slash already. If
     called unconditionally on a URL, it may produce a redirect loop.
@@ -208,15 +242,15 @@ Various utility functions shipped with Werkzeug.
     are preferred in most cases because Werkzeug can manage the file and
     get extra information from the path. Passing a file-like object
     requires that the file is opened in binary mode, and is mostly
-    useful when building a file in memory with [<code>io.BytesIO</code>](https://docs.python.org/3/library/io.html#io.BytesIO "(in Python v3.11)").
+    useful when building a file in memory with [`io.BytesIO`](https://docs.python.org/3/library/io.html#io.BytesIO "(in Python v3.11)").
 
     Never pass file paths provided by a user. The path is assumed to be
     trusted, so a user could craft a path to access a file you didn’t
-    intend. Use [<code>send\_from\_directory()</code>](#werkzeug.utils.send_from_directory "werkzeug.utils.send_from_directory") to safely serve user-provided paths.
+    intend. Use [`send_from_directory()`](#werkzeug.utils.send_from_directory "werkzeug.utils.send_from_directory") to safely serve user-provided paths.
 
-    If the WSGI server sets a <code>file\_wrapper</code> in <code>environ</code>, it is
+    If the WSGI server sets a `file_wrapper` in `environ`, it is
     used, otherwise Werkzeug’s built-in wrapper is used. Alternatively,
-    if the HTTP server supports <code>X-Sendfile</code>, <code>use\_x\_sendfile=True</code>
+    if the HTTP server supports `X-Sendfile`, `use_x_sendfile=True`
     will tell the server to send the given path, which is much more
     efficient than reading it in Python.
 
@@ -239,22 +273,22 @@ Various utility functions shipped with Werkzeug.
           - <Outline.ParameterTarget>download\_name</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – The default name browsers will use when saving
             the file. Defaults to the passed file name.
           - <Outline.ParameterTarget>conditional</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Enable conditional and range responses based on
-            request headers. Requires passing a file path and <code>environ</code>.
+            request headers. Requires passing a file path and `environ`.
           - <Outline.ParameterTarget>etag</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – Calculate an ETag for the file, which requires passing
             a file path. Can also be a string to use instead.
           - <Outline.ParameterTarget>last\_modified</Outline.ParameterTarget> (<em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em>[<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – The last modified time to send for the file,
             in seconds. If not provided, it will try to detect it from the
             file path.
           - <Outline.ParameterTarget>max\_age</Outline.ParameterTarget> (<em>None</em><em> | </em><em>(</em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>t.Callable</em><em>\[</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em><em>]</em><em>, </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em><em>]</em><em>)</em>) – How long the client should cache the file, in
-            seconds. If set, <code>Cache-Control</code> will be <code>public</code>, otherwise
-            it will be <code>no-cache</code> to prefer conditional caching.
-          - <Outline.ParameterTarget>use\_x\_sendfile</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Set the <code>X-Sendfile</code> header to let the
+            seconds. If set, `Cache-Control` will be `public`, otherwise
+            it will be `no-cache` to prefer conditional caching.
+          - <Outline.ParameterTarget>use\_x\_sendfile</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) – Set the `X-Sendfile` header to let the
             server to efficiently send the file. Requires support from the
             HTTP server. Requires passing a file path.
           - <Outline.ParameterTarget>response\_class</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em>[<em>Response</em>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response")<em>] </em><em>| </em><em>None</em>) – Build the response using this class. Defaults
-            to [<code>Response</code>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response").
+            to [`Response`](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response").
           - <Outline.ParameterTarget>\_root\_path</Outline.ParameterTarget> ([<em>os.PathLike</em>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Do not use. For internal use only. Use
-            [<code>send\_from\_directory()</code>](#werkzeug.utils.send_from_directory "werkzeug.utils.send_from_directory") to safely send files under a path.
+            [`send_from_directory()`](#werkzeug.utils.send_from_directory "werkzeug.utils.send_from_directory") to safely send files under a path.
         </dd>
 
         <dt className="field-name">
@@ -268,8 +302,8 @@ Various utility functions shipped with Werkzeug.
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0.2: </span><code>send\_file</code> only sets a detected <code>Content-Encoding</code> if
-      <code>as\_attachment</code> is disabled.
+      <span>Changed in version 2.0.2: </span>`send_file` only sets a detected `Content-Encoding` if
+      `as_attachment` is disabled.
     </Container>
 
     <Container type="info" title="Version added">
@@ -277,25 +311,25 @@ Various utility functions shipped with Werkzeug.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span><code>download\_name</code> replaces Flask’s <code>attachment\_filename</code>
-      &#x20;parameter. If <code>as\_attachment=False</code>, it is passed with
-      &#x20;<code>Content-Disposition: inline</code> instead.
+      <span>Changed in version 2.0: </span>`download_name` replaces Flask’s `attachment_filename`
+      &#x20;parameter. If `as_attachment=False`, it is passed with
+      &#x20;`Content-Disposition: inline` instead.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span><code>max\_age</code> replaces Flask’s <code>cache\_timeout</code> parameter.
-      <code>conditional</code> is enabled and <code>max\_age</code> is not set by
+      <span>Changed in version 2.0: </span>`max_age` replaces Flask’s `cache_timeout` parameter.
+      `conditional` is enabled and `max_age` is not set by
       default.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span><code>etag</code> replaces Flask’s <code>add\_etags</code> parameter. It can be a
+      <span>Changed in version 2.0: </span>`etag` replaces Flask’s `add_etags` parameter. It can be a
       string to use instead of generating one.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>If an encoding is returned when guessing <code>mimetype</code> from
-      <code>download\_name</code>, set the <code>Content-Encoding</code> header.
+      <span>Changed in version 2.0: </span>If an encoding is returned when guessing `mimetype` from
+      `download_name`, set the `Content-Encoding` header.
     </Container>
   </Outline.Content>
 </Outline>
@@ -306,15 +340,15 @@ Various utility functions shipped with Werkzeug.
   </Outline.Signature>
 
   <Outline.Content>
-    Send a file from within a directory using [<code>send\_file()</code>](#werkzeug.utils.send_file "werkzeug.utils.send_file").
+    Send a file from within a directory using [`send_file()`](#werkzeug.utils.send_file "werkzeug.utils.send_file").
 
     This is a secure way to serve files from a folder, such as static
-    files or uploads. Uses [<code>safe\_join()</code>](#werkzeug.security.safe_join "werkzeug.security.safe_join") to
+    files or uploads. Uses [`safe_join()`](#werkzeug.security.safe_join "werkzeug.security.safe_join") to
     ensure the path coming from the client is not maliciously crafted to
     point outside the specified directory.
 
     If the final path does not point to an existing regular file,
-    returns a 404 [<code>NotFound</code>](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") error.
+    returns a 404 [`NotFound`](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") error.
 
     <FieldList>
       <dl>
@@ -323,12 +357,12 @@ Various utility functions shipped with Werkzeug.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>directory</Outline.ParameterTarget> ([<em>os.PathLike</em>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The directory that <code>path</code> must be located under. This <em>must not</em>
+          - <Outline.ParameterTarget>directory</Outline.ParameterTarget> ([<em>os.PathLike</em>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The directory that `path` must be located under. This <em>must not</em>
             be a value provided by the client, otherwise it becomes insecure.
-          - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>os.PathLike</em>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The path to the file to send, relative to <code>directory</code>. This is the
+          - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>os.PathLike</em>](https://docs.python.org/3/library/os.html#os.PathLike "(in Python v3.11)")<em> | </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) – The path to the file to send, relative to `directory`. This is the
             part of the path provided by the client, which is checked for security.
           - <Outline.ParameterTarget>environ</Outline.ParameterTarget> (<em>WSGIEnvironment</em>) – The WSGI environ for the current request.
-          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) – Arguments to pass to [<code>send\_file()</code>](#werkzeug.utils.send_file "werkzeug.utils.send_file").
+          - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) – Arguments to pass to [`send_file()`](#werkzeug.utils.send_file "werkzeug.utils.send_file").
         </dd>
 
         <dt className="field-name">
@@ -355,8 +389,8 @@ Various utility functions shipped with Werkzeug.
   <Outline.Content>
     Imports an object based on a string.  This is useful if you want to
     use import paths as endpoints or something similar.  An import path can
-    be specified either in dotted notation (<code>xml.sax.saxutils.escape</code>)
-    or with a colon as object delimiter (<code>xml.sax.saxutils\:escape</code>).
+    be specified either in dotted notation (`xml.sax.saxutils.escape`)
+    or with a colon as object delimiter (`xml.sax.saxutils:escape`).
 
     If <cite>silent</cite> is True the return value will be <cite>None</cite> if the import fails.
 
@@ -447,7 +481,7 @@ Various utility functions shipped with Werkzeug.
   <Outline.Content>
     Pass it a filename and it will return a secure version of it.  This
     filename can then safely be stored on a regular file system and passed
-    to [<code>os.path.join()</code>](https://docs.python.org/3/library/os.path.html#os.path.join "(in Python v3.11)").  The filename returned is an ASCII only string
+    to [`os.path.join()`](https://docs.python.org/3/library/os.path.html#os.path.join "(in Python v3.11)").  The filename returned is an ASCII only string
     for maximum portability.
 
     On windows systems the function also makes sure that the file is not
@@ -510,10 +544,10 @@ Please refer to [URL Helpers](urls.mdx).
   <Outline.Content>
     Represents a parsed user agent header value.
 
-    The default implementation does no parsing, only the [<code>string</code>](#werkzeug.user_agent.UserAgent.string "werkzeug.user_agent.UserAgent.string")
+    The default implementation does no parsing, only the [`string`](#werkzeug.user_agent.UserAgent.string "werkzeug.user_agent.UserAgent.string")
     attribute is set. A subclass may parse the string to set the
     common attributes or expose other information. Set
-    [<code>werkzeug.wrappers.Request.user\_agent\_class</code>](wrappers.mdx#werkzeug.wrappers.Request.user_agent_class "werkzeug.wrappers.Request.user_agent_class") to use a
+    [`werkzeug.wrappers.Request.user_agent_class`](wrappers.mdx#werkzeug.wrappers.Request.user_agent_class "werkzeug.wrappers.Request.user_agent_class") to use a
     subclass.
 
     <FieldList>
@@ -529,7 +563,7 @@ Please refer to [URL Helpers](urls.mdx).
     </FieldList>
 
     <Container type="info" title="Version added">
-      <span>New in version 2.0: </span>This replaces the previous <code>useragents</code> module, but does not
+      <span>New in version 2.0: </span>This replaces the previous `useragents` module, but does not
       provide a built-in parser.
     </Container>
 
@@ -613,20 +647,19 @@ Please refer to [URL Helpers](urls.mdx).
 
 <Outline domain="py" objectType="function" target={"werkzeug.security.generate_password_hash"} module={"werkzeug.security"} fullname={"generate_password_hash"} parameters={["password", "method", "salt_length"]} description={"Securely hash a password for storage. A password can be compared to a stored hash\nusing check_password_hash()."}>
   <Outline.Signature fullname="generate_password_hash" id="werkzeug.security.generate_password_hash">
-    <Outline.Prefix>werkzeug.security.</Outline.Prefix><Outline.Name>generate\_password\_hash</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">password</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>'pbkdf2'</span></Outline.Parameter>, <Outline.Parameter><span className="name">salt\_length</span><span>=</span><span>16</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+    <Outline.Prefix>werkzeug.security.</Outline.Prefix><Outline.Name>generate\_password\_hash</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">password</span></Outline.Parameter>, <Outline.Parameter><span className="name">method</span><span>=</span><span>'scrypt'</span></Outline.Parameter>, <Outline.Parameter><span className="name">salt\_length</span><span>=</span><span>16</span></Outline.Parameter><span>)</span></Outline.ParameterList>
   </Outline.Signature>
 
   <Outline.Content>
     Securely hash a password for storage. A password can be compared to a stored hash
-    using [<code>check\_password\_hash()</code>](#werkzeug.security.check_password_hash "werkzeug.security.check_password_hash").
+    using [`check_password_hash()`](#werkzeug.security.check_password_hash "werkzeug.security.check_password_hash").
 
     The following methods are supported:
 
-    - <code>scrypt</code>, more secure but not available on PyPy. The parameters are <code>n</code>,
-      <code>r</code>, and <code>p</code>, the default is <code>scrypt:32768:8:1</code>. See
-      [<code>hashlib.scrypt()</code>](https://docs.python.org/3/library/hashlib.html#hashlib.scrypt "(in Python v3.11)").
-    - <code>pbkdf2</code>, the default. The parameters are <code>hash\_method</code> and <code>iterations</code>,
-      the default is <code>pbkdf2\:sha256:600000</code>. See [<code>hashlib.pbkdf2\_hmac()</code>](https://docs.python.org/3/library/hashlib.html#hashlib.pbkdf2_hmac "(in Python v3.11)").
+    - `scrypt`, the default. The parameters are `n`, `r`, and `p`, the default
+      is `scrypt:32768:8:1`. See [`hashlib.scrypt()`](https://docs.python.org/3/library/hashlib.html#hashlib.scrypt "(in Python v3.11)").
+    - `pbkdf2`, less secure. The parameters are `hash_method` and `iterations`,
+      the default is `pbkdf2:sha256:600000`. See [`hashlib.pbkdf2_hmac()`](https://docs.python.org/3/library/hashlib.html#hashlib.pbkdf2_hmac "(in Python v3.11)").
 
     Default parameters may be updated to reflect current guidelines, and methods may be
     deprecated and removed if they are no longer considered secure. To migrate old
@@ -676,7 +709,7 @@ Please refer to [URL Helpers](urls.mdx).
 
   <Outline.Content>
     Securely check that the given stored password hash, previously generated using
-    [<code>generate\_password\_hash()</code>](#werkzeug.security.generate_password_hash "werkzeug.security.generate_password_hash"), matches the given password.
+    [`generate_password_hash()`](#werkzeug.security.generate_password_hash "werkzeug.security.generate_password_hash"), matches the given password.
 
     Methods may be deprecated and removed if they are no longer considered secure. To
     migrate old hashes, you may generate a new hash when checking an old hash, or you
@@ -735,7 +768,7 @@ Please refer to [URL Helpers](urls.mdx).
         </dt>
 
         <dd className="field-body">
-          A safe path, otherwise <code>None</code>.
+          A safe path, otherwise `None`.
         </dd>
 
         <dt className="field-name">
@@ -754,14 +787,14 @@ Please refer to [URL Helpers](urls.mdx).
 
 ## Logging
 
-Werkzeug uses standard Python [<code>logging</code>](https://docs.python.org/3/library/logging.html#module-logging "(in Python v3.11)"). The logger is named
-<code>"werkzeug"</code>.
+Werkzeug uses standard Python [`logging`](https://docs.python.org/3/library/logging.html#module-logging "(in Python v3.11)"). The logger is named
+`"werkzeug"`.
 
 ```python
 import logging
 logger = logging.getLogger("werkzeug")
 ```
 
-If the logger level is not set, it will be set to <code>INFO</code>
+If the logger level is not set, it will be set to [`INFO`](https://docs.python.org/3/library/logging.html#logging.INFO "(in Python v3.11)")
 on first use. If there is no handler for that level, a
-[<code>StreamHandler</code>](https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler "(in Python v3.11)") is added.
+[`StreamHandler`](https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler "(in Python v3.11)") is added.

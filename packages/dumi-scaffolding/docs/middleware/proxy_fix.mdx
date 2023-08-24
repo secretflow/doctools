@@ -3,7 +3,7 @@
 # X-Forwarded-For Proxy Fix
 
 This module provides a middleware that adjusts the WSGI environ based on
-<code>X-Forwarded-</code> headers that proxies in front of an application may
+`X-Forwarded-` headers that proxies in front of an application may
 set.
 
 When an application is running behind a proxy server, WSGI may see the
@@ -22,22 +22,22 @@ setting each header so the middleware knows what to trust.
   </Outline.Signature>
 
   <Outline.Content>
-    Adjust the WSGI environ based on <code>X-Forwarded-</code> that proxies in
+    Adjust the WSGI environ based on `X-Forwarded-` that proxies in
     front of the application may set.
 
-    - <code>X-Forwarded-For</code> sets <code>REMOTE\_ADDR</code>.
-    - <code>X-Forwarded-Proto</code> sets <code>wsgi.url\_scheme</code>.
-    - <code>X-Forwarded-Host</code> sets <code>HTTP\_HOST</code>, <code>SERVER\_NAME</code>, and
-      <code>SERVER\_PORT</code>.
-    - <code>X-Forwarded-Port</code> sets <code>HTTP\_HOST</code> and <code>SERVER\_PORT</code>.
-    - <code>X-Forwarded-Prefix</code> sets <code>SCRIPT\_NAME</code>.
+    - `X-Forwarded-For` sets `REMOTE_ADDR`.
+    - `X-Forwarded-Proto` sets `wsgi.url_scheme`.
+    - `X-Forwarded-Host` sets `HTTP_HOST`, `SERVER_NAME`, and
+      `SERVER_PORT`.
+    - `X-Forwarded-Port` sets `HTTP_HOST` and `SERVER_PORT`.
+    - `X-Forwarded-Prefix` sets `SCRIPT_NAME`.
 
     You must tell the middleware how many proxies set each header so it
     knows what values to trust. It is a security issue to trust values
     that came from the client rather than a proxy.
 
     The original values of the headers are stored in the WSGI
-    environ as <code>werkzeug.proxy\_fix.orig</code>, a dict.
+    environ as `werkzeug.proxy_fix.orig`, a dict.
 
     <FieldList>
       <dl>
@@ -47,12 +47,12 @@ setting each header so the middleware knows what to trust.
 
         <dd className="field-body">
           - <Outline.ParameterTarget>app</Outline.ParameterTarget> (<em>WSGIApplication</em>) – The WSGI application to wrap.
-          - <Outline.ParameterTarget>x\_for</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-For</code>.
-          - <Outline.ParameterTarget>x\_proto</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Proto</code>.
-          - <Outline.ParameterTarget>x\_host</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Host</code>.
-          - <Outline.ParameterTarget>x\_port</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for <code>X-Forwarded-Port</code>.
+          - <Outline.ParameterTarget>x\_for</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for `X-Forwarded-For`.
+          - <Outline.ParameterTarget>x\_proto</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for `X-Forwarded-Proto`.
+          - <Outline.ParameterTarget>x\_host</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for `X-Forwarded-Host`.
+          - <Outline.ParameterTarget>x\_port</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for `X-Forwarded-Port`.
           - <Outline.ParameterTarget>x\_prefix</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")) – Number of values to trust for
-            <code>X-Forwarded-Prefix</code>.
+            `X-Forwarded-Prefix`.
         </dd>
       </dl>
     </FieldList>
@@ -64,9 +64,9 @@ setting each header so the middleware knows what to trust.
     ```
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0: </span>The <code>num\_proxies</code> argument and attribute; the <code>get\_remote\_addr</code> method; and
-      the environ keys <code>orig\_remote\_addr</code>, <code>orig\_wsgi\_url\_scheme</code>, and
-      <code>orig\_http\_host</code> were removed.
+      <span>Changed in version 1.0: </span>The `num_proxies` argument and attribute; the `get_remote_addr` method; and
+      the environ keys `orig_remote_addr`, `orig_wsgi_url_scheme`, and
+      `orig_http_host` were removed.
     </Container>
 
     <Container type="info" title="Version changed">
@@ -75,16 +75,16 @@ setting each header so the middleware knows what to trust.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15: </span>Original WSGI environ values are stored in the <code>werkzeug.proxy\_fix.orig</code> dict.
+      <span>Changed in version 0.15: </span>Original WSGI environ values are stored in the `werkzeug.proxy_fix.orig` dict.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15: </span>Support <code>X-Forwarded-Port</code> and <code>X-Forwarded-Prefix</code>.
+      <span>Changed in version 0.15: </span>Support `X-Forwarded-Port` and `X-Forwarded-Prefix`.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15: </span><code>X-Forwarded-Host</code> and <code>X-Forwarded-Port</code> modify
-      <code>SERVER\_NAME</code> and <code>SERVER\_PORT</code>.
+      <span>Changed in version 0.15: </span>`X-Forwarded-Host` and `X-Forwarded-Port` modify
+      `SERVER_NAME` and `SERVER_PORT`.
     </Container>
   </Outline.Content>
 </Outline>

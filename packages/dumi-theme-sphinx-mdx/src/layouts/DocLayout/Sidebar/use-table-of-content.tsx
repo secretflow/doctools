@@ -6,19 +6,19 @@ import type { SidebarItem } from './typing.js';
 
 import { randstring } from '~/internals/utils/string.js';
 
-export type TocTreeEntry = {
-  path: string | null;
+export type SitemapEntry = {
+  filepath: string | null;
   title: string;
-  subpages: TocTreeEntry[];
+  children: SitemapEntry[];
 };
 
-export type TocTree = TocTreeEntry[];
+export type Sitemap = SitemapEntry[];
 
 export function useNearestTocTree():
   | {
       projectName: string;
       indexPage: string;
-      tocTree: TocTree;
+      sitemap: Sitemap;
     }
   | undefined {
   const { pathname } = useLocation();
@@ -30,10 +30,10 @@ export function useNearestTocTree():
     const routeInfo = routes[prefix.slice(1)] as
       | (IRoute & { meta?: IRouteMeta })
       | undefined;
-    const tocTree = routeInfo?.meta?.frontmatter?.['toctree'];
+    const tocTree = routeInfo?.meta?.frontmatter?.['sitemap'];
     if (routeInfo !== undefined && tocTree !== undefined) {
       return {
-        tocTree,
+        sitemap: tocTree,
         indexPage: prefix || '/',
         projectName: routeInfo?.meta?.frontmatter.title || prefix,
       };
@@ -44,12 +44,12 @@ export function useNearestTocTree():
   return undefined;
 }
 
-function toctreeToSidebarItem(entry: TocTreeEntry): SidebarItem {
+function toctreeToSidebarItem(entry: SitemapEntry): SidebarItem {
   return {
-    key: entry.path || randstring(),
-    selectable: entry.path !== null,
+    key: entry.filepath || randstring(),
+    selectable: entry.filepath !== null,
     title: entry.title,
-    children: entry.subpages.map(toctreeToSidebarItem),
+    children: entry.children.map(toctreeToSidebarItem),
   };
 }
 
@@ -62,7 +62,7 @@ export function useTableOfContent(): SidebarItem[] {
     {
       key: info.indexPage,
       title: info.projectName,
-      children: info.tocTree.map(toctreeToSidebarItem),
+      children: info.sitemap.map(toctreeToSidebarItem),
     },
   ];
 }

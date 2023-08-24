@@ -26,11 +26,11 @@ def application(request):
 
 As you can see from this example those exceptions are callable WSGI
 applications. However, they are not Werkzeug response objects. You
-can get a response object by calling <code>get\_response()</code> on a HTTP
+can get a response object by calling `get_response()` on a HTTP
 exception.
 
 Keep in mind that you may have to pass an environ (WSGI) or scope
-(ASGI) to <code>get\_response()</code> because some errors fetch additional
+(ASGI) to `get_response()` because some errors fetch additional
 information relating to the request.
 
 If you want to hook in a different exception page to say, a 404 status
@@ -93,13 +93,13 @@ The following error classes exist in Werkzeug:
   </Outline.Signature>
 
   <Outline.Content>
-    <em>401</em> <code>Unauthorized</code>
+    <em>401</em> `Unauthorized`
 
     Raise if the user is not authorized to access a resource.
 
-    The <code>www\_authenticate</code> argument should be used to set the
-    <code>WWW-Authenticate</code> header. This is used for HTTP basic auth and
-    other schemes. Use [<code>WWWAuthenticate</code>](datastructures.mdx#werkzeug.datastructures.WWWAuthenticate "werkzeug.datastructures.WWWAuthenticate")
+    The `www_authenticate` argument should be used to set the
+    `WWW-Authenticate` header. This is used for HTTP basic auth and
+    other schemes. Use [`WWWAuthenticate`](datastructures.mdx#werkzeug.datastructures.WWWAuthenticate "werkzeug.datastructures.WWWAuthenticate")
     to create correctly formatted values. Strictly speaking a 401
     response is invalid if it doesn’t provide at least one value for
     this header, although real clients typically don’t care.
@@ -130,28 +130,28 @@ The following error classes exist in Werkzeug:
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.0: </span>Serialize multiple <code>www\_authenticate</code> items into multiple
-      <code>WWW-Authenticate</code> headers, rather than joining them
+      <span>Changed in version 2.0: </span>Serialize multiple `www_authenticate` items into multiple
+      `WWW-Authenticate` headers, rather than joining them
       into a single value, for better interoperability.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15.3: </span>If the <code>www\_authenticate</code> argument is not set, the
-      <code>WWW-Authenticate</code> header is not set.
+      <span>Changed in version 0.15.3: </span>If the `www_authenticate` argument is not set, the
+      `WWW-Authenticate` header is not set.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15.3: </span>The <code>response</code> argument was restored.
+      <span>Changed in version 0.15.3: </span>The `response` argument was restored.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15.1: </span><code>description</code> was moved back as the first argument, restoring
+      <span>Changed in version 0.15.1: </span>`description` was moved back as the first argument, restoring
       &#x20;its previous position.
     </Container>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 0.15.0: </span><code>www\_authenticate</code> was added as the first argument, ahead of
-      <code>description</code>.
+      <span>Changed in version 0.15.0: </span>`www_authenticate` was added as the first argument, ahead of
+      `description`.
     </Container>
   </Outline.Content>
 </Outline>
@@ -411,7 +411,7 @@ The following error classes exist in Werkzeug:
   <Outline.Content>
     <em>411</em> <cite>Length Required</cite>
 
-    Raise if the browser submitted data but no <code>Content-Length</code> header which
+    Raise if the browser submitted data but no `Content-Length` header which
     is required for the kind of processing the server does.
 
     <FieldList>
@@ -445,8 +445,8 @@ The following error classes exist in Werkzeug:
   <Outline.Content>
     <em>412</em> <cite>Precondition Failed</cite>
 
-    Status code used in combination with <code>If-Match</code>, <code>If-None-Match</code>, or
-    <code>If-Unmodified-Since</code>.
+    Status code used in combination with `If-Match`, `If-None-Match`, or
+    `If-Unmodified-Since`.
 
     <FieldList>
       <dl>
@@ -586,7 +586,7 @@ The following error classes exist in Werkzeug:
       <span>New in version 0.7.</span>
     </Container>
 
-    Takes an optional <cite>Content-Range</cite> header value based on <code>length</code>
+    Takes an optional <cite>Content-Range</cite> header value based on `length`
     parameter.
 
     <FieldList>
@@ -850,9 +850,9 @@ The following error classes exist in Werkzeug:
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>retry\_after</Outline.ParameterTarget> (<em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – If given, set the <code>Retry-After</code> header to this
-            value. May be an [<code>int</code>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") number of seconds or a
-            [<code>datetime</code>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)").
+          - <Outline.ParameterTarget>retry\_after</Outline.ParameterTarget> (<em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – If given, set the `Retry-After` header to this
+            value. May be an [`int`](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") number of seconds or a
+            [`datetime`](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)").
           - <Outline.ParameterTarget>description</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
           - <Outline.ParameterTarget>response</Outline.ParameterTarget> ([<em>Response</em>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response")<em> | </em><em>None</em>) –&#x20;
         </dd>
@@ -868,7 +868,7 @@ The following error classes exist in Werkzeug:
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0: </span>Added <code>retry\_after</code> parameter.
+      <span>Changed in version 1.0: </span>Added `retry_after` parameter.
     </Container>
   </Outline.Content>
 </Outline>
@@ -954,7 +954,7 @@ The following error classes exist in Werkzeug:
     unknown error occurred in the dispatcher.
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0.0: </span>Added the [<code>original\_exception</code>](#werkzeug.exceptions.InternalServerError.original_exception "werkzeug.exceptions.InternalServerError.original_exception") attribute.
+      <span>Changed in version 1.0.0: </span>Added the [`original_exception`](#werkzeug.exceptions.InternalServerError.original_exception "werkzeug.exceptions.InternalServerError.original_exception") attribute.
     </Container>
 
     <FieldList>
@@ -1080,9 +1080,9 @@ The following error classes exist in Werkzeug:
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>retry\_after</Outline.ParameterTarget> (<em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – If given, set the <code>Retry-After</code> header to this
-            value. May be an [<code>int</code>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") number of seconds or a
-            [<code>datetime</code>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)").
+          - <Outline.ParameterTarget>retry\_after</Outline.ParameterTarget> (<em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – If given, set the `Retry-After` header to this
+            value. May be an [`int`](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") number of seconds or a
+            [`datetime`](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)").
           - <Outline.ParameterTarget>description</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
           - <Outline.ParameterTarget>response</Outline.ParameterTarget> ([<em>Response</em>](wrappers.mdx#werkzeug.wrappers.Response "werkzeug.wrappers.Response")<em> | </em><em>None</em>) –&#x20;
         </dd>
@@ -1098,7 +1098,7 @@ The following error classes exist in Werkzeug:
     </FieldList>
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 1.0: </span>Added <code>retry\_after</code> parameter.
+      <span>Changed in version 1.0: </span>Added `retry_after` parameter.
     </Container>
   </Outline.Content>
 </Outline>
@@ -1266,7 +1266,7 @@ All the exceptions implement this common interface:
     of it independently and render nicer error messages.
 
     <Container type="info" title="Version changed">
-      <span>Changed in version 2.1: </span>Removed the <code>wrap</code> class method.
+      <span>Changed in version 2.1: </span>Removed the `wrap` class method.
     </Container>
 
     <FieldList>
@@ -1349,7 +1349,7 @@ All the exceptions implement this common interface:
             </dt>
 
             <dd className="field-body">
-              a <code>Response</code> object or a subclass thereof.
+              a `Response` object or a subclass thereof.
             </dd>
 
             <dt className="field-name">
@@ -1371,11 +1371,11 @@ All the exceptions implement this common interface:
 ## Special HTTP Exceptions
 
 Starting with Werkzeug 0.3 some of the builtin classes raise exceptions that
-look like regular python exceptions (eg [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)")) but are
-[<code>BadRequest</code>](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest") HTTP exceptions at the same time.  This decision was made
+look like regular python exceptions (eg [`KeyError`](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)")) but are
+[`BadRequest`](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest") HTTP exceptions at the same time.  This decision was made
 to simplify a common pattern where you want to abort if the client tampered
 with the submitted form data in a way that the application can’t recover
-properly and should abort with <code>400 BAD REQUEST</code>.
+properly and should abort with `400 BAD REQUEST`.
 
 Assuming the application catches all HTTP exceptions and reacts to them
 properly a view function could do the following safely and doesn’t have to
@@ -1389,7 +1389,7 @@ def new_post(request):
 ```
 
 If <cite>title</cite> or <cite>body</cite> are missing in the form, a special key error will be
-raised which behaves like a [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") but also a [<code>BadRequest</code>](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest")
+raised which behaves like a [`KeyError`](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") but also a [`BadRequest`](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest")
 exception.
 
 <Outline domain="py" objectType="exception" target={"werkzeug.exceptions.BadRequestKeyError"} module={"werkzeug.exceptions"} fullname={"BadRequestKeyError"} parameters={["arg", "args", "kwargs"]} description={"An exception that is used to signal both a KeyError and a\nBadRequest. Used by many of the datastructures."}>
@@ -1398,8 +1398,8 @@ exception.
   </Outline.Signature>
 
   <Outline.Content>
-    An exception that is used to signal both a [<code>KeyError</code>](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") and a
-    [<code>BadRequest</code>](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest"). Used by many of the datastructures.
+    An exception that is used to signal both a [`KeyError`](https://docs.python.org/3/library/exceptions.html#KeyError "(in Python v3.11)") and a
+    [`BadRequest`](#werkzeug.exceptions.BadRequest "werkzeug.exceptions.BadRequest"). Used by many of the datastructures.
 
     <FieldList>
       <dl>
@@ -1423,7 +1423,7 @@ exception.
 
 Sometimes it’s convenient to just raise an exception by the error code,
 without importing the exception and looking up the name etc.  For this
-purpose there is the [<code>abort()</code>](#werkzeug.exceptions.abort "werkzeug.exceptions.abort") function.
+purpose there is the [`abort()`](#werkzeug.exceptions.abort "werkzeug.exceptions.abort") function.
 
 <Outline domain="py" objectType="function" target={"werkzeug.exceptions.abort"} module={"werkzeug.exceptions"} fullname={"abort"} parameters={["status", "args", "kwargs"]} description={"Raises an HTTPException for the given status code or WSGI\napplication."}>
   <Outline.Signature fullname="abort" id="werkzeug.exceptions.abort">
@@ -1431,7 +1431,7 @@ purpose there is the [<code>abort()</code>](#werkzeug.exceptions.abort "werkzeug
   </Outline.Signature>
 
   <Outline.Content>
-    Raises an [<code>HTTPException</code>](#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException") for the given status code or WSGI
+    Raises an [`HTTPException`](#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException") for the given status code or WSGI
     application.
 
     If a status code is given, it will be looked up in the list of
@@ -1504,10 +1504,10 @@ create an instance of the aborter class:
 
 As you can see from the list above not all status codes are available as
 errors.  Especially redirects and other non 200 status codes that do not
-represent errors are missing.  For redirects you can use the <code>redirect()</code>
+represent errors are missing.  For redirects you can use the `redirect()`
 function from the utilities.
 
-If you want to add an error yourself you can subclass [<code>HTTPException</code>](#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException"):
+If you want to add an error yourself you can subclass [`HTTPException`](#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException"):
 
 ```default
 from werkzeug.exceptions import HTTPException
@@ -1519,13 +1519,13 @@ class PaymentRequired(HTTPException):
 
 This is the minimal code you need for your own exception.  If you want to
 add more logic to the errors you can override the
-<code>get\_description()</code>, <code>get\_body()</code>,
-<code>get\_headers()</code> and [<code>get\_response()</code>](#werkzeug.exceptions.HTTPException.get_response "werkzeug.exceptions.HTTPException.get_response")
+`get_description()`, `get_body()`,
+`get_headers()` and [`get_response()`](#werkzeug.exceptions.HTTPException.get_response "werkzeug.exceptions.HTTPException.get_response")
 methods.  In any case you should have a look at the sourcecode of the
 exceptions module.
 
 You can override the default description in the constructor with the
-<code>description</code> parameter:
+`description` parameter:
 
 ```default
 raise BadRequest(description='Request failed because X was not present')

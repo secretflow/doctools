@@ -13,7 +13,7 @@
 - It uses a single process with multiple thread workers.
 
 This page outlines the basics of running Waitress. Be sure to read its
-documentation and <code>waitress-serve --help</code> to understand what features
+documentation and `waitress-serve --help` to understand what features
 are available.
 
 :target{#installing}
@@ -21,7 +21,7 @@ are available.
 ## Installing
 
 Create a virtualenv, install your application, then install
-<code>waitress</code>.
+`waitress`.
 
 ```text
 $ cd hello-app
@@ -35,11 +35,11 @@ $ pip install waitress
 
 ## Running
 
-The only required argument to <code>waitress-serve</code> tells it how to load
-your application. The syntax is <code>\{module}:\{app}</code>. <code>module</code> is
-the dotted import name to the module with your application. <code>app</code> is
+The only required argument to `waitress-serve` tells it how to load
+your application. The syntax is `{module}:{app}`. `module` is
+the dotted import name to the module with your application. `app` is
 the variable with the application. If you’re using the app factory
-pattern, use <code>--call \{module}:\{factory}</code> instead.
+pattern, use `--call {module}:{factory}` instead.
 
 ```text
 # equivalent to 'from hello import app'
@@ -51,7 +51,7 @@ $ waitress-serve --call hello:create_app --host 127.0.0.1
 Serving on http://127.0.0.1:8080
 ```
 
-The <code>--host</code> option binds the server to local <code>127.0.0.1</code> only.
+The `--host` option binds the server to local `127.0.0.1` only.
 
 Logs for each request aren’t shown, only errors are shown. Logging can
 be configured through the Python interface instead of the command line.
@@ -67,8 +67,8 @@ reverse proxy such as [nginx](nginx.mdx) or [Apache httpd](apache-httpd.mdx) sho
 in front of Waitress.
 
 You can bind to all external IPs on a non-privileged port by not
-specifying the <code>--host</code> option. Don’t do this when using a revers
+specifying the `--host` option. Don’t do this when using a revers
 proxy setup, otherwise it will be possible to bypass the proxy.
 
-<code>0.0.0.0</code> is not a valid address to navigate to, you’d use a specific
+`0.0.0.0` is not a valid address to navigate to, you’d use a specific
 IP address in your browser.

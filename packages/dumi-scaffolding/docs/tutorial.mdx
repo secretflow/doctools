@@ -46,7 +46,7 @@ excels at.
 
 The final result will look something like this:
 
-![a screenshot of shortly](_static/shortly.png):target{#step-0-a-basic-wsgi-introduction}
+![a screenshot of shortly](_assets/shortly.png):target{#step-0-a-basic-wsgi-introduction}
 
 ## Step 0: A Basic WSGI Introduction
 
@@ -64,8 +64,8 @@ def application(environ, start_response):
 ```
 
 A WSGI application is something you can call and pass an environ dict
-and a <code>start\_response</code> callable.  The environ contains all incoming
-information, the <code>start\_response</code> function can be used to indicate the
+and a `start_response` callable.  The environ contains all incoming
+information, the `start_response` function can be used to indicate the
 start of the response.  With Werkzeug you don’t have to deal directly with
 either as request and response objects are provided to work with them.
 
@@ -186,18 +186,18 @@ if __name__ == '__main__':
     run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
 ```
 
-The basic idea here is that our <code>Shortly</code> class is an actual WSGI
-application.  The <code>\_\_call\_\_</code> method directly dispatches to <code>wsgi\_app</code>.
-This is done so that we can wrap <code>wsgi\_app</code> to apply middlewares like we
-do in the <code>create\_app</code> function.  The actual <code>wsgi\_app</code> method then
-creates a <code>Request</code> object and calls the <code>dispatch\_request</code>
-method which then has to return a <code>Response</code> object which is then
+The basic idea here is that our `Shortly` class is an actual WSGI
+application.  The `__call__` method directly dispatches to `wsgi_app`.
+This is done so that we can wrap `wsgi_app` to apply middlewares like we
+do in the `create_app` function.  The actual `wsgi_app` method then
+creates a `Request` object and calls the `dispatch_request`
+method which then has to return a `Response` object which is then
 evaluated as WSGI application again.  As you can see: turtles all the way
-down.  Both the <code>Shortly</code> class we create, as well as any request object
+down.  Both the `Shortly` class we create, as well as any request object
 in Werkzeug implements the WSGI interface.  As a result of that you could
-even return another WSGI application from the <code>dispatch\_request</code> method.
+even return another WSGI application from the `dispatch_request` method.
 
-The <code>create\_app</code> factory function can be used to create a new instance
+The `create_app` factory function can be used to create a new instance
 of our application.  Not only will it pass some parameters as
 configuration to the application but also optionally add a WSGI middleware
 that exports static files.  This way we have access to the files from the
@@ -251,8 +251,8 @@ def render_template(self, template_name, **context):
 Next up is routing.  Routing is the process of matching and parsing the URL to
 something we can use.  Werkzeug provides a flexible integrated routing
 system which we can use for that.  The way it works is that you create a
-[<code>Map</code>](routing.mdx#werkzeug.routing.Map "werkzeug.routing.Map") instance and add a bunch of
-[<code>Rule</code>](routing.mdx#werkzeug.routing.Rule "werkzeug.routing.Rule") objects.  Each rule has a pattern it will
+[`Map`](routing.mdx#werkzeug.routing.Map "werkzeug.routing.Map") instance and add a bunch of
+[`Rule`](routing.mdx#werkzeug.routing.Rule "werkzeug.routing.Rule") objects.  Each rule has a pattern it will
 try to match the URL against and an “endpoint”.  The endpoint is typically
 a string and can be used to uniquely identify the URL.  We could also use
 this to automatically reverse the URL, but that’s not what we will do in this
@@ -268,14 +268,14 @@ self.url_map = Map([
 ])
 ```
 
-Here we create a URL map with three rules.  <code>/</code> for the root of the URL
+Here we create a URL map with three rules.  `/` for the root of the URL
 space where we will just dispatch to a function that implements the logic
 to create a new URL.  And then one that follows the short link to the
-target URL and another one with the same rule but a plus (<code>+</code>) at the
+target URL and another one with the same rule but a plus (`+`) at the
 end to show the link details.
 
 So how do we find our way from the endpoint to a function?  That’s up to you.
-The way we will do it in this tutorial is by calling the method <code>on\_</code>
+The way we will do it in this tutorial is by calling the method `on_`
 \+ endpoint on the class itself.  Here is how this works:
 
 ```default
@@ -289,11 +289,11 @@ def dispatch_request(self, request):
 ```
 
 We bind the URL map to the current environment and get back a
-<code>URLAdapter</code>.  The adapter can be used to match
+`URLAdapter`.  The adapter can be used to match
 the request but also to reverse URLs.  The match method will return the
 endpoint and a dictionary of values in the URL.  For instance the rule for
-<code>follow\_short\_link</code> has a variable part called <code>short\_id</code>.  When we go
-to <code>http\://localhost:5000/foo</code> we will get the following values back:
+`follow_short_link` has a variable part called `short_id`.  When we go
+to `http://localhost:5000/foo` we will get the following values back:
 
 ```default
 endpoint = 'follow_short_link'
@@ -301,12 +301,12 @@ values = {'short_id': 'foo'}
 ```
 
 If it does not match anything, it will raise a
-[<code>NotFound</code>](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") exception, which is an
-[<code>HTTPException</code>](exceptions.mdx#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException").  All HTTP exceptions are also
+[`NotFound`](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") exception, which is an
+[`HTTPException`](exceptions.mdx#werkzeug.exceptions.HTTPException "werkzeug.exceptions.HTTPException").  All HTTP exceptions are also
 WSGI applications by themselves which render a default error page.  So we
 just catch all of them down and return the error itself.
 
-If all works well, we call the function <code>on\_</code> + endpoint and pass it the
+If all works well, we call the function `on_` + endpoint and pass it the
 request as argument as well as all the URL arguments as keyword arguments
 and return the response object that method returns.
 
@@ -356,9 +356,9 @@ def insert_url(self, url):
     return short_id
 ```
 
-<code>reverse-url:</code> + the URL will store the short id.  If the URL was
+`reverse-url:` + the URL will store the short id.  If the URL was
 already submitted this won’t be None and we can just return that value
-which will be the short ID.  Otherwise we increment the <code>last-url-id</code>
+which will be the short ID.  Otherwise we increment the `last-url-id`
 key and convert it to base36.  Then we store the link and the reverse
 entry in redis.  And here the function to convert to base 36:
 
@@ -395,9 +395,9 @@ def on_follow_short_link(self, request, short_id):
     return redirect(link_target)
 ```
 
-In this case we will raise a [<code>NotFound</code>](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") exception
+In this case we will raise a [`NotFound`](exceptions.mdx#werkzeug.exceptions.NotFound "werkzeug.exceptions.NotFound") exception
 by hand if the URL does not exist, which will bubble up to the
-<code>dispatch\_request</code> function and be converted into a default 404
+`dispatch_request` function and be converted into a default 404
 response.
 
 :target{#step-7-detail-view}
@@ -423,7 +423,7 @@ def on_short_link_details(self, request, short_id):
 ```
 
 Please be aware that redis always works with strings, so you have to convert
-the click count to [<code>int</code>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") by hand.
+the click count to [`int`](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)") by hand.
 
 :target{#step-8-templates}
 
