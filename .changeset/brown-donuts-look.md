@@ -5,7 +5,6 @@
 '@secretflow/dumi-plugin-yuque': minor
 '@secretflow/dumi-plugin-mdx': minor
 '@secretflow/unified-toolkit': minor
-'@secretflow/sync-yuque': minor
 'doctools': minor
 ---
 

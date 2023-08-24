@@ -26,9 +26,6 @@ jobs:
 
       - uses: ./.github/actions/ci-setup
 
-      - name: Build
-        run: pnpm exec nx run-many --target=build --exclude docs,website
-
       - name: Create release PR or publish packages
         id: changesets
         uses: changesets/action@v1
