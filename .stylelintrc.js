@@ -1,7 +1,6 @@
 module.exports = {
-  extends: [
-    'stylelint-config-standard',
-    'stylelint-config-css-modules',
-    'stylelint-config-idiomatic-order',
-  ],
+  extends: ['stylelint-config-standard', 'stylelint-config-idiomatic-order'],
+  rules: {
+    'custom-property-empty-line-before': null,
+  },
 };

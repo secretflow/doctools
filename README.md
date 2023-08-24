@@ -2,7 +2,7 @@
 
 [SecretFlow] 文档构建工具。
 
-[SecretFlow]: https://secretflow.org.cn/
+[SecretFlow]: https://www.secretflow.org.cn/
 
 ## 安装
 

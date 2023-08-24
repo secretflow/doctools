@@ -6,8 +6,7 @@ import Layout from '@theme/Layout';
 const Header = styled.header`
   position: relative;
   overflow: hidden;
-  padding: 4rem 0;
-  text-align: center;
+  padding: 2rem calc(var(--ifm-navbar-padding-horizontal) + 2.4rem);
 
   @media screen and (max-width: 996px) {
     padding: 2rem;
@@ -18,22 +17,24 @@ function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Header>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-      </div>
+      <Heading as="h1" className="hero__title">
+        {siteConfig.title}
+      </Heading>
+      <p>
+        Documentation toolchain for{' '}
+        <a target="_blank" rel="noopener" href="https://www.secretflow.org.cn">
+          SecretFlow
+        </a>
+        .
+      </p>
+      <hr></hr>
     </Header>
   );
 }
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
-    >
+    <Layout title="Home">
       <HomepageHeader />
     </Layout>
   );
