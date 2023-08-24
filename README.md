@@ -19,7 +19,7 @@ extensions = [
 ]
 ```
 
-`doctools` 提供一个新的 `mdx` 输出格式，生成 [MDX] (Markdown + MDX) 文件。
+`doctools` 提供一个新的 `mdx` 输出格式，生成 [MDX] (Markdown + JSX) 文件。
 
 [MDX]: https://mdxjs.com/
 
