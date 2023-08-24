@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-plugin-search",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Better search for Dumi",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-plugin-search",

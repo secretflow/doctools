@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-mdx-loader-core",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Use proper .mdx files in Dumi.",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-mdx-loader-core",
