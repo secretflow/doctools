@@ -35,6 +35,16 @@ jobs:
       - name: Authenticate with NPM
         run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
+      # Generate GitHub token for changesets/action
+      # Using https://github.com/secretflow/bot
+      # This allows changesets/action to create a release PR using the bot's identity
+      # Token goes into env. See action for details
+      - name: Generate GitHub token
+        uses: wow-actions/use-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
       - name: Create release PR or publish packages
         id: changesets
         uses: changesets/action@v1
@@ -48,6 +58,6 @@ jobs:
           # title of the release PR
           title: 'chore: release'
         env:
-          GITHUB_TOKEN: ${{ secrets.SF_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
           HATCH_INDEX_USER: __token__
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
