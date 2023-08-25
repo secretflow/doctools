@@ -43,6 +43,14 @@ module.exports = {
     // no sloppiness
     'no-console': ['error', { allow: ['error', 'warn'] }],
 
+    // security
+    'react/jsx-no-target-blank': [
+      'error',
+      {
+        allowReferrer: true,
+      },
+    ],
+
     // import rules and fixes
     '@typescript-eslint/consistent-type-imports': 'warn',
     'import/newline-after-import': 'warn',

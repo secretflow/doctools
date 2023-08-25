@@ -11,12 +11,12 @@ async function createConfig() {
   const remarkPlugins = [[gfm, { singleTilde: false }]];
 
   return {
-    title: 'SecretFlow 文档手册',
-    tagline: 'Docs are cool',
+    title: 'secretflow/doctools',
+    tagline: 'Documentation toolchain for SecretFlow',
     favicon: 'img/favicon.ico',
 
     // Set the production url of your site here
-    url: 'https://secretflow-docs.vercel.app',
+    url: 'https://secretflow-doctools.vercel.app',
     // Set the /<baseUrl>/ pathname under which your site is served
     // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: '/',
@@ -60,12 +60,11 @@ async function createConfig() {
       ({
         colorMode: {
           defaultMode: 'dark',
-          disableSwitch: true,
         },
         // Replace with your project's social card
         image: 'img/docusaurus-social-card.jpg',
         navbar: {
-          title: 'SecretFlow 文档手册',
+          title: 'secretflow/doctools',
           logo: {
             alt: 'Docs Logo',
             src: 'img/logo.svg',
@@ -73,15 +72,15 @@ async function createConfig() {
           items: [
             {
               type: 'docSidebar',
-              sidebarId: 'monorepo',
+              sidebarId: 'doctools',
               position: 'left',
-              label: 'Monorepo',
+              label: '开发',
             },
             {
-              type: 'docSidebar',
-              sidebarId: 'handbook',
-              position: 'left',
-              label: 'Handbook',
+              href: 'https://github.com/secretflow/doctools',
+              position: 'right',
+              className: 'header-github-link',
+              'aria-label': 'GitHub repository',
             },
           ],
         },

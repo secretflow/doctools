@@ -400,7 +400,7 @@ importers:
   packages/dumi-scaffolding:
     dependencies:
       '@secretflow/dumi-theme-sphinx-mdx':
-        specifier: workspace:latest
+        specifier: workspace:^
         version: link:../dumi-theme-sphinx-mdx
       '@types/react':
         specifier: ^18.2.15
