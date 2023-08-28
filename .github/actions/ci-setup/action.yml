@@ -56,6 +56,7 @@ runs:
           cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}
           cache-nx-${{ github.ref }}-${{ runner.os }}
           cache-nx-${{ github.ref }}
+          cache-nx
 
     - name: Setup projects
       shell: bash

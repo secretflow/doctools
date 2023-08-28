@@ -33,6 +33,7 @@ jobs:
           job-name: 'lint'
 
       - name: Lint
+        # Same as package.json:scripts.lint
         run: |
           pnpm exec nx affected \
             -t lint:prettier \
