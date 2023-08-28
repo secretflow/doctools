@@ -58,7 +58,7 @@ tqdm==4.66.1
 twisted==22.10.0
 typing-extensions==4.7.1
 urllib3==1.26.16
-watchfiles==0.19.0
+watchfiles==0.20.0
 zipp==3.16.2
 zope-interface==6.0
 # The following packages are considered to be unsafe in a requirements file:
