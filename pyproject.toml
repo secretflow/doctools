@@ -21,7 +21,7 @@ dependencies = [
   "urllib3<2.0.0",              # urllib3>=2.0.0 breaks requests-unixsocket
   "requests>=2.31.0",
   "requests-unixsocket>=0.3.0",
-  "watchfiles>=0.19.0",
+  "watchfiles>=0.20.0",
   "pathspec>=0.11.1",
 ]
 description = "Documentation toolchain for SecretFlow"
@@ -44,7 +44,6 @@ dev-dependencies = [
   "hatch>=1.7.0",
   "ipython>=8.12.2",
   "myst-parser~=2.0.0",
-  "pytest-watch>=4.2.0",
   "pytest>=7.4.0",
   "ruff>=0.0.284",
   "sphinx-autobuild>=2021.3.14",

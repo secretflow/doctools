@@ -4,6 +4,9 @@ from typing import List, Tuple
 import pytest
 from sphinx.testing.path import path
 
+IGNORED_FILES = {"objects.inv", ".buildinfo"}
+IGNORED_EXTENSIONS = {".pickle", ".doctree"}
+
 
 def parametrize_test_projects(root: Path):
     """Parametrize a test function with all test projects in a directory."""
@@ -19,7 +22,11 @@ def parametrize_test_projects(root: Path):
         source_dir = rootdir / f"test-{testroot}"
         expect_dir = source_dir / "expect"
         for sample_path in expect_dir.glob("**/*"):
-            if sample_path.is_dir():
+            if (
+                sample_path.is_dir()
+                or sample_path.name in IGNORED_FILES
+                or sample_path.suffix in IGNORED_EXTENSIONS
+            ):
                 continue
             expect_file = sample_path.relative_to(expect_dir)
             parameters.append((testroot, expect_file))

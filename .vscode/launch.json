@@ -37,24 +37,6 @@
   ],
   "configurations": [
     {
-      "name": "doctools: sphinx-build",
-      "type": "python",
-      "request": "launch",
-      "module": "sphinx",
-      "args": [
-        "-T",
-        "-E",
-        "-D",
-        "language=${input:sphinxBuildLanguage}",
-        "-b",
-        "${input:sphinxBuildFormat}",
-        "${input:sphinxBuildSource}",
-        "${input:sphinxBuildTarget}/${input:sphinxBuildFormat}"
-      ],
-      "cwd": "${workspaceFolder}/pyproject/docs",
-      "justMyCode": false
-    },
-    {
       "name": "doctools: pytest",
       "type": "python",
       "request": "launch",

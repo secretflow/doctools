@@ -17,9 +17,13 @@ pnpm-lock.yaml
 **/*_pb.ts
 **/*_connect.ts
 
-**/tests/**/*.md
-**/tests/**/*.mdx
-**/packages/dumi-scaffolding/docs/**/*
+# sphinx_mdx tests
+**/tests/**/expect/**/*.md
+**/tests/**/expect/**/*.mdx
+
+# other vendored docs, mostly for demo / local development
+**/vendor/**/*.md
+**/vendor/**/*.mdx
 
 # symlinks
 .github/pull_request_template.md
