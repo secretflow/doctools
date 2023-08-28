@@ -32,7 +32,10 @@ jobs:
         with:
           job-name: 'lint'
 
+      - run: node .github/workflows/octokit-debug.js
+
       - name: Lint
+        # Same as package.json:scripts.lint
         run: |
           pnpm exec nx affected \
             -t lint:prettier \
