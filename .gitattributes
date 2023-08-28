@@ -44,3 +44,10 @@
 *.7z binary
 *.tar.gz binary
 *.tgz binary
+
+# ===
+# Linguist overrides
+# https://github.com/github-linguist/linguist/blob/master/docs/overrides.md
+# ===
+
+*.mdx linguist-documentation
