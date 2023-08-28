@@ -32,10 +32,6 @@ jobs:
         with:
           job-name: 'lint'
 
-      - run: |
-          pnpm install -w @actions/github
-          node .github/workflows/octokit-debug.js
-
       - name: Lint
         # Same as package.json:scripts.lint
         run: |

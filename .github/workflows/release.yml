@@ -32,6 +32,10 @@ jobs:
 
       - uses: ./.github/actions/ci-setup
 
+      - run: |
+          pnpm install -w @actions/github
+          node -e "const github = require('@actions/github'); console.log(github.context.repo);"
+
       - name: Authenticate with NPM
         run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
