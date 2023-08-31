@@ -38,6 +38,7 @@ def resolve_sitemap(
                         filepath=None,
                         external=ref,
                         title=title or ref,
+                        hidden=toctree.get("hidden"),
                     )
                     root.append(entry)
                     continue
@@ -51,7 +52,11 @@ def resolve_sitemap(
                 file = file.relative_to(pathfinder.output_root)
                 title = title or clean_astext(env.titles[ref])
 
-                entry = ContentEntry(filepath=str(file), title=title)
+                entry = ContentEntry(
+                    filepath=str(file),
+                    title=title,
+                    hidden=toctree.get("hidden"),
+                )
                 root.append(entry)
 
                 child = env.get_doctree(ref)
