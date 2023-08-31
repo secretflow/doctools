@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-theme-sphinx-mdx",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Dumi theme for SecretFlow's documentation.",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-theme-sphinx-mdx",
