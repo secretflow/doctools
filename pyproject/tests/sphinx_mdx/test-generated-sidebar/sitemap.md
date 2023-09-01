@@ -1,0 +1,5 @@
+```{toctree}
+
+index
+lorem
+```

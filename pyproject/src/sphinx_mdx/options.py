@@ -12,8 +12,6 @@ class MDXOptions(BaseModel):
     class Config:
         extra = Extra.allow
 
-    mdx_toctree_doc: str = "index"
-
     mdx_output_file_suffix: str = ".mdx"
     mdx_output_path_normalizer: Optional[Callable[[str], str]] = None
     mdx_assets_output_dir: Union[Path, str] = "_assets"

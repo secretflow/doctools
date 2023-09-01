@@ -18,8 +18,7 @@ pnpm-lock.yaml
 **/*_connect.ts
 
 # sphinx_mdx tests
-**/tests/**/expect/**/*.md
-**/tests/**/expect/**/*.mdx
+**/tests/**/expect/**/*
 
 # other vendored docs, mostly for demo / local development
 **/vendor/**/*.md

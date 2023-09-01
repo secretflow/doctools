@@ -1,0 +1,4 @@
+sidebar:
+  - {id: index.mdx, label: Hidden toctree, type: doc}
+  - {id: lorem.mdx, label: Lorem ipsum, type: doc}
+version: '1'

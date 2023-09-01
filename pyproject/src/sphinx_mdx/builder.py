@@ -5,26 +5,34 @@ import shutil
 from datetime import datetime
 from os import path
 from pathlib import Path
-from typing import Iterator, Optional, Set, Union
+from typing import Iterator, Literal, Optional, Set, Union
 
 from docutils import nodes
+from pydantic import BaseModel
+from ruamel.yaml import YAML
 from sphinx import addnodes
 from sphinx.application import Sphinx
 from sphinx.builders import Builder
 from sphinx.builders.html import INVENTORY_FILENAME, BuildInfo
 from sphinx.environment import BuildEnvironment
 from sphinx.locale import __
-from sphinx.util import logging
 from sphinx.util.display import progress_message, status_iterator
 from sphinx.util.inventory import InventoryFile
 
 from .mdserver.client import MarkdownClient
 from .options import parse_options
 from .pathfinding import Pathfinder, StaticFiles
-from .toctree import resolve_sitemap
+from .sidebar import Sidebar, generate_sidebar
 from .translator import MDXTranslator
+from .utils.logging import get_logger
 
-logger = logging.getLogger(__name__)
+yaml = YAML(typ="safe", pure=True)
+yaml.indent(mapping=2, sequence=4, offset=2)
+
+
+class Manifest(BaseModel):
+    version: Literal["1"] = "1"
+    sidebar: Sidebar
 
 
 def ensure_parent(path: Union[Path, str]) -> None:
@@ -62,6 +70,8 @@ class MDXBuilder(Builder):
     """
 
     file_extension = ".mdx"
+
+    logger = get_logger(__name__)
 
     def __init__(self, app: Sphinx, env: BuildEnvironment) -> None:
         super().__init__(app, env)
@@ -107,18 +117,18 @@ class MDXBuilder(Builder):
             with open(self.build_info_path, encoding="utf-8") as fp:
                 buildinfo = BuildInfo.load(fp)
             if self.build_info != buildinfo:
-                logger.debug("[build target] did not match: build_info ")
+                self.logger.debug("[build target] did not match: build_info ")
                 yield from self.env.found_docs
                 return
         except ValueError as exc:
-            logger.warning(__("Failed to read build info file: %r"), exc)
+            self.logger.warning(__("Failed to read build info file: %r"), exc)
         except OSError:
             # ignore errors on reading
             pass
 
         for docname in self.env.found_docs:
             if docname not in self.env.all_docs:
-                logger.debug("[build target] not in env: %r", docname)
+                self.logger.debug("[build target] not in env: %r", docname)
                 yield docname
                 continue
             output_path = self.pathfinder.get_output_path(docname)
@@ -129,7 +139,7 @@ class MDXBuilder(Builder):
             try:
                 source_mtime = path.getmtime(self.env.doc2path(docname))
                 if source_mtime > output_mtime:
-                    logger.debug(
+                    self.logger.debug(
                         "[build target] target %r (%s), docname %r (%s)",
                         output_mtime,
                         datetime.utcfromtimestamp(output_mtime),
@@ -173,12 +183,6 @@ class MDXBuilder(Builder):
         )
         doctree.walkabout(translator)
 
-        if docname == self.config.master_doc:
-            sitemap = self.build_sitemap()
-            translator.metadata["sitemap"] = [
-                tree.dict(exclude_none=True) for tree in sitemap
-            ]
-
         output_path.write_text(translator.export())
 
     def copy_assets(self) -> None:
@@ -186,26 +190,35 @@ class MDXBuilder(Builder):
             ensure_parent(dst)
             shutil.copy(src, dst)
 
-    def build_sitemap(self):
-        sitemap_docname = self.options.mdx_toctree_doc or self.config.master_doc
-        doctree = self.env.get_doctree(sitemap_docname)
-        return resolve_sitemap(doctree, self.pathfinder, self.env)
-
     @progress_message(__("dumping object inventory"))
     def dump_inventory(self) -> None:
         InventoryFile.dump(str(self.output_root / INVENTORY_FILENAME), self.env, self)
+
+    def write_manifest(self):
+        manifest_path = self.output_root / "manifest.yml"
+
+        # Generate sidebar
+        sidebar_docname = self.config.root_doc
+        doctree = self.env.get_doctree(sidebar_docname)
+        sidebar = generate_sidebar(doctree, self.pathfinder, self.env)
+
+        manifest = Manifest(sidebar=sidebar)
+
+        with open(manifest_path, "w+") as f:
+            yaml.dump(manifest.dict(exclude_none=True), f)
 
     def write_buildinfo(self) -> None:
         try:
             with open(self.build_info_path, "w", encoding="utf-8") as fp:
                 self.build_info.dump(fp)
         except OSError as exc:
-            logger.warning(__("Failed to write build info file: %r"), exc)
+            self.logger.warning(__("Failed to write build info file: %r"), exc)
 
     def finish(self):
         self.finish_tasks.add_task(self.copy_assets)
         self.finish_tasks.add_task(self.dump_inventory)
         self.finish_tasks.add_task(self.write_buildinfo)
+        self.finish_tasks.add_task(self.write_manifest)
 
     def cleanup(self) -> None:
         self.mdclient.stop()
