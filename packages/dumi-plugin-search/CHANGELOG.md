@@ -1,5 +1,16 @@
 # @secretflow/dumi-plugin-search
 
+## 0.2.0
+
+### Minor Changes
+
+- 462f3b0: Sphinx docs manifest.yml version 1 (Sphinx toctrees)
+
+### Patch Changes
+
+- Updated dependencies [462f3b0]
+  - @secretflow/unified-toolkit@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes

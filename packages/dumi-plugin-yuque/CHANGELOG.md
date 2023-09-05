@@ -1,5 +1,13 @@
 # @secretflow/dumi-plugin-yuque
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [462f3b0]
+  - @secretflow/dumi-mdx-loader-core@0.2.0
+  - @secretflow/unified-toolkit@0.2.0
+
 ## 0.1.1
 
 ### Patch Changes

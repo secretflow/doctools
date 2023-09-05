@@ -1,5 +1,11 @@
 # @secretflow/unified-toolkit
 
+## 0.2.0
+
+### Minor Changes
+
+- 462f3b0: Sphinx docs manifest.yml version 1 (Sphinx toctrees)
+
 ## 0.1.1
 
 ### Patch Changes
