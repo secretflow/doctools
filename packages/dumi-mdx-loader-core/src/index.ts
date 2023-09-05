@@ -18,3 +18,4 @@ export function mdxLoader(api: DumiAPI): (options: () => WebpackOptions) => void
 }
 
 export type { Pipeline } from './loader.js';
+export { normalizedDocDirs } from './utils.js';

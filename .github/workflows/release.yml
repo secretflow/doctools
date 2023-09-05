@@ -2,11 +2,8 @@
 name: 'Code: Release'
 
 on:
-  workflow_run:
-    workflows: ['Code: CI']
+  push:
     branches: ['main']
-    types:
-      - completed
 
 permissions: {}
 

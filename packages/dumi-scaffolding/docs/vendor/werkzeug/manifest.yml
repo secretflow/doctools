@@ -1,0 +1,46 @@
+sidebar:
+  - {id: installation.mdx, label: Installation, type: doc}
+  - {id: tutorial.mdx, label: Werkzeug Tutorial, type: doc}
+  - {id: levels.mdx, label: API Levels, type: doc}
+  - {id: quickstart.mdx, label: Quickstart, type: doc}
+  - {id: serving.mdx, label: Serving WSGI Applications, type: doc}
+  - {id: test.mdx, label: Testing WSGI Applications, type: doc}
+  - {id: debug.mdx, label: Debugging Applications, type: doc}
+  - {id: wrappers.mdx, label: Request / Response Objects, type: doc}
+  - {id: routing.mdx, label: URL Routing, type: doc}
+  - {id: wsgi.mdx, label: WSGI Helpers, type: doc}
+  - {id: http.mdx, label: HTTP Utilities, type: doc}
+  - {id: datastructures.mdx, label: Data Structures, type: doc}
+  - {id: utils.mdx, label: Utilities, type: doc}
+  - {id: urls.mdx, label: URL Helpers, type: doc}
+  - {id: local.mdx, label: Context Locals, type: doc}
+  - items:
+      - {id: middleware/proxy_fix.mdx, label: X-Forwarded-For Proxy Fix, type: doc}
+      - {id: middleware/shared_data.mdx, label: Serve Shared Static Files, type: doc}
+      - {id: middleware/dispatcher.mdx, label: Application Dispatcher, type: doc}
+      - {id: middleware/http_proxy.mdx, label: Basic HTTP Proxy, type: doc}
+      - {id: middleware/lint.mdx, label: WSGI Protocol Linter, type: doc}
+      - {id: middleware/profiler.mdx, label: Application Profiler, type: doc}
+    label: Middleware
+    link: {id: middleware/index.mdx, label: Middleware, type: doc}
+    type: category
+  - {id: exceptions.mdx, label: HTTP Exceptions, type: doc}
+  - items:
+      - {id: deployment/gunicorn.mdx, label: Gunicorn, type: doc}
+      - {id: deployment/waitress.mdx, label: Waitress, type: doc}
+      - {id: deployment/mod_wsgi.mdx, label: mod_wsgi, type: doc}
+      - {id: deployment/uwsgi.mdx, label: uWSGI, type: doc}
+      - {id: deployment/gevent.mdx, label: gevent, type: doc}
+      - {id: deployment/eventlet.mdx, label: eventlet, type: doc}
+      - {id: deployment/proxy_fix.mdx, label: Tell Werkzeug it is Behind a Proxy,
+        type: doc}
+      - {id: deployment/nginx.mdx, label: nginx, type: doc}
+      - {id: deployment/apache-httpd.mdx, label: Apache httpd, type: doc}
+    label: Deploying to Production
+    link: {id: deployment/index.mdx, label: Deploying to Production, type: doc}
+    type: category
+  - {id: terms.mdx, label: Important Terms, type: doc}
+  - {id: request_data.mdx, label: Dealing with Request Data, type: doc}
+  - {id: license.mdx, label: BSD-3-Clause License, type: doc}
+  - {id: changes.mdx, label: Changes, type: doc}
+version: '1'

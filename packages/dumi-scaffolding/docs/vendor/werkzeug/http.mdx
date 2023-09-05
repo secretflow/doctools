@@ -55,7 +55,7 @@ naive.
         </dt>
 
         <dd className="field-body">
-          [<em>datetime</em>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)") | None
+          datetime | None
         </dd>
       </dl>
     </FieldList>
@@ -87,7 +87,7 @@ naive.
         </dt>
 
         <dd className="field-body">
-          <Outline.ParameterTarget>timestamp</Outline.ParameterTarget> ([<em>datetime</em>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<em> | </em>[<em>date</em>](https://docs.python.org/3/library/datetime.html#datetime.date "(in Python v3.11)")<em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em>[<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em>[<em>struct\_time</em>](https://docs.python.org/3/library/time.html#time.struct_time "(in Python v3.11)")<em> | </em><em>None</em>) – The datetime or timestamp to format. Defaults to
+          <Outline.ParameterTarget>timestamp</Outline.ParameterTarget> (<em>datetime</em><em> | </em><em>date</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em>[<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>struct\_time</em><em> | </em><em>None</em>) – The datetime or timestamp to format. Defaults to
           the current time.
         </dd>
 
@@ -249,7 +249,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
 
         <dd className="field-body">
           - <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – a set header to be parsed.
-          - <Outline.ParameterTarget>on\_update</Outline.ParameterTarget> ([<em>Callable</em>](https://docs.python.org/3/library/typing.html#typing.Callable "(in Python v3.11)")<em>\[</em><em>\[</em>[<em>HeaderSet</em>](datastructures.mdx#werkzeug.datastructures.HeaderSet "werkzeug.datastructures.structures.HeaderSet")<em>]</em><em>, </em><em>None</em><em>] </em><em>| </em><em>None</em>) – an optional callable that is called every time a
+          - <Outline.ParameterTarget>on\_update</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>ds.HeaderSet</em><em>]</em><em>, </em><em>None</em><em>] </em><em>| </em><em>None</em>) – an optional callable that is called every time a
             value on the [`HeaderSet`](datastructures.mdx#werkzeug.datastructures.HeaderSet "werkzeug.datastructures.HeaderSet")
             object is changed.
         </dd>
@@ -267,7 +267,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
         </dt>
 
         <dd className="field-body">
-          [<em>HeaderSet</em>](datastructures.mdx#werkzeug.datastructures.HeaderSet "werkzeug.datastructures.structures.HeaderSet")
+          ds.HeaderSet
         </dd>
       </dl>
     </FieldList>
@@ -497,7 +497,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
         </dt>
 
         <dd className="field-body">
-          [<em>IfRange</em>](datastructures.mdx#werkzeug.datastructures.IfRange "werkzeug.datastructures.range.IfRange")
+          ds.IfRange
         </dd>
       </dl>
     </FieldList>
@@ -535,7 +535,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
         </dt>
 
         <dd className="field-body">
-          [<em>Range</em>](datastructures.mdx#werkzeug.datastructures.Range "werkzeug.datastructures.range.Range") | None
+          ds.Range | None
         </dd>
       </dl>
     </FieldList>
@@ -564,7 +564,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
 
         <dd className="field-body">
           - <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – a content range header to be parsed.
-          - <Outline.ParameterTarget>on\_update</Outline.ParameterTarget> ([<em>Callable</em>](https://docs.python.org/3/library/typing.html#typing.Callable "(in Python v3.11)")<em>\[</em><em>\[</em>[<em>ContentRange</em>](datastructures.mdx#werkzeug.datastructures.ContentRange "werkzeug.datastructures.range.ContentRange")<em>]</em><em>, </em><em>None</em><em>] </em><em>| </em><em>None</em>) – an optional callable that is called every time a value
+          - <Outline.ParameterTarget>on\_update</Outline.ParameterTarget> (<em>t.Callable</em><em>\[</em><em>\[</em><em>ds.ContentRange</em><em>]</em><em>, </em><em>None</em><em>] </em><em>| </em><em>None</em>) – an optional callable that is called every time a value
             on the [`ContentRange`](datastructures.mdx#werkzeug.datastructures.ContentRange "werkzeug.datastructures.ContentRange")
             object is changed.
         </dd>
@@ -574,7 +574,7 @@ by [<strong>RFC 2616</strong>](https://datatracker.ietf.org/doc/html/rfc2616.htm
         </dt>
 
         <dd className="field-body">
-          [<em>ContentRange</em>](datastructures.mdx#werkzeug.datastructures.ContentRange "werkzeug.datastructures.range.ContentRange") | None
+          ds.ContentRange | None
         </dd>
       </dl>
     </FieldList>
@@ -697,8 +697,8 @@ strings from the parsed data.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.headers.Headers")<em> | </em>[<em>list</em>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")<em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – a list or `Headers` object.
-          - <Outline.ParameterTarget>allowed</Outline.ParameterTarget> ([<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – a list of headers that should still be allowed even though
+          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> (<em>ds.Headers</em><em> | </em>[<em>list</em>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")<em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – a list or `Headers` object.
+          - <Outline.ParameterTarget>allowed</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em>) – a list of headers that should still be allowed even though
             they are entity headers.
         </dd>
 
@@ -734,7 +734,7 @@ strings from the parsed data.
         </dt>
 
         <dd className="field-body">
-          <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.headers.Headers")<em> | </em>[<em>list</em>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")<em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – a list or `Headers` object.
+          <Outline.ParameterTarget>headers</Outline.ParameterTarget> (<em>ds.Headers</em><em> | </em>[<em>list</em>](https://docs.python.org/3/library/stdtypes.html#list "(in Python v3.11)")<em>\[</em>[<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>]</em><em>]</em>) – a list or `Headers` object.
         </dd>
 
         <dt className="field-name">
@@ -909,7 +909,7 @@ strings from the parsed data.
         </dt>
 
         <dd className="field-body">
-          <Outline.ParameterTarget>iterable</Outline.ParameterTarget> ([<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>] </em><em>| </em>[<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>Any</em>](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.11)")<em>]</em>) – The items to create a header from.
+          <Outline.ParameterTarget>iterable</Outline.ParameterTarget> ([<em>dict</em>](https://docs.python.org/3/library/stdtypes.html#dict "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>, </em><em>t.Any</em><em>] </em><em>| </em><em>t.Iterable</em><em>\[</em><em>t.Any</em><em>]</em>) – The items to create a header from.
         </dd>
 
         <dt className="field-name">
@@ -1011,11 +1011,11 @@ strings from the parsed data.
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>max\_age</Outline.ParameterTarget> ([<em>timedelta</em>](https://docs.python.org/3/library/datetime.html#datetime.timedelta "(in Python v3.11)")<em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – should be a number of seconds, or <cite>None</cite> (default) if
+          - <Outline.ParameterTarget>max\_age</Outline.ParameterTarget> (<em>timedelta</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) – should be a number of seconds, or <cite>None</cite> (default) if
             the cookie should last only as long as the client’s
             browser session.  Additionally <cite>timedelta</cite> objects
             are accepted, too.
-          - <Outline.ParameterTarget>expires</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em>[<em>datetime</em>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em>[<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – should be a <cite>datetime</cite> object or unix timestamp.
+          - <Outline.ParameterTarget>expires</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>datetime</em><em> | </em>[<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em>[<em>float</em>](https://docs.python.org/3/library/functions.html#float "(in Python v3.11)")<em> | </em><em>None</em>) – should be a <cite>datetime</cite> object or unix timestamp.
           - <Outline.ParameterTarget>path</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – limits the cookie to a given path, per default it will
             span the whole domain.
           - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em> | </em><em>None</em>) – Use this if you want to set a cross-domain cookie. For
@@ -1112,7 +1112,7 @@ For conditional responses the following functions might be useful:
         </dt>
 
         <dd className="field-body">
-          [<em>ETags</em>](datastructures.mdx#werkzeug.datastructures.ETags "werkzeug.datastructures.etag.ETags")
+          ds.ETags
         </dd>
       </dl>
     </FieldList>
@@ -1188,7 +1188,7 @@ For conditional responses the following functions might be useful:
         </dt>
 
         <dd className="field-body">
-          [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")] | [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[None, None]
+          [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)"), [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")] | [tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")\[(None, None)]
         </dd>
       </dl>
     </FieldList>

@@ -20,9 +20,8 @@ pnpm-lock.yaml
 # sphinx_mdx tests
 **/tests/**/expect/**/*
 
-# other vendored docs, mostly for demo / local development
-**/vendor/**/*.md
-**/vendor/**/*.mdx
+# vendored files
+**/vendor/**
 
 # symlinks
 .github/pull_request_template.md

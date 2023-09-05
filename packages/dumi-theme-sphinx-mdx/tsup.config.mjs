@@ -1,7 +1,7 @@
 // @ts-check
-import createOptions, { emitDeclarations } from 'tsup-utils';
 import { globbySync } from 'globby';
 import { defineConfig } from 'tsup';
+import createOptions, { emitDeclarations } from 'tsup-utils';
 
 // TODO: Explain the whole ESM/CJS saga
 
@@ -14,6 +14,7 @@ export default defineConfig((options) => [
       './src/{builtins,layouts,slots}/*/index.{ts,tsx,mts,mtsx}',
       './src/locales/*.json',
     ]),
+    external: [/^@@\//],
     format: ['esm'],
     loader: {
       '.json': 'copy',
@@ -24,7 +25,6 @@ export default defineConfig((options) => [
   {
     ...createOptions(options),
     entry: globbySync(['./src/plugin/index.cts', './src/plugin/package.json']),
-    external: [/\.\/bundled/],
     outDir: './dist/plugin',
     format: ['cjs'],
     loader: {

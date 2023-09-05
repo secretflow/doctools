@@ -4,16 +4,8 @@ import type { IApi as DumiAPI, IRoute } from 'dumi';
 import { globbySync } from 'globby';
 import pluralize from 'pluralize';
 
-import { extensionTest } from './utils.js';
-
-type DocDirConfig = DumiAPI['config']['resolve']['docDirs'][number];
-
-type NormalizedDocDirConfig = Exclude<DocDirConfig, string>;
-
-// from Dumi
-function normalizeDocDir(docDir: DocDirConfig): NormalizedDocDirConfig {
-  return typeof docDir === 'object' ? docDir : { dir: docDir };
-}
+import type { DocDirConfig } from './utils.js';
+import { extensionTest, normalizedDocDirs } from './utils.js';
 
 type Options = {
   cwd: string;
@@ -48,7 +40,7 @@ export function findDocs(options: () => Options): RouteModifier {
 
     const updated = { ...routes };
 
-    const docDirs = dirs.map(normalizeDocDir);
+    const docDirs = normalizedDocDirs(dirs);
 
     docDirs.forEach(({ type, dir }) => {
       const base = path.join(cwd, dir);
