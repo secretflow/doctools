@@ -1,43 +1,17 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
+import { normalizedDocDirs } from '@secretflow/dumi-mdx-loader-core';
 import type { IApi as DumiAPI, IRoute } from 'dumi';
+import { globby } from 'globby';
 import YAML from 'yaml';
-import zod from 'zod';
 
-import { THEME_KEY } from './index.cjs';
+import { THEME_KEY } from '../index.cjs';
 
-const SidebarItemDoc = zod.object({
-  type: zod.literal('doc'),
-  id: zod.string(),
-  label: zod.string(),
-});
+import type { Sidebar, SidebarItemDoc } from './schema.mjs';
+import { Manifest } from './schema.mjs';
 
-const SidebarItemLink = zod.object({
-  type: zod.literal('link'),
-  href: zod.string(),
-  label: zod.string(),
-});
-
-const SidebarItemCategory = zod.object({
-  type: zod.literal('category'),
-  label: zod.string(),
-  items: zod.array(SidebarItemDoc.or(SidebarItemLink)),
-  link: SidebarItemDoc.or(zod.null()).optional().default(null),
-});
-
-const SidebarItem = SidebarItemDoc.or(SidebarItemLink).or(SidebarItemCategory);
-
-const Sidebar = zod.array(SidebarItem);
-
-type Sidebar = zod.infer<typeof Sidebar>;
-
-const Manifest = zod.object({
-  version: zod.literal('1'),
-  sidebar: Sidebar,
-});
-
-export type Manifest = zod.infer<typeof Manifest>;
+import { randstring } from '~/internals/utils/string.js';
 
 type RuntimeSidebarItem = {
   key: string;
@@ -51,10 +25,6 @@ export type RuntimeSidebar = RuntimeSidebarItem[];
 export type RuntimeManifest = { sidebar: RuntimeSidebar };
 
 export async function manifestPlugin(api: DumiAPI) {
-  const { normalizedDocDirs } = await import('@secretflow/dumi-mdx-loader-core');
-  const { globby } = await import('globby');
-  const { randstring } = await import('~/internals/utils/string.js');
-
   api.onGenerateFiles(async () => {
     const docDirs = normalizedDocDirs(api.config.resolve.docDirs);
     const routes: Record<string, IRoute> = api.appData['routes'];
@@ -83,7 +53,7 @@ export async function manifestPlugin(api: DumiAPI) {
               const indexPath = rootRoute.absPath;
               const sourceDir = path.dirname(rootRoute.file);
 
-              const resolveRoute = (item: zod.infer<typeof SidebarItemDoc>) => {
+              const resolveRoute = (item: SidebarItemDoc) => {
                 const targetRoute = Object.values(routes).find(
                   (r) => r.file === path.join(sourceDir, item.id),
                 );

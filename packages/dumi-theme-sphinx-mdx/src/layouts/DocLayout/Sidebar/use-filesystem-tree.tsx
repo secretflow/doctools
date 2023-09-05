@@ -2,7 +2,7 @@ import { Tooltip } from 'antd';
 import { useFullSidebarData as useDumiSidebarData } from 'dumi';
 import { useMemo } from 'react';
 
-import type { RuntimeSidebar } from '~/plugin/manifest.cjs';
+import type { RuntimeSidebar } from '~/plugin/manifest/index.mjs';
 
 /**
  * Generate sidebar items from Dumi routes
