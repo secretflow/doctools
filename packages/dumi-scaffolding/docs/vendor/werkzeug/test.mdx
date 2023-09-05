@@ -167,7 +167,7 @@ The test client responses make this available through
             </dt>
 
             <dd className="field-body">
-              [<em>Cookie</em>](#werkzeug.test.Cookie "werkzeug.test.Cookie") | None
+              [Cookie](#werkzeug.test.Cookie "werkzeug.test.Cookie") | None
             </dd>
           </dl>
         </FieldList>
@@ -632,11 +632,11 @@ The test client responses make this available through
         </dt>
 
         <dd className="field-body">
-          - <Outline.ParameterTarget>response</Outline.ParameterTarget> ([<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")<em>] </em><em>| </em>[<em>Iterable</em>](https://docs.python.org/3/library/typing.html#typing.Iterable "(in Python v3.11)")<em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) –&#x20;
+          - <Outline.ParameterTarget>response</Outline.ParameterTarget> (<em>t.Iterable</em><em>\[</em>[<em>bytes</em>](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<em>]</em>) –&#x20;
           - <Outline.ParameterTarget>status</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.headers.Headers")) –&#x20;
-          - <Outline.ParameterTarget>request</Outline.ParameterTarget> ([<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")) –&#x20;
-          - <Outline.ParameterTarget>history</Outline.ParameterTarget> ([<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>werkzeug.test.TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<em>, </em><em>...</em><em>]</em>) –&#x20;
+          - <Outline.ParameterTarget>headers</Outline.ParameterTarget> ([<em>Headers</em>](datastructures.mdx#werkzeug.datastructures.Headers "werkzeug.datastructures.Headers")) –&#x20;
+          - <Outline.ParameterTarget>request</Outline.ParameterTarget> ([<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.Request")) –&#x20;
+          - <Outline.ParameterTarget>history</Outline.ParameterTarget> ([<em>tuple</em>](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<em>\[</em>[<em>TestResponse</em>](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<em>]</em>) –&#x20;
           - <Outline.ParameterTarget>kwargs</Outline.ParameterTarget> (<em>t.Any</em>) –&#x20;
         </dd>
       </dl>
@@ -654,7 +654,7 @@ The test client responses make this available through
 
     <Outline domain="py" objectType="attribute" target={"werkzeug.test.TestResponse.request"} module={"werkzeug.test"} fullname={"TestResponse.request"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"A request object with the environ used to make the request that\nresulted in this response."}>
       <Outline.Signature fullname="TestResponse.request" id="werkzeug.test.TestResponse.request">
-        <Outline.Name>request</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[Request](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")</Outline.Keyword>
+        <Outline.Name>request</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[Request](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.Request")</Outline.Keyword>
       </Outline.Signature>
 
       <Outline.Content>
@@ -665,7 +665,7 @@ The test client responses make this available through
 
     <Outline domain="py" objectType="attribute" target={"werkzeug.test.TestResponse.history"} module={"werkzeug.test"} fullname={"TestResponse.history"} parameters={["response", "status", "headers", "request", "history", "kwargs"]} description={"A list of intermediate responses. Populated when the test request\nis made with follow_redirects enabled."}>
       <Outline.Signature fullname="TestResponse.history" id="werkzeug.test.TestResponse.history">
-        <Outline.Name>history</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[werkzeug.test.TestResponse](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<span>,</span><span>{" "}</span><span>...</span><span>]</span></Outline.Keyword>
+        <Outline.Name>history</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[tuple](https://docs.python.org/3/library/stdtypes.html#tuple "(in Python v3.11)")<span>\[</span>[TestResponse](#werkzeug.test.TestResponse "werkzeug.test.TestResponse")<span>,</span><span>{" "}</span><span>...</span><span>]</span></Outline.Keyword>
       </Outline.Signature>
 
       <Outline.Content>
@@ -717,7 +717,7 @@ The test client responses make this available through
           - <Outline.ParameterTarget>value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
           - <Outline.ParameterTarget>decoded\_key</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
           - <Outline.ParameterTarget>decoded\_value</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
-          - <Outline.ParameterTarget>expires</Outline.ParameterTarget> ([<em>datetime</em>](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
+          - <Outline.ParameterTarget>expires</Outline.ParameterTarget> (<em>datetime</em><em> | </em><em>None</em>) –&#x20;
           - <Outline.ParameterTarget>max\_age</Outline.ParameterTarget> ([<em>int</em>](https://docs.python.org/3/library/functions.html#int "(in Python v3.11)")<em> | </em><em>None</em>) –&#x20;
           - <Outline.ParameterTarget>domain</Outline.ParameterTarget> ([<em>str</em>](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.11)")) –&#x20;
           - <Outline.ParameterTarget>origin\_only</Outline.ParameterTarget> ([<em>bool</em>](https://docs.python.org/3/library/functions.html#bool "(in Python v3.11)")) –&#x20;
@@ -771,7 +771,7 @@ The test client responses make this available through
 
     <Outline domain="py" objectType="attribute" target={"werkzeug.test.Cookie.expires"} module={"werkzeug.test"} fullname={"Cookie.expires"} parameters={["key", "value", "decoded_key", "decoded_value", "expires", "max_age", "domain", "origin_only", "path", "secure", "http_only", "same_site"]} description={"The time at which the cookie is no longer valid."}>
       <Outline.Signature fullname="Cookie.expires" id="werkzeug.test.Cookie.expires">
-        <Outline.Name>expires</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[datetime](https://docs.python.org/3/library/datetime.html#datetime.datetime "(in Python v3.11)")<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+        <Outline.Name>expires</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>datetime<span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
       </Outline.Signature>
 
       <Outline.Content>
@@ -1145,7 +1145,7 @@ The test client responses make this available through
 
     <Outline domain="py" objectType="property" target={"werkzeug.test.EnvironBuilder.input_stream"} module={"werkzeug.test"} fullname={"EnvironBuilder.input_stream"} parameters={["path", "base_url", "query_string", "method", "input_stream", "content_type", "content_length", "errors_stream", "multithread", "multiprocess", "run_once", "headers", "data", "environ_base", "environ_overrides", "mimetype", "json", "auth"]} description={"An optional input stream. This is mutually exclusive with\nsetting form and files, setting it will clear\nthose. Do not provide this if the method is not POST or\nanother method that has a body."}>
       <Outline.Signature fullname="EnvironBuilder.input_stream" id="werkzeug.test.EnvironBuilder.input_stream">
-        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>input\_stream</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>[IO](https://docs.python.org/3/library/typing.html#typing.IO "(in Python v3.11)")<span>\[</span>[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
+        <Outline.Keyword>property<span>{" "}</span></Outline.Keyword><Outline.Name>input\_stream</Outline.Name><Outline.Keyword><span>:</span><span>{" "}</span>t.IO<span>\[</span>[bytes](https://docs.python.org/3/library/stdtypes.html#bytes "(in Python v3.11)")<span>]</span><span>{" "}</span><span>|</span><span>{" "}</span>[None](https://docs.python.org/3/library/constants.html#None "(in Python v3.11)")</Outline.Keyword>
       </Outline.Signature>
 
       <Outline.Content>
@@ -1265,7 +1265,7 @@ The test client responses make this available through
             </dt>
 
             <dd className="field-body">
-              <Outline.ParameterTarget>cls</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em>[<em>werkzeug.wrappers.request.Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")<em>] </em><em>| </em><em>None</em>) – The request wrapper to use.
+              <Outline.ParameterTarget>cls</Outline.ParameterTarget> ([<em>type</em>](https://docs.python.org/3/library/functions.html#type "(in Python v3.11)")<em>\[</em>[<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.Request")<em>] </em><em>| </em><em>None</em>) – The request wrapper to use.
             </dd>
 
             <dt className="field-name">
@@ -1273,7 +1273,7 @@ The test client responses make this available through
             </dt>
 
             <dd className="field-body">
-              [<em>Request</em>](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.request.Request")
+              [Request](wrappers.mdx#werkzeug.wrappers.Request "werkzeug.wrappers.Request")
             </dd>
           </dl>
         </FieldList>

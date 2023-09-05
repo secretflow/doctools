@@ -1,7 +1,7 @@
 // @ts-check
-import createOptions from 'tsup-utils';
 import { globbySync } from 'globby';
 import { defineConfig } from 'tsup';
+import createOptions from 'tsup-utils';
 
 export default defineConfig((overrides) => [
   {

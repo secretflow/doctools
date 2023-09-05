@@ -1,4 +1,3 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as url from 'node:url';
 
@@ -39,21 +38,12 @@ export function rehypeReactRouter(
   return async (tree, file) => {
     const pathMapping: Record<string, string> = {};
 
-    // FIXME:
-    // map routes[...].file to routes[...].absPath, resolving possible symlinks
-    await Promise.all(
-      Object.values(routes).map(async (route) => {
-        if (!route.file) {
-          return;
-        }
-        try {
-          const actualRouteFile = await fs.realpath(route.file);
-          pathMapping[actualRouteFile] = route.absPath;
-        } catch (e) {
-          pathMapping[route.file] = route.absPath;
-        }
-      }),
-    );
+    Object.values(routes).map(async (route) => {
+      if (!route.file) {
+        return;
+      }
+      pathMapping[route.file] = route.absPath;
+    });
 
     visit(
       tree,

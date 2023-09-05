@@ -2,16 +2,16 @@ import { Tooltip } from 'antd';
 import { useFullSidebarData as useDumiSidebarData } from 'dumi';
 import { useMemo } from 'react';
 
-import type { SidebarItem } from './typing.js';
+import type { RuntimeSidebar } from '~/plugin/manifest.cjs';
 
 /**
  * Generate sidebar items from Dumi routes
  */
-export function useFileSystemTree(): SidebarItem[] {
+export function useFileSystemTree(): RuntimeSidebar {
   const routes = useDumiSidebarData();
 
-  const tree = useMemo<SidebarItem[]>(() => {
-    const items: SidebarItem[] = [];
+  const tree = useMemo<RuntimeSidebar>(() => {
+    const items: RuntimeSidebar = [];
 
     Object.entries(routes).forEach(([prefix, groups]) => {
       const segments = prefix.slice(1).split('/');
@@ -22,7 +22,7 @@ export function useFileSystemTree(): SidebarItem[] {
         const path = '/' + segments.slice(0, idx + 1).join('/');
         const existing = parent.find((item) => item.key === path);
         if (existing) {
-          parent = existing.children;
+          parent = existing.children ?? [];
         } else {
           const subgroup = {
             key: path,

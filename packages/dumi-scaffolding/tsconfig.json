@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "paths": {
-      "@@/*": [".dumi/tmp/*"]
+      "@@/*": [".dumi/tmp/*", ".dumi/tmp-production/*"]
     }
   },
   "include": [".dumi/**/*", "plugins/**/*.ts", ".dumirc.ts"]

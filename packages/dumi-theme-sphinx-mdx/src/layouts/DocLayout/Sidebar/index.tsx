@@ -4,7 +4,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { useFileSystemTree } from './use-filesystem-tree.js';
-import { useTableOfContent } from './use-table-of-content.js';
+
+import { useNearestManifest } from '~/exports/manifest.js';
 
 const SidebarContainer = styled.div`
   display: flex;
@@ -38,12 +39,17 @@ const FlexTree = styled(Tree)`
 `;
 
 export const Sidebar = () => {
-  const [sidebarType, setSidebarType] = useState<'filesystem' | 'toctree'>(
-    'filesystem',
-  );
+  const [sidebarType, setSidebarType] = useState<'filesystem' | 'toctree'>('toctree');
 
   const fsTree = useFileSystemTree();
-  const tocTree = useTableOfContent();
+  const manifest = useNearestManifest();
+
+  let tree = fsTree;
+  if (sidebarType === 'toctree' && manifest) {
+    tree = [
+      { key: manifest.index, title: '(index)', children: manifest.manifest.sidebar },
+    ];
+  }
 
   return (
     <SidebarContainer>
@@ -61,8 +67,8 @@ export const Sidebar = () => {
         optionType="button"
         buttonStyle="solid"
         options={[
-          { label: 'File System', value: 'filesystem' },
           { label: 'Table of Content', value: 'toctree' },
+          { label: 'File System', value: 'filesystem' },
         ]}
       />
       <FlexTree
@@ -76,7 +82,7 @@ export const Sidebar = () => {
           }
           history.push(String(key));
         }}
-        treeData={sidebarType === 'filesystem' ? fsTree : tocTree}
+        treeData={tree}
         blockNode
         autoExpandParent
         defaultExpandAll
