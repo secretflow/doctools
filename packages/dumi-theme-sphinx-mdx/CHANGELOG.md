@@ -1,5 +1,11 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.2.2
+
+### Patch Changes
+
+- 3b96c16: Fix ESM stuff
+
 ## 0.2.1
 
 ### Patch Changes
