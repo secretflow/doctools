@@ -1,6 +1,6 @@
 // @ts-check
-import createOptions, { emitDeclarations } from 'tsup-utils';
 import { defineConfig } from 'tsup';
+import createOptions, { emitDeclarations } from 'tsup-utils';
 
 export default defineConfig((options) => [
   {

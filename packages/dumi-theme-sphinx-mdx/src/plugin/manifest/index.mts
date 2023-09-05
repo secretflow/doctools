@@ -6,7 +6,7 @@ import type { IApi as DumiAPI, IRoute } from 'dumi';
 import { globby } from 'globby';
 import YAML from 'yaml';
 
-import { THEME_KEY } from '../index.cjs';
+import { THEME_KEY } from '../index.mjs';
 
 import type { Sidebar, SidebarItemDoc } from './schema.mjs';
 import { Manifest } from './schema.mjs';

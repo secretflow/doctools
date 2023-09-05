@@ -24,7 +24,14 @@ export default defineConfig((options) => [
   },
   {
     ...createOptions(options),
+    entry: ['./src/plugin/index.mts'],
+    outDir: './dist/plugin',
+    format: ['esm'],
+  },
+  {
+    ...createOptions(options),
     entry: globbySync(['./src/plugin/index.cts', './src/plugin/package.json']),
+    external: ['./index.mjs'],
     outDir: './dist/plugin',
     format: ['cjs'],
     loader: {

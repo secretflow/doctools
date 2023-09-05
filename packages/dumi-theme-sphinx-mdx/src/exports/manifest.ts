@@ -1,7 +1,11 @@
 import { manifests } from '@@/plugin-sphinx-theme/manifest';
 import { useLocation } from 'dumi';
 
-export function useNearestManifest() {
+import type { RuntimeManifest } from '../plugin/manifest/index.mjs';
+
+export function useNearestManifest():
+  | { index: string; manifest: RuntimeManifest }
+  | undefined {
   const { pathname } = useLocation();
 
   const candidates = Object.keys(manifests).filter((path) => pathname.startsWith(path));
