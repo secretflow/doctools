@@ -1,5 +1,11 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.2.1
+
+### Patch Changes
+
+- f769232: Fix insufficient schema type
+
 ## 0.2.0
 
 ### Minor Changes
