@@ -12,7 +12,6 @@ jobs:
     # prevent this action from running on forks
     if: |
       github.repository == 'secretflow/doctools'
-      && github.event.workflow_run.conclusion == 'success'
 
     permissions:
       contents: write # to create release (changesets/action)
