@@ -1,5 +1,12 @@
 # dumi-scaffolding
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [f769232]
+  - @secretflow/dumi-theme-sphinx-mdx@0.2.1
+
 ## 0.1.0
 
 ### Minor Changes
