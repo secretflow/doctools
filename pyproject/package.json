@@ -4,12 +4,12 @@
   "private": true,
   "files": [],
   "scripts": {
-    "build": "python3 -m hatch clean && hatch build -t sdist -t wheel -t custom",
-    "test:pytest": "python3 -m pytest",
-    "lint:black": "python3 -m black --check src tests",
-    "lint:ruff": "python3 -m ruff check src tests",
-    "lint:pyright": "pyright src",
-    "release": "python3 -m hatch publish pyproject/dist"
+    "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel -t custom",
+    "test:pytest": "python -m pytest",
+    "lint:black": "python -m black --check src tests",
+    "lint:ruff": "python -m ruff check src tests",
+    "typecheck:pyright": "pyright src",
+    "release": "python -m hatch publish pyproject/dist"
   },
   "devDependencies": {
     "mdserver": "workspace:^"

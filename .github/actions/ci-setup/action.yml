@@ -10,10 +10,6 @@ inputs:
     description: 'Python version'
     required: false
     default: '3.8.x'
-  job-name:
-    description: 'Job name. Used to cache Nx results'
-    required: false
-    default: 'unknown-job'
 
 runs:
   using: 'composite'
@@ -49,15 +45,19 @@ runs:
         # Including SHA in the key causes a cache miss with every commit
         # This is desired because we want cache results to always be updated
         # while we will be using restore-keys to select the closest cache
-        key: cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.node-version }}-${{ inputs.job-name }}-${{ github.sha }}
+        key: cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.node-version }}-${{ github.sha }}
         restore-keys: |
-          cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.node-version }}-${{ inputs.job-name }}
+          cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.node-version }}
           cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}-${{ inputs.node-version }}
           cache-nx-${{ github.ref }}-${{ runner.os }}-${{ inputs.python-version }}
           cache-nx-${{ github.ref }}-${{ runner.os }}
           cache-nx-${{ github.ref }}
           cache-nx
 
-    - name: Setup projects
+    - name: Install Node dependencies
       shell: bash
-      run: pnpm bootstrap
+      run: pnpm install --frozen-lockfile
+
+    - name: Install Python dependencies
+      shell: bash
+      run: pip install -r requirements.lock -r requirements-dev.lock

@@ -37,7 +37,7 @@
     "dev": "tsup --watch",
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
-    "lint:tsc": "tsc --noEmit",
+    "typecheck:tsc": "tsc --noEmit",
     "release": "pnpm publish -r --filter ."
   },
   "dependencies": {

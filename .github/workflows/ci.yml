@@ -13,9 +13,13 @@ permissions:
   actions: read # required by nrwl/nx-set-shas
 
 jobs:
-  lint:
-    name: 'Lint'
+  ci-javascript:
+    name: 'CI: JavaScript'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['16.20.x']
     steps:
       - uses: actions/checkout@v3
         with:
@@ -24,67 +28,38 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'main'
-
       - uses: ./.github/actions/ci-setup
         with:
-          job-name: 'lint'
-
-      - name: Lint
-        # Same as package.json:scripts.lint
-        run: |
+          node-version: ${{ matrix.node-version }}
+      - run: |
           pnpm exec nx affected \
             -t lint:prettier \
             -t lint:eslint \
             -t lint:stylelint \
-            -t lint:tsc \
-            -t lint:black \
-            -t lint:ruff \
-            -t lint:pyright \
+            -t typecheck:tsc \
+            -t test:vitest
 
-  test-js:
-    name: 'Test JavaScript: Node ${{ matrix.node-version }}'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ['16.20.x']
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-
-      - uses: ./.github/actions/ci-setup
-        with:
-          job-name: 'test-js'
-          node-version: ${{ matrix.node-version }}
-
-      - name: Test
-        run: pnpm exec nx affected -t test:vitest
-
-  test-py:
-    name: 'Test Python: Python ${{ matrix.python-version }}'
+  ci-python:
+    name: 'CI: Python'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.8.x', '3.9.x', '3.10.x']
-
     steps:
       - uses: actions/checkout@v3
         with:
+          # fetch the full history for Nx to determine affected projects
           fetch-depth: 0
       - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'main'
-
       - uses: ./.github/actions/ci-setup
         with:
-          job-name: 'test-py'
           python-version: ${{ matrix.python-version }}
-
-      - name: Test
-        run: pnpm exec nx affected -t test:pytest
+      - run: |
+          pnpm exec nx affected \
+            -t lint:black \
+            -t lint:ruff \
+            -t test:pytest \
+            -t typecheck:pyright
