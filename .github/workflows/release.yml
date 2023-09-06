@@ -8,7 +8,7 @@ on:
 permissions: {}
 
 jobs:
-  release:
+  changesets:
     # prevent this action from running on forks
     if: |
       github.repository == 'secretflow/doctools'
@@ -17,16 +17,17 @@ jobs:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
 
-    name: Release
+    name: Changesets
     runs-on: ubuntu-latest
+
+    outputs:
+      should-release: ${{ steps.changesets.outputs.hasChangesets == 'false' }}
 
     steps:
       - uses: actions/checkout@v3
         with:
           # fetch the full history for changesets to generate changelog
           fetch-depth: 0
-
-      - uses: ./.github/actions/ci-setup
 
       # Generate GitHub token for changesets/action
       # Using https://github.com/secretflow/bot
@@ -46,7 +47,7 @@ jobs:
         uses: changesets/action@v1
         with:
           # run changeset version to consume all changesets and bump versions
-          version: pnpm run version
+          version: npx changeset version
           # publish with Nx. won't call changeset publish but does call changeset tag
           publish: echo 'No changesets. Will publish packages'
           # title of the release PR
@@ -58,18 +59,44 @@ jobs:
           # Comes from wow-actions/use-app-token
           GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
 
-      # hasChangesets == 'false' means will publish
-      - if: steps.changesets.outputs.hasChangesets == 'false'
-        name: CI
-        uses: ./.github/workflows/ci.yml
+  ci:
+    needs: [changesets]
+    if: |
+      needs.changesets.outputs.should-release == 'true'
 
-      - if: steps.changesets.outputs.hasChangesets == 'false'
-        name: Authenticate with NPM
+    permissions:
+      contents: write # to create tags
+
+    name: Prerelease CI
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: [ci]
+    if: |
+      needs.ci.result == 'success'
+
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/ci-setup
+
+      - name: Authenticate with NPM
         run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
-      - if: steps.changesets.outputs.hasChangesets == 'false'
-        name: Publish
+      - name: Generate GitHub token
+        uses: wow-actions/use-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Publish
         run: pnpm run release && pnpm exec changeset tag && git push --tags
         env:
+          GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
           HATCH_INDEX_USER: __token__ # For PyPI
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
