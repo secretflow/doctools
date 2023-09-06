@@ -28,9 +28,6 @@ jobs:
 
       - uses: ./.github/actions/ci-setup
 
-      - name: Authenticate with NPM
-        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-
       # Generate GitHub token for changesets/action
       # Using https://github.com/secretflow/bot
       # This allows changesets/action to create a release PR using the bot's identity
@@ -40,6 +37,9 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Authenticate with NPM
+        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
       - name: Create release PR or publish packages
         id: changesets

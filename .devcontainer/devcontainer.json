@@ -3,16 +3,22 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "containerUser": "vscode",
   "mounts": [
-    // https://github.com/pnpm/pnpm/issues/5803
     {
       "type": "volume",
       "source": "${localWorkspaceFolderBasename}-node_modules",
       "target": "${containerWorkspaceFolder}/node_modules"
+    },
+    {
+      "type": "volume",
+      "source": "${localWorkspaceFolderBasename}-virtualenv",
+      "target": "${containerWorkspaceFolder}/.venv"
     }
   ],
-  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/post-create.sh",
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+  "postCreateCommand": "${containerWorkspaceFolder}/.devcontainer/scripts/post-create.sh",
+  "waitFor": "postCreateCommand",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -21,14 +27,16 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "charliermarsh.ruff",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "stylelint.vscode-stylelint",
-        "streetsidesoftware.code-spell-checker",
+        "ms-azuretools.vscode-docker",
+        "ms-python.black-formatter",
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "charliermarsh.ruff",
-        "ms-python.black-formatter"
+        "streetsidesoftware.code-spell-checker",
+        "stylelint.vscode-stylelint",
+        "tamasfe.even-better-toml"
       ]
     }
   },

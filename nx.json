@@ -67,13 +67,7 @@
     "lint:prettier": {
       "inputs": [":default", ":prettier"]
     },
-    "lint:tsc": {
-      "inputs": [":default", ":tsc"]
-    },
     "lint:black": {
-      "inputs": [":python"]
-    },
-    "lint:pyright": {
       "inputs": [":python"]
     },
     "lint:ruff": {
@@ -84,6 +78,13 @@
     },
     "test:pytest": {
       "inputs": [":default", ":python"]
+    },
+    "typecheck:tsc": {
+      "inputs": [":default", ":tsc"],
+      "dependsOn": ["^build", "build"]
+    },
+    "typecheck:pyright": {
+      "inputs": [":python"]
     },
     "release": {
       "dependsOn": ["^build", "^release", "build"]
@@ -100,10 +101,10 @@
           "lint:eslint",
           "lint:stylelint",
           "lint:prettier",
-          "lint:tsc",
+          "typecheck:tsc",
           "lint:black",
           "lint:ruff",
-          "lint:pyright",
+          "typecheck:pyright",
           "lint",
           "test:vitest",
           "test:pytest",

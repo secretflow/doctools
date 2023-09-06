@@ -30,8 +30,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint:eslint": "eslint src",
-    "lint:tsc": "tsc --noEmit",
-    "test:vitest": "vitest",
+    "typecheck:tsc": "tsc --noEmit",
+    "test:vitest": "vitest run",
     "release": "pnpm publish -r --filter ."
   },
   "dependencies": {
