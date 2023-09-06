@@ -38,22 +38,38 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
 
-      - name: Authenticate with NPM
-        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-
-      - name: Create release PR or publish packages
+      - name: Determine if changesets exist
+        # If there are changesets, this step will create a release PR
+        # If there isn't any changeset, this step will do nothing
+        # Instead, later steps will run CI and publish
         id: changesets
         uses: changesets/action@v1
         with:
           # run changeset version to consume all changesets and bump versions
           version: pnpm run version
           # publish with Nx. won't call changeset publish but does call changeset tag
-          publish: pnpm run release && pnpm exec changeset tag
-          # commit message for the release commits
-          commit: 'chore: stage changes for next release'
+          publish: echo 'No changesets. Will publish packages'
           # title of the release PR
           title: 'chore: release'
+          # commit message for the release commits
+          commit: 'chore: stage changes for next release'
         env:
+          # For changesets/action to create a release PR
+          # Comes from wow-actions/use-app-token
           GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
-          HATCH_INDEX_USER: __token__
+
+      # hasChangesets == 'false' means will publish
+      - if: steps.changesets.outputs.hasChangesets == 'false'
+        name: CI
+        uses: ./.github/workflows/ci.yml
+
+      - if: steps.changesets.outputs.hasChangesets == 'false'
+        name: Authenticate with NPM
+        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+
+      - if: steps.changesets.outputs.hasChangesets == 'false'
+        name: Publish
+        run: pnpm run release && pnpm exec changeset tag && git push --tags
+        env:
+          HATCH_INDEX_USER: __token__ # For PyPI
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
