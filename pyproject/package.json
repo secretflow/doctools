@@ -5,7 +5,7 @@
   "files": [],
   "scripts": {
     "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel -t custom",
-    "test:pytest": "python -m pytest",
+    "test:pytest": "nx run mdserver:build && python -m pytest",
     "lint:black": "python -m black --check src tests",
     "lint:ruff": "python -m ruff check src tests",
     "typecheck:pyright": "pyright src",
