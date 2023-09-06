@@ -13,12 +13,12 @@ jobs:
     if: |
       github.repository == 'secretflow/doctools'
 
+    name: Changesets
+    runs-on: ubuntu-latest
+
     permissions:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
-
-    name: Changesets
-    runs-on: ubuntu-latest
 
     outputs:
       should-release: ${{ steps.changesets.outputs.hasChangesets == 'false' }}
@@ -64,12 +64,12 @@ jobs:
     if: |
       needs.changesets.outputs.should-release == 'true'
 
+    name: Prerelease CI
+    uses: ./.github/workflows/ci.yml
+
     permissions:
       contents: read
       actions: read
-
-    name: Prerelease CI
-    uses: ./.github/workflows/ci.yml
 
   release:
     needs: [ci]
@@ -78,6 +78,9 @@ jobs:
 
     name: Release
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # to create tags
 
     steps:
       - uses: actions/checkout@v3
@@ -89,15 +92,11 @@ jobs:
       - name: Authenticate with NPM
         run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
 
-      - name: Generate GitHub token
-        uses: wow-actions/use-app-token@v2
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-
       - name: Publish
-        run: pnpm run release && pnpm exec changeset tag && git push --tags
+        run: pnpm run release
         env:
-          GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
           HATCH_INDEX_USER: __token__ # For PyPI
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Tag
+        run: pnpm exec changeset tag && git push --tags
