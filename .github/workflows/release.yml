@@ -65,7 +65,8 @@ jobs:
       needs.changesets.outputs.should-release == 'true'
 
     permissions:
-      contents: write # to create tags
+      contents: read
+      actions: read
 
     name: Prerelease CI
     uses: ./.github/workflows/ci.yml
