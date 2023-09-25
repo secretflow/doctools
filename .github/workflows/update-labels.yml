@@ -14,22 +14,5 @@ on:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14.x
-
-      - name: Use pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ^7.29
-          run_install: false
-
-      - name: Run github-label-sync
-        run: pnpm dlx github-label-sync --labels .github/workflows/config/labels.yml
-          --access-token ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }}
+    uses: secretflow/web-ci/.github/workflows/update-labels.yml@main
+    secrets: inherit

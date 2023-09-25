@@ -7,6 +7,7 @@
 #   all-features: false
 
 -e file:.
+-e file:pyprojects/secretflow-doctools
 aiofiles==23.1.0
 alabaster==0.7.13
 anyio==3.7.1
@@ -110,7 +111,7 @@ trove-classifiers==2023.8.7
 twisted==22.10.0
 typing-extensions==4.7.1
 urllib3==1.26.16
-userpath==1.9.0
+userpath==1.9.1
 virtualenv==20.24.3
 watchfiles==0.20.0
 wcwidth==0.2.6

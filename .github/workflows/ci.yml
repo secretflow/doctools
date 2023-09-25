@@ -16,51 +16,20 @@ permissions:
 jobs:
   ci-javascript:
     name: 'CI: JavaScript'
-    runs-on: ubuntu-latest
+    uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
+    with:
+      node-version: ${{ matrix.node-version }}
     strategy:
       fail-fast: false
       matrix:
         node-version: ['16.20.x']
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch the full history for Nx to determine affected projects
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-      - uses: ./.github/actions/ci-setup
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: |
-          pnpm exec nx affected \
-            -t lint:prettier \
-            -t lint:eslint \
-            -t lint:stylelint \
-            -t typecheck:tsc \
-            -t test:vitest
 
   ci-python:
     name: 'CI: Python'
-    runs-on: ubuntu-latest
+    uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
+    with:
+      python-version: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.8.x', '3.9.x', '3.10.x']
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch the full history for Nx to determine affected projects
-          fetch-depth: 0
-      - uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: 'main'
-      - uses: ./.github/actions/ci-setup
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: |
-          pnpm exec nx affected \
-            -t lint:black \
-            -t lint:ruff \
-            -t test:pytest \
-            -t typecheck:pyright
