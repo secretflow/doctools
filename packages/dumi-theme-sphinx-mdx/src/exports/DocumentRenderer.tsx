@@ -5,7 +5,7 @@ import Badge from 'dumi/theme-default/builtins/Badge';
 import Container from 'dumi/theme-default/builtins/Container';
 import SourceCode from 'dumi/theme-default/builtins/SourceCode';
 import Table from 'dumi/theme-default/builtins/Table';
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 
 import * as intrinsic from './intrinsic-elements.js';
@@ -39,6 +39,8 @@ const Article = styled.article`
   ${theming.typesetting}
 `;
 
+type ForeignComponent = (props: React.PropsWithChildren) => React.ReactElement;
+
 export const DocumentRenderer = forwardRef<HTMLElement, React.PropsWithChildren>(
   function DocumentRenderer({ children }, ref) {
     return (
@@ -47,10 +49,10 @@ export const DocumentRenderer = forwardRef<HTMLElement, React.PropsWithChildren>
           <MDXProvider
             components={{
               Link,
-              Badge,
-              Container,
-              SourceCode,
-              Table,
+              Badge: Badge as unknown as ForeignComponent,
+              Container: Container as unknown as ForeignComponent,
+              SourceCode: SourceCode as unknown as ForeignComponent,
+              Table: Table as unknown as ForeignComponent,
               ...intrinsic,
               ...components,
             }}
