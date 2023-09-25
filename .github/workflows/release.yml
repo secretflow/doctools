@@ -1,5 +1,5 @@
 # https://github.com/sveltejs/kit/blob/32afba695088b946aefe96da75b36de9b0667fbe/.github/workflows/release.yml
-name: 'Code: Release'
+name: 'Release'
 
 on:
   push:
@@ -9,55 +9,16 @@ permissions: {}
 
 jobs:
   changesets:
-    # prevent this action from running on forks
-    if: |
-      github.repository == 'secretflow/doctools'
+    # prevents this action from running on forks
+    if: github.repository == 'secretflow/doctools'
 
     name: Changesets
-    runs-on: ubuntu-latest
+    uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
 
     permissions:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
-
-    outputs:
-      should-release: ${{ steps.changesets.outputs.hasChangesets == 'false' }}
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch the full history for changesets to generate changelog
-          fetch-depth: 0
-
-      # Generate GitHub token for changesets/action
-      # Using https://github.com/secretflow/bot
-      # This allows changesets/action to create a release PR using the bot's identity
-      # Token goes into env. See action for details
-      - name: Generate GitHub token
-        uses: wow-actions/use-app-token@v2
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-
-      - name: Determine if changesets exist
-        # If there are changesets, this step will create a release PR
-        # If there isn't any changeset, this step will do nothing
-        # Instead, later steps will run CI and publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          # run changeset version to consume all changesets and bump versions
-          version: npx changeset version
-          # publish with Nx. won't call changeset publish but does call changeset tag
-          publish: echo 'No changesets. Will publish packages'
-          # title of the release PR
-          title: 'chore: release'
-          # commit message for the release commits
-          commit: 'chore: stage changes for next release'
-        env:
-          # For changesets/action to create a release PR
-          # Comes from wow-actions/use-app-token
-          GITHUB_TOKEN: ${{ env.BOT_TOKEN }}
+    secrets: inherit
 
   ci:
     needs: [changesets]
@@ -71,32 +32,14 @@ jobs:
       contents: read
       actions: read
 
-  release:
+  publish:
     needs: [ci]
     if: |
       needs.ci.result == 'success'
 
-    name: Release
-    runs-on: ubuntu-latest
+    name: Publish
+    uses: secretflow/web-ci/.github/workflows/release-publish.yml@main
 
     permissions:
       contents: write # to create tags
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - uses: ./.github/actions/ci-setup
-
-      - name: Authenticate with NPM
-        run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-
-      - name: Publish
-        run: pnpm run release
-        env:
-          HATCH_INDEX_USER: __token__ # For PyPI
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
-
-      - name: Tag
-        run: pnpm exec changeset tag && git push --tags
+    secrets: inherit

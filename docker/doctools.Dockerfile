@@ -58,7 +58,7 @@ RUN ${FNM_EXEC} pnpm exec nx run 'doctools:build'
 # Export artifacts
 RUN ${FNM_EXEC} pnpm --filter dumi-scaffolding --prod deploy /build/scaffolding/
 RUN mkdir -p /build/pypi-simple/secretflow-doctools/ \
-  && cp ./pyproject/dist/* /build/pypi-simple/secretflow-doctools/
+  && cp ./pyprojects/secretflow-doctools/dist/* /build/pypi-simple/secretflow-doctools/
 
 FROM python:3.10-slim-bookworm AS runtime
 

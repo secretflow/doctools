@@ -6,7 +6,7 @@
     "sourceMap": true,
     "declarationMap": true,
     "pretty": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "baseUrl": "./",
     "paths": {
