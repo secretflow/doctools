@@ -1,6 +1,7 @@
-import { defineConfig } from 'vitest/config';
+// @ts-check
 
-export default defineConfig({
+/** @type {import('vitest/config').UserConfig} */
+export default {
   test: {
     globals: true,
     coverage: {
@@ -10,4 +11,4 @@ export default defineConfig({
       include: ['**/{.dumi,src}/**/*.{ts,mts,cts,tsx}'],
     },
   },
-});
+};

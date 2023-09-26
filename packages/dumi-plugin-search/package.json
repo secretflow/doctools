@@ -78,7 +78,7 @@
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "tsup-utils": "workspace:^",
+    "@secretflow/repo-utils": "workspace:^",
     "@types/node": "^18.16.19",
     "@types/react": "^18.2.15",
     "@umijs/bundler-webpack": "^4.0.72",

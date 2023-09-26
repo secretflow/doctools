@@ -1,11 +1,11 @@
 // @ts-check
+import { tsup } from '@secretflow/repo-utils';
 import { globbySync } from 'globby';
 import { defineConfig } from 'tsup';
-import createOptions from 'tsup-utils';
 
 export default defineConfig((overrides) => [
   {
-    ...createOptions(overrides),
+    ...tsup.defineOptions(overrides),
     entry: [
       './src/client/index.mts',
       './src/worker/index.mts',
@@ -18,7 +18,7 @@ export default defineConfig((overrides) => [
     format: ['esm'],
   },
   {
-    ...createOptions(overrides),
+    ...tsup.defineOptions(overrides),
     entry: ['./src/loader/index.cts', './src/plugin/index.cts'],
     external: ['./index.mjs'],
     outDir: 'dist',

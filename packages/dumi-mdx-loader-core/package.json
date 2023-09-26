@@ -44,7 +44,7 @@
     "swc-loader": "^0.2.3"
   },
   "devDependencies": {
-    "tsup-utils": "workspace:^",
+    "@secretflow/repo-utils": "workspace:^",
     "@types/node": "^18.16.19",
     "@types/pluralize": "^0.0.29",
     "@umijs/bundler-webpack": "^4.0.72",

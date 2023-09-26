@@ -3,4 +3,3 @@ packages:
   - 'packages/*'
   - 'docs'
   - 'pyprojects/*'
-  - 'pyprojects/*/src/*/assets'

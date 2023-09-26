@@ -1,22 +1,22 @@
 // @ts-check
-import createOptions, { emitDeclarations } from 'tsup-utils';
+import { tsup } from '@secretflow/repo-utils';
 import { defineConfig } from 'tsup';
 
 export default defineConfig((options) => [
   {
-    ...createOptions(options),
+    ...tsup.defineOptions(options),
     entry: ['src/index.mts'],
     external: ['./html-preprocessor/index.cjs'],
     outDir: 'dist',
     format: ['esm'],
-    onSuccess: emitDeclarations({
+    onSuccess: tsup.emitDeclarations({
       src: 'src',
       out: 'dist/typing',
       tsconfig: 'tsconfig.build.json',
     }),
   },
   {
-    ...createOptions(options),
+    ...tsup.defineOptions(options),
     entry: ['src/index.cts', 'src/html-preprocessor/index.ts'],
     external: ['./index.mjs'],
     outDir: 'dist',
