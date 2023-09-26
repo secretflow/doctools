@@ -4,25 +4,16 @@
   "private": true,
   "files": [],
   "scripts": {
+    "setup": "repo-utils pyproject link -n mdserver -p sphinx_mdx",
     "build": "hatch clean && hatch build -t sdist -t wheel -t custom",
     "test:pytest": "pytest",
     "lint:black": "black --check src tests",
     "lint:ruff": "ruff check src tests",
     "lint:pyright": "pyright src",
-    "release": ": hatch publish ./dist"
-  },
-  "nx": {
-    "$schema": "https://cdn.jsdelivr.net/npm/nx@16.7.0/schemas/project-schema.json",
-    "targets": {
-      "build": {
-        "inputs": [
-          ":default",
-          ":python"
-        ]
-      }
-    }
+    "release": "hatch publish ./dist"
   },
   "devDependencies": {
+    "@secretflow/repo-utils": "workspace:^",
     "mdserver": "workspace:^"
   }
 }

@@ -20,8 +20,8 @@
     "skipLibCheck": true,
 
     /* modules */
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
 
     /* features */

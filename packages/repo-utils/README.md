@@ -1,4 +1,4 @@
-# tsup-utils
+# repo-utils
 
 [tsup] presets and utility functions for this monorepo.
 

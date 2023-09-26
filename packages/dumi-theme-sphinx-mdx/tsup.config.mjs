@@ -1,13 +1,13 @@
 // @ts-check
+import { tsup } from '@secretflow/repo-utils';
 import { globbySync } from 'globby';
 import { defineConfig } from 'tsup';
-import createOptions, { emitDeclarations } from 'tsup-utils';
 
 // TODO: Explain the whole ESM/CJS saga
 
 export default defineConfig((options) => [
   {
-    ...createOptions(options),
+    ...tsup.defineOptions(options),
     entry: globbySync([
       './src/exports/index.{ts,tsx,mts,mtsx}',
       './src/{builtins,layouts,slots}/*.{ts,tsx,mts,mtsx}',
@@ -20,16 +20,16 @@ export default defineConfig((options) => [
       '.json': 'copy',
     },
     outExtension: () => ({ js: '.js' }),
-    onSuccess: emitDeclarations({ src: 'src', out: 'dist/typing' }),
+    onSuccess: tsup.emitDeclarations({ src: 'src', out: 'dist/typing' }),
   },
   {
-    ...createOptions(options),
+    ...tsup.defineOptions(options),
     entry: ['./src/plugin/index.mts'],
     outDir: './dist/plugin',
     format: ['esm'],
   },
   {
-    ...createOptions(options),
+    ...tsup.defineOptions(options),
     entry: globbySync(['./src/plugin/index.cts', './src/plugin/package.json']),
     external: ['./index.mjs'],
     outDir: './dist/plugin',

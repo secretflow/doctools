@@ -53,7 +53,7 @@
     "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "tsup-utils": "workspace:^",
+    "@secretflow/repo-utils": "workspace:^",
     "@umijs/bundler-webpack": "^4.0.72",
     "dumi": "^2.2.1"
   },
