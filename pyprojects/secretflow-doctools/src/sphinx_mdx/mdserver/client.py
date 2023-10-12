@@ -19,7 +19,7 @@ def find_server_executable() -> Tuple[str, List[str]]:
     import sphinx_mdx
 
     module_dir = files(sphinx_mdx)
-    dist_dir = Path(str(module_dir.joinpath("assets/node_modules/mdserver/dist")))
+    dist_dir = Path(str(module_dir.joinpath("assets/mdserver/dist")))
 
     arch = platform.machine().lower()
 

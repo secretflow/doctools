@@ -1,5 +1,11 @@
 # doctools
 
+## 0.4.2
+
+### Patch Changes
+
+- bump deps
+
 ## 0.4.1
 
 ### Patch Changes

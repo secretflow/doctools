@@ -48,7 +48,7 @@ pattern = '"version": "(?P<version>[^"]+)"'
 sources = ["src"]
 
 [tool.hatch.build]
-artifacts = ["**/node_modules/mdserver/dist"]
+artifacts = ["src/sphinx_mdx/assets/mdserver/dist"]
 directory = "dist"
 only-include = ["src", "package.json"]
 
