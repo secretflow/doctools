@@ -1,5 +1,11 @@
 # doctools
 
+## 0.4.0
+
+### Minor Changes
+
+- 3e2ae25: Support toctree captions as sidebar categories
+
 ## 0.3.0
 
 ### Minor Changes
