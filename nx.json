@@ -66,16 +66,16 @@
     "lint:stylelint": {
       "inputs": [":default", ":stylelint"]
     },
-    "lint:prettier": {
+    "format:prettier": {
       "inputs": [":default", ":prettier"]
     },
-    "lint:tsc": {
+    "typecheck:tsc": {
       "inputs": [":default", ":tsc"]
     },
-    "lint:black": {
+    "format:black": {
       "inputs": [":default"]
     },
-    "lint:pyright": {
+    "typecheck:pyright": {
       "inputs": [":default"]
     },
     "lint:ruff": {
@@ -98,15 +98,15 @@
         "cacheableOperations": [
           "setup",
           "build",
+          "format:black",
+          "format:prettier",
           "lint:eslint",
-          "lint:stylelint",
-          "lint:prettier",
-          "lint:tsc",
-          "lint:black",
-          "lint:pyright",
           "lint:ruff",
+          "lint:stylelint",
+          "test:pytest",
           "test:vitest",
-          "test:pytest"
+          "typecheck:pyright",
+          "typecheck:tsc"
         ]
       }
     }

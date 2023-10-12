@@ -258,6 +258,7 @@ export const typesetting = css`
     &.topic-title {
       font-weight: 600;
       font-size: 1.5rem;
+      margin-top: 1rem;
     }
   }
 

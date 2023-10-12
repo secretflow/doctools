@@ -20,7 +20,7 @@
     "setup": "tsup",
     "build": "tsup",
     "lint:eslint": "eslint src",
-    "lint:tsc": "tsc --noEmit"
+    "typecheck:tsc": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
