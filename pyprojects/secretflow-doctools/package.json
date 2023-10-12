@@ -1,11 +1,11 @@
 {
   "name": "doctools",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "files": [],
   "scripts": {
-    "setup": "repo-utils pyproject link -n mdserver -p sphinx_mdx && find -L .",
-    "build": "find -L . && python -m hatch clean && python -m hatch build -t sdist -t wheel -t custom",
+    "setup": "repo-utils pyproject link -n mdserver -p sphinx_mdx",
+    "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel -t custom",
     "format:black": "python -m black --config ../../pyproject.toml --check src tests",
     "lint:ruff": "python -m ruff check src tests",
     "typecheck:pyright": "pyright --project ../.. src",
