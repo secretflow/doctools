@@ -46,6 +46,9 @@ def generate_sidebar(
 ) -> Sidebar:
     def resolve_doctree(doctree: nodes.document) -> Sidebar:
         root: Sidebar = []
+        # current level of sidebar
+        # either root or a category in case the sidebar has a caption
+        curr: Sidebar = root
 
         for toctree in doctree.findall(addnodes.toctree):
             # will not honor :hidden: because its intended use was to hide a toctree
@@ -57,6 +60,11 @@ def generate_sidebar(
             # is to skip the toctree directive entirely
             # (which causes Sphinx to emit warnings)
 
+            if toctree.get("caption"):
+                category = SidebarItemCategory(label=toctree["caption"], items=[])
+                curr.append(category)
+                curr = category.items
+
             for title, ref in toctree["entries"]:
                 title: Union[str, None]
                 ref: str
@@ -64,7 +72,7 @@ def generate_sidebar(
                 if pathfinder.is_external_url(ref):
                     # external link
                     entry = SidebarItemLink(label=title or ref, href=ref)
-                    root.append(entry)
+                    curr.append(entry)
                     continue
 
                 if ref == "self":
@@ -82,7 +90,9 @@ def generate_sidebar(
                 if items:
                     entry = SidebarItemCategory(label=title, items=items, link=entry)
 
-                root.append(entry)
+                curr.append(entry)
+
+            curr = root
 
         return root
 

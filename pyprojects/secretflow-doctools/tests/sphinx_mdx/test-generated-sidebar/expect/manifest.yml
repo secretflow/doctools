@@ -1,4 +1,8 @@
 sidebar:
   - {id: index.mdx, label: Hidden toctree, type: doc}
   - {id: lorem.mdx, label: Lorem ipsum, type: doc}
+  - items:
+      - {id: ipsum.mdx, label: ipsum, type: doc}
+    label: category
+    type: category
 version: '1'

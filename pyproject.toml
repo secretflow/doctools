@@ -40,7 +40,7 @@ _pb2\\.pyi?
 | _pb2_grpc\\.pyi?
 """
 line-length = 88
-target-versions = ["py38", "py39", "py310"]
+target-version = ["py38", "py39", "py310"]
 
 [tool.ruff]
 line-length = 88
