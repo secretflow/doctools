@@ -8,34 +8,34 @@ on:
 permissions: {}
 
 jobs:
-  changesets:
-    # prevents this action from running on forks
-    if: github.repository == 'secretflow/doctools'
+  # changesets:
+  #   # prevents this action from running on forks
+  #   if: github.repository == 'secretflow/doctools'
 
-    name: Changesets
-    uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
+  #   name: Changesets
+  #   uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
 
-    permissions:
-      contents: write # to create release (changesets/action)
-      pull-requests: write # to create pull request (changesets/action)
-    secrets: inherit
+  #   permissions:
+  #     contents: write # to create release (changesets/action)
+  #     pull-requests: write # to create pull request (changesets/action)
+  #   secrets: inherit
 
-  ci:
-    needs: [changesets]
-    if: |
-      needs.changesets.outputs.should-release == 'true'
+  # ci:
+  #   needs: [changesets]
+  #   if: |
+  #     needs.changesets.outputs.should-release == 'true'
 
-    name: Prerelease CI
-    uses: ./.github/workflows/ci.yml
+  #   name: Prerelease CI
+  #   uses: ./.github/workflows/ci.yml
 
-    permissions:
-      contents: read
-      actions: read
+  #   permissions:
+  #     contents: read
+  #     actions: read
 
   publish:
-    needs: [ci]
-    if: |
-      needs.ci.result == 'success'
+    # needs: [ci]
+    # if: |
+    #   needs.ci.result == 'success'
 
     name: Publish
     uses: secretflow/web-ci/.github/workflows/release-publish.yml@main
