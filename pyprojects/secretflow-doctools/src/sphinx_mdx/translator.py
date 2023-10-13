@@ -8,6 +8,7 @@ from typing import Any, Callable, DefaultDict, Dict, List, Optional, Set, TypeVa
 
 from docutils import nodes
 from more_itertools import first
+from myst_parser.parsers import parse_html
 from sphinx import addnodes
 from sphinx.builders import Builder
 from sphinx.util import logging
@@ -969,13 +970,47 @@ class MDXTranslator(SphinxTranslator):
     def visit_raw(self, node: nodes.raw):
         if node.get("format") != "html":
             raise nodes.SkipNode
-        try:
-            transformed = self.mdclient.html_to_tree(node.astext())
-        except ValueError as e:
-            logger.error("Malformed HTML: %s", node.astext(), location=node)
-            raise nodes.SkipNode from e
-        for elem in transformed["children"]:
-            self.append_child(node, elem)
+
+        def maybe_html(node: nodes.Element):
+            try:
+                return self.mdclient.html_to_tree(node.astext())
+            except ValueError as e:
+                logger.error("Malformed HTML: %s", node.astext(), location=node)
+                raise nodes.SkipNode from e
+
+        if isinstance(node.parent, nodes.paragraph):
+            # We are inline
+            # opening and closing tags are separated into
+            # two different raw nodes
+            try:
+                tag = next(parse_html.tokenize_html(node.astext()).walk())
+
+            except StopIteration:
+                # empty AST, assume to be a closing tag
+                self.leave_nesting(node.parent)
+
+            else:
+                # convert the opening tag to a (self-closing) JSX element
+                # FIXME: no guarantee that this won't raise in the future
+                transformed = maybe_html(node)
+
+                # XHTML tags are considered "startendtags" in the parser
+                if isinstance(tag, (parse_html.VoidTag, parse_html.XTag)):
+                    for elem in transformed["children"]:
+                        self.append_child(node.parent, elem)
+                        break
+
+                elif isinstance(tag, parse_html.Tag):
+                    for elem in transformed["children"]:
+                        self.enter_nesting(node.parent, elem)
+                        break
+
+        else:
+            # We are a block element, treat the entire node as HTML
+            transformed = maybe_html(node)
+            for elem in transformed["children"]:
+                self.append_child(node, elem)
+
         raise nodes.SkipNode
 
     # === Extension: autosummary ===
