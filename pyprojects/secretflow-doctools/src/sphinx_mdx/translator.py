@@ -180,13 +180,15 @@ class MDXTranslator(SphinxTranslator):
         self.ancestors.append(ParentNode(origin, markup))
         return markup
 
-    def leave_nesting(self, origin: nodes.Element):
+    def leave_nesting(self, origin: nodes.Element, *, multiple: bool = False):
         child = self.ancestors.pop()
         if child.origin is not origin:
             # this guarantees parity
             self.ancestors.append(child)
             return child.markup
         self.append_child(origin, child.markup)
+        if multiple:
+            return self.leave_nesting(origin, multiple=True)
         return child.markup
 
     def visit_Text(self, node: nodes.Text):  # noqa: N802
@@ -226,8 +228,10 @@ class MDXTranslator(SphinxTranslator):
     def depart_document(self, node: nodes.document):
         self.leave_nesting(node)
         assert not self.ancestors, (
+            f"stack: {self.ancestors}\n"
             "nesting stack is not empty. this indicates"
-            " unclosed elements, which is a bug."
+            " unclosed elements, which is a bug.\n"
+            f"file: {self.source_path}"
         )
 
     def visit_section(self, node: nodes.section):
@@ -260,7 +264,9 @@ class MDXTranslator(SphinxTranslator):
         self.enter_nesting(node, md.paragraph())
 
     def depart_paragraph(self, node: nodes.paragraph):
-        self.leave_nesting(node)
+        # multiple: wrap up any potentially unclosed HTML tags
+        # TODO: handle malformed HTML more gracefully
+        self.leave_nesting(node, multiple=True)
 
     def visit_literal_block(self, node: nodes.literal_block):
         lang = node.get("language", "plaintext")

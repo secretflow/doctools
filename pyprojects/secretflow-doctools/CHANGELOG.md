@@ -1,5 +1,11 @@
 # doctools
 
+## 0.4.4
+
+### Patch Changes
+
+- add a hack to tolerate malformed inline HTML
+
 ## 0.4.3
 
 ### Patch Changes

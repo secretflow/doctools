@@ -4,6 +4,8 @@
 
 This is _not_ a <s>paragraph</s>.
 
+This is <invalid>
+
 <mark>You _cannot_ parse HTML with regex</mark>
 
 This is <u><strong><em>very important</em></strong></u>.
