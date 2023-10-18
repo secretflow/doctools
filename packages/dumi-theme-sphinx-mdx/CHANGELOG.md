@@ -1,5 +1,13 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.3.1-alpha.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.2.1-alpha.0
+  - @secretflow/dumi-plugin-mdx@0.1.3-alpha.0
+
 ## 0.3.0
 
 ### Minor Changes

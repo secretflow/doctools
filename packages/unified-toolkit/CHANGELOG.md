@@ -1,5 +1,11 @@
 # @secretflow/unified-toolkit
 
+## 0.2.1-alpha.0
+
+### Patch Changes
+
+- move dumi-plugin-search to alpha
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,0 +1,18 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "docs": "0.0.2",
+    "@secretflow/dumi-mdx-loader-core": "0.2.0",
+    "@secretflow/dumi-plugin-mdx": "0.1.2",
+    "@secretflow/dumi-plugin-search": "0.2.0",
+    "@secretflow/dumi-plugin-yuque": "0.1.2",
+    "dumi-scaffolding": "0.1.3",
+    "@secretflow/dumi-theme-sphinx-mdx": "0.3.0",
+    "mdserver": "0.0.2",
+    "@secretflow/repo-utils": "0.1.0",
+    "@secretflow/unified-toolkit": "0.2.0",
+    "doctools": "0.4.4"
+  },
+  "changesets": ["nice-seals-hear"]
+}

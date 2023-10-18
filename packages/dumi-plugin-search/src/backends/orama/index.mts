@@ -4,6 +4,7 @@ import type {
   SearchBackendModule,
   SearchableContent,
   SearchResult,
+  SearchResultList,
 } from '../../shared/typing.mjs';
 
 type DataType<T> = T extends string
@@ -34,16 +35,24 @@ const schema: DataType<SearchableContent> = {
   },
 };
 
+const tokenize = (raw: string) =>
+  raw
+    // remove all non-word characters
+    .replaceAll(/[^_\d\p{Script=Han}\p{Script=Latin}]+/gu, ' ')
+    // insert spaces between every Chinese characters
+    .replaceAll(/([\p{Script=Han}])/gu, ' $1 ')
+    // split by spaces
+    .split(' ')
+    // remove empty strings
+    .filter((x) => x)
+    .map((x) => x.toLocaleLowerCase());
+
 export const createProvider: SearchBackendModule['createProvider'] = async function () {
   const db = await orama.create({
     schema,
     components: {
       tokenizer: {
-        tokenize: (raw) =>
-          raw
-            .replaceAll(/[^.\d\p{Script=Han}\p{Script=Latin}]+/gu, ' ')
-            .split(' ')
-            .filter((x) => x),
+        tokenize,
         language: 'english',
         normalizationCache: new Map(),
       },
@@ -62,13 +71,16 @@ export const createProvider: SearchBackendModule['createProvider'] = async funct
     await orama.insertMultiple(db, content);
   }
 
-  async function search(query: string) {
+  async function search(query: string): Promise<SearchResultList> {
     const result = await orama.search(db, {
       term: query,
-      limit: 30,
-      threshold: 0.5,
     });
-    return { totalCount: result.count, items: result.hits as SearchResult[] };
+    return {
+      totalCount: result.count,
+      items: result.hits as SearchResult[],
+      elapsedTimeMS: result.elapsed.raw,
+      queryTokens: tokenize(query),
+    };
   }
 
   return { load, dump, insert, search };

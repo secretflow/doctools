@@ -12,6 +12,7 @@ import 'remark-mdx';
 export type OutlineItem = {
   id: string;
   title: string;
+  longTitle: string;
   depth: number;
   order: number;
 
@@ -127,13 +128,13 @@ function elementId(elem: PointOfInterest) {
 
 export function rehypeArticleOutline(): Transformer {
   return (tree, file) => {
-    file.value;
     const outline = new Map<PointOfInterest, OutlineItem>();
 
     // collect all points of interest
 
     const slugger = new Slugger();
 
+    let lastTopLevelTitle: string | undefined = undefined;
     let lastFQN: string | undefined = undefined;
     let lastDepth = 0;
     let headingCount = 0;
@@ -210,6 +211,10 @@ export function rehypeArticleOutline(): Transformer {
         return;
       }
 
+      if (depth === 1) {
+        lastTopLevelTitle = title;
+      }
+
       let id = elementId(heading);
       if (!id) {
         id = slugger.slug(title);
@@ -220,9 +225,26 @@ export function rehypeArticleOutline(): Transformer {
       heading.data ??= { id };
       heading.data['id'] = id;
 
+      let longTitle = title;
+
+      if (depth !== 1 && lastTopLevelTitle) {
+        longTitle = `${lastTopLevelTitle} - ${longTitle}`;
+      }
+
+      if (isCodeSymbol(heading)) {
+        const fullname = jsxLiteralAttribute<string>(heading, 'target');
+        const objectType = jsxStringAttribute(heading, 'objectType');
+        if (fullname && objectType) {
+          longTitle = `${objectType} ${fullname}`;
+        } else if (fullname) {
+          longTitle = fullname;
+        }
+      }
+
       outline.set(heading, {
         id,
         title,
+        longTitle,
         depth,
         order: headingCount++,
         headline: heading.children.map((e) => ({ ...e, position: undefined })),
@@ -233,16 +255,7 @@ export function rehypeArticleOutline(): Transformer {
       });
     });
 
-    const topLevelContent: OutlineItem = {
-      id: '',
-      title: '',
-      depth: 0,
-      order: -1,
-      headline: [],
-      content: '',
-      tags: [],
-      metadata: {},
-    };
+    let strayContent = '';
 
     let currentOutline: OutlineItem | undefined = undefined;
 
@@ -255,8 +268,15 @@ export function rehypeArticleOutline(): Transformer {
         }
 
         if (!currentOutline) {
-          topLevelContent.content += hastToString(node);
+          strayContent += hastToString(node);
+          strayContent += ' ';
           return;
+        }
+
+        if (strayContent) {
+          currentOutline.content += strayContent;
+          currentOutline.content += ' ';
+          strayContent = '';
         }
 
         if (isCodeSymbol(node)) {
@@ -298,6 +318,6 @@ export function rehypeArticleOutline(): Transformer {
       },
     );
 
-    file.data['outline'] = [...outline.values(), topLevelContent];
+    file.data['outline'] = [...outline.values()];
   };
 }

@@ -1,5 +1,13 @@
 # @secretflow/dumi-plugin-search
 
+## 0.2.1-alpha.0
+
+### Patch Changes
+
+- move dumi-plugin-search to alpha
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.2.1-alpha.0
+
 ## 0.2.0
 
 ### Minor Changes

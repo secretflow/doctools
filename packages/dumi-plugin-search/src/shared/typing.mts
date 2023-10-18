@@ -22,6 +22,7 @@ export type SearchResultList = {
   items: SearchResult[];
   totalCount: number;
   elapsedTimeMS?: number;
+  queryTokens?: string[];
 };
 
 export interface SearchProvider {

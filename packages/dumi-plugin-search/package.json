@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-plugin-search",
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "0.2.1-alpha.0",
   "description": "Better search for Dumi",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-plugin-search",
@@ -62,7 +62,7 @@
     "release": "pnpm publish -r --filter ."
   },
   "dependencies": {
-    "@orama/orama": "^1.0.10",
+    "@orama/orama": "^1.2.11",
     "@secretflow/unified-toolkit": "workspace:^",
     "rehype-raw": "^6.1.1",
     "remark-directive": "^2.0.1",

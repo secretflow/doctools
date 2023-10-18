@@ -61,11 +61,11 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
         const result = await processor.process(source);
         const targets: SearchableContent[] = [];
 
-        result.data.outline?.forEach(({ id, title, content }) => {
+        result.data.outline?.forEach(({ id, longTitle, content }) => {
           const url = id ? `${absPath}#${id}` : absPath;
           targets.push({
             url,
-            title,
+            title: longTitle,
             content,
             type: 'prose',
           });

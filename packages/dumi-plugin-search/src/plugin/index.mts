@@ -107,7 +107,7 @@ export async function plugin(api: DumiAPI) {
               .use(remarkDirective)
               .use(remarkMath)
               .use(remarkAttrs)
-              .use(remarkRehype),
+              .use(remarkRehype, { passThrough: MDX_NODE_TYPES }),
           md: (processor) =>
             processor
               .use(remarkParse)
@@ -118,7 +118,7 @@ export async function plugin(api: DumiAPI) {
               .use(remarkMath)
               .use(remarkAttrs)
               .use(remarkRehype)
-              .use(rehypeRaw, { passThrough: MDX_NODE_TYPES }),
+              .use(rehypeRaw),
         },
       } satisfies LoaderConfig)
       .end();
