@@ -712,6 +712,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/mdserver
 
+  pyprojects/sphinx-mdx: {}
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:

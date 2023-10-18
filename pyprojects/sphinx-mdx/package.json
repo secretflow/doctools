@@ -1,0 +1,15 @@
+{
+  "name": "sphinx-mdx",
+  "version": "0.0.0",
+  "private": true,
+  "files": [],
+  "scripts": {
+    "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel -t custom",
+    "format:black": "python -m black --config ../../pyproject.toml --check src tests",
+    "lint:ruff": "python -m ruff check src tests",
+    "typecheck:pyright": "pyright --project ../.. src",
+    "test:pytest": "python -m pytest",
+    "release": "hatch publish ./dist"
+  },
+  "devDependencies": {}
+}

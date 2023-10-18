@@ -1,0 +1,13 @@
+[package]
+edition = "2021"
+name = "sphinx-mdx"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+crate-type = ["cdylib"]
+name = "sphinx_mdx"
+
+[dependencies]
+mdxjs = "0.1.19"
+pyo3 = "0.19.0"

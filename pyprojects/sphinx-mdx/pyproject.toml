@@ -1,0 +1,27 @@
+[project]
+authors = [
+  {name = "Tony Wu", email = "tonywu6@protonmail.com"},
+]
+dependencies = [
+  "pydantic<2",
+  "pytablewriter>=1.2.0",
+  "beautifulsoup4>=4.12.2",
+  "lxml>=4.9.3",
+]
+description = "MDX builder for Sphinx"
+dynamic = ["version"]
+name = "sphinx-mdx"
+readme = "README.md"
+requires-python = ">= 3.8.15"
+
+[build-system]
+build-backend = "maturin"
+requires = ["maturin>=1.2,<2.0"]
+
+[tool.rye]
+dev-dependencies = []
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "sphinx_mdx._lib"
+python-source = "src/py"

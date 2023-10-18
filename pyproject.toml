@@ -28,6 +28,9 @@ dev-dependencies = [
   "sphinx-autobuild>=2021.3.14",
   "sphinx-autodoc2~=0.4.2",
   "sphinx-intl>=2.1.0",
+  "maturin>=1.3.0",
+  "jupyterlab>=4.0.7",
+  "pip>=23.3",
 ]
 managed = true
 
@@ -45,11 +48,11 @@ target-version = ["py38", "py39", "py310"]
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
-src = ["pyprojects/*/src"]
+src = ["pyprojects/*/src", "pyprojects/*/src/py"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__"]
-include = ["pyprojects/*/src"]
+include = ["pyprojects/*/src", "pyprojects/*/src/py"]
 reportGeneralTypeIssues = "information"
 reportOptionalMemberAccess = "information"
 reportPrivateImportUsage = "information"

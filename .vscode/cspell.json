@@ -30,6 +30,8 @@
     "proto",
     "protobuf",
     "protoc",
+    "pyfunction",
+    "pymodule",
     "pypa",
     "pypi",
     "pyproject",

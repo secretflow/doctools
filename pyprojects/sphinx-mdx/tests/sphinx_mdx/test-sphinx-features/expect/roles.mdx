@@ -1,0 +1,103 @@
+:target{#module-signal}
+
+# Signal Handling
+
+<Outline domain="py" objectType="function" target={"signal.install"} module={"signal"} fullname={"install"} parameters={[]} description={"This function installs a handler for every signal known by the\nsignal module.  See the section List of signals for more information."}>
+  <Outline.Signature fullname="install" id="signal.install">
+    <Outline.Prefix>signal.</Outline.Prefix><Outline.Name>install</Outline.Name><Outline.ParameterList><span>(</span><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This function installs a [`handler`](#signal.handler "signal.handler") for every signal known by the
+    [`signal`](#module-signal "signal") module.  See the section [<span>List of signals</span>](#list-of-signals) for more information.
+  </Outline.Content>
+</Outline>
+
+<Outline domain="py" objectType="function" target={"signal.handler"} module={"signal"} fullname={"handler"} parameters={["signal", "frame"]} description={"This function is called when a signal is received.  The signal argument\nis the signal number, and the frame argument is the current stack frame\n(or None if the signal is not associated with a stack frame)."}>
+  <Outline.Signature fullname="handler" id="signal.handler">
+    <Outline.Prefix>signal.</Outline.Prefix><Outline.Name>handler</Outline.Name><Outline.ParameterList><span>(</span><Outline.Parameter><span className="name">signal</span></Outline.Parameter>, <Outline.Parameter><span className="name">frame</span></Outline.Parameter><span>)</span></Outline.ParameterList>
+  </Outline.Signature>
+
+  <Outline.Content>
+    This function is called when a signal is received.  The `signal` argument
+    is the signal number, and the `frame` argument is the current stack frame
+    (or [`None`](https://docs.python.org/3.11/library/constants.html#None "(in Python v3.11)") if the signal is not associated with a stack frame).
+
+    The default handler prints a message to the standard error stream and
+    raises a [`SystemExit`](https://docs.python.org/3.11/library/exceptions.html#SystemExit "(in Python v3.11)") exception with the signal number as the exit
+    code.  See the section [<span>List of signals</span>](#list-of-signals) for more information.
+  </Outline.Content>
+</Outline>
+
+:target{#list-of-signals}
+
+## List of signals
+
+The [`signal`](#module-signal "signal") module defines a number of signals, which are listed in the
+following table.  The table also shows the default action for each signal.
+
+<table>
+  <thead>
+    <tr>
+      <td>
+        Signal
+      </td>
+
+      <td>
+        Default Action
+      </td>
+
+      <td>
+        Description
+      </td>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>
+        `signal.SIGABRT`
+      </td>
+
+      <td colSpan={2}>
+        Abnormal termination of the program, such as a call to
+        `abort()`.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        `signal.SIGALRM`
+      </td>
+
+      <td colSpan={2}>
+        Termination of the program on alarm clock timeout.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        `signal.SIGBUS`
+      </td>
+
+      <td colSpan={2}>
+        Abnormal termination of the program, such as a
+        `SIGBUS`.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+[C++ Domain](cpp.mdx)
+
+See <a href="_assets/conf.py" download={true}>this example script</a>.
+
+In Python, <code data-language="python">1 + 2</code> is equal to <code data-language="python">3</code>.
+
+<strong>rm -rf /</strong>
+
+<kbd>Control-x Control-f</kbd>
+
+... is installed in `/usr/lib/python3.x/site-packages` ...
+
+Start ‣ Programs
