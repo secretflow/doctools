@@ -45,7 +45,7 @@
     "mermaid": "^10.2.4",
     "styled-components": "^5.3.11",
     "yaml": "^2.3.1",
-    "zod": "^3.22.2"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@secretflow/repo-utils": "workspace:^",
