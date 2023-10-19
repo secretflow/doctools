@@ -57,9 +57,6 @@
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build"]
     },
-    "release": {
-      "dependsOn": ["^build", "^release", "build"]
-    },
     "lint:eslint": {
       "inputs": [":default", ":eslint"]
     },
@@ -88,6 +85,9 @@
     "test:pytest": {
       "inputs": [":default"],
       "outputs": ["{projectRoot}/coverage"]
+    },
+    "publish:hatch": {
+      "dependsOn": ["^build", "build"]
     }
   },
   "tasksRunnerOptions": {

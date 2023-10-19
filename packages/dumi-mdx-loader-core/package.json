@@ -32,8 +32,7 @@
     "dev": "tsup --watch",
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
-    "typecheck:tsc": "tsc --noEmit",
-    "release": "pnpm publish -r --filter ."
+    "typecheck:tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@mdx-js/loader": "^2.3.0",

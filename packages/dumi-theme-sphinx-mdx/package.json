@@ -31,8 +31,7 @@
     "dev": "tsup --watch",
     "lint:eslint": "eslint src",
     "typecheck:tsc": "tsc --noEmit",
-    "test:vitest": "vitest run",
-    "release": "pnpm publish -r --filter ."
+    "test:vitest": "vitest run"
   },
   "dependencies": {
     "@mdx-js/react": "^2.3.0",

@@ -119,6 +119,13 @@ export async function plugin(api: DumiAPI) {
               .use(remarkAttrs)
               .use(remarkRehype)
               .use(rehypeRaw),
+          html: (processor) =>
+            processor
+              .use(remarkParse)
+              .use(remarkFrontmatter)
+              .use(remarkExtractFrontmatter, { yaml: YAML.parse, name: 'frontmatter' })
+              .use(remarkRehype)
+              .use(rehypeRaw),
         },
       } satisfies LoaderConfig)
       .end();

@@ -58,8 +58,7 @@
     "dev": "tsup --watch",
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
-    "typecheck:tsc": "tsc -b",
-    "release": "pnpm publish -r --filter ."
+    "typecheck:tsc": "tsc -b"
   },
   "dependencies": {
     "@orama/orama": "^1.2.11",

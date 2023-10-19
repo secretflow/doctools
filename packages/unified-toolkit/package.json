@@ -27,8 +27,7 @@
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
     "typecheck:tsc": "tsc --noEmit",
-    "coverage": "vitest run --coverage",
-    "release": "pnpm publish -r --filter ."
+    "coverage": "vitest run --coverage"
   },
   "private": false,
   "publishConfig": {

@@ -37,8 +37,7 @@
     "dev": "tsup --watch",
     "test:vitest": "vitest run",
     "lint:eslint": "eslint src",
-    "typecheck:tsc": "tsc --noEmit",
-    "release": "pnpm publish -r --filter ."
+    "typecheck:tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@secretflow/dumi-mdx-loader-core": "workspace:^",
