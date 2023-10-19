@@ -14,5 +14,5 @@
     "@secretflow/unified-toolkit": "0.2.0",
     "doctools": "0.4.4"
   },
-  "changesets": ["nice-seals-hear"]
+  "changesets": ["dry-rice-learn", "nice-seals-hear"]
 }

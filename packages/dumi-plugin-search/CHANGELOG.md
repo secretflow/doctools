@@ -1,5 +1,11 @@
 # @secretflow/dumi-plugin-search
 
+## 0.2.1-alpha.1
+
+### Patch Changes
+
+- add html to loader
+
 ## 0.2.1-alpha.0
 
 ### Patch Changes
