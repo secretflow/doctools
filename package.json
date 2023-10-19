@@ -42,7 +42,7 @@
     "jest": "^29.6.1",
     "lint-staged": "^13.2.3",
     "nx": "^16.5.2",
-    "postcss": "^8.4.26",
+    "postcss": "^8.4.31",
     "prettier": "^3.0.0",
     "pyright": "^1.1.323",
     "remark-directive": "^2.0.1",

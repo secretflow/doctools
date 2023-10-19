@@ -39,7 +39,7 @@
     "github-slugger": "^2.0.0",
     "hast-util-to-string": "^2.0.0",
     "mdast-util-to-string": "^3.2.0",
-    "postcss": "^8.4.26",
+    "postcss": "^8.4.31",
     "postcss-js": "^4.0.1",
     "property-information": "^6.2.0",
     "title-case": "^3.0.3",
