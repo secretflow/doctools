@@ -1,5 +1,11 @@
 # doctools
 
+## 0.5.0
+
+### Minor Changes
+
+- fix issues with multiple element IDs
+
 ## 0.4.4
 
 ### Patch Changes

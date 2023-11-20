@@ -1,5 +1,23 @@
 # @secretflow/dumi-plugin-mdx
 
+## 0.2.0
+
+### Minor Changes
+
+- fix issues with multiple element IDs
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.3.0
+
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [bb42f04]
+  - @secretflow/unified-toolkit@0.2.1
+
 ## 0.1.3-alpha.0
 
 ### Patch Changes

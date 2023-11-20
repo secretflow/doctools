@@ -10,3 +10,5 @@ export * from './OptionList.js';
 export * from './Outline/index.js';
 export * from './SphinxDesign/index.js';
 export * from './TableOfContents/index.js';
+export * from './Container.js';
+export * from './Target.js';

@@ -4,7 +4,7 @@ from collections import ChainMap, defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Set, TypeVar, cast
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, TypeVar, cast
 
 from docutils import nodes
 from more_itertools import first
@@ -57,7 +57,6 @@ class MDXTranslator(SphinxTranslator):
         self.root: md.Root
         self.ancestors: List[ParentNode]
 
-        self.ids: Set[str] = set()
         self.metadata: Dict = {}
         self.section_depth = 0
 
@@ -142,25 +141,26 @@ class MDXTranslator(SphinxTranslator):
             callback()
 
     def add_element_id(self, origin: nodes.Element, markup: Optional[md.Content]):
-        primary_id: Optional[str] = first(origin["ids"], None)
-        if not primary_id:
+        try:
+            primary_id, *secondary_ids = origin["ids"]
+        except (ValueError, LookupError):
             return
-        if primary_id in self.ids:
-            # ensure ID uniqueness
+
+        if markup is None:
             return
-        if markup is not None and markup["type"] in (
-            "mdxJsxFlowElement",
-            "mdxJsxTextElement",
-        ):
+
+        if markup["type"] in ("mdxJsxFlowElement", "mdxJsxTextElement"):
             # add ID to JSX element
             element = cast(mdx.MDXJSXFlowElement, markup)
             if not any(attr.get("name") == "id" for attr in element["attributes"]):
                 element["attributes"].append(mdx.attr_html_like("id", primary_id))
-                self.ids.add(primary_id)
+            for secondary_id in secondary_ids:
+                element["children"].insert(0, mdx.inline("Target", id=secondary_id))
         else:
             # include as a text directive, which could then be processed by remark
             self.parent["children"].append(directive.inline("target", id=primary_id))
-            self.ids.add(primary_id)
+            for secondary_id in secondary_ids:
+                markup["children"].insert(0, mdx.inline("Target", id=secondary_id))
 
     def append_child(
         self,

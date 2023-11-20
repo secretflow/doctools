@@ -1,5 +1,27 @@
 # dumi-scaffolding
 
+## 0.2.0
+
+### Minor Changes
+
+- fix issues with multiple element IDs
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-theme-sphinx-mdx@0.4.0
+  - @secretflow/dumi-plugin-search@0.3.0
+
+## 0.1.4
+
+### Patch Changes
+
+- bb42f04: move dumi-plugin-search to alpha
+- Updated dependencies [5495db8]
+- Updated dependencies [bb42f04]
+  - @secretflow/dumi-plugin-search@0.2.1
+  - @secretflow/dumi-theme-sphinx-mdx@0.3.1
+
 ## 0.1.4-alpha.1
 
 ### Patch Changes

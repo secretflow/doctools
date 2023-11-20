@@ -8,11 +8,11 @@
 
 Paragraphs contain text and may contain inline markup: <em>emphasis</em>,
 <strong>strong emphasis</strong>, `inline literals`, standalone hyperlinks
-([https://www.python.org](https://www.python.org)), external hyperlinks ([Python](https://www.python.org) <sup>:target{#id20}[4](#id19)</sup>), internal
+([https://www.python.org](https://www.python.org)), external hyperlinks ([Python](https://www.python.org) <sup id="id20">:target{#id20}[4](#id19)</sup>), internal
 cross-references ([example](#example)), external hyperlinks with embedded URIs
 ([Python web site](https://www.python.org)), footnote references
-(manually numbered <sup>:target{#id1}[1](#id8)</sup>, anonymous auto-numbered <sup>:target{#id2}[3](#id11)</sup>, labeled
-auto-numbered <sup>:target{#id3}[2](#label)</sup>, or symbolic <sup>:target{#id4}[\*](#id12)</sup>), citation references
+(manually numbered <sup id="id1">:target{#id1}[1](#id8)</sup>, anonymous auto-numbered <sup id="id2">:target{#id2}[3](#id11)</sup>, labeled
+auto-numbered <sup id="id3">:target{#id3}[2](#label)</sup>, or symbolic <sup id="id4">:target{#id4}[\*](#id12)</sup>), citation references
 (:target{#id5}[\[CIT2002\]](#cit2002)), substitution references (![EXAMPLE](_assets/biohazard.png)), and <span id="inline-hyperlink-targets">inline
 hyperlink targets</span> (see [Targets](#targets) below for a reference back to here).
 Character-level inline markup is also possible (although exceedingly
@@ -34,7 +34,7 @@ Section headers are implicit targets, referred to by name. See
 [Targets](#targets), which is a subsection of [Body Elements](#body-elements).
 
 Explicit external targets are interpolated into references such as
-"[Python](https://www.python.org) <sup>:target{#id21}[4](#id19)</sup>".
+"[Python](https://www.python.org) <sup id="id21">:target{#id21}[4](#id19)</sup>".
 
 Targets may be indirect and anonymous.  Thus [this phrase](#targets) may also
 refer to the [Targets](#targets) section.
@@ -70,10 +70,10 @@ this: <del id="id25">\`Duplicate Target Names\`\_</del>), an error is generated.
 </Footnote>
 
 <Footnote label="2" backrefs={["id3", "id10"]} id="label">
-  Footnotes may be numbered, either manually (as in <sup>:target{#id9}[1](#id8)</sup>) or
+  Footnotes may be numbered, either manually (as in <sup id="id9">:target{#id9}[1](#id8)</sup>) or
   automatically using a "#"-prefixed label.  This footnote has a
   label so it can be referred to from multiple places, both as a
-  footnote reference (<sup>:target{#id10}[2](#label)</sup>) and as a hyperlink reference
+  footnote reference (<sup id="id10">:target{#id10}[2](#label)</sup>) and as a hyperlink reference
   ([label](#label)).
 </Footnote>
 
@@ -84,7 +84,7 @@ this: <del id="id25">\`Duplicate Target Names\`\_</del>), an error is generated.
 
 <Footnote label="*" backrefs={["id4"]} id="id12">
   Footnotes may also use symbols, specified with a "\*" label.
-  Here's a reference to the next footnote: <sup>:target{#id13}[†](#id14)</sup>.
+  Here's a reference to the next footnote: <sup id="id13">:target{#id13}[†](#id14)</sup>.
 </Footnote>
 
 <Footnote label="†" backrefs={["id13"]} id="id14">

@@ -1,5 +1,26 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.4.0
+
+### Minor Changes
+
+- fix issues with multiple element IDs
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.3.0
+  - @secretflow/dumi-plugin-mdx@0.2.0
+
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [5495db8]
+- Updated dependencies [bb42f04]
+  - @secretflow/dumi-plugin-search@0.2.1
+  - @secretflow/dumi-plugin-mdx@0.1.3
+
 ## 0.3.1-alpha.1
 
 ### Patch Changes

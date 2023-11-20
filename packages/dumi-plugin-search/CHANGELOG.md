@@ -1,5 +1,25 @@
 # @secretflow/dumi-plugin-search
 
+## 0.3.0
+
+### Minor Changes
+
+- fix issues with multiple element IDs
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.3.0
+
+## 0.2.1
+
+### Patch Changes
+
+- 5495db8: add html to loader
+- bb42f04: move dumi-plugin-search to alpha
+- Updated dependencies [bb42f04]
+  - @secretflow/unified-toolkit@0.2.1
+
 ## 0.2.1-alpha.1
 
 ### Patch Changes
