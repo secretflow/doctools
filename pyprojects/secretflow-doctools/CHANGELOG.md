@@ -1,5 +1,11 @@
 # doctools
 
+## 0.6.0
+
+### Minor Changes
+
+- c43c476: Include GitHub info in build output
+
 ## 0.5.0
 
 ### Minor Changes

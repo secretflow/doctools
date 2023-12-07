@@ -1,5 +1,11 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.5.0
+
+### Minor Changes
+
+- c43c476: Include GitHub info in build output
+
 ## 0.4.0
 
 ### Minor Changes
