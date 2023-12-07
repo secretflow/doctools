@@ -124,10 +124,11 @@ class MDXBuilder(Builder):
                 .strip()
             )
             match = re.match(
-                r"git@(?:.*)github\.com:(?P<owner>[^/]+)/(?P<repo>[^/]+)\.git",
+                r"git@(?:.*)github\.com:(?P<owner>[^/]+)/(?P<repo>[^/]+)",
                 git_origin,
             ) or re.match(
-                r"https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)\.git", git_origin
+                r"https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)",
+                git_origin,
             )
             if match:
                 owner = match["owner"]

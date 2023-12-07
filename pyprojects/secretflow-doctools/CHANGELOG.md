@@ -1,5 +1,11 @@
 # doctools
 
+## 0.6.1
+
+### Patch Changes
+
+- Support SSH-style GitHub remote URLs
+
 ## 0.6.0
 
 ### Minor Changes
