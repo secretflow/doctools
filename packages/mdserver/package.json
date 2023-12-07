@@ -7,7 +7,6 @@
   ],
   "main": "./dist/mdserver.cjs",
   "scripts": {
-    "setup": "tsup",
     "build": "tsup && ./scripts/pkg.sh",
     "lint:eslint": "eslint src",
     "typecheck:tsc": "tsc --noEmit"
@@ -34,5 +33,10 @@
     "unist-builder": "^3.0.1",
     "unist-util-is": "^5.2.1",
     "unist-util-visit": "^4.1.2"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

@@ -53,7 +53,6 @@
     }
   },
   "scripts": {
-    "setup": "tsup",
     "build": "tsup",
     "dev": "tsup --watch",
     "test:vitest": "vitest run",
@@ -89,5 +88,10 @@
   "peerDependencies": {
     "dumi": "^2.2.1",
     "react": "^18.2.0"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

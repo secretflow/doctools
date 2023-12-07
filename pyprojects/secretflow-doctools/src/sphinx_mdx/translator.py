@@ -59,6 +59,7 @@ class MDXTranslator(SphinxTranslator):
 
         self.metadata: Dict = {}
         self.section_depth = 0
+        self.current_line: int = -1
 
         self.context_info: ChainMap[str, Any] = ChainMap()
         self.context_handlers: DefaultDict[str, List[NodeHandler]] = defaultdict(list)
@@ -173,11 +174,17 @@ class MDXTranslator(SphinxTranslator):
             return False
         if origin is not None:
             self.add_element_id(origin, markup)
+            # if origin.line is not None and origin.line > self.current_line:
+            #     self.current_line = origin.line
+            #     parent["children"].append(mdx.inline("_Line", row=self.current_line))
         parent["children"].append(markup)
         return True
 
     def enter_nesting(self, origin: nodes.Element, markup: md.Parent):
         self.ancestors.append(ParentNode(origin, markup))
+        # if origin.line is not None and origin.line > self.current_line:
+        #     self.current_line = origin.line
+        #     self.parent["children"].append(mdx.inline("_Line", row=self.current_line))
         return markup
 
     def leave_nesting(self, origin: nodes.Element, *, multiple: bool = False):
@@ -290,28 +297,19 @@ class MDXTranslator(SphinxTranslator):
         self.enter_nesting(node, md.unordered_list())
 
     def depart_bullet_list(self, node: nodes.bullet_list):
-        ul: md.List_ = self.leave_nesting(node)
-        if any(child["spread"] for child in ul["children"]):
-            ul["spread"] = True
+        md.List_ = self.leave_nesting(node)
 
     def visit_enumerated_list(self, node: nodes.enumerated_list):
         self.enter_nesting(node, md.ordered_list(node.get("start")))
 
     def depart_enumerated_list(self, node: nodes.enumerated_list):
-        ol: md.List_ = self.leave_nesting(node)
-        if any(child["spread"] for child in ol["children"]):
-            ol["spread"] = True
+        md.List_ = self.leave_nesting(node)
 
     def visit_list_item(self, node: nodes.list_item):
         self.enter_nesting(node, md.list_item())
 
     def depart_list_item(self, node: nodes.list_item):
-        list_item: md.ListItem = self.leave_nesting(node)
-        if any(
-            child["type"] == "list" and child["ordered"]
-            for child in list_item["children"]
-        ):
-            list_item["spread"] = True
+        self.leave_nesting(node)
 
     def visit_definition_list(self, node: nodes.definition_list):
         self.enter_nesting(node, mdx.block("DefinitionList"))

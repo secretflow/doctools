@@ -26,7 +26,6 @@
     }
   },
   "scripts": {
-    "setup": "tsup",
     "build": "tsup",
     "dev": "tsup --watch",
     "lint:eslint": "eslint src",
@@ -39,15 +38,18 @@
     "@secretflow/dumi-plugin-mdx": "workspace:^",
     "@secretflow/dumi-plugin-search": "workspace:^",
     "antd": "^5.7.0",
+    "date-fns": "^2.30.0",
     "globby": "^13.2.2",
     "graphviz-react": "^1.2.5",
     "katex": "^0.16.8",
     "mermaid": "^10.2.4",
+    "new-github-issue-url": "^1.0.0",
     "styled-components": "^5.3.11",
     "yaml": "^2.3.1",
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@secretflow/repo-utils": "workspace:^",
     "@types/react": "^18.2.15",
     "@types/styled-components": "^5.1.26",
@@ -57,8 +59,14 @@
     "react-dom": "^18.2.0"
   },
   "peerDependencies": {
+    "@ant-design/icons": "^5.2.6",
     "dumi": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "nx": {
+    "tags": [
+      "postinstall"
+    ]
   }
 }

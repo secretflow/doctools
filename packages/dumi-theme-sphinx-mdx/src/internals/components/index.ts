@@ -12,3 +12,4 @@ export * from './SphinxDesign/index.js';
 export * from './TableOfContents/index.js';
 export * from './Container.js';
 export * from './Target.js';
+export * from './_Line.js';
