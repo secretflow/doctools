@@ -25,7 +25,6 @@
     }
   },
   "scripts": {
-    "setup": "tsup",
     "build": "tsup",
     "dev": "tsup --watch",
     "test:vitest": "vitest run",

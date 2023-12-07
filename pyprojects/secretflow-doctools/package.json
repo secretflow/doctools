@@ -9,7 +9,7 @@
     "lint:ruff": "python -m ruff check src tests",
     "typecheck:pyright": "pyright --project ../.. src",
     "test:pytest": "python -m pytest",
-    "publish:hatch": "python -m hatch publish ./dist"
+    "publish": "python -m hatch publish ./dist"
   },
   "devDependencies": {
     "@secretflow/repo-utils": "workspace:^",

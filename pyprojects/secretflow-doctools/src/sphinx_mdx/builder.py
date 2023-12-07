@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
+import subprocess
+from contextlib import suppress
 from datetime import datetime
 from os import path
 from pathlib import Path
 from typing import Iterator, Literal, Optional, Set, Union
+from urllib.parse import urlunsplit
 
 from docutils import nodes
 from pydantic import BaseModel
@@ -83,6 +87,13 @@ class MDXBuilder(Builder):
         self.pathfinder: Pathfinder
         self.staticfiles: StaticFiles
 
+        self.git_host: Optional[str] = None
+        self.git_owner: Optional[str] = None
+        self.git_repo: Optional[str] = None
+        self.git_commit: Optional[str] = None
+        self.git_root: Optional[Path] = None
+        self.git_timestamp: Optional[str] = None
+
     @property
     def source_root(self) -> Path:
         return Path(self.srcdir)
@@ -103,6 +114,77 @@ class MDXBuilder(Builder):
         self.pathfinder = Pathfinder(self, self.options)
         self.staticfiles = StaticFiles(self, self.options)
         self.mdclient.start()
+
+        with suppress(subprocess.CalledProcessError):
+            git_origin = (
+                subprocess.run(
+                    ["git", "config", "--get", "remote.origin.url"], capture_output=True
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
+            match = re.match(
+                r"git@(?:.*)github\.com:(?P<owner>[^/]+)/(?P<repo>[^/]+)\.git",
+                git_origin,
+            ) or re.match(
+                r"https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)\.git", git_origin
+            )
+            if match:
+                owner = match["owner"]
+                repo = match["repo"]
+                if repo.endswith(".git"):
+                    repo = repo[:-4]
+                self.git_host = "github.com"
+                self.git_owner = owner
+                self.git_repo = repo
+        with suppress(subprocess.CalledProcessError):
+            self.git_commit = (
+                subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True)
+                .stdout.decode("utf-8")
+                .strip()
+            )
+        with suppress(subprocess.CalledProcessError):
+            self.git_root = Path(
+                subprocess.run(
+                    ["git", "rev-parse", "--show-toplevel"], capture_output=True
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
+        with suppress(subprocess.CalledProcessError):
+            self.git_timestamp = (
+                subprocess.run(
+                    ["git", "log", "-1", "--format=%cI"], capture_output=True
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
+
+    def get_source_tree_path(self, docname: str) -> Optional[str]:
+        if not self.git_root:
+            return None
+        path = self.env.doc2path(docname, base=False)
+        path = self.source_root.joinpath(path)
+        try:
+            return str(path.relative_to(self.git_root))
+        except ValueError:
+            return None
+
+    def get_origin_url(self, docname: str) -> Optional[str]:
+        if not self.git_commit or self.git_host != "github.com":
+            return None
+        if not (path := self.get_source_tree_path(docname)):
+            return None
+        path = f"/{self.git_owner}/{self.git_repo}/blob/{self.git_commit}/{path}"
+        return urlunsplit(("https", self.git_host, path, "", ""))
+
+    def get_download_url(self, docname: str) -> Optional[str]:
+        if not self.git_commit or self.git_host != "github.com":
+            return None
+        if not (path := self.get_source_tree_path(docname)):
+            return None
+        path = f"/{self.git_owner}/{self.git_repo}/raw/{self.git_commit}/{path}"
+        return urlunsplit(("https", self.git_host, path, "", ""))
 
     def create_build_info(self) -> BuildInfo:
         return BuildInfo(self.config, self.tags, ["mdx"])
@@ -182,6 +264,15 @@ class MDXBuilder(Builder):
             self.staticfiles,
         )
         doctree.walkabout(translator)
+
+        origin_url = self.get_origin_url(docname)
+        if origin_url:
+            translator.metadata["git_origin_url"] = self.get_origin_url(docname)
+            translator.metadata["git_download_url"] = self.get_download_url(docname)
+            translator.metadata["git_owner"] = self.git_owner
+            translator.metadata["git_repo"] = self.git_repo
+            translator.metadata["git_commit"] = self.git_commit
+            translator.metadata["git_timestamp"] = self.git_timestamp
 
         output_path.write_text(translator.export())
 

@@ -11,16 +11,15 @@
     "postinstall": "is-ci || husky install",
     "changeset": "changeset",
     "clean": "git clean -fX .",
+    "dev:all": "nx run-many -t dev",
     "format:prettier": "prettier --check --ignore-unknown .",
-    "ci:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
-    "ci:python": "nx run-many -t format:black -t lint:ruff -t test:pytest -t typecheck:pyright",
-    "ci:release": "nx run-many --nx-bail -t build && changeset publish && nx run-many --nx-bail -t publish:hatch"
+    "ci:setup": "nx run-many -p tag:postinstall -t setup:umi -t build",
+    "ci:check:javascript": "nx run-many -t format:prettier -t lint:eslint -t lint:stylelint -t test:vitest -t typecheck:tsc",
+    "ci:check:python": "nx run-many -t format:black -t lint:ruff -t test:pytest -t typecheck:pyright",
+    "ci:build": "nx run-many -t build",
+    "ci:publish": "nx run-many --nx-bail -t build && changeset publish && nx run-many --nx-bail -t publish"
   },
-  "nx": {
-    "includedScripts": [
-      "format:prettier"
-    ]
-  },
+  "nx": {},
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@commitlint/cli": "^17.6.6",
@@ -61,7 +60,7 @@
     "vitest": "^0.32.4"
   },
   "engines": {
-    "node": ">=16.20.0"
+    "node": ">=18.18.0"
   },
   "packageManager": "pnpm@8.7.6"
 }
