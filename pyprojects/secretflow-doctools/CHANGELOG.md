@@ -1,5 +1,11 @@
 # doctools
 
+## 0.6.2
+
+### Patch Changes
+
+- Clarify revision date vs. modified date
+
 ## 0.6.1
 
 ### Patch Changes

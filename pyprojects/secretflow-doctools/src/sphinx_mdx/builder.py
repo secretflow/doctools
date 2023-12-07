@@ -8,7 +8,7 @@ from contextlib import suppress
 from datetime import datetime
 from os import path
 from pathlib import Path
-from typing import Iterator, Literal, Optional, Set, Union
+from typing import Iterator, Literal, Optional, Set, Tuple, Union
 from urllib.parse import urlunsplit
 
 from docutils import nodes
@@ -90,9 +90,9 @@ class MDXBuilder(Builder):
         self.git_host: Optional[str] = None
         self.git_owner: Optional[str] = None
         self.git_repo: Optional[str] = None
-        self.git_commit: Optional[str] = None
         self.git_root: Optional[Path] = None
-        self.git_timestamp: Optional[str] = None
+        self.git_revision_commit: Optional[str] = None
+        self.git_revision_time: Optional[str] = None
 
     @property
     def source_root(self) -> Path:
@@ -118,7 +118,9 @@ class MDXBuilder(Builder):
         with suppress(subprocess.CalledProcessError):
             git_origin = (
                 subprocess.run(
-                    ["git", "config", "--get", "remote.origin.url"], capture_output=True
+                    ["git", "config", "--get", "remote.origin.url"],
+                    capture_output=True,
+                    check=True,
                 )
                 .stdout.decode("utf-8")
                 .strip()
@@ -139,23 +141,31 @@ class MDXBuilder(Builder):
                 self.git_owner = owner
                 self.git_repo = repo
         with suppress(subprocess.CalledProcessError):
-            self.git_commit = (
-                subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True)
+            self.git_revision_commit = (
+                subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    capture_output=True,
+                    check=True,
+                )
                 .stdout.decode("utf-8")
                 .strip()
             )
         with suppress(subprocess.CalledProcessError):
             self.git_root = Path(
                 subprocess.run(
-                    ["git", "rev-parse", "--show-toplevel"], capture_output=True
+                    ["git", "rev-parse", "--show-toplevel"],
+                    capture_output=True,
+                    check=True,
                 )
                 .stdout.decode("utf-8")
                 .strip()
             )
         with suppress(subprocess.CalledProcessError):
-            self.git_timestamp = (
+            self.git_revision_time = (
                 subprocess.run(
-                    ["git", "log", "-1", "--format=%cI"], capture_output=True
+                    ["git", "log", "-1", "--format=%cI"],
+                    capture_output=True,
+                    check=True,
                 )
                 .stdout.decode("utf-8")
                 .strip()
@@ -172,20 +182,44 @@ class MDXBuilder(Builder):
             return None
 
     def get_origin_url(self, docname: str) -> Optional[str]:
-        if not self.git_commit or self.git_host != "github.com":
+        if not self.git_revision_commit or self.git_host != "github.com":
             return None
         if not (path := self.get_source_tree_path(docname)):
             return None
-        path = f"/{self.git_owner}/{self.git_repo}/blob/{self.git_commit}/{path}"
+        path = (
+            f"/{self.git_owner}/{self.git_repo}/blob/{self.git_revision_commit}/{path}"
+        )
         return urlunsplit(("https", self.git_host, path, "", ""))
 
     def get_download_url(self, docname: str) -> Optional[str]:
-        if not self.git_commit or self.git_host != "github.com":
+        if not self.git_revision_commit or self.git_host != "github.com":
             return None
         if not (path := self.get_source_tree_path(docname)):
             return None
-        path = f"/{self.git_owner}/{self.git_repo}/raw/{self.git_commit}/{path}"
+        path = (
+            f"/{self.git_owner}/{self.git_repo}/raw/{self.git_revision_commit}/{path}"
+        )
         return urlunsplit(("https", self.git_host, path, "", ""))
+
+    def get_last_modified(self, docname: str) -> Tuple[Optional[str], Optional[str]]:
+        if not self.git_revision_commit or self.git_host != "github.com":
+            return (None, None)
+        if not (path := self.get_source_tree_path(docname)):
+            return (None, None)
+        try:
+            info = (
+                subprocess.run(
+                    ["git", "log", "-1", r"--format=%cI%%%H", "--", f":/{path}"],
+                    capture_output=True,
+                    check=True,
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
+            date, sha = info.split("%")
+            return (date, sha)
+        except (subprocess.CalledProcessError, ValueError):
+            return (None, None)
 
     def create_build_info(self) -> BuildInfo:
         return BuildInfo(self.config, self.tags, ["mdx"])
@@ -268,12 +302,19 @@ class MDXBuilder(Builder):
 
         origin_url = self.get_origin_url(docname)
         if origin_url:
-            translator.metadata["git_origin_url"] = self.get_origin_url(docname)
-            translator.metadata["git_download_url"] = self.get_download_url(docname)
-            translator.metadata["git_owner"] = self.git_owner
-            translator.metadata["git_repo"] = self.git_repo
-            translator.metadata["git_commit"] = self.git_commit
-            translator.metadata["git_timestamp"] = self.git_timestamp
+            last_modified_date, last_modified_commit = self.get_last_modified(docname)
+            translator.metadata.update(
+                {
+                    "git_origin_url": origin_url,
+                    "git_download_url": self.get_download_url(docname),
+                    "git_owner": self.git_owner,
+                    "git_repo": self.git_repo,
+                    "git_revision_commit": self.git_revision_commit,
+                    "git_revision_time": self.git_revision_time,
+                    "git_last_modified_commit": last_modified_commit,
+                    "git_last_modified_time": last_modified_date,
+                }
+            )
 
         output_path.write_text(translator.export())
 
