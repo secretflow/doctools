@@ -945,7 +945,6 @@
                     "description": "A longer description of this example value."
                   },
                   "value": {
-                    "type": "string",
                     "description": "The example value."
                   }
                 }
