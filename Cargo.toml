@@ -1,5 +1,5 @@
 [workspace]
 members = [
-  "./pyprojects/sphinx-mdx",
+  "./pyprojects/sphinx-jsx",
 ]
 resolver = "2"

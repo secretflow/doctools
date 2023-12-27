@@ -17,7 +17,7 @@ pnpm-lock.yaml
 **/*_pb.ts
 **/*_connect.ts
 
-# sphinx_mdx tests
+# sphinx_jsx tests
 **/tests/**/expect/**/*
 
 # vendored files

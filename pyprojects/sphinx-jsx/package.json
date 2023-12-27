@@ -1,0 +1,19 @@
+{
+  "name": "sphinx-jsx",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [],
+  "scripts": {
+    "format:black": "python -m black --check src tests",
+    "lint:ruff": "python -m ruff check src tests",
+    "test:pytest": "python -m pytest",
+    "typecheck:pyright": "pyright --project ../.. src tests",
+    "dev:maturin": "python -m maturin develop --skip-install",
+    "build": "python -m hatch clean && python -m hatch build -t sdist -t wheel",
+    "publish": "python -m hatch publish ./dist"
+  },
+  "devDependencies": {
+    "property-information": "^6.2.0"
+  }
+}

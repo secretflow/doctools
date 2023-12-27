@@ -42,7 +42,7 @@
       "request": "launch",
       "module": "pytest",
       "args": ["-vv", "-s", "-k", "${input:pytestFilter}"],
-      "cwd": "${workspaceFolder}/pyproject",
+      "cwd": "${workspaceFolder}/pyprojects/sphinx-jsx",
       "justMyCode": false
     }
   ]

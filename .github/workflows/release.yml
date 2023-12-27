@@ -15,10 +15,13 @@ jobs:
     name: Changesets
     uses: secretflow/web-ci/.github/workflows/release-changesets.yml@main
 
+    secrets:
+      BOT_APP_ID: ${{ secrets.APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
     permissions:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
-    secrets: inherit
 
   ci:
     needs: [changesets]
@@ -40,6 +43,15 @@ jobs:
     name: Publish
     uses: secretflow/web-ci/.github/workflows/release-publish.yml@main
 
+    with:
+      node-version: 16.20.x
+      python-version: 3.8.x
+
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+      BOT_APP_ID: ${{ secrets.APP_ID }}
+      BOT_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
     permissions:
       contents: write # to create tags
-    secrets: inherit

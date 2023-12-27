@@ -1,0 +1,88 @@
+{%- macro jsx_value(value) -%}
+{%- if value is sequence -%}
+  {{- jsx_array(value) -}}
+{%- elif value is mapping -%}
+  {{- jsx_record(value) -}}
+{%- else -%}
+  {{- value|tojson -}}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro jsx_array(value) -%}
+[
+  {%- for item in value -%}
+    {{- jsx_value(item) -}}
+  {%- endfor -%}
+]
+{%- endmacro -%}
+
+{%- macro jsx_record(value) -%}
+{
+  {%- for key, value in value|items -%}
+    {{- key -}}: {{ jsx_value(value) -}}
+  {%- endfor -%}
+}
+{%- endmacro -%}
+
+{%- macro props(record) -%}
+{%- for key, value in record|default({})|items -%}
+  {{- " " -}}
+  {{- key -}}
+  =
+  {{- "{" -}}
+  {{- jsx_value(value)-}}
+  {{- "}" -}}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- macro jsx(children) -%}
+
+{%- if children|default([])|length > 1 -%}<>{%- endif -%}
+
+{%- for child in children|default([]) -%}
+  {%- if child is mapping -%}
+    <{{ child.name }}{{ props(child.props) }}>
+      {{- jsx(child.children) -}}
+    </{{ child.name }}>
+  {%- else -%}
+    {{- child -}}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if children|default([])|length > 1 -%}</>{%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro define_component(fragment) -%}
+export const {{ fragment.name }} = ({ components = {} }) => {
+  ensureComponents(components, {{ fragment.components|tojson }});
+  const { {{ fragment.namespaces|join(', ') }} } = components;
+  return {{ jsx(fragment.children) }}
+}
+{%- endmacro -%}
+
+{%- for fragment in fragments -%}
+{{- define_component(fragment) -}}{{- "\n\n" -}}
+{%- endfor -%}
+
+export default {{ root }}
+
+function ensureComponents(components, names) {
+  const missing = [];
+  for (const name of names) {
+    const path = name.split('.');
+    let found = components;
+    for (const part of path) {
+      if (found === undefined) {
+        break;
+      }
+      found = found[part];
+    }
+    if (found === undefined) {
+      missing.push(name);
+    }
+  }
+  if (missing.length) {
+    throw new Error(`Expected the following to be defined: ${missing.join(', ')}`);
+  }
+}

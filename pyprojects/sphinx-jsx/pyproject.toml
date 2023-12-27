@@ -1,0 +1,39 @@
+[project]
+authors = [
+  {name = "Tony Wu", email = "tonywu6@protonmail.com"},
+]
+dependencies = [
+  "beautifulsoup4~=4.12",
+  "loguru~=0.7",
+  "lxml~=4.9",
+  "more-itertools~=10.1",
+  "orjson~=3.9",
+  "pydantic~=1.10",
+  "pillow~=8.0",
+  "fastapi<100",
+  "pyhumps~=3.8",
+]
+description = "MDX builder for Sphinx"
+dynamic = ["version"]
+name = "sphinx-jsx"
+readme = "README.md"
+requires-python = ">=3.8.15, <3.11"
+
+[build-system]
+build-backend = "maturin"
+requires = ["maturin~=1.4"]
+
+[tool.rye]
+dev-dependencies = [
+  "nbsphinx~=0.9",
+  "sphinxcontrib-mermaid~=0.9",
+  "uvicorn~=0.24",
+]
+
+[tool.ruff]
+extend = "../../pyproject.toml"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "sphinx_jsx._lib"
+python-source = "src/py"
