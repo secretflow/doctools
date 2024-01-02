@@ -170,8 +170,6 @@ class JSXElement(JSFragment):
 
 
 class PseudoElement(JSXElement):
-    kind: Literal["jsx_pseudo_element"] = "jsx_pseudo_element"
-
     @override
     def render(self) -> str:
         logger.warning(f"rendering pseudo element: {repr(self)}")

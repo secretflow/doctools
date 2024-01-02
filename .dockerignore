@@ -1,19 +1,7 @@
-# .git
-
-.git
-
-# packages
-
-**/node_modules
-**/.venv
-
-# artifacts
-
-**/__pycache__
-**/build
-**/dist
-**/.dumi/tmp
-**/.dumi/tmp-production
-
 **/Dockerfile
 **/*.Dockerfile
+**/node_modules
+**/build
+**/dist
+**/.venv
+target

@@ -4,8 +4,9 @@
 # last locked with the following flags:
 #   pre: false
 #   features: []
-#   all-features: true
+#   all-features: false
 
+-e file:pyprojects/esm-serve
 -e file:.
 -e file:pyprojects/sphinx-jsx
 anyio==4.2.0

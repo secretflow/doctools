@@ -1,14 +1,18 @@
-from loguru import logger
-from sphinx.application import Sphinx
-
-logger.disable("sphinx_jsx")
+from typing import cast
 
 
-def setup(app: Sphinx):
+def setup(app):
+    from loguru import logger
+    from sphinx.application import Sphinx
+
     from .builder import SphinxJSXBuilder
     from .options import setup_config
     from .syntax import html, math, rst
     from .translator import SphinxJSXTranslator
+
+    logger.disable("sphinx_jsx")
+
+    app = cast(Sphinx, app)
 
     app.add_builder(SphinxJSXBuilder)
     app.registry.add_translator("jsx", SphinxJSXTranslator)
@@ -22,3 +26,6 @@ def setup(app: Sphinx):
     html.setup(app)
 
     setup_config(app)
+
+
+__version__ = "6.4.4"

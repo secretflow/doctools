@@ -41,14 +41,6 @@ include = []
 [tool.hatch.build.targets.wheel]
 bypass-selection = true
 
-[tool.black]
-force-exclude = """
-_pb2\\.pyi?
-| _pb2_grpc\\.pyi?
-"""
-line-length = 88
-target-version = ["py38", "py39", "py310", "py311"]
-
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "W", "B", "I"]
@@ -59,7 +51,8 @@ src = ["pyprojects/*/src", "pyprojects/*/src/py"]
 
 [tool.pyright]
 exclude = ["**/node_modules", "**/__pycache__", "**/.ipynb_checkpoints"]
-include = ["pyprojects/*/src", "pyprojects/*/src/py"]
+include = ["pyprojects/*/src/**/*"]
 reportGeneralTypeIssues = "information"
+reportIncompatibleVariableOverride = "error"
 reportOptionalMemberAccess = "information"
 reportPrivateImportUsage = "information"

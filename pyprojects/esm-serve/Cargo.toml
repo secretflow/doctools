@@ -1,0 +1,25 @@
+[package]
+build = "build.rs"
+edition = "2021"
+license = "MIT"
+name = "esm-serve"
+readme = "README.md"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+name = "esm_serve"
+
+[dependencies]
+anyhow = "1.0.77"
+minijinja = "1.0.10"
+pyo3 = "0.19.0"
+serde = {version = "1.0.193", features = ["derive"]}
+swc_core = {version = "0.87.*", features = ["ecma_plugin_transform", "ecma_parser", "ecma_codegen"]}
+url = "2.5.0"
+
+[dev-dependencies]
+deno_core = "0.240.0"
+
+[build-dependencies]
+maturin-utils = {path = "../../crates/maturin-utils"}

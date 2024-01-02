@@ -1,8 +1,10 @@
 [package]
+build = "build.rs"
 edition = "2021"
 license = "MIT"
 name = "sphinx-jsx"
-version = "0.1.0"
+readme = "README.md"
+version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
@@ -13,3 +15,6 @@ katex = "0.4.6"
 mdxjs = "0.1.19"
 minijinja = "1.0.10"
 pyo3 = "0.19.0"
+
+[build-dependencies]
+maturin-utils = {path = "../../crates/maturin-utils"}

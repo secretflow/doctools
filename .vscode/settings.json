@@ -83,9 +83,8 @@
     "tsconfig.json": "jsonc",
     "*.js.jinja": "jinja"
   },
-  "python.analysis.diagnosticMode": "workspace",
-  "python.analysis.include": ["pyprojects/**"],
   "typescript.tsdk": "node_modules/typescript/lib",
+  "python.analysis.diagnosticMode": "workspace",
   "python.testing.pytestArgs": ["pyprojects"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,

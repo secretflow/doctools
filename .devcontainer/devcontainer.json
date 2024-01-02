@@ -1,6 +1,6 @@
 {
   "name": "secretflow/doctools",
-  "image": "ghcr.io/tonywu6/devcontainer1:0.0.4-node18-python3.8",
+  "image": "ghcr.io/tonywu6/devcontainer1:node18-py3.8-latest",
   "mounts": [
     {
       "type": "volume",

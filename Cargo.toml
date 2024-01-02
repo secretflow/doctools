@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "./crates/maturin-utils",
   "./pyprojects/sphinx-jsx",
+  "./pyprojects/esm-serve",
 ]
 resolver = "2"

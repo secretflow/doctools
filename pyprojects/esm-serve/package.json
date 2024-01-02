@@ -1,5 +1,5 @@
 {
-  "name": "sphinx-jsx",
+  "name": "esm-serve",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,5 @@
     "build:maturin": "VIRTUAL_ENV=../../.venv python -m maturin build --release --out ./dist",
     "publish:maturin": "python -m maturin publish --out ./dist"
   },
-  "devDependencies": {
-    "property-information": "^6.2.0"
-  }
+  "devDependencies": {}
 }

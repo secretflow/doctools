@@ -1,0 +1,10 @@
+[package]
+edition = "2021"
+name = "maturin-utils"
+version = "0.0.0"
+
+[dependencies]
+anyhow = "1.0.77"
+serde = {version = "1.0.193", features = ["derive"]}
+serde_json = "1.0.108"
+toml = "0.8.8"
