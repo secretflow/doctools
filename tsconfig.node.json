@@ -3,9 +3,9 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
+    "lib": ["ESNext"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ESNext"],
     "types": ["node"]
   }
 }

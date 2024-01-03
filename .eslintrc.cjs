@@ -1,52 +1,39 @@
 module.exports = {
   root: true,
-
-  env: { browser: true, es2020: true },
+  env: { browser: true, es2022: true },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     'plugin:promise/recommended',
     'prettier',
   ],
-  plugins: ['import', 'react-refresh'],
-
-  ignorePatterns: ['dist', '.eslintrc.cjs', '.eslintrc.*.cjs'],
-
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'import', 'react-refresh'],
+  ignorePatterns: ['dist', '.eslintrc.*'],
   rules: {
-    // common pitfalls
     eqeqeq: 'error',
     curly: 'error',
-
-    // stricter type correctness
     '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
-    '@typescript-eslint/no-shadow': [
+    '@typescript-eslint/no-shadow': ['warn', { ignoreTypeValueShadow: true }],
+    '@typescript-eslint/consistent-type-imports': [
       'warn',
-      {
-        ignoreTypeValueShadow: true,
-      },
+      { disallowTypeAnnotations: false },
     ],
-
-    // react rules
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
-    'react/jsx-uses-react': 'off',
-    'react/react-in-jsx-scope': 'off',
-
-    // no sloppiness
-    'no-console': ['error', { allow: ['error', 'warn'] }],
-
-    // security
-    'react/jsx-no-target-blank': [
+    'react/no-unknown-property': [
       'error',
       {
-        allowReferrer: true,
+        ignore: [
+          'jsx', // styled-jsx
+        ],
       },
     ],
-
-    // import rules and fixes
-    '@typescript-eslint/consistent-type-imports': 'warn',
+    'no-console': ['error', { allow: ['error', 'warn'] }],
+    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     'import/newline-after-import': 'warn',
     'import/order': [
       'warn',
@@ -75,17 +62,8 @@ module.exports = {
         },
       },
     ],
-
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
   },
-
   overrides: [
-    {
-      files: ['*.js', '*.cjs', '*.mjs', '*.jsx'],
-      rules: {
-        '@typescript-eslint/no-var-requires': 'off',
-      },
-    },
     {
       files: ['*.mdx'],
       extends: ['plugin:mdx/recommended'],

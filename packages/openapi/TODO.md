@@ -1,0 +1,1 @@
+- deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser

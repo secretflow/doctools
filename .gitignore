@@ -295,6 +295,9 @@ dist
 # Nx cache
 .nx
 
+# SWC
+.swc
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged

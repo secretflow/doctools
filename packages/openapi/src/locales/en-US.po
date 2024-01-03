@@ -1,0 +1,278 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-01-03 09:00+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en-US\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/openapi/SchemaHeader.tsx:155
+#~ msgid ","
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:155
+#~ msgid ",\\s"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:124
+#~ msgid "{0, plural, one {character} other {characters}}"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:185
+msgid "{0, plural, one {maximum # character} other {maximum # characters}}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:226
+msgid "{0, plural, one {maximum # item} other {maximum # items}}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:266
+msgid "{0, plural, one {maximum # property} other {maximum # properties}}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:174
+msgid "{0, plural, one {minimum # character} other {minimum # characters}}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:219
+msgid "{0, plural, one {minimum # item} other {minimum # items}}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:255
+msgid "{0, plural, one {minimum # property} other {minimum # properties}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:74
+msgid "{count, plural, one {array} other {arrays}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:54
+msgid "{count, plural, one {base64 string} other {base64 strings}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:64
+msgid "{count, plural, one {boolean} other {booleans}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:28
+msgid "{count, plural, one {date} other {dates}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:26
+msgid "{count, plural, one {date/time} other {dates/times}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:32
+msgid "{count, plural, one {duration} other {durations}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:34
+msgid "{count, plural, one {email} other {emails}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:36
+msgid "{count, plural, one {hostname} other {hostnames}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:66
+msgid "{count, plural, one {integer} other {integers}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:38
+msgid "{count, plural, one {IPv4 address} other {IPv4 addresses}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:40
+msgid "{count, plural, one {IPv6 address} other {IPv6 addresses}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:99
+msgid "{count, plural, one {map} other {maps}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:68
+msgid "{count, plural, one {number} other {numbers}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:70
+msgid "{count, plural, one {object} other {objects}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:58
+msgid "{count, plural, one {password} other {passwords}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:72
+msgid "{count, plural, one {string} other {strings}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:42
+msgid "{count, plural, one {URI} other {URIs}}"
+msgstr ""
+
+#: src/components/openapi/text.ts:44
+msgid "{count, plural, one {UUID} other {UUIDs}}"
+msgstr ""
+
+#: src/components/i18n/punctuations.tsx:16
+msgid "<0> – </0>"
+msgstr ""
+
+#: src/components/i18n/punctuations.tsx:4
+msgid "<0>, </0>"
+msgstr ""
+
+#: src/components/i18n/punctuations.tsx:10
+msgid "<0>: </0>"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:30
+#~ msgid "array"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:32
+#~ msgid "array of {subtype}"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:60
+#~ msgid "base64 string"
+#~ msgstr ""
+
+#: src/components/openapi/text.ts:56
+msgid "binary"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:36
+#~ msgid "boolean"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:46
+#~ msgid "date"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:45
+#~ msgid "datetime"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:76
+msgid "default: <0/>"
+msgstr ""
+
+#: src/components/openapi/text.ts:52
+msgid "double"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:48
+#~ msgid "duration"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaTree.tsx:96
+msgid "Each item: {0}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:49
+#~ msgid "email"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:93
+msgid "example: <0/>"
+msgstr ""
+
+#: src/components/openapi/text.ts:50
+msgid "float"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:50
+#~ msgid "hostname"
+#~ msgstr ""
+
+#: src/components/openapi/text.ts:46
+msgid "int32"
+msgstr ""
+
+#: src/components/openapi/text.ts:48
+msgid "int64"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:37
+#~ msgid "integer"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:51
+#~ msgid "ipv4"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:52
+#~ msgid "ipv6"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:233
+msgid "items must be unique"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:135
+#~ msgid "maximum length {0}"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:124
+#~ msgid "minimum length {0}"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:149
+msgid "multiple of {0}"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:112
+msgid "must be one of"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:196
+msgid "must match regular expression <0>{0}</0>"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:277
+msgid "no extra keys allowed"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:38
+#~ msgid "number"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:39
+#~ msgid "object"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:62
+#~ msgid "password"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:142
+#~ msgid "regular expression <0>{0}</0>"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:53
+msgid "required"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:40
+#~ msgid "string"
+#~ msgstr ""
+
+#: src/components/openapi/text.ts:30
+msgid "time"
+msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:53
+#~ msgid "uri"
+#~ msgstr ""
+
+#: src/components/openapi/SchemaHeader.tsx:54
+#~ msgid "uuid"
+#~ msgstr ""
