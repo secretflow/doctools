@@ -158,6 +158,9 @@ importers:
 
   packages/openapi:
     dependencies:
+      '@lingui/core':
+        specifier: ^4.6.0
+        version: 4.6.0
       '@lingui/macro':
         specifier: ^4.6.0
         version: 4.6.0(@lingui/react@4.6.0)(babel-plugin-macros@3.1.0)(typescript@5.3.3)
@@ -192,9 +195,6 @@ importers:
       '@lingui/conf':
         specifier: ^4.6.0
         version: 4.6.0(typescript@5.3.3)
-      '@lingui/core':
-        specifier: ^4.6.0
-        version: 4.6.0
       '@lingui/swc-plugin':
         specifier: ^4.0.4
         version: 4.0.4(@lingui/macro@4.6.0)
