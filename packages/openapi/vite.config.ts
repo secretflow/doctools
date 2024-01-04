@@ -40,13 +40,13 @@ export default defineConfig({
   build: {
     target: 'esnext',
     lib: {
-      entry: ['./src/index.ts', './src/sphinx.ts'],
+      entry: {
+        index: './src/index.ts',
+        sphinx: './src/sphinx/index.ts',
+      },
       formats: ['es'],
     },
     rollupOptions: {
-      output: {
-        entryFileNames: '[name].js',
-      },
       external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)].map(
         (k) => new RegExp(`^${k}(/|$)`),
       ),

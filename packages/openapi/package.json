@@ -1,6 +1,6 @@
 {
   "name": "@secretflow/openapi",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.3",
   "license": "Apache-2.0",
   "author": "Tony Wu <tonywu6@protonmail.com>",
   "type": "module",
@@ -15,7 +15,7 @@
       "default": "./dist/index.js"
     },
     "./sphinx": {
-      "types": "./src/sphinx.ts",
+      "types": "./src/sphinx/index.ts",
       "import": "./dist/sphinx.js",
       "default": "./dist/sphinx.js"
     },
@@ -35,6 +35,7 @@
     "@lingui/react": "^4.6.0",
     "@mdx-js/mdx": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
+    "@monaco-editor/react": "^4.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-syntax-highlighter": "^15.5.0",
@@ -59,8 +60,6 @@
     "memfs": "^4.6.0",
     "oas": "^24.1.0",
     "oas-normalize": "^11.0.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.8",
     "vite-plugin-node-polyfills": "^0.19.0"
   },
   "publishConfig": {
