@@ -57,3 +57,139 @@ export const AdditionalProperties: Story = {
     },
   },
 };
+
+export const ArrayOfArrays: Story = {
+  args: {
+    schema: {
+      type: 'object',
+      properties: {
+        'string[][]': {
+          type: 'array',
+          items: {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+        'object[][]': {
+          type: 'array',
+          items: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                foo: { type: 'string' },
+                bar: { type: 'string' },
+              },
+            },
+          },
+        },
+        'float[][][]': {
+          type: 'array',
+          items: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'number',
+                format: 'float',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+export const MapsOfMaps: Story = {
+  args: {
+    schema: {
+      type: 'object',
+      properties: {
+        'Map<string, Map<string, string>': {
+          type: 'object',
+          additionalProperties: {
+            type: 'object',
+            additionalProperties: {
+              type: 'string',
+            },
+          },
+        },
+        'Map<string, Map<string, object>': {
+          type: 'object',
+          additionalProperties: {
+            type: 'object',
+            additionalProperties: {
+              type: 'object',
+              properties: {
+                foo: { type: 'string' },
+                bar: { type: 'string' },
+              },
+            },
+          },
+        },
+        'Map<string, Map<string, Map<string, float>>>': {
+          type: 'object',
+          additionalProperties: {
+            type: 'object',
+            additionalProperties: {
+              type: 'object',
+              additionalProperties: {
+                type: 'number',
+                format: 'float',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+export const ConfusingContainer: Story = {
+  args: {
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          additionalProperties: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        foo: { type: 'string' },
+                        bar: { type: 'string' },
+                      },
+                      required: ['foo'],
+                      additionalProperties: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            foo: { type: 'string' },
+                            bar: { type: 'string' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};

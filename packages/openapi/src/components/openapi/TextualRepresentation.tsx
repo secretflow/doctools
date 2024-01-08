@@ -1,5 +1,9 @@
+import { Popover } from 'antd';
 import styled from 'styled-components';
 
+import { lightTheme } from '@/theme';
+
+import { CodeHighlighter } from './CodeHighlighter';
 import { maybeJSON, truncate } from './text';
 
 export function TextualRepresentation({
@@ -14,30 +18,26 @@ export function TextualRepresentation({
   if (value === undefined) {
     return null;
   }
-
   const text = maybeJSON(value);
-
   const shortened = truncate(text, len);
-
-  if (shouldShorten && shortened !== text) {
-    return (
-      <TextualRepresentation.ShortenedText title={text}>
-        {shortened}
-      </TextualRepresentation.ShortenedText>
-    );
-  }
-
   return (
-    <TextualRepresentation.NormalText title={text}>
-      {text}
-    </TextualRepresentation.NormalText>
+    <Popover
+      content={
+        <CodeHighlighter language="json">
+          {JSON.stringify(value, null, 2)}
+        </CodeHighlighter>
+      }
+      mouseEnterDelay={1}
+      overlayInnerStyle={{ padding: lightTheme.vars.openapi.spacing.s }}
+    >
+      <TextualRepresentation.Text>
+        {shouldShorten && shortened !== text ? shortened : text}
+      </TextualRepresentation.Text>
+    </Popover>
   );
 }
 
-TextualRepresentation.NormalText = styled.code``;
-
-TextualRepresentation.ShortenedText = styled.code`
+TextualRepresentation.Text = styled.code`
+  font-family: ${lightTheme.vars.openapi.typography.monospace};
   cursor: help;
-  text-decoration: 0.08em dotted underline;
-  text-underline-offset: 0.3em;
 `;

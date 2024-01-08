@@ -27,7 +27,6 @@ export const Int32: Story = {
 export const String: Story = {
   args: {
     name: 'name',
-    required: ['name'],
     schema: {
       type: 'string',
       description: '# Lorem ipsum',
@@ -35,6 +34,10 @@ export const String: Story = {
       maxLength: 20,
       pattern: '^[a-zA-Z0-9]*$',
       default: 'John Doe',
+    },
+    parent: {
+      required: ['name'],
+      type: 'object',
     },
   },
 };

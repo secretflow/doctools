@@ -1,16 +1,24 @@
+import { I18nProvider } from '@lingui/react';
+import { MDXProvider } from '@mdx-js/react';
 import { Alert, Skeleton, Divider } from 'antd';
-import OAS from 'oas';
+import type OAS from 'oas';
 import type { OASDocument } from 'oas/types';
-import OASNormalize from 'oas-normalize';
+import styled from 'styled-components';
 import useSWR from 'swr';
 import YAML from 'yaml';
 
+import { i18n } from '@/i18n';
+import { ThemeConfig } from '@/index';
+import { lightTheme } from '@/theme';
 import { intersperse } from '@/utils/itertools';
 
-import { Operation } from './Operation';
+import type { OpenAPIComponents } from './injection';
+import { OperationViewer } from './OperationViewer';
 
 function resolveAPI(schema: unknown): () => Promise<OAS> {
   return async () => {
+    const { default: OAS } = await import('oas');
+    const { default: OASNormalize } = await import('oas-normalize');
     const raw = (() => {
       if (typeof schema === 'string') {
         return YAML.parse(schema);
@@ -24,7 +32,19 @@ function resolveAPI(schema: unknown): () => Promise<OAS> {
   };
 }
 
-export function OpenAPIViewer({ schema }: { schema: unknown }) {
+const RootContainer = styled.div`
+  box-sizing: border-box;
+  font-family: ${lightTheme.vars.openapi.typography.sans};
+  font-size: 14px;
+`;
+
+export function OpenAPIViewer({
+  schema,
+  components,
+}: {
+  schema: unknown;
+  components?: OpenAPIComponents;
+}) {
   const {
     data: api,
     isLoading,
@@ -45,24 +65,28 @@ export function OpenAPIViewer({ schema }: { schema: unknown }) {
   }
   const paths = api.getPaths();
   return (
-    <div>
-      {intersperse(
-        Object.entries(paths).flatMap(([path, methods]) =>
-          Object.entries(methods).map(([method, operation]) => {
-            return (
-              <Operation
-                key={`${method} ${path}`}
-                method={method}
-                path={path}
-                operation={operation}
-              />
-            );
-          }),
-        ),
-        (i) => (
-          <Divider key={`divider-${i}`} style={{ margin: '2rem 0' }} />
-        ),
-      )}
-    </div>
+    <I18nProvider i18n={i18n}>
+      <lightTheme.ThemeVariables />
+      <MDXProvider components={components}>
+        <ThemeConfig>
+          <RootContainer>
+            <div>
+              {intersperse(
+                Object.entries(paths).flatMap(([path, methods]) =>
+                  Object.entries(methods).map(([method, operation]) => (
+                    <OperationViewer key={`${method} ${path}`} operation={operation} />
+                  )),
+                ),
+                (i) => (
+                  <Divider key={`divider-${i}`} />
+                ),
+              )}
+            </div>
+          </RootContainer>
+        </ThemeConfig>
+      </MDXProvider>
+    </I18nProvider>
   );
 }
+
+export { type OpenAPIComponents };

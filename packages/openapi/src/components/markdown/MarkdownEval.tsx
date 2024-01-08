@@ -3,6 +3,7 @@ import type { RunOptions } from '@mdx-js/mdx';
 import { useMDXComponents } from '@mdx-js/react';
 import { memo } from 'react';
 import * as jsxRuntime from 'react/jsx-runtime';
+import remarkGfm from 'remark-gfm';
 
 export const MarkdownEval = memo(function MarkdownEval({
   content,
@@ -12,6 +13,7 @@ export const MarkdownEval = memo(function MarkdownEval({
   const code = compileSync(content, {
     format: 'md',
     outputFormat: 'function-body',
+    remarkPlugins: [remarkGfm],
   });
   const { default: Content } = runSync(code, {
     ...(jsxRuntime as RunOptions),

@@ -12,7 +12,7 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'import', 'react-refresh'],
-  ignorePatterns: ['dist', '.eslintrc.*'],
+  ignorePatterns: ['dist', '.eslintrc.*', '!.storybook'],
   rules: {
     eqeqeq: 'error',
     curly: 'error',
@@ -22,16 +22,9 @@ module.exports = {
       'warn',
       { disallowTypeAnnotations: false },
     ],
+    'react/no-unknown-property': ['error', { ignore: ['jsx', 'global'] }],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
-    'react/no-unknown-property': [
-      'error',
-      {
-        ignore: [
-          'jsx', // styled-jsx
-        ],
-      },
-    ],
     'no-console': ['error', { allow: ['error', 'warn'] }],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     'import/newline-after-import': 'warn',

@@ -1,6 +1,6 @@
 {
   "name": "@secretflow/openapi",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "license": "Apache-2.0",
   "author": "Tony Wu <tonywu6@protonmail.com>",
   "type": "module",
@@ -18,18 +18,21 @@
       "types": "./src/sphinx/index.ts",
       "import": "./dist/sphinx.js",
       "default": "./dist/sphinx.js"
-    },
-    "./locales/*": {
-      "import": "./src/locales/*",
-      "default": "./src/locales/*"
     }
   },
   "scripts": {
-    "prepare": "tsc && vite build",
+    "dev:storybook": "storybook dev -p 6006 --no-open",
+    "build:vite": "tsc && vite build",
     "i18n:extract:lingui": "lingui extract",
-    "i18n:compile:lingui": "lingui compile"
+    "i18n:compile:lingui": "lingui compile",
+    "prepare": "nx build:vite"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@lingui/core": "^4.6.0",
     "@lingui/macro": "^4.6.0",
     "@lingui/react": "^4.6.0",
@@ -38,8 +41,11 @@
     "@monaco-editor/react": "^4.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
     "react-syntax-highlighter": "^15.5.0",
+    "remark-gfm": "^4.0.0",
     "styled-components": "^6.1.6",
+    "styled-jsx": "^5.1.2",
     "swr": "^2.2.4",
     "yaml": "^2.3.4"
   },
@@ -49,9 +55,11 @@
     "@lingui/vite-plugin": "^4.6.0",
     "@readme/oas-examples": "^5.12.1",
     "@swc/plugin-styled-components": "^1.5.108",
+    "@swc/plugin-styled-jsx": "^1.5.108",
     "@types/mdx": "^2.0.10",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
+    "@types/react-helmet": "^6.1.11",
     "@types/react-syntax-highlighter": "^15.5.11",
     "@types/swagger2openapi": "^7.0.4",
     "@vitejs/plugin-react-swc": "^3.5.0",

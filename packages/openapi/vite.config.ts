@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { lingui } from '@lingui/vite-plugin';
@@ -8,30 +9,35 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 import { dependencies, peerDependencies } from './package.json';
 
+const require = createRequire(import.meta.url);
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      plugins: [
-        ['@lingui/swc-plugin', {}],
-        ['@swc/plugin-styled-components', {}],
-      ],
-    }),
-    lingui(),
     nodePolyfills({
       overrides: {
         fs: 'memfs',
       },
     }),
+    react({
+      plugins: [
+        [
+          '@lingui/swc-plugin',
+          {
+            runtimeModules: {
+              i18n: [require.resolve('./src/i18n.ts'), 'i18n'],
+              trans: [require.resolve('./src/i18n.ts'), 'Trans'],
+            },
+          },
+        ],
+        ['@swc/plugin-styled-components', { displayName: true }],
+      ],
+    }),
+    lingui(),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      // ...Object.fromEntries(
-      //   [...Object.entries(peerDependencies), ...Object.entries(dependencies)].map(
-      //     ([k, v]) => [k, `https://esm.sh/${k}@${v}`],
-      //   ),
-      // ),
     },
   },
   define: {
@@ -51,6 +57,7 @@ export default defineConfig({
         (k) => new RegExp(`^${k}(/|$)`),
       ),
     },
+    minify: process.env['NODE_ENV'] !== 'development',
   },
   optimizeDeps: {
     esbuildOptions: {

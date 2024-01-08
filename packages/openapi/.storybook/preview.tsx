@@ -1,14 +1,10 @@
-import type { Preview } from '@storybook/react';
 import { I18nProvider } from '@lingui/react';
+import type { Preview } from '@storybook/react';
 import { useEffect } from 'react';
 
 import { i18n } from '../src/i18n';
-import * as enUS from '../src/locales/en-US.mjs';
-import * as zhHans from '../src/locales/zh-Hans.mjs';
-
-i18n.load('en-US', enUS.messages);
-i18n.load('zh-Hans', zhHans.messages);
-i18n.activate('en-US');
+import { lightTheme } from '../src/theme';
+import { ThemeConfig, ThemeResources } from '../src/theme/config';
 
 function I18nContext({
   locale,
@@ -45,9 +41,13 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => (
-      <I18nContext locale={context.globals.locale}>
-        <Story />
-      </I18nContext>
+      <ThemeConfig>
+        <I18nContext locale={context.globals.locale}>
+          <lightTheme.ThemeVariables />
+          <ThemeResources />
+          <Story />
+        </I18nContext>
+      </ThemeConfig>
     ),
   ],
 };

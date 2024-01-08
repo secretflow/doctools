@@ -1,1 +1,6 @@
-- deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser
+- [x] autocollapsing
+- [x] styles
+- [x] code samples QoL
+- [x] fully-managed i18n
+- [ ] outline
+- [ ] deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser

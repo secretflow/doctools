@@ -8,14 +8,14 @@
   },
   "[javascript]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll": true
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
   },
   "[javascriptreact]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll": true
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
@@ -48,14 +48,14 @@
   },
   "[typescript]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll": true
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
   },
   "[typescriptreact]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll": true
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.tabSize": 2
@@ -73,6 +73,7 @@
     "typescriptreact",
     "mdx"
   ],
+  "stylelint.validate": ["css", "postcss", "typescript", "typescriptreact"],
   "files.associations": {
     "**/tooling/tsconfig/*.json": "jsonc",
     "**/tooling/tsconfig/package.json": "json",
@@ -90,7 +91,7 @@
   "python.testing.pytestEnabled": true,
   "[javascript][javascriptreact][typescript][typescriptreact]": {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll": "explicit"
     }
   }
 }

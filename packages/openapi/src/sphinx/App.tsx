@@ -1,4 +1,3 @@
-import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 import { Editor } from '@monaco-editor/react';
 import { Button, Drawer, message } from 'antd';
@@ -6,6 +5,7 @@ import { useRef, useState } from 'react';
 import YAML from 'yaml';
 
 import { OpenAPIViewer } from '@/components/openapi/OpenAPIViewer';
+import { i18n } from '@/i18n';
 
 import { Container } from './Container';
 
