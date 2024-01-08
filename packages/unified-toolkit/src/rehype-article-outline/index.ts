@@ -201,7 +201,7 @@ export function rehypeArticleOutline(): Transformer {
             const data: OpenAPIV2.Document = YAML.parse(schema);
             if (data['swagger'] === '2.0') {
               const paths = data.paths;
-              Object.entries(paths).forEach(([path, pathData]) => {
+              Object.entries(paths).forEach(([, pathData]) => {
                 Object.entries(pathData).forEach(([method, methodData]) => {
                   if (typeof methodData !== 'object') {
                     return;
@@ -240,7 +240,7 @@ export function rehypeArticleOutline(): Transformer {
                     contentHint.push(description);
                   }
                   const id = operationId;
-                  const title = `${method.toUpperCase()} ${path}`.trim();
+                  const title = `${summary}`.trim();
                   swagger.push({
                     id,
                     title: title,

@@ -1,5 +1,11 @@
 # @secretflow/unified-toolkit
 
+## 0.4.0-alpha.1.2
+
+### Patch Changes
+
+- fix misc issues
+
 ## 0.4.0-alpha.1.0
 
 ### Minor Changes

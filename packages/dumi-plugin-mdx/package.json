@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-plugin-mdx",
   "license": "MIT",
-  "version": "0.3.0-alpha.1.0",
+  "version": "0.3.0-alpha.1.2",
   "description": "Dumi plugin to enable compiling .mdx files.",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-plugin-mdx",

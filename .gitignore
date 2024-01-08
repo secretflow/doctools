@@ -308,3 +308,5 @@ dist
 
 # Personalization
 .vscode/launch.json
+
+.nx
