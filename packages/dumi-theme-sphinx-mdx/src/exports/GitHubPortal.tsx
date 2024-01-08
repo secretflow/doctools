@@ -6,7 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Tooltip, Typography, ConfigProvider } from 'antd';
 import { formatRelative } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import zhCN from 'date-fns/locale/zh-CN/index.js';
 import { useRouteMeta } from 'dumi';
 import newGitHubIssueURL from 'new-github-issue-url';
 

@@ -6,8 +6,8 @@
     "sourceMap": true,
     "declarationMap": true,
     "pretty": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "baseUrl": "./",
     "paths": {
       "~/*": ["src/*"]

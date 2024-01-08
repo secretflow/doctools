@@ -4,8 +4,10 @@ import { Link } from 'dumi';
 import Badge from 'dumi/theme-default/builtins/Badge';
 import SourceCode from 'dumi/theme-default/builtins/SourceCode';
 import Table from 'dumi/theme-default/builtins/Table';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
+
+import { OpenAPI } from '../internals/components/OpenAPI.js';
 
 import * as intrinsic from './intrinsic-elements.js';
 
@@ -51,6 +53,7 @@ export const DocumentRenderer = forwardRef<HTMLElement, React.PropsWithChildren>
               Badge: Badge as unknown as ForeignComponent,
               SourceCode: SourceCode as unknown as ForeignComponent,
               Table: Table as unknown as ForeignComponent,
+              OpenAPIViewer: OpenAPI,
               ...intrinsic,
               ...components,
             }}

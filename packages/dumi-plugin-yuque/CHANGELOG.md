@@ -1,5 +1,12 @@
 # @secretflow/dumi-plugin-yuque
 
+## 0.2.1-alpha.1.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.4.0-alpha.1.0
+
 ## 0.2.0
 
 ### Minor Changes

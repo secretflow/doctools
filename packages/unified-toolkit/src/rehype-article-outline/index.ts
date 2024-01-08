@@ -2,11 +2,12 @@ import Slugger from 'github-slugger';
 import type * as hast from 'hast';
 import { toString as hastToString } from 'hast-util-to-string';
 import { toString as mdastToString } from 'mdast-util-to-string';
+import type { OpenAPIV2 } from 'openapi-types';
 import type { Transformer } from 'unified';
 import { convert } from 'unist-util-is';
 import { selectAll } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
-
+import YAML from 'yaml';
 import 'remark-mdx';
 
 export type OutlineItem = {
@@ -40,9 +41,17 @@ type JSXOutlineElement = MdxJsxFlowElementHAST & {
   name: 'Outline';
 };
 
+type JSXOpenAPIViewerElement = MdxJsxFlowElementHAST & {
+  name: 'OpenAPIViewer';
+};
+
 type HASTHeading = hast.Element & { tagName: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' };
 
-type PointOfInterest = JSXHeading | JSXOutlineElement | HASTHeading;
+type PointOfInterest =
+  | JSXHeading
+  | JSXOutlineElement
+  | JSXOpenAPIViewerElement
+  | HASTHeading;
 
 declare module 'vfile' {
   interface DataMap {
@@ -99,6 +108,10 @@ function isCodeSymbol(elem: ContentElement): elem is JSXOutlineElement {
   return elem.type === 'mdxJsxFlowElement' && elem.name === 'Outline';
 }
 
+function isOpenAPIViewer(elem: ContentElement): elem is JSXOpenAPIViewerElement {
+  return elem.type === 'mdxJsxFlowElement' && elem.name === 'OpenAPIViewer';
+}
+
 function elementTitle(elem: PointOfInterest) {
   if (isCodeSymbol(elem)) {
     const fullname = jsxLiteralAttribute<string | null>(elem, 'fullname');
@@ -130,6 +143,8 @@ export function rehypeArticleOutline(): Transformer {
   return (tree, file) => {
     const outline = new Map<PointOfInterest, OutlineItem>();
 
+    const swagger: OutlineItem[] = [];
+
     // collect all points of interest
 
     const slugger = new Slugger();
@@ -160,6 +175,7 @@ export function rehypeArticleOutline(): Transformer {
         'root > element[tagName="h5"]',
         'root > element[tagName="h6"]',
         'mdxJsxFlowElement[name="Outline"]',
+        'mdxJsxFlowElement[name="OpenAPIViewer"]',
         // FIXME:
         ...(file.basename?.endsWith('.html')
           ? [
@@ -177,6 +193,75 @@ export function rehypeArticleOutline(): Transformer {
       const heading = node as PointOfInterest;
 
       let depth: number;
+
+      if (isOpenAPIViewer(heading)) {
+        const schema = jsxStringAttribute(heading, 'schema');
+        if (schema) {
+          try {
+            const data: OpenAPIV2.Document = YAML.parse(schema);
+            if (data['swagger'] === '2.0') {
+              const paths = data.paths;
+              Object.entries(paths).forEach(([path, pathData]) => {
+                Object.entries(pathData).forEach(([method, methodData]) => {
+                  if (typeof methodData !== 'object') {
+                    return;
+                  }
+                  const isOperation = (
+                    _: typeof methodData,
+                  ): _ is OpenAPIV2.OperationObject => {
+                    return [
+                      'get',
+                      'put',
+                      'post',
+                      'delete',
+                      'options',
+                      'head',
+                      'patch',
+                      'trace',
+                    ].includes(method);
+                  };
+                  if (!isOperation(methodData)) {
+                    return;
+                  }
+                  const operationId = methodData.operationId;
+                  if (!operationId) {
+                    return;
+                  }
+                  const summary = methodData.summary;
+                  const description = methodData.description;
+                  const contentHint: string[] = [];
+                  if (operationId) {
+                    contentHint.push(operationId);
+                  }
+                  if (summary) {
+                    contentHint.push(summary);
+                  }
+                  if (description) {
+                    contentHint.push(description);
+                  }
+                  const id = operationId;
+                  const title = `${method.toUpperCase()} ${path}`.trim();
+                  swagger.push({
+                    id,
+                    title: title,
+                    longTitle: `${title} - ${summary}`,
+                    depth: 1,
+                    order: headingCount++,
+                    headline: [],
+                    content: contentHint.join(', '),
+                    // initialize containers
+                    metadata: {},
+                    tags: [],
+                  });
+                });
+              });
+            }
+          } catch (e) {
+            // ignored
+          }
+        }
+        return;
+      }
 
       if (isHTMLHeading(heading)) {
         depth = Number(heading.tagName[1]);
@@ -318,6 +403,6 @@ export function rehypeArticleOutline(): Transformer {
       },
     );
 
-    file.data['outline'] = [...outline.values()];
+    file.data['outline'] = [...outline.values(), ...swagger];
   };
 }

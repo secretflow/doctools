@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-theme-sphinx-mdx",
   "license": "MIT",
-  "version": "0.5.0",
+  "version": "0.6.0-alpha.1.0",
   "description": "Dumi theme for SecretFlow's documentation.",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-theme-sphinx-mdx",
@@ -37,6 +37,7 @@
     "@secretflow/dumi-mdx-loader-core": "workspace:^",
     "@secretflow/dumi-plugin-mdx": "workspace:^",
     "@secretflow/dumi-plugin-search": "workspace:^",
+    "@secretflow/openapi": ">=0.0.1-alpha.5",
     "antd": "^5.7.0",
     "date-fns": "^2.30.0",
     "globby": "^13.2.2",

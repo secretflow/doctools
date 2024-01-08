@@ -1,5 +1,17 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.6.0-alpha.1.0
+
+### Minor Changes
+
+- add transitional openapi features
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-mdx@0.3.0-alpha.1.0
+  - @secretflow/dumi-plugin-search@0.3.1-alpha.1.0
+
 ## 0.5.0
 
 ### Minor Changes
