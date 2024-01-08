@@ -64,7 +64,7 @@
     },
     "build:vite": {
       "inputs": [":default", ":javascript"],
-      "outputs": ["{projectRoot}/dist"],
+      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"],
       "dependsOn": ["^build:vite"],
       "cache": true
     },

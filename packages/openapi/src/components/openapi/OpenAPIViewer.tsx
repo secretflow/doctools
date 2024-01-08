@@ -70,18 +70,16 @@ export function OpenAPIViewer({
       <MDXProvider components={components}>
         <ThemeConfig>
           <RootContainer>
-            <div>
-              {intersperse(
-                Object.entries(paths).flatMap(([path, methods]) =>
-                  Object.entries(methods).map(([method, operation]) => (
-                    <OperationViewer key={`${method} ${path}`} operation={operation} />
-                  )),
-                ),
-                (i) => (
-                  <Divider key={`divider-${i}`} />
-                ),
-              )}
-            </div>
+            {intersperse(
+              Object.entries(paths).flatMap(([path, methods]) =>
+                Object.entries(methods).map(([method, operation]) => (
+                  <OperationViewer key={`${method} ${path}`} operation={operation} />
+                )),
+              ),
+              (i) => (
+                <Divider key={`divider-${i}`} />
+              ),
+            )}
           </RootContainer>
         </ThemeConfig>
       </MDXProvider>

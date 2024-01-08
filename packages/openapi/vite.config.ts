@@ -45,6 +45,7 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
+    outDir: 'dist/esm',
     lib: {
       entry: {
         index: './src/index.ts',

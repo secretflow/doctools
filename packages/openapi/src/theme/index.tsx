@@ -40,6 +40,7 @@ type ThemeTokens = {
 function createTheme(tokens: ThemeTokens): {
   ThemeVariables: ReturnType<typeof createGlobalStyle>;
   vars: ThemeTokens;
+  tokens: ThemeTokens;
 } {
   const reduceVars = (root: CSSVariables): Record<string, string> =>
     Object.fromEntries(
@@ -71,7 +72,7 @@ function createTheme(tokens: ThemeTokens): {
   `;
   const vars = mapVars(tokens);
 
-  return { ThemeVariables, vars };
+  return { ThemeVariables, vars, tokens };
 }
 
 export const lightTheme = createTheme({
