@@ -63,7 +63,7 @@ Method.Text = styled.span`
 function EndpointTitle({ operation }: { operation: Operation }) {
   const { OperationTitle = EndpointTitle.Text } = useOpenAPIComponents();
   const text =
-    operation.getSummary().trim() ||
+    paragraphs()(operation.getSummary()).trim() ||
     `${operation.method.toUpperCase()} ${operation.path}}`;
   return (
     <OperationTitle id={operation.getOperationId()}>
