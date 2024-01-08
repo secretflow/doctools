@@ -1,6 +1,6 @@
 {
   "name": "@secretflow/openapi",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.7",
   "license": "Apache-2.0",
   "author": "Tony Wu <tonywu6@protonmail.com>",
   "type": "module",
