@@ -371,6 +371,7 @@ SchemaHeader.Constraints = styled(SchemaHeader.Card)`
 
 const ValidationItem = styled.p`
   margin: 0;
+  font-family: ${lightTheme.vars.openapi.typography.sans};
   font-size: 0.9em;
 
   strong {

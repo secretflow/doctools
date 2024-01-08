@@ -13,27 +13,27 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/openapi/SchemaHeader.tsx:202
+#: src/components/openapi/SchemaHeader.tsx:203
 msgid "{0, plural, one {maximum # character} other {maximum # characters}}"
 msgstr "{0, plural, one {最长 # 个字符} other {最长 # 个字符}}"
 
-#: src/components/openapi/SchemaHeader.tsx:240
+#: src/components/openapi/SchemaHeader.tsx:241
 msgid "{0, plural, one {maximum # item} other {maximum # items}}"
 msgstr "{0, plural, one {最多 # 个元素} other {最多 # 个元素}}"
 
-#: src/components/openapi/SchemaHeader.tsx:277
+#: src/components/openapi/SchemaHeader.tsx:278
 msgid "{0, plural, one {maximum # property} other {maximum # properties}}"
 msgstr "{0, plural, one {最多 # 个属性} other {最多 # 个属性}}"
 
-#: src/components/openapi/SchemaHeader.tsx:191
+#: src/components/openapi/SchemaHeader.tsx:192
 msgid "{0, plural, one {minimum # character} other {minimum # characters}}"
 msgstr "{0, plural, one {最短 # 个字符} other {最短 # 个字符}}"
 
-#: src/components/openapi/SchemaHeader.tsx:233
+#: src/components/openapi/SchemaHeader.tsx:234
 msgid "{0, plural, one {minimum # item} other {minimum # items}}"
 msgstr "{0, plural, one {最少 # 个元素} other {最少 # 个元素}}"
 
-#: src/components/openapi/SchemaHeader.tsx:266
+#: src/components/openapi/SchemaHeader.tsx:267
 msgid "{0, plural, one {minimum # property} other {minimum # properties}}"
 msgstr "{0, plural, one {最少 # 个属性} other {最少 # 个属性}}"
 
@@ -146,11 +146,11 @@ msgstr "数组"
 msgid "binary data"
 msgstr "二进制数据"
 
-#: src/components/openapi/SchemaHeader.tsx:99
+#: src/components/openapi/SchemaHeader.tsx:100
 msgid "default ="
 msgstr "默认是"
 
-#: src/components/openapi/SchemaHeader.tsx:114
+#: src/components/openapi/SchemaHeader.tsx:115
 msgid "example:"
 msgstr "示例："
 
@@ -162,7 +162,7 @@ msgstr "int32"
 msgid "int64"
 msgstr "int64"
 
-#: src/components/openapi/SchemaHeader.tsx:247
+#: src/components/openapi/SchemaHeader.tsx:248
 msgid "items must be unique"
 msgstr "每个元素必须唯一"
 
@@ -170,47 +170,47 @@ msgstr "每个元素必须唯一"
 msgid "map"
 msgstr "映射"
 
-#: src/components/openapi/SchemaHeader.tsx:173
+#: src/components/openapi/SchemaHeader.tsx:174
 msgid "multiple of {0}"
 msgstr "必须是 {0} 的倍数"
 
-#: src/components/openapi/SchemaHeader.tsx:213
+#: src/components/openapi/SchemaHeader.tsx:214
 msgid "must match regular expression <0>{0}</0>"
 msgstr "必须匹配正则表达式 <0>{0}</0>"
 
-#: src/components/openapi/SchemaHeader.tsx:288
+#: src/components/openapi/SchemaHeader.tsx:289
 msgid "no extra keys allowed"
 msgstr "不允许额外的键"
 
-#: src/components/openapi/SchemaHeader.tsx:131
+#: src/components/openapi/SchemaHeader.tsx:132
 msgid "one of"
 msgstr "枚举"
 
-#: src/components/openapi/OperationViewer.tsx:230
+#: src/components/openapi/OperationViewer.tsx:228
 msgid "Query parameters"
 msgstr "Query 参数"
 
-#: src/components/openapi/OperationViewer.tsx:251
+#: src/components/openapi/OperationViewer.tsx:249
 msgid "Request body"
 msgstr "请求体"
 
-#: src/components/openapi/OperationViewer.tsx:206
+#: src/components/openapi/OperationViewer.tsx:204
 msgid "Request examples"
 msgstr "请求体示例"
 
-#: src/components/openapi/SchemaHeader.tsx:74
+#: src/components/openapi/SchemaHeader.tsx:75
 msgid "required"
 msgstr "必填"
 
-#: src/components/openapi/OperationViewer.tsx:306
+#: src/components/openapi/OperationViewer.tsx:304
 msgid "Response body"
 msgstr "响应体"
 
-#: src/components/openapi/OperationViewer.tsx:297
+#: src/components/openapi/OperationViewer.tsx:295
 msgid "Response examples"
 msgstr "响应体示例"
 
-#: src/components/openapi/OperationViewer.tsx:368
+#: src/components/openapi/OperationViewer.tsx:369
 msgid "Responses"
 msgstr "响应"
 

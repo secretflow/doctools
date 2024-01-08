@@ -2,5 +2,12 @@
 - [x] styles
 - [x] code samples QoL
 - [x] fully-managed i18n
-- [ ] outline
+- [x] outline
+- [x] use name in outline
+- [ ] ~~key order~~
+- [x] hide invalid response
+- [x] list styles
+- [x] validation strong
+- [x] path margin
+- [x] title description
 - [ ] deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser

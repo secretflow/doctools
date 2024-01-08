@@ -13,27 +13,27 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/openapi/SchemaHeader.tsx:202
+#: src/components/openapi/SchemaHeader.tsx:203
 msgid "{0, plural, one {maximum # character} other {maximum # characters}}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:240
+#: src/components/openapi/SchemaHeader.tsx:241
 msgid "{0, plural, one {maximum # item} other {maximum # items}}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:277
+#: src/components/openapi/SchemaHeader.tsx:278
 msgid "{0, plural, one {maximum # property} other {maximum # properties}}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:191
+#: src/components/openapi/SchemaHeader.tsx:192
 msgid "{0, plural, one {minimum # character} other {minimum # characters}}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:233
+#: src/components/openapi/SchemaHeader.tsx:234
 msgid "{0, plural, one {minimum # item} other {minimum # items}}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:266
+#: src/components/openapi/SchemaHeader.tsx:267
 msgid "{0, plural, one {minimum # property} other {minimum # properties}}"
 msgstr ""
 
@@ -146,11 +146,11 @@ msgstr ""
 msgid "binary data"
 msgstr "binary data"
 
-#: src/components/openapi/SchemaHeader.tsx:99
+#: src/components/openapi/SchemaHeader.tsx:100
 msgid "default ="
 msgstr "default ="
 
-#: src/components/openapi/SchemaHeader.tsx:114
+#: src/components/openapi/SchemaHeader.tsx:115
 msgid "example:"
 msgstr "example:"
 
@@ -162,7 +162,7 @@ msgstr ""
 msgid "int64"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:247
+#: src/components/openapi/SchemaHeader.tsx:248
 msgid "items must be unique"
 msgstr ""
 
@@ -170,47 +170,47 @@ msgstr ""
 msgid "map"
 msgstr "map"
 
-#: src/components/openapi/SchemaHeader.tsx:173
+#: src/components/openapi/SchemaHeader.tsx:174
 msgid "multiple of {0}"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:213
+#: src/components/openapi/SchemaHeader.tsx:214
 msgid "must match regular expression <0>{0}</0>"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:288
+#: src/components/openapi/SchemaHeader.tsx:289
 msgid "no extra keys allowed"
 msgstr ""
 
-#: src/components/openapi/SchemaHeader.tsx:131
+#: src/components/openapi/SchemaHeader.tsx:132
 msgid "one of"
 msgstr "one of"
 
-#: src/components/openapi/OperationViewer.tsx:230
+#: src/components/openapi/OperationViewer.tsx:228
 msgid "Query parameters"
 msgstr "Query parameters"
 
-#: src/components/openapi/OperationViewer.tsx:251
+#: src/components/openapi/OperationViewer.tsx:249
 msgid "Request body"
 msgstr "Request body"
 
-#: src/components/openapi/OperationViewer.tsx:206
+#: src/components/openapi/OperationViewer.tsx:204
 msgid "Request examples"
 msgstr "Request examples"
 
-#: src/components/openapi/SchemaHeader.tsx:74
+#: src/components/openapi/SchemaHeader.tsx:75
 msgid "required"
 msgstr ""
 
-#: src/components/openapi/OperationViewer.tsx:306
+#: src/components/openapi/OperationViewer.tsx:304
 msgid "Response body"
 msgstr "Response body"
 
-#: src/components/openapi/OperationViewer.tsx:297
+#: src/components/openapi/OperationViewer.tsx:295
 msgid "Response examples"
 msgstr "Response examples"
 
-#: src/components/openapi/OperationViewer.tsx:368
+#: src/components/openapi/OperationViewer.tsx:369
 msgid "Responses"
 msgstr "Responses"
 

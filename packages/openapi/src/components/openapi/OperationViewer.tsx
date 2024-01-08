@@ -107,7 +107,7 @@ Endpoint.Text = styled.div`
   flex-flow: row wrap;
   gap: 0.5ch;
   align-items: baseline;
-  margin: 0.5em 0;
+  margin: 1em 0;
   font-family: ${lightTheme.vars.openapi.typography.sans};
   font-size: 1.5em;
 `;
@@ -126,9 +126,7 @@ Endpoint.Path = styled.code`
 function EndpointDocumentation({ operation }: { operation: Operation }) {
   return (
     <EndpointDocumentation.Text>
-      <Documentation
-        text={paragraphs()(operation.getSummary(), operation.getDescription())}
-      />
+      <Documentation text={paragraphs()(operation.getDescription())} />
     </EndpointDocumentation.Text>
   );
 }
@@ -343,6 +341,9 @@ StatusCode.Text = styled(Tag)`
 
 function Responses({ operation }: { operation: Operation }) {
   const items = operation.getResponseStatusCodes().flatMap((code): CollapseItem[] => {
+    if (Number.isNaN(Number(code))) {
+      return [];
+    }
     const response = operation.getResponseByStatusCode(code);
     if (typeof response !== 'object') {
       return [];

@@ -8,8 +8,8 @@ export const ThemeConfig = ({ children }: React.PropsWithChildren) => (
     theme={{
       components: {
         Collapse: {
-          headerPadding: `${lightTheme.vars.openapi.spacing.xs} ${lightTheme.vars.openapi.spacing.s}`,
-          contentPadding: lightTheme.vars.openapi.spacing.s,
+          headerPadding: `${lightTheme.vars.openapi.spacing.xs} ${lightTheme.vars.openapi.spacing.sm}`,
+          contentPadding: `${lightTheme.vars.openapi.spacing.sm} ${lightTheme.vars.openapi.spacing.s}`,
         },
       },
     }}
