@@ -12,9 +12,8 @@ name = "sphinx_jsx"
 
 [dependencies]
 katex = "0.4.6"
-mdxjs = "0.1.19"
-minijinja = "1.0.10"
 pyo3 = "0.19.0"
+swc_core = {version = "0.87.*", features = ["ecma_ast", "ecma_codegen"]}
 
 [build-dependencies]
 maturin-utils = {path = "../../crates/maturin-utils"}

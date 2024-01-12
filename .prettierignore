@@ -29,3 +29,8 @@ pnpm-lock.yaml
 # lingui messages
 **/src/locales/*.mjs
 **/src/locales/*.ts
+
+# swc tests
+**/__swc_snapshots__/**
+**/tests/fixtures/**/*.js
+**/tests/fixtures/**/*.html

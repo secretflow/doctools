@@ -1,0 +1,19 @@
+- [ ] ESM
+  - [ ] SWC + PyO3
+- [ ] i18n
+  - [ ] lingui format
+  - [ ] .po extract
+  - [ ] .po compile
+- [ ] search
+  - [ ] deno + orama
+  - [ ] vector search, transformer
+- [ ] SSR
+  - [ ] deno + react-dom/server
+  - [ ] hydrate
+- [ ] loaders
+  - [ ] ESM.SH
+  - [ ] jsDelivr
+  - [ ] TNPM
+- [ ] OpenAPI
+  - [ ] deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser
+- [ ] dependency tracking

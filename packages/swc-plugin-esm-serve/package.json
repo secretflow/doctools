@@ -1,0 +1,17 @@
+{
+  "name": "swc-plugin-esm-serve",
+  "version": "0.0.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "author": "Tony Wu <tonywu6@protonmail.com>",
+  "keywords": [
+    "swc-plugin"
+  ],
+  "main": "swc_plugin_esm_serve.wasm",
+  "scripts": {
+    "build:cargo": "cargo build --target wasm32-wasi --profile swc-plugin",
+    "prepack": "cp ../../target/swc-plugin/release/swc_plugin_esm_serve.wasm ."
+  },
+  "files": [],
+  "preferUnplugged": true
+}

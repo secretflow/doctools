@@ -5,3 +5,7 @@
 **/dist/**/*.js
 **/dist/**/*.cjs
 **/dist/**/*.mjs
+
+# swc tests
+**/__swc_snapshots__/**
+**/tests/fixtures/**/*.js

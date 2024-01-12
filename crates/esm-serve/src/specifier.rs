@@ -1,5 +1,6 @@
 use url;
 
+#[derive(Debug, PartialEq)]
 pub struct PackageImport<'a> {
     pub package: &'a str,
     pub path: &'a str,
@@ -200,39 +201,6 @@ mod test_specifier {
     }
 
     #[test]
-    fn test_parse_import_empty_string() {
-        match parse_specifier("") {
-            Some(PackageImport { package, path }) => {
-                assert_eq!(package, "");
-                assert_eq!(path, "");
-            }
-            None => assert!(false),
-        }
-    }
-
-    #[test]
-    fn test_parse_import_single_slash() {
-        match parse_specifier("/") {
-            Some(PackageImport { package, path }) => {
-                assert_eq!(package, "");
-                assert_eq!(path, "/");
-            }
-            None => assert!(false),
-        }
-    }
-
-    #[test]
-    fn test_parse_import_multiple_slashes() {
-        match parse_specifier("//") {
-            Some(PackageImport { package, path }) => {
-                assert_eq!(package, "");
-                assert_eq!(path, "//");
-            }
-            None => assert!(false),
-        }
-    }
-
-    #[test]
     fn test_parse_import_package_only() {
         match parse_specifier("my-package") {
             Some(PackageImport { package, path }) => {
@@ -252,5 +220,20 @@ mod test_specifier {
             }
             None => assert!(false),
         }
+    }
+
+    #[test]
+    fn test_parse_import_empty_string() {
+        assert!(parse_specifier("").is_none());
+    }
+
+    #[test]
+    fn test_parse_import_single_slash() {
+        assert!(parse_specifier("/").is_none());
+    }
+
+    #[test]
+    fn test_parse_import_multiple_slashes() {
+        assert!(parse_specifier("///").is_none());
     }
 }

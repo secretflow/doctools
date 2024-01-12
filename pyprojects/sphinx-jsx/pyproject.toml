@@ -28,6 +28,7 @@ dev-dependencies = [
   "nbsphinx~=0.9",
   "sphinxcontrib-mermaid~=0.9",
   "uvicorn~=0.24",
+  "jinja2>=3.1.2",
 ]
 
 [tool.ruff]

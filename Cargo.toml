@@ -1,7 +1,21 @@
 [workspace]
 members = [
-  "./crates/maturin-utils",
-  "./pyprojects/sphinx-jsx",
-  "./pyprojects/esm-serve",
+  "crates/esm-serve",
+  "crates/html5jsx",
+  "crates/maturin-utils",
+  "crates/playground",
+  "crates/serde-jsx",
+  "packages/swc-plugin-esm-serve",
+  "pyprojects/esm-serve-pyo3",
+  "pyprojects/sphinx-jsx",
 ]
 resolver = "2"
+
+[profile.release]
+lto = true
+
+[profile.swc-plugin]
+inherits = "release"
+lto = true
+opt-level = "z"
+strip = "symbols"

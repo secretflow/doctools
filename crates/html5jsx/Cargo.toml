@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "html5jsx"
+version = "0.1.0"
+
+[dependencies]
+adler = "1.0.2"
+serde = {version = "1", features = ["derive"]}
+swc_core = {version = "0.87.21", features = ["ecma_ast", "ecma_utils"]}
+swc_html_ast = "0.33.12"
+swc_html_parser = "0.39.17"
+swc_html_visit = "0.33.12"
+
+[dev-dependencies]
+ansi_term = "0.12.1"
+anyhow = "1.0.79"
+serde_json = "1.0.111"
+swc_core = {version = "0.87.21", features = ["ecma_codegen"]}
+testing = "0.35.14"
