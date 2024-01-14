@@ -9,9 +9,10 @@ use swc_core::{
         codegen::{text_writer::JsWriter, Config, Emitter},
     },
 };
+use swc_utils::jsx::factory::JSXFactory;
 use testing::{diff, fixture};
 
-use html5jsx::{html_to_jsx, Fragment, JSXOptions};
+use html5jsx::{html_to_jsx, Fragment};
 
 fn make_module(f: Fragment) -> Module {
     let mut body = f
@@ -50,7 +51,7 @@ fn compile(module: &Module) -> Result<String> {
 
 #[fixture("tests/fixtures/expects/*.html")]
 fn test_conversion(input: PathBuf) {
-    let options: JSXOptions = std::fs::read_to_string(input.clone().with_extension("json"))
+    let jsx: JSXFactory = std::fs::read_to_string(input.clone().with_extension("json"))
         // exits on deserialize error
         .and_then(|s| match serde_json::from_str(&s) {
             Ok(v) => Ok(v),
@@ -65,7 +66,7 @@ fn test_conversion(input: PathBuf) {
     let expected = expected.trim();
 
     let source = std::fs::read_to_string(input.clone()).unwrap();
-    let fragment = html_to_jsx(&source, Some(options)).unwrap();
+    let fragment = html_to_jsx(&source, Some(jsx)).unwrap();
 
     let actual = compile(&make_module(fragment)).unwrap();
     let actual = actual.trim();
@@ -95,7 +96,8 @@ fn test_conversion(input: PathBuf) {
 
 #[cfg(test)]
 mod test_rejections {
-    use html5jsx::{html_to_jsx, JSXFactory, JSXOptions};
+    use html5jsx::html_to_jsx;
+    use swc_utils::jsx::factory::JSXFactory;
 
     #[test]
     #[should_panic = "refuse to parse script tags"]
@@ -152,11 +154,9 @@ mod test_rejections {
     fn no_malicious_jsx() {
         html_to_jsx(
             "<div>",
-            Some(JSXOptions {
-                factory: JSXFactory {
-                    jsx: "eval".into(),
-                    ..Default::default()
-                },
+            Some(JSXFactory {
+                jsx: "eval".into(),
+                ..Default::default()
             }),
         )
         .unwrap();
@@ -167,11 +167,9 @@ mod test_rejections {
     fn no_malicious_jsx_2() {
         html_to_jsx(
             "<div>",
-            Some(JSXOptions {
-                factory: JSXFactory {
-                    jsx: "evaluate".into(),
-                    ..Default::default()
-                },
+            Some(JSXFactory {
+                jsx: "evaluate".into(),
+                ..Default::default()
             }),
         )
         .unwrap();
@@ -182,11 +180,9 @@ mod test_rejections {
     fn no_malicious_jsxs() {
         html_to_jsx(
             "<div>",
-            Some(JSXOptions {
-                factory: JSXFactory {
-                    jsxs: "globalThis.eval".into(),
-                    ..Default::default()
-                },
+            Some(JSXFactory {
+                jsxs: "globalThis.eval".into(),
+                ..Default::default()
             }),
         )
         .unwrap();
@@ -197,11 +193,9 @@ mod test_rejections {
     fn no_malicious_fragment() {
         html_to_jsx(
             "<div>",
-            Some(JSXOptions {
-                factory: JSXFactory {
-                    fragment: "window.Function".into(),
-                    ..Default::default()
-                },
+            Some(JSXFactory {
+                fragment: "window.Function".into(),
+                ..Default::default()
             }),
         )
         .unwrap();

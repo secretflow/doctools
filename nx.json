@@ -70,15 +70,18 @@
     },
     "build:hatch": {
       "inputs": [":default", ":python"],
-      "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build:vite"],
-      "cache": true
+      "cache": false
     },
     "build:maturin": {
       "inputs": [":default", ":python", ":rust"],
-      "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build:vite"],
-      "cache": true
+      "cache": false
+    },
+    "build:cargo": {
+      "inputs": [":default", ":rust"],
+      "dependsOn": ["^build:vite"],
+      "cache": false
     },
     "publish:maturin": {
       "dependsOn": ["^build:maturin", "build:maturin", "^publish:maturin"],

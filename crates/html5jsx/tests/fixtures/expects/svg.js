@@ -12,7 +12,7 @@ jsx("meta", {
     "charSet": "utf-8"
 });
 jsx("title", {
-    children: "SVG Demo"
+    "children": "SVG Demo"
 });
 jsx("meta", {
     "name": "viewport",
@@ -31,7 +31,7 @@ jsxs(Fragment, {
             "children": [
                 "\n            ",
                 jsx("title", {
-                    children: "A gradient"
+                    "children": "A gradient"
                 }),
                 "\n            ",
                 jsxs("linearGradient", {
@@ -41,13 +41,13 @@ jsxs(Fragment, {
                         jsx("stop", {
                             "offset": "0%",
                             "stopColor": "red",
-                            className: "begin"
+                            "className": "begin"
                         }),
                         "\n                ",
                         jsx("stop", {
                             "offset": "100%",
                             "stopColor": "black",
-                            className: "end"
+                            "className": "end"
                         }),
                         "\n            "
                     ]
@@ -58,14 +58,14 @@ jsxs(Fragment, {
                     "y": "0",
                     "width": "100",
                     "height": "100",
-                    className: "jsx-styled-4a9b0717"
+                    "className": "jsx-styled-4a9b0717"
                 }),
                 "\n            ",
                 jsx("circle", {
                     "cx": "50",
                     "cy": "50",
                     "r": "30",
-                    className: "jsx-styled-4a9b0717"
+                    "className": "jsx-styled-4a9b0717"
                 }),
                 "\n        "
             ]

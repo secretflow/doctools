@@ -5,13 +5,12 @@ use swc_core::{
 use swc_html_ast::{DocumentMode, Element, Namespace};
 use swc_html_parser::{parse_file_as_document_fragment, parser::ParserConfig};
 use swc_html_visit::VisitWith as _;
+use swc_utils::jsx::factory::JSXFactory;
 
-mod element;
 mod props;
 mod visit;
 
 use crate::visit::DOMVisitor;
-pub use crate::visit::{JSXFactory, JSXOptions};
 
 pub struct Fragment {
     pub head: Vec<Box<Expr>>,
@@ -20,7 +19,7 @@ pub struct Fragment {
 
 pub fn html_to_jsx(
     html: &str,
-    options: Option<JSXOptions>,
+    jsx: Option<JSXFactory>,
 ) -> Result<Fragment, swc_html_parser::error::Error> {
     let files: SourceMap = Default::default();
     let file = files.new_source_file(FileName::Anon, html.to_string());
@@ -50,9 +49,9 @@ pub fn html_to_jsx(
         &mut errors,
     )?;
 
-    let options = options.unwrap_or_default();
+    let jsx = jsx.unwrap_or_default();
 
-    let mut visitor = DOMVisitor::new(options);
+    let mut visitor = DOMVisitor::new(jsx);
 
     dom.visit_with(&mut visitor);
 

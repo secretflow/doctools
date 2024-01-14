@@ -3,5 +3,5 @@ jsx("link", {
     "href": "style.css"
 });
 jsx(Fragment, {
-    children: "\n"
+    "children": "\n"
 });

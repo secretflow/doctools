@@ -1,24 +1,23 @@
 use swc_core::{
     atoms::Atom,
-    ecma::ast::{KeyValueProp, Lit, Prop, PropName, PropOrSpread, Str},
+    ecma::ast::{KeyValueProp, Lit, Prop, PropName},
 };
 use swc_html_ast::Attribute;
 
-fn create_attribute(key: &Atom, value: Lit) -> Option<PropOrSpread> {
-    Some(PropOrSpread::Prop(
-        Prop::KeyValue(KeyValueProp {
-            key: PropName::Str(Str::from(key.as_str())),
+fn create_attribute(key: &Atom, value: Lit) -> Option<Prop> {
+    Some(
+        Prop::from(KeyValueProp {
+            key: PropName::Str(key.as_str().into()),
             value: value.into(),
         })
         .into(),
-    ))
+    )
 }
 
-fn create_value<F: FnOnce(&Atom) -> Option<Lit>>(
-    atom: &Option<Atom>,
-    from: F,
-    default: Lit,
-) -> Option<Lit> {
+fn create_value<F>(atom: &Option<Atom>, from: F, default: Lit) -> Option<Lit>
+where
+    F: FnOnce(&Atom) -> Option<Lit>,
+{
     match atom {
         Some(atom) => from(atom),
         None => Some(default),
@@ -26,7 +25,7 @@ fn create_value<F: FnOnce(&Atom) -> Option<Lit>>(
 }
 
 fn as_string(atom: &Atom) -> Option<Lit> {
-    Some(Lit::Str(Str::from(atom.as_str())))
+    Some(atom.as_str().into())
 }
 
 fn as_boolean(atom: &Atom) -> Option<Lit> {
@@ -53,19 +52,32 @@ fn as_number(atom: &Atom) -> Option<Lit> {
 
 fn reject_unsafe_inline_javascript(atom: &Atom) -> Option<Lit> {
     if atom.as_str().contains("javascript:") {
-        panic!("refuse to convert `javascript:` URLs")
+        if cfg!(feature = "unsafe-ignore") {
+            None
+        } else if cfg!(feature = "unsafe-ignore") {
+            as_string(atom)
+        } else {
+            panic!("refuse to convert `javascript:` URLs")
+        }
     } else {
         as_string(atom)
     }
 }
 
-pub fn convert_attribute(attr: &Attribute) -> Option<PropOrSpread> {
-    if attr.name.to_lowercase() == "dangerouslysetinnerhtml" {
-        panic!("refuse to convert dangerouslySetInnerHTML")
-    }
-
-    if attr.name.starts_with("on") {
-        panic!("refuse to convert event handlers")
+pub fn convert_attribute(attr: &Attribute) -> Option<Prop> {
+    if cfg!(feature = "unsafe-ignore") {
+        if attr.name.to_lowercase() == "dangerouslysetinnerhtml" || attr.name.starts_with("on") {
+            return None;
+        }
+    } else if cfg!(feature = "unsafe-allow") {
+        ();
+    } else {
+        if attr.name.to_lowercase() == "dangerouslysetinnerhtml" {
+            panic!("refuse to convert dangerouslySetInnerHTML")
+        }
+        if attr.name.starts_with("on") {
+            panic!("refuse to convert event handlers")
+        }
     }
 
     match attr.name.as_str() {

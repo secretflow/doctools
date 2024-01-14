@@ -4,11 +4,11 @@ jsxs(Fragment, {
             "children": [
                 "\n    ",
                 jsx("h1", {
-                    children: "Hello, world!"
+                    "children": "Hello, world!"
                 }),
                 "\n    ",
                 jsx("p", {
-                    children: "This is a paragraph."
+                    "children": "This is a paragraph."
                 }),
                 "\n"
             ]

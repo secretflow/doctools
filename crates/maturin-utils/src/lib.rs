@@ -1,9 +1,11 @@
+use std::env;
+use std::fs::File;
+use std::io::Read;
+
 use anyhow::Context;
 pub use anyhow::Result;
 use serde::Deserialize;
 use serde_json;
-use std::fs::File;
-use std::io::Read;
 use toml;
 
 #[derive(Deserialize, Debug)]
@@ -77,4 +79,28 @@ pub fn assert_versions() -> Result<()> {
     } else {
         Ok(())
     }
+}
+
+pub fn include_libpython_in_dev() -> Result<()> {
+    match env::var("PYO3_PYTHON") {
+        // building with maturin
+        Ok(_) => return Ok(()),
+        _ => (),
+    };
+    // figure out sys.base_prefix by executing python. this is icky.
+    // (ignoring venv since lib won't be there)
+    let output = std::process::Command::new("python")
+        .arg("-c")
+        .arg("import sys\nsys.stdout.write(sys.base_prefix)")
+        .output()?;
+    let base_prefix = String::from_utf8(output.stdout)?.trim().to_string();
+    let lib_path = format!("{}/lib", base_prefix);
+    println!("cargo:warning=Using libpython from {}", lib_path);
+    // for cargo build
+    println!("cargo:rustc-link-search=crate={}", lib_path);
+    // for cargo run/test
+    println!("cargo:rustc-env=DYLD_LIBRARY_PATH={}", lib_path);
+    // for cargo run/test
+    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", lib_path);
+    Ok(())
 }

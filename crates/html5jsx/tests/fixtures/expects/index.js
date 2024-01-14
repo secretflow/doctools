@@ -6,7 +6,7 @@ jsx("meta", {
     "content": "width=device-width, initial-scale=1.0"
 });
 jsx("title", {
-    children: "Document"
+    "children": "Document"
 });
 jsxs(Fragment, {
     "children": [
@@ -15,58 +15,58 @@ jsxs(Fragment, {
         "\n        ",
         "\n    \n    \n        ",
         jsx("h1", {
-            children: "The Crushing Bore"
+            "children": "The Crushing Bore"
         }),
         "\n        ",
         jsx("p", {
-            children: "By Chris Mills"
+            "children": "By Chris Mills"
         }),
         "\n        ",
         jsx("h2", {
-            children: "Chapter 1: The dark night"
+            "children": "Chapter 1: The dark night"
         }),
         "\n        ",
         jsx("p", {
-            children: "\n            It was a dark night. Somewhere, an owl hooted. The rain lashed down on the…\n        "
+            "children": "\n            It was a dark night. Somewhere, an owl hooted. The rain lashed down on the…\n        "
         }),
         "\n        ",
         jsx("h2", {
-            children: "Chapter 2: The eternal silence"
+            "children": "Chapter 2: The eternal silence"
         }),
         "\n        ",
         jsx("p", {
-            children: "Our protagonist could not so much as a whisper out of the shadowy figure…"
+            "children": "Our protagonist could not so much as a whisper out of the shadowy figure…"
         }),
         "\n        ",
         jsx("h3", {
-            children: "The specter speaks"
+            "children": "The specter speaks"
         }),
         "\n        ",
         jsx("p", {
-            children: '\n            Several more hours had passed, when all of a sudden the specter sat bolt\n            upright and exclaimed, "Please have mercy on my soul!"\n        '
+            "children": '\n            Several more hours had passed, when all of a sudden the specter sat bolt\n            upright and exclaimed, "Please have mercy on my soul!"\n        '
         }),
         "\n        ",
         jsxs("ol", {
             "children": [
                 "\n            ",
                 jsx("li", {
-                    children: "Drive to the end of the road"
+                    "children": "Drive to the end of the road"
                 }),
                 "\n            ",
                 jsx("li", {
-                    children: "Turn right"
+                    "children": "Turn right"
                 }),
                 "\n            ",
                 jsx("li", {
-                    children: "Go straight across the first two roundabouts"
+                    "children": "Go straight across the first two roundabouts"
                 }),
                 "\n            ",
                 jsx("li", {
-                    children: "Turn left at the third roundabout"
+                    "children": "Turn left at the third roundabout"
                 }),
                 "\n            ",
                 jsx("li", {
-                    children: "The school is on your right, 300 meters up the road"
+                    "children": "The school is on your right, 300 meters up the road"
                 }),
                 "\n        "
             ]
@@ -80,7 +80,7 @@ jsxs(Fragment, {
                     "children": [
                         "\n                ",
                         jsx("cite", {
-                            children: "MDN blockquote page"
+                            "children": "MDN blockquote page"
                         })
                     ]
                 }),
@@ -99,14 +99,14 @@ jsxs(Fragment, {
                             "children": [
                                 "HTML ",
                                 jsx("code", {
-                                    children: "<blockquote>"
+                                    "children": "<blockquote>"
                                 }),
                                 " Element"
                             ]
                         }),
                         " (or\n                ",
                         jsx("em", {
-                            children: "HTML Block Quotation Element"
+                            "children": "HTML Block Quotation Element"
                         }),
                         ") indicates that the enclosed text\n                is an extended quotation.\n            "
                     ]
@@ -119,18 +119,18 @@ jsxs(Fragment, {
             "children": [
                 "\n            The quote element — ",
                 jsx("code", {
-                    children: "<q>"
+                    "children": "<q>"
                 }),
                 " — is\n            ",
                 jsx("q", {
                     "cite": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/q",
-                    children: "\n                intended for short quotations that don't require paragraph breaks.\n            "
+                    "children": "\n                intended for short quotations that don't require paragraph breaks.\n            "
                 }),
                 "\n            — ",
                 jsx("a", {
                     "href": "/en-US/docs/Web/HTML/Element/q",
-                    children: jsx("cite", {
-                        children: "MDN q page"
+                    "children": jsx("cite", {
+                        "children": "MDN q page"
                     })
                 }),
                 ".\n        "

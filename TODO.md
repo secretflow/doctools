@@ -1,3 +1,5 @@
+- [ ] Rendering
+  - [ ] JSX transform
 - [ ] ESM
   - [ ] SWC + PyO3
 - [ ] i18n

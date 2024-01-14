@@ -11,12 +11,12 @@ jsxs("style", {
 jsxs(Fragment, {
     "children": [
         jsxs("div", {
-            className: "jsx-styled-38090ec1",
+            "className": "jsx-styled-38090ec1",
             "children": [
                 "\n    ",
                 jsx("blockquote", {
-                    className: "blockquote jsx-styled-b3e61195",
-                    children: "\n        A quick brown fox jumps over the lazy dog.\n    "
+                    "className": "blockquote jsx-styled-b3e61195",
+                    "children": "\n        A quick brown fox jumps over the lazy dog.\n    "
                 }),
                 "\n"
             ]

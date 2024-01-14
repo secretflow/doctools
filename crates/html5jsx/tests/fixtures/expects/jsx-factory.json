@@ -1,7 +1,5 @@
 {
-    "factory": {
-        "jsx": "React.createElement",
-        "jsxs": "React.createElement",
-        "Fragment": "React.Fragment"
-    }
+    "jsx": "React.createElement",
+    "jsxs": "React.createElement",
+    "Fragment": "React.Fragment"
 }

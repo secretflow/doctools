@@ -186,7 +186,7 @@ impl VisitMut for ModuleSpecifierRewriter<'_> {
 
         match self.rewrite_specifier(specifier) {
             Ok(Some(rewritten)) => {
-                arg0.expr = Box::new(rewritten.into());
+                arg0.expr = rewritten.into();
             }
             Ok(None) => (),
             Err(err) => {

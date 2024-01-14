@@ -12,7 +12,7 @@ name = "esm_serve"
 
 [dependencies]
 esm-serve = {version = "0.1.0", path = "../../crates/esm-serve"}
-pyo3 = "0.19.0"
+pyo3 = "0.20.0"
 
 [dev-dependencies]
 
