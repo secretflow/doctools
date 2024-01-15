@@ -1,14 +1,14 @@
-import { Popover } from 'antd';
-import styled from 'styled-components';
+import { Popover } from "antd";
+import styled from "styled-components";
 
-import { lightTheme } from '@/theme';
+import { lightTheme } from "@/theme";
 
-import { CodeHighlighter } from './CodeHighlighter';
-import { maybeJSON, truncate } from './text';
+import { CodeHighlighter } from "./CodeHighlighter";
+import { maybeJSON, truncate } from "./text";
 
 export function TextualRepresentation({
   value,
-  shorten: shouldShorten = typeof value === 'object',
+  shorten: shouldShorten = typeof value === "object",
   len = 40,
 }: {
   value: unknown;

@@ -1,14 +1,14 @@
-import complexNesting from '@readme/oas-examples/3.0/json/complex-nesting.json';
-import petStore from '@readme/oas-examples/3.0/json/petstore.json';
-import starTrek from '@readme/oas-examples/3.0/json/star-trek.json';
-import type { Meta, StoryObj } from '@storybook/react';
-import OAS from 'oas';
-import type { SchemaObject } from 'oas/types';
+import complexNesting from "@readme/oas-examples/3.0/json/complex-nesting.json";
+import petStore from "@readme/oas-examples/3.0/json/petstore.json";
+import starTrek from "@readme/oas-examples/3.0/json/star-trek.json";
+import type { Meta, StoryObj } from "@storybook/react";
+import OAS from "oas";
+import type { SchemaObject } from "oas/types";
 
-import { SchemaTree } from './SchemaTree';
+import { SchemaTree } from "./SchemaTree";
 
 const createSchema = async (raw: unknown) => {
-  const oas = new OAS(typeof raw === 'string' ? raw : JSON.stringify(raw));
+  const oas = new OAS(typeof raw === "string" ? raw : JSON.stringify(raw));
   await oas.dereference({ preserveRefAsJSONSchemaTitle: true });
   return oas;
 };
@@ -27,20 +27,20 @@ type Story = StoryObj<typeof SchemaTree>;
 
 export const Pet: Story = {
   args: {
-    schema: petStoreSchema.api.components?.schemas?.['Pet'] as SchemaObject,
+    schema: petStoreSchema.api.components?.schemas?.["Pet"] as SchemaObject,
   },
 };
 
 export const BookSeriesFull: Story = {
   args: {
-    schema: starTrekSchema.api.components?.schemas?.['BookSeriesFull'] as SchemaObject,
+    schema: starTrekSchema.api.components?.schemas?.["BookSeriesFull"] as SchemaObject,
   },
 };
 
 export const ObjectOfEverything: Story = {
   args: {
     schema: complexNestingSchema.api.components?.schemas?.[
-      'ObjectOfEverything'
+      "ObjectOfEverything"
     ] as SchemaObject,
   },
 };
@@ -48,10 +48,10 @@ export const ObjectOfEverything: Story = {
 export const AdditionalProperties: Story = {
   args: {
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
-        foo: { type: 'string' },
-        bar: { type: 'string' },
+        foo: { type: "string" },
+        bar: { type: "string" },
       },
       additionalProperties: {},
     },
@@ -61,39 +61,39 @@ export const AdditionalProperties: Story = {
 export const ArrayOfArrays: Story = {
   args: {
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
-        'string[][]': {
-          type: 'array',
+        "string[][]": {
+          type: "array",
           items: {
-            type: 'array',
+            type: "array",
             items: {
-              type: 'string',
+              type: "string",
             },
           },
         },
-        'object[][]': {
-          type: 'array',
+        "object[][]": {
+          type: "array",
           items: {
-            type: 'array',
+            type: "array",
             items: {
-              type: 'object',
+              type: "object",
               properties: {
-                foo: { type: 'string' },
-                bar: { type: 'string' },
+                foo: { type: "string" },
+                bar: { type: "string" },
               },
             },
           },
         },
-        'float[][][]': {
-          type: 'array',
+        "float[][][]": {
+          type: "array",
           items: {
-            type: 'array',
+            type: "array",
             items: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'number',
-                format: 'float',
+                type: "number",
+                format: "float",
               },
             },
           },
@@ -106,39 +106,39 @@ export const ArrayOfArrays: Story = {
 export const MapsOfMaps: Story = {
   args: {
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
-        'Map<string, Map<string, string>': {
-          type: 'object',
+        "Map<string, Map<string, string>": {
+          type: "object",
           additionalProperties: {
-            type: 'object',
+            type: "object",
             additionalProperties: {
-              type: 'string',
+              type: "string",
             },
           },
         },
-        'Map<string, Map<string, object>': {
-          type: 'object',
+        "Map<string, Map<string, object>": {
+          type: "object",
           additionalProperties: {
-            type: 'object',
+            type: "object",
             additionalProperties: {
-              type: 'object',
+              type: "object",
               properties: {
-                foo: { type: 'string' },
-                bar: { type: 'string' },
+                foo: { type: "string" },
+                bar: { type: "string" },
               },
             },
           },
         },
-        'Map<string, Map<string, Map<string, float>>>': {
-          type: 'object',
+        "Map<string, Map<string, Map<string, float>>>": {
+          type: "object",
           additionalProperties: {
-            type: 'object',
+            type: "object",
             additionalProperties: {
-              type: 'object',
+              type: "object",
               additionalProperties: {
-                type: 'number',
-                format: 'float',
+                type: "number",
+                format: "float",
               },
             },
           },
@@ -151,34 +151,34 @@ export const MapsOfMaps: Story = {
 export const ConfusingContainer: Story = {
   args: {
     schema: {
-      type: 'object',
+      type: "object",
       properties: {
         data: {
-          type: 'object',
+          type: "object",
           additionalProperties: {
-            type: 'array',
+            type: "array",
             items: {
-              type: 'object',
+              type: "object",
               additionalProperties: {
-                type: 'array',
+                type: "array",
                 items: {
-                  type: 'object',
+                  type: "object",
                   additionalProperties: {
-                    type: 'array',
+                    type: "array",
                     items: {
-                      type: 'object',
+                      type: "object",
                       properties: {
-                        foo: { type: 'string' },
-                        bar: { type: 'string' },
+                        foo: { type: "string" },
+                        bar: { type: "string" },
                       },
-                      required: ['foo'],
+                      required: ["foo"],
                       additionalProperties: {
-                        type: 'array',
+                        type: "array",
                         items: {
-                          type: 'object',
+                          type: "object",
                           properties: {
-                            foo: { type: 'string' },
-                            bar: { type: 'string' },
+                            foo: { type: "string" },
+                            bar: { type: "string" },
                           },
                         },
                       },

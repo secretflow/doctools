@@ -1,15 +1,15 @@
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import styled from 'styled-components';
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { atomOneLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import styled from "styled-components";
 
-import { lightTheme } from '@/theme';
+import { lightTheme } from "@/theme";
 
-import { Copyable } from './typography';
+import { Copyable } from "./typography";
 
 export function CodeHighlighter({
   language,
   children,
-}: Pick<React.ComponentProps<typeof SyntaxHighlighter>, 'language' | 'children'>) {
+}: Pick<React.ComponentProps<typeof SyntaxHighlighter>, "language" | "children">) {
   return (
     <CodeHighlighter.Container>
       <SyntaxHighlighter
@@ -19,8 +19,8 @@ export function CodeHighlighter({
           margin: 0,
           padding: lightTheme.vars.openapi.spacing.xs,
           paddingInlineEnd: lightTheme.vars.openapi.spacing.ml,
-          fontSize: '12px',
-          maxHeight: '40vh',
+          fontSize: "12px",
+          maxHeight: "40vh",
           fontFamily: lightTheme.vars.openapi.typography.monospace,
         }}
         codeTagProps={{

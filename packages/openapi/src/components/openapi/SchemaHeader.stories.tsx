@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { SchemaHeader } from './SchemaHeader';
+import { SchemaHeader } from "./SchemaHeader";
 
 const meta: Meta<typeof SchemaHeader> = {
   component: SchemaHeader,
@@ -12,10 +12,10 @@ type Story = StoryObj<typeof SchemaHeader>;
 
 export const Int32: Story = {
   args: {
-    name: 'size',
+    name: "size",
     schema: {
-      type: 'integer',
-      format: 'int32',
+      type: "integer",
+      format: "int32",
       minimum: 0,
       maximum: 100,
       multipleOf: 2,
@@ -26,58 +26,58 @@ export const Int32: Story = {
 
 export const String: Story = {
   args: {
-    name: 'name',
+    name: "name",
     schema: {
-      type: 'string',
-      description: '# Lorem ipsum',
+      type: "string",
+      description: "# Lorem ipsum",
       minLength: 3,
       maxLength: 20,
-      pattern: '^[a-zA-Z0-9]*$',
-      default: 'John Doe',
+      pattern: "^[a-zA-Z0-9]*$",
+      default: "John Doe",
     },
     parent: {
-      required: ['name'],
-      type: 'object',
+      required: ["name"],
+      type: "object",
     },
   },
 };
 
 export const TextOptions: Story = {
   args: {
-    name: 'text',
+    name: "text",
     schema: {
-      type: 'string',
-      enum: ['foo', 'bar', 'baz'],
-      default: 'bar',
+      type: "string",
+      enum: ["foo", "bar", "baz"],
+      default: "bar",
     },
   },
 };
 
 export const StringArray: Story = {
   args: {
-    name: 'names',
+    name: "names",
     schema: {
-      type: 'array',
+      type: "array",
       items: {
-        type: 'string',
+        type: "string",
       },
       minItems: 1,
       maxItems: 10,
       uniqueItems: true,
-      default: ['John Doe', 'Jane Doe'],
+      default: ["John Doe", "Jane Doe"],
     },
   },
 };
 
 export const MapStringString: Story = {
   args: {
-    name: 'map',
+    name: "map",
     schema: {
-      type: 'object',
+      type: "object",
       minProperties: 2,
       maxProperties: 10,
       additionalProperties: {
-        type: 'string',
+        type: "string",
       },
     },
   },

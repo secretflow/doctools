@@ -1,7 +1,7 @@
-import { ConfigProvider, Divider } from 'antd';
-import styled, { css } from 'styled-components';
+import { ConfigProvider, Divider } from "antd";
+import styled, { css } from "styled-components";
 
-import { lightTheme } from '@/theme';
+import { lightTheme } from "@/theme";
 
 const blockSpacing = css`
   margin: 6px 0;
@@ -22,35 +22,35 @@ const typography = css`
 `;
 
 type RequiredElements =
-  | 'a'
-  | 'blockquote'
-  | 'code'
-  | 'del'
-  | 'em'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'h5'
-  | 'h6'
-  | 'hr'
-  | 'img'
-  | 'input'
-  | 'li'
-  | 'ol'
-  | 'p'
-  | 'pre'
-  | 'section'
-  | 'strong'
-  | 'sup'
-  | 'sub'
-  | 'table'
-  | 'tbody'
-  | 'td'
-  | 'th'
-  | 'thead'
-  | 'tr'
-  | 'ul';
+  | "a"
+  | "blockquote"
+  | "code"
+  | "del"
+  | "em"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "hr"
+  | "img"
+  | "input"
+  | "li"
+  | "ol"
+  | "p"
+  | "pre"
+  | "section"
+  | "strong"
+  | "sup"
+  | "sub"
+  | "table"
+  | "tbody"
+  | "td"
+  | "th"
+  | "thead"
+  | "tr"
+  | "ul";
 
 type RequiredComponents = Record<RequiredElements, () => React.ReactNode>;
 

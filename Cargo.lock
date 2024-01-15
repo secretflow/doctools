@@ -2647,6 +2647,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "swc-transforms-lingui-jsx"
+version = "0.1.0"
+dependencies = [
+ "swc_core",
+]
+
+[[package]]
 name = "swc-utils"
 version = "0.1.0"
 dependencies = [

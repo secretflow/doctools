@@ -1,18 +1,18 @@
-import { setupI18n } from '@lingui/core';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { setupI18n } from "@lingui/core";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import * as enUS from './locales/en-US';
-import * as zhHans from './locales/zh-Hans';
+import * as enUS from "./locales/en-US";
+import * as zhHans from "./locales/zh-Hans";
 
-export type SupportedLocale = 'en-US' | 'zh-Hans';
+export type SupportedLocale = "en-US" | "zh-Hans";
 
 export const i18n = setupI18n({
-  locale: 'en-US',
-  locales: ['en-US', 'zh-Hans'],
-  messages: { 'en-US': enUS.messages, 'zh-Hans': zhHans.messages },
+  locale: "en-US",
+  locales: ["en-US", "zh-Hans"],
+  messages: { "en-US": enUS.messages, "zh-Hans": zhHans.messages },
 });
 
-export function useLocale(initial: SupportedLocale = 'en-US') {
+export function useLocale(initial: SupportedLocale = "en-US") {
   const initialLocale = useRef(initial);
 
   const setLocale = useCallback((locale: SupportedLocale) => {
@@ -33,6 +33,6 @@ export function useLocale(initial: SupportedLocale = 'en-US') {
   };
 }
 
-export { Trans } from '@lingui/react';
+export { Trans } from "@lingui/react";
 
-i18n.activate('en-US');
+i18n.activate("en-US");

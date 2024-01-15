@@ -1,10 +1,10 @@
-import { I18nProvider } from '@lingui/react';
-import type { Preview } from '@storybook/react';
-import { useEffect } from 'react';
+import { I18nProvider } from "@lingui/react";
+import type { Preview } from "@storybook/react";
+import { useEffect } from "react";
 
-import { i18n } from '../src/i18n';
-import { lightTheme } from '../src/theme';
-import { ThemeConfig, ThemeResources } from '../src/theme/config';
+import { i18n } from "../src/i18n";
+import { lightTheme } from "../src/theme";
+import { ThemeConfig, ThemeResources } from "../src/theme/config";
 
 function I18nContext({
   locale,
@@ -18,7 +18,7 @@ function I18nContext({
 
 const preview: Preview = {
   parameters: {
-    actions: { argTypesRegex: '^on[A-Z].*' },
+    actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -28,13 +28,13 @@ const preview: Preview = {
   },
   globalTypes: {
     locale: {
-      description: 'Language',
-      defaultValue: 'en-US',
+      description: "Language",
+      defaultValue: "en-US",
       toolbar: {
-        icon: 'globe',
+        icon: "globe",
         items: [
-          { value: 'en-US', title: 'English (US)' },
-          { value: 'zh-Hans', title: '中文（简体）' },
+          { value: "en-US", title: "English (US)" },
+          { value: "zh-Hans", title: "中文（简体）" },
         ],
       },
     },

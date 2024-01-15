@@ -1,13 +1,13 @@
 module.exports = {
   printWidth: 88,
-  singleQuote: true,
-  trailingComma: 'all',
-  proseWrap: 'always',
+  singleQuote: false,
+  trailingComma: "all",
+  proseWrap: "always",
   overrides: [
     {
-      files: ['**/*.md', '**/*.mdx', '.github/**/*.yml'],
+      files: ["**/*.md", "**/*.mdx", ".github/**/*.yml"],
       options: {
-        proseWrap: 'preserve',
+        proseWrap: "preserve",
       },
     },
   ],

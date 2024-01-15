@@ -1,4 +1,4 @@
-import { useMDXComponents } from '@mdx-js/react';
+import { useMDXComponents } from "@mdx-js/react";
 
 export type OpenAPIComponents = {
   OperationTitle?: React.FC<{ id?: string }>;

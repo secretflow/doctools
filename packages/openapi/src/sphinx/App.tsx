@@ -1,18 +1,18 @@
-import { I18nProvider } from '@lingui/react';
-import { Editor } from '@monaco-editor/react';
-import { Button, Drawer, message } from 'antd';
-import { useRef, useState } from 'react';
-import YAML from 'yaml';
+import { I18nProvider } from "@lingui/react";
+import { Editor } from "@monaco-editor/react";
+import { Button, Drawer, message } from "antd";
+import { useRef, useState } from "react";
+import YAML from "yaml";
 
-import { OpenAPIViewer } from '@/components/openapi/OpenAPIViewer';
-import { i18n } from '@/i18n';
+import { OpenAPIViewer } from "@/components/openapi/OpenAPIViewer";
+import { i18n } from "@/i18n";
 
-import { Container } from './Container';
+import { Container } from "./Container";
 
 export function App({ schema: original }: { schema: unknown }) {
   const [schema, setSchema] = useState(original);
   const [visible, setVisible] = useState(false);
-  const content = typeof schema === 'string' ? schema : YAML.stringify(schema);
+  const content = typeof schema === "string" ? schema : YAML.stringify(schema);
   const buffer = useRef(content);
   const [msg] = message.useMessage();
   return (

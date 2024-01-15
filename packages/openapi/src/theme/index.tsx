@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 type CSSVariables = { [x: string]: string | CSSVariables };
 
@@ -45,17 +45,17 @@ function createTheme(tokens: ThemeTokens): {
   const reduceVars = (root: CSSVariables): Record<string, string> =>
     Object.fromEntries(
       Object.entries(root).flatMap(([key, value]) =>
-        typeof value === 'string'
+        typeof value === "string"
           ? [[key, value]]
           : Object.entries(reduceVars(value)).map(([k, v]) => [`${key}-${k}`, v]),
       ),
     );
 
-  const mapVars = <T extends CSSVariables>(root: T, prefix = ''): T =>
+  const mapVars = <T extends CSSVariables>(root: T, prefix = ""): T =>
     Object.fromEntries(
       Object.entries(root).map(([key, value]) => [
         key,
-        typeof value === 'string'
+        typeof value === "string"
           ? `var(--${prefix}${key})`
           : mapVars(value, `${prefix}${key}-`),
       ]),
@@ -67,7 +67,7 @@ function createTheme(tokens: ThemeTokens): {
     :root {
       ${Object.entries(mapping)
         .map(([key, value]) => `--${key}: ${value};`)
-        .join('')}
+        .join("")}
     }
   `;
   const vars = mapVars(tokens);
@@ -78,34 +78,34 @@ function createTheme(tokens: ThemeTokens): {
 export const lightTheme = createTheme({
   openapi: {
     backgroundColors: {
-      default: '#fdfdfe',
-      info: '#eef9fd',
-      warning: '#fff8e6',
+      default: "#fdfdfe",
+      info: "#eef9fd",
+      warning: "#fff8e6",
     },
     colors: {
-      default: 'rgb(0 0 0 / 88%)',
-      inverted: '#fdfdfe',
-      muted: '#4f5a66',
-      link: 'rgb(0, 96, 230)',
-      blue: '#61afef',
-      red: '#e06c75',
-      green: '#98c379',
-      yellow: '#e5c07b',
-      magenta: '#c678dd',
-      cyan: '#56b6c2',
-      neutral: '#abb2bf',
-      border: '#eaeaea',
+      default: "rgb(0 0 0 / 88%)",
+      inverted: "#fdfdfe",
+      muted: "#4f5a66",
+      link: "rgb(0, 96, 230)",
+      blue: "#61afef",
+      red: "#e06c75",
+      green: "#98c379",
+      yellow: "#e5c07b",
+      magenta: "#c678dd",
+      cyan: "#56b6c2",
+      neutral: "#abb2bf",
+      border: "#eaeaea",
     },
     typography: {
       sans: "Inter, Noto Sans SC, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
       monospace: "'Roboto Mono', monospace",
     },
     spacing: {
-      xs: '5px',
-      s: '10px',
-      sm: '15px',
-      m: '20px',
-      ml: '30px',
+      xs: "5px",
+      s: "10px",
+      sm: "15px",
+      m: "20px",
+      ml: "30px",
     },
   },
 });

@@ -1,7 +1,7 @@
-import { ConfigProvider } from 'antd';
-import { Helmet } from 'react-helmet';
+import { ConfigProvider } from "antd";
+import { Helmet } from "react-helmet";
 
-import { lightTheme } from './index';
+import { lightTheme } from "./index";
 
 export const ThemeConfig = ({ children }: React.PropsWithChildren) => (
   <ConfigProvider

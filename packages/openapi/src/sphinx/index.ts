@@ -1,5 +1,5 @@
-import { createElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
 
 declare global {
   interface Window {
@@ -7,27 +7,27 @@ declare global {
   }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const sites: [Element, string][] = [];
 
-  document.querySelectorAll('div.highlight-swagger').forEach((elem) => {
-    const raw = elem.querySelector('pre')?.textContent;
+  document.querySelectorAll("div.highlight-swagger").forEach((elem) => {
+    const raw = elem.querySelector("pre")?.textContent;
     if (!raw) {
       return;
     }
     sites.push([elem, raw]);
-    createRoot(elem).render(createElement('div', null, 'Loading...'));
+    createRoot(elem).render(createElement("div", null, "Loading..."));
   });
 
   await (async () => {
     // https://github.com/no-context/moo/blob/main/moo.js#L1-L9
     const define = window.define;
     window.define = undefined;
-    await import('@lingui/core');
+    await import("@lingui/core");
     window.define = define;
   })();
 
-  const { App } = await import('./App');
+  const { App } = await import("./App");
 
   sites.forEach(([elem, schema]) => {
     createRoot(elem).render(createElement(App, { schema }));

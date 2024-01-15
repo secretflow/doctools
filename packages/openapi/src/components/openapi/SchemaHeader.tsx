@@ -1,27 +1,27 @@
-import { Trans, Plural } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { MDXProvider } from '@mdx-js/react';
-import { Popover } from 'antd';
-import type { SchemaObject } from 'oas/types';
-import { useContext } from 'react';
-import styled from 'styled-components';
+import { Trans, Plural } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
+import { MDXProvider } from "@mdx-js/react";
+import { Popover } from "antd";
+import type { SchemaObject } from "oas/types";
+import { useContext } from "react";
+import styled from "styled-components";
 
-import { Comma } from '@/components/i18n/punctuations';
-import * as markdown from '@/components/markdown/components';
-import { MarkdownEval } from '@/components/markdown/MarkdownEval';
-import { lightTheme } from '@/theme';
-import { intersperse } from '@/utils/itertools';
+import { Comma } from "@/components/i18n/punctuations";
+import * as markdown from "@/components/markdown/components";
+import { MarkdownEval } from "@/components/markdown/MarkdownEval";
+import { lightTheme } from "@/theme";
+import { intersperse } from "@/utils/itertools";
 
-import { CodeHighlighter } from './CodeHighlighter';
-import { SchemaContext } from './SchemaTree';
-import { paragraphs, typeExcerpt } from './text';
-import { TextualRepresentation } from './TextualRepresentation';
-import type { QualifiedSchema } from './types';
+import { CodeHighlighter } from "./CodeHighlighter";
+import { SchemaContext } from "./SchemaTree";
+import { paragraphs, typeExcerpt } from "./text";
+import { TextualRepresentation } from "./TextualRepresentation";
+import type { QualifiedSchema } from "./types";
 
-function FieldName({ schema, name }: Pick<QualifiedSchema, 'schema' | 'name'>) {
+function FieldName({ schema, name }: Pick<QualifiedSchema, "schema" | "name">) {
   const { parents } = useContext(SchemaContext);
   const breadcrumbs = pathToSchema(...parents, schema);
-  const text = breadcrumbs.reduce((acc, line, y) => `${acc}\n${'  '.repeat(y)}${line}`);
+  const text = breadcrumbs.reduce((acc, line, y) => `${acc}\n${"  ".repeat(y)}${line}`);
   if (!name) {
     return null;
   }
@@ -45,7 +45,7 @@ FieldName.Text = styled.code`
   cursor: help;
 `;
 
-function TypeExcerpt({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function TypeExcerpt({ schema }: Pick<QualifiedSchema, "schema">) {
   useLingui();
   const text = typeExcerpt(schema);
   if (!text) {
@@ -66,7 +66,7 @@ TypeExcerpt.Text = styled.span`
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-required
  */
-function Required({ name, parent }: Pick<QualifiedSchema, 'name' | 'parent'>) {
+function Required({ name, parent }: Pick<QualifiedSchema, "name" | "parent">) {
   if (!(name && Array.isArray(parent?.required) && parent.required?.includes(name))) {
     return null;
   }
@@ -89,7 +89,7 @@ Required.Text = styled.em`
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-default
  */
-function Default({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function Default({ schema }: Pick<QualifiedSchema, "schema">) {
   const defaultValue = schema.default;
   if (defaultValue === undefined) {
     return null;
@@ -104,7 +104,7 @@ function Default({ schema }: Pick<QualifiedSchema, 'schema'>) {
   );
 }
 
-function Example({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function Example({ schema }: Pick<QualifiedSchema, "schema">) {
   const exampleValue = schema.example;
   if (exampleValue === undefined) {
     return null;
@@ -122,7 +122,7 @@ function Example({ schema }: Pick<QualifiedSchema, 'schema'>) {
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-enum
  */
-function Enum({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function Enum({ schema }: Pick<QualifiedSchema, "schema">) {
   if (!schema.enum?.length) {
     return null;
   }
@@ -154,7 +154,7 @@ Enum.Item = styled.span`
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-num
  */
-function NumericConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function NumericConstraints({ schema }: Pick<QualifiedSchema, "schema">) {
   const constraints: React.ReactElement[] = [];
   if (schema.minimum !== undefined) {
     constraints.push(<code key="minimum">{`>=${schema.minimum}`}</code>);
@@ -163,10 +163,10 @@ function NumericConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
     constraints.push(<code key="maximum">{`<=${schema.maximum}`}</code>);
   }
   if (schema.exclusiveMinimum !== undefined) {
-    constraints.push(<code key="exclusive-minimum">{'>'}</code>);
+    constraints.push(<code key="exclusive-minimum">{">"}</code>);
   }
   if (schema.exclusiveMaximum !== undefined) {
-    constraints.push(<code key="exclusive-maximum">{'<'}</code>);
+    constraints.push(<code key="exclusive-maximum">{"<"}</code>);
   }
   if (schema.multipleOf !== undefined) {
     constraints.push(
@@ -184,7 +184,7 @@ function NumericConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-str
  */
-function StringConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function StringConstraints({ schema }: Pick<QualifiedSchema, "schema">) {
   const constraints: React.ReactElement[] = [];
   if (schema.minLength !== undefined) {
     constraints.push(
@@ -226,7 +226,7 @@ function StringConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-arr
  */
-function ArrayConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function ArrayConstraints({ schema }: Pick<QualifiedSchema, "schema">) {
   const constraints: React.ReactElement[] = [];
   if (schema.minItems !== undefined) {
     constraints.push(
@@ -259,7 +259,7 @@ function ArrayConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
 /**
  * @see https://json-schema.org/draft/2020-12/json-schema-validation#name-validation-keywords-for-obj
  */
-function ObjectConstraints({ schema }: Pick<QualifiedSchema, 'schema'>) {
+function ObjectConstraints({ schema }: Pick<QualifiedSchema, "schema">) {
   const constraints: React.ReactElement[] = [];
   if (schema.minProperties !== undefined) {
     constraints.push(
@@ -308,7 +308,7 @@ export function SchemaHeader({ schema, parent, name }: QualifiedSchema) {
       <SchemaHeader.Description>
         <MDXProvider components={markdown.prose}>
           {/* FIXME: decide on whether to treat titles as part of the description */}
-          <MarkdownEval content={paragraphs('\n')(schema.title, schema.description)} />
+          <MarkdownEval content={paragraphs("\n")(schema.title, schema.description)} />
         </MDXProvider>
       </SchemaHeader.Description>
       <SchemaHeader.Examples>
@@ -391,22 +391,22 @@ function pathToSchema(...parents: SchemaObject[]): string[] {
   let parentObject: SchemaObject | undefined = undefined;
   let currentSchema = parents.shift();
   while (currentSchema) {
-    let prefix = '';
-    if (parentObject?.type === 'object') {
+    let prefix = "";
+    if (parentObject?.type === "object") {
       let key = Object.entries(parentObject?.properties ?? {}).find(
         ([, v]) => v === currentSchema,
       )?.[0];
       if (key === undefined && parentObject?.additionalProperties) {
-        key = '*';
+        key = "*";
       }
       if (key !== undefined) {
         prefix = `${JSON.stringify(key)}: `;
       }
     }
-    if (currentSchema.type === 'array') {
+    if (currentSchema.type === "array") {
       lines.push(`${prefix}[`);
       parentObject = undefined;
-    } else if (currentSchema.type === 'object') {
+    } else if (currentSchema.type === "object") {
       lines.push(`${prefix}{`);
       parentObject = currentSchema;
     } else {
@@ -416,9 +416,9 @@ function pathToSchema(...parents: SchemaObject[]): string[] {
     currentSchema = parents.shift();
   }
   const lastLine = lines.pop();
-  if (lastLine?.endsWith('{')) {
+  if (lastLine?.endsWith("{")) {
     lines.push(`${lastLine} // object`);
-  } else if (lastLine?.endsWith('[')) {
+  } else if (lastLine?.endsWith("[")) {
     lines.push(`${lastLine} // array`);
   } else if (lastLine) {
     lines.push(lastLine);

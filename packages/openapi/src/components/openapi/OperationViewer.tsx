@@ -1,44 +1,44 @@
-import { Trans } from '@lingui/macro';
-import { MDXProvider } from '@mdx-js/react';
-import type { CollapseProps } from 'antd';
-import { Collapse, Tag } from 'antd';
-import type { Operation } from 'oas/operation';
-import { isSchema } from 'oas/types';
+import { Trans } from "@lingui/macro";
+import { MDXProvider } from "@mdx-js/react";
+import type { CollapseProps } from "antd";
+import { Collapse, Tag } from "antd";
+import type { Operation } from "oas/operation";
+import { isSchema } from "oas/types";
 import type {
   ResponseObject,
   ParameterObject,
   SchemaObject,
   HttpMethods,
-} from 'oas/types';
-import styled from 'styled-components';
+} from "oas/types";
+import styled from "styled-components";
 
-import * as markdown from '@/components/markdown/components';
-import { MarkdownEval } from '@/components/markdown/MarkdownEval';
-import { lightTheme } from '@/theme';
+import * as markdown from "@/components/markdown/components";
+import { MarkdownEval } from "@/components/markdown/MarkdownEval";
+import { lightTheme } from "@/theme";
 
-import { CodeHighlighter } from './CodeHighlighter';
-import { useOpenAPIComponents } from './injection';
-import { SchemaTree } from './SchemaTree';
-import { maybeJSON, paragraphs } from './text';
-import { Copyable } from './typography';
+import { CodeHighlighter } from "./CodeHighlighter";
+import { useOpenAPIComponents } from "./injection";
+import { SchemaTree } from "./SchemaTree";
+import { maybeJSON, paragraphs } from "./text";
+import { Copyable } from "./typography";
 
 type ElementOf<T> = T extends (infer U)[] ? U : never;
 
-type CollapseItem = ElementOf<CollapseProps['items']>;
+type CollapseItem = ElementOf<CollapseProps["items"]>;
 
 type MediaTypeExample = ElementOf<
-  ElementOf<Operation['responseExamples']>['mediaTypes'][string]
+  ElementOf<Operation["responseExamples"]>["mediaTypes"][string]
 >;
 
 const HTTP_METHOD_COLORS: Record<HttpMethods, [string, string]> = {
-  get: ['#61affe', lightTheme.vars.openapi.colors.inverted],
-  post: ['#49cc90', lightTheme.vars.openapi.colors.inverted],
-  put: ['#fca130', lightTheme.vars.openapi.colors.inverted],
-  patch: ['#4bc5ab', lightTheme.vars.openapi.colors.inverted],
-  delete: ['#f93e3e', lightTheme.vars.openapi.colors.inverted],
-  head: ['#9012fe', lightTheme.vars.openapi.colors.inverted],
-  options: ['#0d5aa7', lightTheme.vars.openapi.colors.inverted],
-  trace: ['#1a1a1a', lightTheme.vars.openapi.colors.inverted],
+  get: ["#61affe", lightTheme.vars.openapi.colors.inverted],
+  post: ["#49cc90", lightTheme.vars.openapi.colors.inverted],
+  put: ["#fca130", lightTheme.vars.openapi.colors.inverted],
+  patch: ["#4bc5ab", lightTheme.vars.openapi.colors.inverted],
+  delete: ["#f93e3e", lightTheme.vars.openapi.colors.inverted],
+  head: ["#9012fe", lightTheme.vars.openapi.colors.inverted],
+  options: ["#0d5aa7", lightTheme.vars.openapi.colors.inverted],
+  trace: ["#1a1a1a", lightTheme.vars.openapi.colors.inverted],
 };
 
 function Method({ operation }: { operation: Operation }) {
@@ -156,10 +156,10 @@ function CodePreview({ mimeType, example }: { mimeType: string; example: unknown
   const text = maybeJSON(example);
   const language = (() => {
     switch (mimeType) {
-      case 'application/json':
-        return 'json';
-      case 'application/xml':
-        return 'xml';
+      case "application/json":
+        return "json";
+      case "application/xml":
+        return "xml";
       default:
         return mimeType;
     }
@@ -220,7 +220,7 @@ RequestExamples.Title = styled.h4`
 `;
 
 function QueryParameters({ operation }: { operation: Operation }) {
-  const params = operation.getParameters().filter((p) => p.in === 'query');
+  const params = operation.getParameters().filter((p) => p.in === "query");
   if (!params.length) {
     return null;
   }
@@ -233,7 +233,7 @@ function QueryParameters({ operation }: { operation: Operation }) {
 
 function RequestBody({ operation }: { operation: Operation }) {
   const requestBody = (() => {
-    const info = operation.getRequestBody('application/json');
+    const info = operation.getRequestBody("application/json");
     if (!info) {
       return null;
     }
@@ -261,14 +261,14 @@ function Response({
   statusCode: string;
   response: ResponseObject;
 }) {
-  const schema = response.content?.['application/json']?.schema;
+  const schema = response.content?.["application/json"]?.schema;
   const examples = operation
     .getResponseExamples()
     .filter((ex) => ex.status === statusCode)
-    .flatMap((ex) => ex.mediaTypes['application/json'] ?? [])
+    .flatMap((ex) => ex.mediaTypes["application/json"] ?? [])
     .flatMap((example, idx) => {
       const value = maybeJSON(example.value);
-      const title = example.title || 'Example';
+      const title = example.title || "Example";
       const desc = paragraphs()(example.summary, example.description);
       return [
         {
@@ -345,7 +345,7 @@ function Responses({ operation }: { operation: Operation }) {
       return [];
     }
     const response = operation.getResponseByStatusCode(code);
-    if (typeof response !== 'object') {
+    if (typeof response !== "object") {
       return [];
     }
     const key = `${code}`;
@@ -450,7 +450,7 @@ function firstKey(items: { key?: React.Key | undefined }[]): [React.Key] | [] {
 }
 
 function paramsToObject(params: ParameterObject[]): SchemaObject {
-  const schema: SchemaObject = { type: 'object', properties: {} };
+  const schema: SchemaObject = { type: "object", properties: {} };
   const properties = schema.properties ?? {};
   params.forEach((p) => {
     if (isSchema(p.schema)) {

@@ -1,26 +1,26 @@
-import { I18nProvider } from '@lingui/react';
-import { MDXProvider } from '@mdx-js/react';
-import { Alert, Skeleton, Divider } from 'antd';
-import type OAS from 'oas';
-import type { OASDocument } from 'oas/types';
-import styled from 'styled-components';
-import useSWR from 'swr';
-import YAML from 'yaml';
+import { I18nProvider } from "@lingui/react";
+import { MDXProvider } from "@mdx-js/react";
+import { Alert, Skeleton, Divider } from "antd";
+import type OAS from "oas";
+import type { OASDocument } from "oas/types";
+import styled from "styled-components";
+import useSWR from "swr";
+import YAML from "yaml";
 
-import { i18n } from '@/i18n';
-import { ThemeConfig } from '@/index';
-import { lightTheme } from '@/theme';
-import { intersperse } from '@/utils/itertools';
+import { i18n } from "@/i18n";
+import { ThemeConfig } from "@/index";
+import { lightTheme } from "@/theme";
+import { intersperse } from "@/utils/itertools";
 
-import type { OpenAPIComponents } from './injection';
-import { OperationViewer } from './OperationViewer';
+import type { OpenAPIComponents } from "./injection";
+import { OperationViewer } from "./OperationViewer";
 
 function resolveAPI(schema: unknown): () => Promise<OAS> {
   return async () => {
-    const { default: OAS } = await import('oas');
-    const { default: OASNormalize } = await import('oas-normalize');
+    const { default: OAS } = await import("oas");
+    const { default: OASNormalize } = await import("oas-normalize");
     const raw = (() => {
-      if (typeof schema === 'string') {
+      if (typeof schema === "string") {
         return YAML.parse(schema);
       }
       return schema;
@@ -49,7 +49,7 @@ export function OpenAPIViewer({
     data: api,
     isLoading,
     error,
-  } = useSWR<OAS>(['openapi', schema], resolveAPI(schema));
+  } = useSWR<OAS>(["openapi", schema], resolveAPI(schema));
   if (error) {
     return (
       <Alert

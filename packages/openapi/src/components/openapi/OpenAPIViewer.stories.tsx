@@ -1,7 +1,7 @@
-import petStore from '@readme/oas-examples/3.0/json/petstore.json';
-import type { Meta, StoryObj } from '@storybook/react';
+import petStore from "@readme/oas-examples/3.0/json/petstore.json";
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { OpenAPIViewer } from './OpenAPIViewer';
+import { OpenAPIViewer } from "./OpenAPIViewer";
 
 const meta: Meta<typeof OpenAPIViewer> = {
   component: OpenAPIViewer,

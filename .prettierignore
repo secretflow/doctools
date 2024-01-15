@@ -33,4 +33,5 @@ pnpm-lock.yaml
 # swc tests
 **/__swc_snapshots__/**
 **/tests/fixtures/**/*.js
+!**/tests/fixtures/**/*.in.js
 **/tests/fixtures/**/*.html

@@ -1,13 +1,13 @@
-import { createRequire } from 'node:module';
-import path from 'node:path';
+import { createRequire } from "node:module";
+import path from "node:path";
 
-import { lingui } from '@lingui/vite-plugin';
-import react from '@vitejs/plugin-react-swc';
-import { polyfillNode } from 'esbuild-plugin-polyfill-node';
-import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { lingui } from "@lingui/vite-plugin";
+import react from "@vitejs/plugin-react-swc";
+import { polyfillNode } from "esbuild-plugin-polyfill-node";
+import { defineConfig } from "vite";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
-import { dependencies, peerDependencies } from './package.json';
+import { dependencies, peerDependencies } from "./package.json";
 
 const require = createRequire(import.meta.url);
 
@@ -16,49 +16,49 @@ export default defineConfig({
   plugins: [
     nodePolyfills({
       overrides: {
-        fs: 'memfs',
+        fs: "memfs",
       },
     }),
     react({
       plugins: [
         [
-          '@lingui/swc-plugin',
+          "@lingui/swc-plugin",
           {
             runtimeModules: {
-              i18n: [require.resolve('./src/i18n.ts'), 'i18n'],
-              trans: [require.resolve('./src/i18n.ts'), 'Trans'],
+              i18n: [require.resolve("./src/i18n.ts"), "i18n"],
+              trans: [require.resolve("./src/i18n.ts"), "Trans"],
             },
           },
         ],
-        ['@swc/plugin-styled-components', { displayName: true }],
+        ["@swc/plugin-styled-components", { displayName: true }],
       ],
     }),
     lingui(),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env['NODE_ENV']),
+    "process.env.NODE_ENV": JSON.stringify(process.env["NODE_ENV"]),
   },
   build: {
-    target: 'esnext',
-    outDir: 'dist/esm',
+    target: "esnext",
+    outDir: "dist/esm",
     lib: {
       entry: {
-        index: './src/index.ts',
-        sphinx: './src/sphinx/index.ts',
+        index: "./src/index.ts",
+        sphinx: "./src/sphinx/index.ts",
       },
-      formats: ['es'],
+      formats: ["es"],
     },
     rollupOptions: {
       external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)].map(
         (k) => new RegExp(`^${k}(/|$)`),
       ),
     },
-    minify: process.env['NODE_ENV'] !== 'development',
+    minify: process.env["NODE_ENV"] !== "development",
   },
   optimizeDeps: {
     esbuildOptions: {
@@ -70,7 +70,7 @@ export default defineConfig({
             url: true,
             process: true,
             fs: true,
-            'fs/promises': true,
+            "fs/promises": true,
           },
         }),
         {
@@ -78,7 +78,7 @@ export default defineConfig({
           // i don't know how this works
           // https://github.com/remorses/esbuild-plugins/issues/24#issuecomment-1369928859
           // https://github.com/evanw/esbuild/issues/2762
-          name: 'fix-node-globals-polyfill',
+          name: "fix-node-globals-polyfill",
           setup(build) {
             build.onResolve(
               { filter: /esbuild-plugin-polyfill-node\/polyfills/ },

@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { TextualRepresentation } from './TextualRepresentation';
+import { TextualRepresentation } from "./TextualRepresentation";
 
 const meta: Meta<typeof TextualRepresentation> = {
   component: TextualRepresentation,
@@ -12,13 +12,13 @@ type Story = StoryObj<typeof TextualRepresentation>;
 
 export const String: Story = {
   args: {
-    value: 'Hello world',
+    value: "Hello world",
   },
 };
 
 export const LongString: Story = {
   args: {
-    value: 'A quick brown fox jumps over the lazy dog. '.repeat(10),
+    value: "A quick brown fox jumps over the lazy dog. ".repeat(10),
   },
 };
 
@@ -49,7 +49,7 @@ export const Undefined: Story = {
 export const Object: Story = {
   args: {
     value: {
-      foo: 'bar',
+      foo: "bar",
       baz: 42,
     },
   },

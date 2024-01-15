@@ -1,15 +1,15 @@
-import { faAngleRight, faAngleDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Trans } from '@lingui/macro';
-import type { SchemaObject } from 'oas/types';
-import { createContext, useContext, useState } from 'react';
-import styled from 'styled-components';
+import { faAngleRight, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Trans } from "@lingui/macro";
+import type { SchemaObject } from "oas/types";
+import { createContext, useContext, useState } from "react";
+import styled from "styled-components";
 
-import { lightTheme } from '@/theme';
+import { lightTheme } from "@/theme";
 
-import { SchemaHeader } from './SchemaHeader';
-import type { QualifiedSchema } from './types';
-import { isSchema } from './types';
+import { SchemaHeader } from "./SchemaHeader";
+import type { QualifiedSchema } from "./types";
+import { isSchema } from "./types";
 
 export const SchemaContext = createContext<{
   parents: SchemaObject[];
@@ -18,7 +18,7 @@ export const SchemaContext = createContext<{
 function Parent({
   schema,
   children,
-}: React.PropsWithChildren<Pick<QualifiedSchema, 'schema'>>) {
+}: React.PropsWithChildren<Pick<QualifiedSchema, "schema">>) {
   const { parents } = useContext(SchemaContext);
   return (
     <SchemaContext.Provider value={{ parents: [...parents, schema] }}>
@@ -40,7 +40,7 @@ function Folder({
         <Folder.Header
           role="button"
           aria-disabled="false"
-          aria-expanded={collapsed ? 'false' : 'true'}
+          aria-expanded={collapsed ? "false" : "true"}
           onClick={() => setCollapsed((prev) => !prev)}
         >
           <Folder.Icon icon={collapsed ? faAngleRight : faAngleDown} />
@@ -103,7 +103,7 @@ Folder.Content = styled.div`
   }
 `;
 
-function propertyList(schema: QualifiedSchema['schema']) {
+function propertyList(schema: QualifiedSchema["schema"]) {
   const fields = Object.entries(schema.properties ?? {}).map(
     ([k, v]) =>
       ({
@@ -152,8 +152,8 @@ const PropertyListItem = styled.li`
   }
 `;
 
-function arrayItems(schema: QualifiedSchema['schema']) {
-  if (schema.type !== 'array' || !isSchema(schema.items)) {
+function arrayItems(schema: QualifiedSchema["schema"]) {
+  if (schema.type !== "array" || !isSchema(schema.items)) {
     return null;
   }
   const children = innerSchema(schema.items);
@@ -175,8 +175,8 @@ function arrayItems(schema: QualifiedSchema['schema']) {
   );
 }
 
-function objectProperties(schema: QualifiedSchema['schema']) {
-  if (schema.type !== 'object') {
+function objectProperties(schema: QualifiedSchema["schema"]) {
+  if (schema.type !== "object") {
     return null;
   }
   const knownProperties = propertyList(schema);
@@ -186,7 +186,7 @@ function objectProperties(schema: QualifiedSchema['schema']) {
   if (!knownProperties && !extraProperties) {
     return null;
   }
-  const title = schema['x-readme-ref-name'];
+  const title = schema["x-readme-ref-name"];
   return (
     <Parent schema={schema}>
       {knownProperties ? (
@@ -196,7 +196,7 @@ function objectProperties(schema: QualifiedSchema['schema']) {
               <SchemaTree.TitleLabel>object</SchemaTree.TitleLabel>
               {title ? (
                 <span>
-                  {' '}
+                  {" "}
                   <SchemaTree.ObjectName>{title}</SchemaTree.ObjectName>
                 </span>
               ) : null}
@@ -221,8 +221,8 @@ function objectProperties(schema: QualifiedSchema['schema']) {
   );
 }
 
-function innerSchema(schema: QualifiedSchema['schema']): React.ReactNode {
-  return schema.type === 'array' ? arrayItems(schema) : objectProperties(schema);
+function innerSchema(schema: QualifiedSchema["schema"]): React.ReactNode {
+  return schema.type === "array" ? arrayItems(schema) : objectProperties(schema);
 }
 
 export function SchemaTree({ name, schema, parent }: QualifiedSchema) {
