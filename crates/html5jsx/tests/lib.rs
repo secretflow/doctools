@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use ansi_term::Color;
 use anyhow::Result;
 use swc_core::{
-    common::{sync::Lrc, SourceMap},
+    common::{sync::Lrc, FileName, SourceMap},
     ecma::{
         ast::{EsVersion, ExprStmt, Module, ModuleItem, Stmt},
         codegen::{text_writer::JsWriter, Config, Emitter},
@@ -65,7 +65,12 @@ fn test_conversion(input: PathBuf) {
     let expected = std::fs::read_to_string(input.clone().with_extension("js")).unwrap();
     let expected = expected.trim();
 
-    let source = std::fs::read_to_string(input.clone()).unwrap();
+    let sourcemap: Lrc<SourceMap> = Default::default();
+    let source = sourcemap.new_source_file(
+        FileName::Anon,
+        std::fs::read_to_string(input.clone()).unwrap(),
+    );
+
     let fragment = html_to_jsx(&source, Some(jsx)).unwrap();
 
     let actual = compile(&make_module(fragment)).unwrap();
@@ -78,7 +83,7 @@ fn test_conversion(input: PathBuf) {
     print!(
         ">>>>> {} <<<<<\n\n{}\n\n",
         Color::Green.paint("Orig"),
-        source
+        source.src
     );
     print!(
         ">>>>> {} <<<<<\n\n{}\n\n",
@@ -97,19 +102,26 @@ fn test_conversion(input: PathBuf) {
 #[cfg(test)]
 mod test_rejections {
     use html5jsx::html_to_jsx;
+    use swc_core::common::{sync::Lrc, FileName, SourceFile, SourceMap};
     use swc_utils::jsx::factory::JSXFactory;
+
+    fn make_source(text: &str) -> Lrc<SourceFile> {
+        let sourcemap: Lrc<SourceMap> = Default::default();
+        let file = sourcemap.new_source_file(FileName::Anon, text.into());
+        file
+    }
 
     #[test]
     #[should_panic = "refuse to parse script tags"]
     fn no_unsafe_inline() {
-        html_to_jsx("<script>alert('Hi!');</script>", None).unwrap();
+        html_to_jsx(&make_source("<script>alert('Hi!');</script>"), None).unwrap();
     }
 
     #[test]
     #[should_panic = "refuse to parse script tags"]
     fn no_remote_script() {
         html_to_jsx(
-            r#"<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>"#,
+            &make_source(r#"<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>"#),
             None,
         )
         .unwrap();
@@ -118,26 +130,32 @@ mod test_rejections {
     #[test]
     #[should_panic = "refuse to parse base tags"]
     fn no_base() {
-        html_to_jsx("<base href='https://example.com/' />", None).unwrap();
+        html_to_jsx(&make_source("<base href='https://example.com/' />"), None).unwrap();
     }
 
     #[test]
     #[should_panic = "refuse to convert event handlers"]
     fn no_on_click() {
-        html_to_jsx("<div onclick='alert(\"Hi!\")'>Hi!</div>", None).unwrap();
+        html_to_jsx(
+            &make_source("<div onclick='alert(\"Hi!\")'>Hi!</div>"),
+            None,
+        )
+        .unwrap();
     }
 
     #[test]
     #[should_panic = "refuse to convert event handlers"]
     fn no_arbitrary_event_handlers() {
-        html_to_jsx("<div onfoo='alert(\"Hi!\")'>Hi!</div>", None).unwrap();
+        html_to_jsx(&make_source("<div onfoo='alert(\"Hi!\")'>Hi!</div>"), None).unwrap();
     }
 
     #[test]
     #[should_panic = "refuse to convert dangerouslySetInnerHTML"]
     fn no_dangerously_set_inner_html() {
         html_to_jsx(
-            "<div dangerouslySetInnerHTML={{__html: '<script>alert(\"Hi!\")</script>'}}></div>",
+            &make_source(
+                "<div dangerouslySetInnerHTML={{__html: '<script>alert(\"Hi!\")</script>'}}></div>",
+            ),
             None,
         )
         .unwrap();
@@ -146,31 +164,25 @@ mod test_rejections {
     #[test]
     #[should_panic = "refuse to convert `javascript:` URLs"]
     fn no_javascript_url() {
-        html_to_jsx("<a href='javascript:alert(\"Hi!\")'>Hi!</a>", None).unwrap();
-    }
-
-    #[test]
-    #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
-    fn no_malicious_jsx() {
         html_to_jsx(
-            "<div>",
-            Some(JSXFactory {
-                jsx: "eval".into(),
-                ..Default::default()
-            }),
+            &make_source("<a href='javascript:alert(\"Hi!\")'>Hi!</a>"),
+            None,
         )
         .unwrap();
     }
 
     #[test]
     #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
+    fn no_malicious_jsx() {
+        html_to_jsx(&make_source("<div>"), Some(JSXFactory::new().jsx("eval"))).unwrap();
+    }
+
+    #[test]
+    #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
     fn no_malicious_jsx_2() {
         html_to_jsx(
-            "<div>",
-            Some(JSXFactory {
-                jsx: "evaluate".into(),
-                ..Default::default()
-            }),
+            &make_source("<div>"),
+            Some(JSXFactory::new().jsx("evaluate")),
         )
         .unwrap();
     }
@@ -179,11 +191,8 @@ mod test_rejections {
     #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
     fn no_malicious_jsxs() {
         html_to_jsx(
-            "<div>",
-            Some(JSXFactory {
-                jsxs: "globalThis.eval".into(),
-                ..Default::default()
-            }),
+            &make_source("<div>"),
+            Some(JSXFactory::new().jsxs("globalThis.eval")),
         )
         .unwrap();
     }
@@ -192,11 +201,8 @@ mod test_rejections {
     #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
     fn no_malicious_fragment() {
         html_to_jsx(
-            "<div>",
-            Some(JSXFactory {
-                fragment: "window.Function".into(),
-                ..Default::default()
-            }),
+            &make_source("<div>"),
+            Some(JSXFactory::new().fragment("window.Function")),
         )
         .unwrap();
     }

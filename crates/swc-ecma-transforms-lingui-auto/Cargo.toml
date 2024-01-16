@@ -1,0 +1,24 @@
+[package]
+edition = "2021"
+name = "swc-ecma-transforms-lingui-auto"
+version = "0.1.0"
+
+[dependencies]
+regex = "1.10.2"
+serde = {version = "1.0.195", features = ["derive"]}
+serde_json = "1.0.111"
+swc-utils = {version = "0.1.0", path = "../swc-utils"}
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+
+[dependencies.swc_core]
+features = [
+  "ecma_ast",
+  "ecma_codegen",
+  "ecma_parser",
+  "ecma_utils",
+  "ecma_visit",
+  "testing",
+  "trace_macro",
+]
+version = "0.87.21"

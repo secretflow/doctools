@@ -1,13 +1,16 @@
 use adler::adler32_slice;
-use std::vec;
+use std::{collections::HashSet, vec};
 use swc_core::{
     atoms::Atom,
     ecma::ast::{Expr, KeyValueProp, Prop, PropName},
 };
-use swc_html_ast::{Document, DocumentFragment, Element, Namespace};
+use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
-use swc_utils::jsx::factory::{JSXElement, JSXFactory};
+use swc_utils::{
+    jsx::factory::{JSXElement, JSXFactory},
+    span::with_span,
+};
 
 use crate::{props::convert_attribute, Fragment};
 
@@ -15,7 +18,7 @@ pub struct DOMVisitor {
     factory: JSXFactory,
     head: Vec<Box<Expr>>,
     ancestors: Vec<Vec<Box<Expr>>>,
-    styles: Vec<Atom>,
+    styles: HashSet<Atom>,
 }
 
 fn style_selector(style: &str) -> String {
@@ -24,51 +27,6 @@ fn style_selector(style: &str) -> String {
 
 fn style_classname(style: &str) -> String {
     format!("jsx-styled-{:x}", adler32_slice(style.as_bytes()))
-}
-
-impl DOMVisitor {
-    pub fn new(factory: JSXFactory) -> Self {
-        if factory.jsx.contains("eval")
-            || factory.jsxs.contains("eval")
-            || factory.fragment.contains("eval")
-            || factory.jsx.contains("Function")
-            || factory.jsxs.contains("Function")
-            || factory.fragment.contains("Function")
-        {
-            panic!("JSX factories cannot contain 'eval' or 'Function' in name");
-        }
-        Self {
-            factory,
-            ancestors: vec![],
-            head: vec![],
-            styles: vec![],
-        }
-    }
-
-    pub fn get(&mut self) -> Result<Fragment, swc_html_parser::error::Error> {
-        let mut head = vec![];
-
-        let mut stylesheet: Vec<Box<Expr>> = vec![];
-
-        self.styles.iter().for_each(|inline| {
-            stylesheet.push(style_selector(&inline).into());
-            stylesheet.push(inline.as_str().into());
-            stylesheet.push("}".into());
-        });
-
-        if stylesheet.len() > 0 {
-            head.push(self.factory.create(&"style".into(), None, Some(stylesheet)));
-        }
-
-        head.append(&mut self.head);
-
-        let children = self.ancestors.pop().unwrap_or(vec![]);
-        let body = self
-            .factory
-            .create(&JSXElement::Fragment, None, Some(children));
-
-        Ok(Fragment { head, body })
-    }
 }
 
 impl Visit for DOMVisitor {
@@ -88,7 +46,9 @@ impl Visit for DOMVisitor {
 
         let children = vec![];
         self.ancestors.push(children);
+
         elem.visit_children_with(self);
+
         let children = self.ancestors.pop().expect("expected children");
 
         let mut props: Vec<Box<Prop>> = vec![];
@@ -99,7 +59,7 @@ impl Visit for DOMVisitor {
             if attr.name == "style" {
                 match &attr.value {
                     Some(value) => {
-                        self.styles.push(value.as_str().into());
+                        self.styles.insert(value.as_str().into());
                         styled = Some(style_classname(value.as_str()));
                     }
                     None => (),
@@ -116,7 +76,7 @@ impl Visit for DOMVisitor {
                 continue;
             }
             if let Some(prop) = convert_attribute(&attr) {
-                props.push(prop.into())
+                props.push(with_span(elem.span)(prop.into()))
             }
         }
 
@@ -131,18 +91,22 @@ impl Visit for DOMVisitor {
         };
 
         if !classes.is_empty() {
-            props.push(
+            props.push(with_span(elem.span)(
                 Prop::KeyValue(KeyValueProp {
                     key: PropName::Str("className".into()),
                     value: classes.into(),
                 })
                 .into(),
-            )
+            ))
         }
 
-        let element =
+        let element = with_span(elem.span)(
             self.factory
-                .create(&elem.tag_name.as_str().into(), Some(props), Some(children));
+                .create(&elem.tag_name.as_str().into())
+                .props(Some(props))
+                .children(Some(children))
+                .build(),
+        );
 
         match elem.tag_name.as_str() {
             "base" | "link" | "meta" | "noscript" | "script" | "style" | "title"
@@ -157,9 +121,9 @@ impl Visit for DOMVisitor {
         };
     }
 
-    fn visit_text(&mut self, text: &swc_html_ast::Text) {
+    fn visit_text(&mut self, text: &Text) {
         let parent = self.ancestors.last_mut().expect("expected parent");
-        parent.push(text.data.as_str().into());
+        parent.push(with_span(text.span)(Expr::from(text.data.as_str())).into());
     }
 
     fn visit_document(&mut self, d: &Document) {
@@ -170,5 +134,62 @@ impl Visit for DOMVisitor {
     fn visit_document_fragment(&mut self, d: &DocumentFragment) {
         self.ancestors.push(vec![]);
         d.visit_children_with(self);
+    }
+}
+
+impl DOMVisitor {
+    pub fn new(factory: JSXFactory) -> Self {
+        if factory
+            .names()
+            .iter()
+            .any(|name| name.contains("eval") || name.contains("Function"))
+        {
+            panic!("JSX factories cannot contain 'eval' or 'Function' in name");
+        }
+        Self {
+            factory,
+            ancestors: vec![],
+            head: vec![],
+            styles: HashSet::new(),
+        }
+    }
+
+    pub fn get(mut self) -> Result<Fragment, swc_html_parser::error::Error> {
+        let mut head = vec![];
+
+        let mut stylesheet: Vec<Box<Expr>> = vec![];
+
+        Some(self.styles.iter().collect::<Vec<_>>())
+            .and_then(|mut c| {
+                c.sort_unstable();
+                Some(c)
+            })
+            .unwrap()
+            .iter()
+            .for_each(|style| {
+                stylesheet.push(style_selector(&style).into());
+                stylesheet.push(style.as_str().into());
+                stylesheet.push("}".into());
+            });
+
+        if stylesheet.len() > 0 {
+            head.push(
+                self.factory
+                    .create(&"style".into())
+                    .children(Some(stylesheet))
+                    .build(),
+            );
+        }
+
+        head.append(&mut self.head);
+
+        let children = self.ancestors.pop().unwrap_or(vec![]);
+        let body = self
+            .factory
+            .create(&JSXElement::Fragment)
+            .children(Some(children))
+            .build();
+
+        Ok(Fragment { head, body })
     }
 }

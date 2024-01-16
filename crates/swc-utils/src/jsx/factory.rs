@@ -9,67 +9,179 @@ use swc_core::{
 
 use crate::json::set_object;
 
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub enum JSXElement {
     Intrinsic(Atom),
     Ident(Atom),
     Fragment,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+impl JSXElement {
+    pub fn is_metadata(&self) -> bool {
+        match self {
+            JSXElement::Intrinsic(name) => match name.as_str() {
+                "base" | "link" | "meta" | "noscript" | "script" | "style" | "title" => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+}
+
+impl From<&str> for JSXElement {
+    fn from(value: &str) -> Self {
+        JSXElement::Intrinsic(value.into())
+    }
+}
+
+impl From<String> for JSXElement {
+    fn from(value: String) -> Self {
+        JSXElement::Intrinsic(value.into())
+    }
+}
+
+impl From<Ident> for JSXElement {
+    fn from(value: Ident) -> Self {
+        JSXElement::Ident(value.sym)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JSXFactory {
     #[serde(rename = "Fragment")]
-    pub fragment: Atom,
-    pub jsx: Atom,
-    pub jsxs: Atom,
+    fragment: Atom,
+    jsx: Atom,
+    jsxs: Atom,
+}
+
+pub struct JSXBuilder<'a> {
+    factory: &'a JSXFactory,
+    name: &'a JSXElement,
+    props: Option<Vec<Box<Prop>>>,
+    children: Option<Vec<Box<Expr>>>,
+    props_with_children: Option<Box<Expr>>,
 }
 
 impl JSXFactory {
-    pub fn create(
-        &self,
-        name: &JSXElement,
-        props: Option<Vec<Box<Prop>>>,
-        children: Option<Vec<Box<Expr>>>,
-    ) -> Box<Expr> {
-        let jsx = match children {
-            Some(ref children) if children.len() > 1 => &self.jsxs,
-            _ => &self.jsx,
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn jsx(mut self, jsx: &str) -> Self {
+        self.jsx = jsx.into();
+        self
+    }
+
+    pub fn jsxs(mut self, jsxs: &str) -> Self {
+        self.jsxs = jsxs.into();
+        self
+    }
+
+    pub fn fragment(mut self, fragment: &str) -> Self {
+        self.fragment = fragment.into();
+        self
+    }
+
+    pub fn names(&self) -> [&str; 3] {
+        [
+            self.fragment.as_str(),
+            self.jsx.as_str(),
+            self.jsxs.as_str(),
+        ]
+    }
+}
+
+impl JSXFactory {
+    pub fn create<'a>(&'a self, name: &'a JSXElement) -> JSXBuilder<'a> {
+        JSXBuilder {
+            factory: self,
+            name,
+            props: None,
+            children: None,
+            props_with_children: None,
+        }
+    }
+}
+
+impl JSXBuilder<'_> {
+    pub fn props(mut self, props: Option<Vec<Box<Prop>>>) -> Self {
+        self.props = props;
+        self
+    }
+
+    pub fn props_with_children(mut self, props: Option<Box<Expr>>) -> Self {
+        self.props_with_children = props;
+        self
+    }
+
+    pub fn children(mut self, children: Option<Vec<Box<Expr>>>) -> Self {
+        self.children = children;
+        self
+    }
+
+    pub fn build(self) -> Box<Expr> {
+        let jsx = match self.children {
+            Some(ref children) if children.len() > 1 => &self.factory.jsxs,
+            _ => &self.factory.jsx,
         };
 
-        let mut props = match props {
-            Some(props) => props,
-            None => vec![],
-        };
-
-        match children {
-            Some(children) => {
-                if children.len() > 1 {
-                    // { "children": [jsx(...), jsxs(...), ...] }
-                    props.push(
-                        Prop::from(KeyValueProp {
-                            key: PropName::Str("children".into()),
-                            value: ArrayLit {
-                                elems: children.into_iter().map(|expr| Some(expr.into())).collect(),
-                                span: Default::default(),
-                            }
-                            .into(),
-                        })
-                        .into(),
-                    )
-                } else if children.len() == 1 {
-                    // { "children": jsx(...) }
-                    // { "children": null }
-                    let mut children = children;
-                    let value = children.pop().unwrap();
-                    props.push(
-                        Prop::from(KeyValueProp {
-                            key: PropName::Str("children".into()),
-                            value,
-                        })
-                        .into(),
-                    )
+        let props = match self.props_with_children {
+            Some(props) => {
+                if self.props.is_some() || self.children.is_some() {
+                    unreachable!("props_with_children cannot be used with props or children");
                 }
+                props
             }
-            _ => (),
+            None => {
+                let mut props = match self.props {
+                    Some(props) => props,
+                    None => vec![],
+                };
+
+                match self.children {
+                    Some(children) => {
+                        if children.len() > 1 {
+                            // { "children": [jsx(...), jsxs(...), ...] }
+                            props.push(
+                                Prop::from(KeyValueProp {
+                                    key: PropName::Str("children".into()),
+                                    value: ArrayLit {
+                                        elems: children
+                                            .into_iter()
+                                            .map(|expr| Some(expr.into()))
+                                            .collect(),
+                                        span: Default::default(),
+                                    }
+                                    .into(),
+                                })
+                                .into(),
+                            )
+                        } else if children.len() == 1 {
+                            // { "children": jsx(...) }
+                            // { "children": null }
+                            let mut children = children;
+                            let value = children.pop().unwrap();
+                            props.push(
+                                Prop::from(KeyValueProp {
+                                    key: PropName::Str("children".into()),
+                                    value,
+                                })
+                                .into(),
+                            )
+                        }
+                    }
+                    _ => (),
+                };
+
+                Expr::from(ObjectLit {
+                    props: props
+                        .into_iter()
+                        .map(|prop| PropOrSpread::Prop(prop.into()))
+                        .collect(),
+                    span: Default::default(),
+                })
+                .into()
+            }
         };
 
         // jsx("tag", { ...attrs, children: jsx(...) })
@@ -78,20 +190,14 @@ impl JSXFactory {
             // jsx(
             callee: Callee::from(Box::from(Ident::from(jsx.as_str()))),
             args: vec![
-                match name {
+                match self.name {
                     JSXElement::Intrinsic(tag) => Expr::from(tag.as_str()).into(),
                     JSXElement::Ident(tag) => Expr::from(Ident::from(tag.as_str())).into(),
-                    JSXElement::Fragment => Expr::from(Ident::from(self.fragment.as_str())).into(),
+                    JSXElement::Fragment => {
+                        Expr::from(Ident::from(self.factory.fragment.as_str())).into()
+                    }
                 },
-                // { ...attrs, children: jsx(...) }
-                Expr::from(ObjectLit {
-                    props: props
-                        .into_iter()
-                        .map(|prop| PropOrSpread::Prop(prop.into()))
-                        .collect(),
-                    span: Default::default(),
-                })
-                .into(),
+                props.into(),
             ],
             span: Default::default(),
             type_args: None,
@@ -130,17 +236,13 @@ impl JSXFactory {
         }
     }
 
-    pub fn is_element(&self, expr: &Box<Expr>) -> Option<JSXElement> {
-        match expr.as_ref() {
-            Expr::Call(CallExpr {
-                callee: Callee::Expr(callee),
-                args,
-                ..
-            }) => match callee.as_ref() {
+    pub fn call_is_jsx(&self, call: &CallExpr) -> Option<JSXElement> {
+        match &call.callee {
+            Callee::Expr(callee) => match &**callee {
                 Expr::Ident(Ident { sym: caller, .. }) => {
                     if caller == &self.jsx || caller == &self.jsxs {
-                        match args.get(0) {
-                            Some(ExprOrSpread { expr, .. }) => match expr.as_ref() {
+                        match call.args.get(0) {
+                            Some(ExprOrSpread { expr, .. }) => match &**expr {
                                 Expr::Lit(Lit::Str(Str { value, .. })) => {
                                     Some(JSXElement::Intrinsic(value.as_str().into()))
                                 }
@@ -161,12 +263,11 @@ impl JSXFactory {
         }
     }
 
-    pub fn replace_props(&self, elem: &mut Box<Expr>, props: Box<Expr>) {
-        let call = elem.as_mut_call().expect("expected call expression");
-        call.args[1] = ExprOrSpread {
-            expr: props,
-            spread: None,
-        };
+    pub fn expr_is_jsx(&self, expr: &Box<Expr>) -> Option<JSXElement> {
+        match &**expr {
+            Expr::Call(call) => self.call_is_jsx(call),
+            _ => None,
+        }
     }
 
     pub fn set_children(&self, elem: &mut Box<Expr>, keypath: &[&str], children: Vec<Box<Expr>>) {
@@ -210,7 +311,11 @@ impl JSXFactory {
             _ => {
                 // wrap children in Fragment if there's more than one
                 let children = if children.len() > 1 {
-                    Some(self.create(&JSXElement::Fragment, None, Some(children)))
+                    Some(
+                        self.create(&JSXElement::Fragment)
+                            .children(Some(children))
+                            .build(),
+                    )
                 } else {
                     children.into_iter().last()
                 };
@@ -232,36 +337,6 @@ impl Default for JSXFactory {
     }
 }
 
-impl JSXElement {
-    pub fn is_metadata(&self) -> bool {
-        match self {
-            JSXElement::Intrinsic(name) => match name.as_str() {
-                "base" | "link" | "meta" | "noscript" | "script" | "style" | "title" => true,
-                _ => false,
-            },
-            _ => false,
-        }
-    }
-}
-
-impl From<&str> for JSXElement {
-    fn from(value: &str) -> Self {
-        JSXElement::Intrinsic(value.into())
-    }
-}
-
-impl From<String> for JSXElement {
-    fn from(value: String) -> Self {
-        JSXElement::Intrinsic(value.into())
-    }
-}
-
-impl From<Ident> for JSXElement {
-    fn from(value: Ident) -> Self {
-        JSXElement::Ident(value.sym)
-    }
-}
-
 #[macro_export]
 macro_rules! props {
     ($obj:expr) => {
@@ -277,6 +352,15 @@ macro_rules! props {
             _ => unreachable!(),
         }
     };
+    ( $($key:literal = $value:expr),+ ) => {
+        vec![
+        $(  Prop::KeyValue(KeyValueProp {
+                key: PropName::Str($key.into()),
+                value: Expr::from($value).into(),
+            })
+            .into(), )*
+        ]
+    }
 }
 
 #[cfg(test)]
@@ -297,20 +381,19 @@ mod tests {
     #[test]
     fn test_fragment() {
         let jsx = JSXFactory::default();
-        let elem = jsx.create(&JSXElement::Fragment, None, None);
-        let code = print_one(&elem, None);
+        let elem = jsx.create(&JSXElement::Fragment).build();
+        let code = print_one(&elem, None, None);
         assert_eq!(code, "jsx(Fragment, {})");
     }
 
     #[test]
     fn test_intrinsic() {
         let jsx = JSXFactory::default();
-        let elem = jsx.create(
-            &JSXElement::Intrinsic("div".into()),
-            None,
-            Some(vec![Box::from(Expr::from(Ident::from("foo")))]),
-        );
-        let code = print_one(&elem, Some(Config::default().with_minify(true)));
+        let elem = jsx
+            .create(&JSXElement::Intrinsic("div".into()))
+            .children(Some(vec![Box::from(Expr::from(Ident::from("foo")))]))
+            .build();
+        let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"jsx("div",{"children":foo})"#)
@@ -320,8 +403,8 @@ mod tests {
     #[test]
     fn test_component() {
         let jsx = JSXFactory::default();
-        let elem = jsx.create(&JSXElement::Ident("Foo".into()), None, None);
-        let code = print_one(&elem, Some(Config::default().with_minify(true)));
+        let elem = jsx.create(&JSXElement::Ident("Foo".into())).build();
+        let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"jsx(Foo,{})"#)
@@ -331,15 +414,14 @@ mod tests {
     #[test]
     fn test_jsxs() {
         let jsx = JSXFactory::default();
-        let elem = jsx.create(
-            &JSXElement::Intrinsic("div".into()),
-            None,
-            Some(vec![
-                jsx.create(&JSXElement::Intrinsic("span".into()), None, None),
-                jsx.create(&JSXElement::Intrinsic("span".into()), None, None),
-            ]),
-        );
-        let code = print_one(&elem, Some(Config::default().with_minify(true)));
+        let elem = jsx
+            .create(&JSXElement::Intrinsic("div".into()))
+            .children(Some(vec![
+                jsx.create(&JSXElement::Intrinsic("span".into())).build(),
+                jsx.create(&JSXElement::Intrinsic("span".into())).build(),
+            ]))
+            .build();
+        let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"jsxs("div",{"children":[jsx("span",{}),jsx("span",{})]})"#)
@@ -349,15 +431,14 @@ mod tests {
     #[test]
     fn test_props() {
         let jsx = JSXFactory::default();
-        let elem = jsx.create(
-            &JSXElement::Intrinsic("div".into()),
-            Some(props!(json_expr(json!({
+        let elem = jsx
+            .create(&JSXElement::Intrinsic("div".into()))
+            .props(Some(props!(json_expr(json!({
                 "className": "foo",
                 "id": "bar"
-            })))),
-            None,
-        );
-        let code = print_one(&elem, Some(Config::default().with_minify(true)));
+            }),))))
+            .build();
+        let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"jsx("div",{"className":"foo","id":"bar"})"#)

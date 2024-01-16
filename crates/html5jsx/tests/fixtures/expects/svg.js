@@ -2,9 +2,6 @@ jsxs("style", {
     "children": [
         ".jsx-styled-4a9b0717{",
         "fill: url(#gradient)",
-        "}",
-        ".jsx-styled-4a9b0717{",
-        "fill: url(#gradient)",
         "}"
     ]
 });

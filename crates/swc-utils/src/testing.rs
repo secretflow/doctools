@@ -3,8 +3,8 @@ use swc_core::{
     ecma::codegen::{text_writer::JsWriter, Config, Emitter, Node},
 };
 
-pub fn print_one<N: Node>(node: &N, conf: Option<Config>) -> String {
-    let cm = Lrc::new(SourceMap::default());
+pub fn print_one<N: Node>(node: &N, cm: Option<Lrc<SourceMap>>, conf: Option<Config>) -> String {
+    let cm = cm.unwrap_or_else(|| Lrc::new(SourceMap::default()));
     let mut buf = vec![];
     let mut emitter = Emitter {
         cfg: conf.unwrap_or_default(),

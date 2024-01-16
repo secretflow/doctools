@@ -45,7 +45,7 @@ pub fn json_expr(value: serde_json::Value) -> Box<Expr> {
 }
 
 pub fn set_object(object: &mut Box<Expr>, keypath: &[&str], value: Box<Expr>) {
-    match object.as_ref() {
+    match **object {
         Expr::Object(_) => (),
         _ => unreachable!(),
     };
@@ -71,6 +71,19 @@ impl VisitMut for ObjectSetter<'_> {
         let key = self.prefix.next();
         match key {
             None => {
+                if object.props.iter().any(|p| {
+                    p.as_prop()
+                        .and_then(|p| p.as_key_value())
+                        .and_then(|p| p.key.as_str())
+                        .and_then(|k| Some(k.value.as_str() == self.key))
+                        .unwrap_or(false)
+                }) {
+                    // if there is a computed key then it's a logic error
+                    unreachable!(
+                        "object already has a key named `{}`\n{:#?}",
+                        self.key, object
+                    );
+                }
                 let value = self.value.take();
                 let prop = Prop::from(KeyValueProp {
                     key: PropName::Str(self.key.into()),
@@ -146,7 +159,11 @@ mod tests {
             "string": "string",
             "array": [42, [{"object": true}]],
         });
-        let code = print_one(&json_expr(value), Some(Config::default().with_minify(true)));
+        let code = print_one(
+            &json_expr(value),
+            None,
+            Some(Config::default().with_minify(true)),
+        );
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(
@@ -159,7 +176,7 @@ mod tests {
     fn test_object_setter() {
         let mut expr = json_expr(json!({}));
         set_object(&mut expr, &["children"], Box::from(json_expr(json!([]))));
-        let code = print_one(&expr, Some(Config::default().with_minify(true)));
+        let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"{"children":[]}"#)
@@ -174,7 +191,7 @@ mod tests {
             &["lorem", "ipsum", "dolor", "sit"],
             Box::from(json_expr(json!("amet"))),
         );
-        let code = print_one(&expr, Some(Config::default().with_minify(true)));
+        let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
         assert_eq!(
             DebugUsingDisplay(code.as_str()),
             DebugUsingDisplay(r#"{"lorem":{"ipsum":{"dolor":{"sit":"amet"}}}}"#)

@@ -20,10 +20,5 @@ swc_core = {version = "0.87.21", features = ["ecma_codegen"]}
 testing = "0.35.14"
 
 [features]
-bin = ["swc_core/ecma_codegen"]
 unsafe-allow = []
 unsafe-ignore = []
-
-[[bin]]
-name = "html5jsx"
-required-features = ["bin"]

@@ -4,5 +4,5 @@ use swc_utils::testing::print_one;
 
 fn main() {
     let ast = from_str::<FnDecl>(include_str!("./ensure.json")).unwrap();
-    println!("{}", print_one(&ast, Default::default()));
+    println!("{}", print_one(&ast, None, Default::default()));
 }

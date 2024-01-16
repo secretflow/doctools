@@ -52,18 +52,33 @@ pub struct ExternalPackages {
     /// - `https://esm.sh/{{package}}@{{version}}{{path}}`
     /// - `https://deno.land/x/{{package}}@{{version}}{{path}}`
     #[serde(default = "ExternalPackages::noop_import_source")]
-    pub import_source: String,
+    import_source: String,
 
     /// A map of package names to versions.
     ///
     /// If a package is not in this map, it is assumed to be `>=0.0.0`.
     #[serde(default)]
-    pub known_packages: HashMap<String, String>,
+    known_packages: HashMap<String, String>,
 }
 
 impl ExternalPackages {
     fn noop_import_source() -> String {
         String::from("{{package}}{{path}}")
+    }
+
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn import_from(mut self, source: &str) -> Self {
+        self.import_source = source.to_string();
+        self
+    }
+
+    pub fn package(mut self, package: &str, version: &str) -> Self {
+        self.known_packages
+            .insert(package.to_string(), version.to_string());
+        self
     }
 }
 

@@ -180,9 +180,9 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "base64"
-version = "0.21.6"
+version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c79fed4cdb43e993fcdadc7e58a09fd0e3e649c4436fa11da71c9f1f3ee7feb9"
+checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
 name = "better_scoped_tls"
@@ -1117,6 +1117,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "html5jsx-bin"
+version = "0.1.0"
+dependencies = [
+ "base64 0.21.7",
+ "html5jsx",
+ "swc-utils",
+ "swc_core",
+]
+
+[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1367,7 +1377,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a36720938833f89c67b698065cf6707a95f6df954a2c7796097ddafe2ef45c5"
 dependencies = [
  "anyhow",
- "base64 0.21.6",
+ "base64 0.21.7",
  "bytesize",
  "cargo-config2",
  "cargo-options",
@@ -2159,7 +2169,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61fc4b4e52897c3e30b12b7e9b04461215b647fbe66f6def60dd8edbce14ec2e"
 dependencies = [
- "base64 0.21.6",
+ "base64 0.21.7",
  "charset",
  "chumsky",
  "memchr",
@@ -2270,7 +2280,7 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35e4980fa29e4c4b212ffb3db068a564cbf560e51d3944b7c88bd8bf5bec64f4"
 dependencies = [
- "base64 0.21.6",
+ "base64 0.21.7",
  "rustls-pki-types",
 ]
 
@@ -2638,18 +2648,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "swc-ecma-transforms-lingui-auto"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "serde",
+ "serde_json",
+ "swc-utils",
+ "swc_core",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "swc-plugin-esm-serve"
 version = "0.1.0"
 dependencies = [
  "esm-serve",
  "serde_json",
- "swc_core",
-]
-
-[[package]]
-name = "swc-transforms-lingui-jsx"
-version = "0.1.0"
-dependencies = [
  "swc_core",
 ]
 
@@ -2727,6 +2743,7 @@ dependencies = [
  "swc_plugin",
  "swc_plugin_macro",
  "swc_plugin_proxy",
+ "swc_trace_macro",
  "testing",
  "vergen",
 ]
@@ -2848,7 +2865,7 @@ checksum = "c9def5b4509c1764173a5cfce81d46d3d64ae479fbc7f1975ba3758dda4abc79"
 dependencies = [
  "ansi_term",
  "anyhow",
- "base64 0.21.6",
+ "base64 0.21.7",
  "hex",
  "serde",
  "serde_json",
@@ -3307,9 +3324,9 @@ dependencies = [
 
 [[package]]
 name = "tracing"
-version = "0.1.39"
+version = "0.1.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee2ef2af84856a50c1d430afce2fdded0a4ec7eda868db86409b4543df0797f9"
+checksum = "c3523ab5a71916ccf420eebdf5521fcef02141234bbc0b8a49f2fdc4544364ef"
 dependencies = [
  "log",
  "pin-project-lite",
@@ -3469,7 +3486,7 @@ version = "2.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8cdd25c339e200129fe4de81451814e5228c9b771d57378817d6117cc2b3f97"
 dependencies = [
- "base64 0.21.6",
+ "base64 0.21.7",
  "flate2",
  "log",
  "once_cell",

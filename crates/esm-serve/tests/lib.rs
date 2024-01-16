@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use once_cell::sync::Lazy;
 use swc_core::ecma::{
     parser::{Syntax, TsConfig},
@@ -8,14 +6,13 @@ use swc_core::ecma::{
 
 use esm_serve::{externalize_modules, ExternalPackages};
 
-static PACKAGES_ESM_SH: Lazy<ExternalPackages> = Lazy::new(|| ExternalPackages {
-    import_source: String::from("https://esm.sh/{{package}}@{{version}}{{path}}"),
-    known_packages: HashMap::from([
-        ("react".to_string(), "18.2.0".to_string()),
-        ("react-dom".to_string(), "18.2.0".to_string()),
-        ("lodash".to_string(), "4.17.21".to_string()),
-        ("vite".to_string(), "^5".to_string()),
-    ]),
+static PACKAGES_ESM_SH: Lazy<ExternalPackages> = Lazy::new(|| {
+    ExternalPackages::new()
+        .import_from("https://esm.sh/{{package}}@{{version}}{{path}}")
+        .package("react", "18.2.0")
+        .package("react-dom", "18.2.0")
+        .package("lodash", "4.17.21")
+        .package("vite", "^5")
 });
 
 test!(

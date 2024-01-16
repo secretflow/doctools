@@ -1,10 +1,18 @@
 - [ ] Rendering
   - [ ] JSX transform
+    - [ ] Ident collect
+  - [ ] JSX-in-HTML
+  - [ ] Sourcemap
 - [ ] ESM
   - [ ] SWC + PyO3
+- [ ] Python symbols
 - [ ] i18n
   - [ ] lingui format
   - [ ] .po extract
+    - [x] whitespace rules https://infra.spec.whatwg.org/#ascii-whitespace
+    - [ ] nesting rules
+    - [ ] potentially empty messages
+    - [ ] top-level Fragments
   - [ ] .po compile
 - [ ] search
   - [ ] deno + orama

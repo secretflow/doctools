@@ -1,9 +1,6 @@
-use swc_core::{
-    common::{FileName, SourceMap},
-    ecma::ast::Expr,
-};
+use swc_core::{common::SourceFile, ecma::ast::Expr};
 use swc_html_ast::{DocumentMode, Element, Namespace};
-use swc_html_parser::{parse_file_as_document_fragment, parser::ParserConfig};
+use swc_html_parser::{error::Error, parse_file_as_document_fragment, parser::ParserConfig};
 use swc_html_visit::VisitWith as _;
 use swc_utils::jsx::factory::JSXFactory;
 
@@ -17,13 +14,7 @@ pub struct Fragment {
     pub body: Box<Expr>,
 }
 
-pub fn html_to_jsx(
-    html: &str,
-    jsx: Option<JSXFactory>,
-) -> Result<Fragment, swc_html_parser::error::Error> {
-    let files: SourceMap = Default::default();
-    let file = files.new_source_file(FileName::Anon, html.to_string());
-
+pub fn html_to_jsx(html: &SourceFile, jsx: Option<JSXFactory>) -> Result<Fragment, Error> {
     let parent = Element {
         namespace: Namespace::HTML,
         span: Default::default(),
@@ -34,10 +25,10 @@ pub fn html_to_jsx(
         is_self_closing: false,
     };
 
-    let mut errors: Vec<swc_html_parser::error::Error> = vec![];
+    let mut errors: Vec<Error> = vec![];
 
     let dom = parse_file_as_document_fragment(
-        &file,
+        &html,
         &parent,
         DocumentMode::NoQuirks,
         None,

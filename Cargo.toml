@@ -2,10 +2,11 @@
 members = [
   "crates/esm-serve",
   "crates/html5jsx",
+  "crates/html5jsx/bin",
   "crates/maturin-utils",
   "crates/playground",
   "crates/playground/serde-jsx",
-  "crates/swc-transforms-lingui-jsx",
+  "crates/swc-ecma-transforms-lingui-auto",
   "crates/swc-utils",
   "packages/swc-plugin-esm-serve",
   "pyprojects/esm-serve-pyo3",

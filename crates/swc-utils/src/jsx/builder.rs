@@ -1,4 +1,9 @@
-use swc_core::ecma::ast::{Expr, Ident};
+use swc_core::{
+    common::Span,
+    ecma::ast::{Expr, Ident},
+};
+
+use crate::span::with_span;
 
 use super::factory::{JSXElement, JSXFactory};
 
@@ -42,11 +47,18 @@ pub struct DocumentBuilder {
 }
 
 impl DocumentBuilder {
-    pub fn element(&mut self, name: &JSXElement, props: Option<Box<Expr>>) -> &mut Self {
-        let mut elem = self.factory.create(name, None, None);
-        if let Some(props) = props {
-            self.factory.replace_props(&mut elem, props);
-        }
+    pub fn element(
+        &mut self,
+        name: &JSXElement,
+        props: Option<Box<Expr>>,
+        span: Option<Span>,
+    ) -> &mut Self {
+        let elem = self.factory.create(name).props_with_children(props).build();
+        let elem = if let Some(span) = span {
+            with_span(span)(elem)
+        } else {
+            elem
+        };
         self.push(elem);
         self
     }
@@ -87,6 +99,7 @@ impl DocumentBuilder {
         self.element(
             &Ident::from(name.as_str()).into(),
             Some(Ident::from("props").into()),
+            None,
         );
         self.snippets.push(JSXSnippet {
             html_id: id,
@@ -115,7 +128,7 @@ impl DocumentBuilder {
     }
 
     fn push(&mut self, value: Box<Expr>) {
-        let kind = self.factory.is_element(&value);
+        let kind = self.factory.expr_is_jsx(&value);
 
         match kind {
             Some(ref elem) if elem.is_metadata() => {
@@ -164,7 +177,9 @@ impl DocumentBuilder {
                 elements.into_iter().next().unwrap()
             } else {
                 self.factory
-                    .create(&JSXElement::Fragment, None, Some(elements))
+                    .create(&JSXElement::Fragment)
+                    .children(Some(elements))
+                    .build()
             }
         };
 
