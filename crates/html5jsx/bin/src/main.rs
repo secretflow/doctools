@@ -29,15 +29,18 @@ fn main() {
 
     let html = jsx
         .create(&"html".into())
-        .children(Some(vec![
+        .children(vec![
             jsx.create(&"head".into())
-                .children(Some(fragment.head))
-                .build(),
+                .children(fragment.head)
+                .build()
+                .into(),
             jsx.create(&"body".into())
-                .children(Some(vec![fragment.body]))
-                .build(),
-        ]))
-        .build();
+                .children(vec![fragment.body])
+                .build()
+                .into(),
+        ])
+        .build()
+        .into();
 
     let main = FnExpr {
         ident: Some("App".into()),

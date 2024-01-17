@@ -2648,7 +2648,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-transforms-lingui-auto"
+name = "swc-ecma-transforms-i18n"
 version = "0.1.0"
 dependencies = [
  "base64 0.21.7",

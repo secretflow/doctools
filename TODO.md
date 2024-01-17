@@ -11,9 +11,10 @@
   - [ ] lingui format
   - [ ] .po extract
     - [x] whitespace rules https://infra.spec.whatwg.org/#ascii-whitespace
-    - [ ] nesting rules
-    - [ ] potentially empty messages
-    - [ ] top-level Fragments
+    - [x] nesting rules
+    - [x] potentially empty messages
+    - [x] top-level Fragments
+    - [ ] attributes
   - [ ] .po compile
 - [ ] search
   - [ ] deno + orama

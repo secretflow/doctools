@@ -3,7 +3,7 @@ use std::slice::Iter;
 use swc_core::{
     common::util::take::Take as _,
     ecma::{
-        ast::{ArrayLit, Expr, Ident, KeyValueProp, Null, ObjectLit, Prop, PropName},
+        ast::{ArrayLit, Expr, Ident, KeyValueProp, Null, ObjectLit, Prop, PropName, PropOrSpread},
         visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _},
     },
 };
@@ -71,24 +71,12 @@ impl VisitMut for ObjectSetter<'_> {
         let key = self.prefix.next();
         match key {
             None => {
-                if object.props.iter().any(|p| {
-                    p.as_prop()
-                        .and_then(|p| p.as_key_value())
-                        .and_then(|p| p.key.as_str())
-                        .and_then(|k| Some(k.value.as_str() == self.key))
-                        .unwrap_or(false)
-                }) {
-                    // if there is a computed key then it's a logic error
-                    unreachable!(
-                        "object already has a key named `{}`\n{:#?}",
-                        self.key, object
-                    );
-                }
                 let value = self.value.take();
                 let prop = Prop::from(KeyValueProp {
                     key: PropName::Str(self.key.into()),
                     value,
                 });
+                object.props.retain(|p| !prop_is_named(self.key)(p));
                 object.props.push(prop.into());
             }
             Some(key) => {
@@ -138,6 +126,16 @@ impl VisitMut for ObjectSetter<'_> {
 fn null() -> Null {
     Null {
         span: Default::default(),
+    }
+}
+
+fn prop_is_named(key: &str) -> impl Fn(&PropOrSpread) -> bool + '_ {
+    move |prop: &PropOrSpread| {
+        prop.as_prop()
+            .and_then(|p| p.as_key_value())
+            .and_then(|p| p.key.as_str())
+            .and_then(|k| Some(k.value.as_str() == key))
+            .unwrap_or(false)
     }
 }
 

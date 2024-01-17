@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "swc-ecma-transforms-lingui-auto"
+name = "swc-ecma-transforms-i18n"
 version = "0.1.0"
 
 [dependencies]

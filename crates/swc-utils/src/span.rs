@@ -17,10 +17,28 @@ impl VisitMut for SetSpan {
     }
 }
 
-pub fn with_span<T: VisitMutWith<SetSpan>>(span: Span) -> impl Fn(T) -> T {
+pub fn with_span<T: VisitMutWith<SetSpan>>(span: Option<Span>) -> impl Fn(T) -> T {
     move |mut node| {
-        let mut v = SetSpan { span };
-        node.visit_mut_with(&mut v);
+        match span {
+            Some(span) => {
+                let mut v = SetSpan { span };
+                node.visit_mut_with(&mut v);
+            }
+            None => {}
+        }
         node
     }
+}
+
+pub fn union_span(low: Span, high: Span) -> Span {
+    if low.lo() > high.hi() {
+        unreachable!()
+    }
+    if low.is_dummy() {
+        return high;
+    }
+    if high.is_dummy() {
+        return low;
+    }
+    Span::new(low.lo(), high.hi(), high.ctxt())
 }

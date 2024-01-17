@@ -1,9 +1,6 @@
 use adler::adler32_slice;
 use std::{collections::HashSet, vec};
-use swc_core::{
-    atoms::Atom,
-    ecma::ast::{Expr, KeyValueProp, Prop, PropName},
-};
+use swc_core::{atoms::Atom, ecma::ast::Expr};
 use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
@@ -51,7 +48,9 @@ impl Visit for DOMVisitor {
 
         let children = self.ancestors.pop().expect("expected children");
 
-        let mut props: Vec<Box<Prop>> = vec![];
+        let name = elem.tag_name.as_str().into();
+        let mut builder = self.factory.create(&name);
+
         let mut classes = String::new();
         let mut styled: Option<String> = None;
 
@@ -76,7 +75,7 @@ impl Visit for DOMVisitor {
                 continue;
             }
             if let Some(prop) = convert_attribute(&attr) {
-                props.push(with_span(elem.span)(prop.into()))
+                builder.props.push(with_span(Some(attr.span))(prop.into()));
             }
         }
 
@@ -91,22 +90,10 @@ impl Visit for DOMVisitor {
         };
 
         if !classes.is_empty() {
-            props.push(with_span(elem.span)(
-                Prop::KeyValue(KeyValueProp {
-                    key: PropName::Str("className".into()),
-                    value: classes.into(),
-                })
-                .into(),
-            ))
+            builder = builder.prop("className", classes.into(), None);
         }
 
-        let element = with_span(elem.span)(
-            self.factory
-                .create(&elem.tag_name.as_str().into())
-                .props(Some(props))
-                .children(Some(children))
-                .build(),
-        );
+        let element = with_span(Some(elem.span))(builder.children(children).build());
 
         match elem.tag_name.as_str() {
             "base" | "link" | "meta" | "noscript" | "script" | "style" | "title"
@@ -123,7 +110,7 @@ impl Visit for DOMVisitor {
 
     fn visit_text(&mut self, text: &Text) {
         let parent = self.ancestors.last_mut().expect("expected parent");
-        parent.push(with_span(text.span)(Expr::from(text.data.as_str())).into());
+        parent.push(with_span(Some(text.span))(Expr::from(text.data.as_str())).into());
     }
 
     fn visit_document(&mut self, d: &Document) {
@@ -176,8 +163,9 @@ impl DOMVisitor {
             head.push(
                 self.factory
                     .create(&"style".into())
-                    .children(Some(stylesheet))
-                    .build(),
+                    .children(stylesheet)
+                    .build()
+                    .into(),
             );
         }
 
@@ -187,8 +175,9 @@ impl DOMVisitor {
         let body = self
             .factory
             .create(&JSXElement::Fragment)
-            .children(Some(children))
-            .build();
+            .children(children)
+            .build()
+            .into();
 
         Ok(Fragment { head, body })
     }

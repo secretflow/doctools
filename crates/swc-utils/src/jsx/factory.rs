@@ -1,13 +1,14 @@
 use serde::{Deserialize, Serialize};
 use swc_core::{
     atoms::Atom,
+    common::Span,
     ecma::ast::{
         ArrayLit, CallExpr, Callee, Expr, ExprOrSpread, Ident, ImportDecl, ImportNamedSpecifier,
         ImportSpecifier, KeyValueProp, Lit, ObjectLit, Prop, PropName, PropOrSpread, Str,
     },
 };
 
-use crate::json::set_object;
+use crate::{json::set_object, span::with_span};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub enum JSXElement {
@@ -57,9 +58,9 @@ pub struct JSXFactory {
 pub struct JSXBuilder<'a> {
     factory: &'a JSXFactory,
     name: &'a JSXElement,
-    props: Option<Vec<Box<Prop>>>,
-    children: Option<Vec<Box<Expr>>>,
-    props_with_children: Option<Box<Expr>>,
+    pub arg1: Option<Box<Expr>>,
+    pub props: Vec<Box<Prop>>,
+    pub children: Vec<ExprOrSpread>,
 }
 
 impl JSXFactory {
@@ -96,99 +97,97 @@ impl JSXFactory {
         JSXBuilder {
             factory: self,
             name,
-            props: None,
-            children: None,
-            props_with_children: None,
+            arg1: None,
+            props: vec![],
+            children: vec![],
         }
     }
 }
 
 impl JSXBuilder<'_> {
-    pub fn props(mut self, props: Option<Vec<Box<Prop>>>) -> Self {
-        self.props = props;
+    pub fn prop(mut self, key: &str, value: Box<Expr>, span: Option<Span>) -> Self {
+        self.props.push(with_span(span)(
+            (Prop::KeyValue(KeyValueProp {
+                key: PropName::Str(Str {
+                    value: key.into(),
+                    span: Default::default(),
+                    raw: None,
+                }),
+                value,
+            }))
+            .into(),
+        ));
         self
     }
 
-    pub fn props_with_children(mut self, props: Option<Box<Expr>>) -> Self {
-        self.props_with_children = props;
+    pub fn children(mut self, mut children: Vec<Box<Expr>>) -> Self {
+        self.children.append(
+            &mut children
+                .drain(..)
+                .map(|expr| expr.into())
+                .collect::<Vec<_>>(),
+        );
         self
     }
 
-    pub fn children(mut self, children: Option<Vec<Box<Expr>>>) -> Self {
-        self.children = children;
-        self
-    }
-
-    pub fn build(self) -> Box<Expr> {
-        let jsx = match self.children {
-            Some(ref children) if children.len() > 1 => &self.factory.jsxs,
-            _ => &self.factory.jsx,
+    pub fn build(mut self) -> CallExpr {
+        let jsx = if self.children.len() > 1 {
+            &*self.factory.jsxs
+        } else {
+            &*self.factory.jsx
         };
 
-        let props = match self.props_with_children {
-            Some(props) => {
-                if self.props.is_some() || self.children.is_some() {
-                    unreachable!("props_with_children cannot be used with props or children");
-                }
-                props
-            }
-            None => {
-                let mut props = match self.props {
-                    Some(props) => props,
-                    None => vec![],
-                };
+        if self.arg1.is_some() && !(self.props.is_empty() || !self.children.is_empty()) {
+            unreachable!("arg1 is set but props and children are not empty");
+        }
 
-                match self.children {
-                    Some(children) => {
-                        if children.len() > 1 {
-                            // { "children": [jsx(...), jsxs(...), ...] }
-                            props.push(
-                                Prop::from(KeyValueProp {
-                                    key: PropName::Str("children".into()),
-                                    value: ArrayLit {
-                                        elems: children
-                                            .into_iter()
-                                            .map(|expr| Some(expr.into()))
-                                            .collect(),
-                                        span: Default::default(),
-                                    }
-                                    .into(),
-                                })
-                                .into(),
-                            )
-                        } else if children.len() == 1 {
-                            // { "children": jsx(...) }
-                            // { "children": null }
-                            let mut children = children;
-                            let value = children.pop().unwrap();
-                            props.push(
-                                Prop::from(KeyValueProp {
-                                    key: PropName::Str("children".into()),
-                                    value,
-                                })
-                                .into(),
-                            )
+        let props = {
+            let mut props = self.props;
+
+            if self.children.len() > 1 {
+                // { "children": [jsx(...), jsxs(...), ...] }
+                props.push(
+                    Prop::from(KeyValueProp {
+                        key: PropName::Str("children".into()),
+                        value: ArrayLit {
+                            elems: self
+                                .children
+                                .drain(..)
+                                .map(|expr| Some(expr.into()))
+                                .collect(),
+                            span: Default::default(),
                         }
-                    }
-                    _ => (),
-                };
-
-                Expr::from(ObjectLit {
-                    props: props
-                        .into_iter()
-                        .map(|prop| PropOrSpread::Prop(prop.into()))
-                        .collect(),
-                    span: Default::default(),
-                })
-                .into()
+                        .into(),
+                    })
+                    .into(),
+                )
+            } else if self.children.len() == 1 {
+                // { "children": jsx(...) }
+                // { "children": null }
+                let value = self.children.pop().unwrap();
+                props.push(
+                    Prop::from(KeyValueProp {
+                        key: PropName::Str("children".into()),
+                        value: value.expr,
+                    })
+                    .into(),
+                )
             }
+
+            Expr::from(ObjectLit {
+                props: props
+                    .into_iter()
+                    .map(|prop| PropOrSpread::Prop(prop.into()))
+                    .collect(),
+                span: Default::default(),
+            })
         };
 
         // jsx("tag", { ...attrs, children: jsx(...) })
         // jsxs("tag", { ...attrs, children: [jsx(...), jsxs(...), ...] })
         CallExpr {
             // jsx(
-            callee: Callee::from(Box::from(Ident::from(jsx.as_str()))),
+            callee: Callee::from(Box::from(Ident::from(jsx))),
             args: vec![
                 match self.name {
                     JSXElement::Intrinsic(tag) => Expr::from(tag.as_str()).into(),
@@ -202,7 +201,6 @@ impl JSXBuilder<'_> {
             span: Default::default(),
             type_args: None,
         }
-        .into()
     }
 }
 
@@ -274,9 +272,12 @@ impl JSXFactory {
         }
     }
 
-    pub fn set_children(&self, elem: &mut Box<Expr>, keypath: &[&str], children: Vec<Box<Expr>>) {
-        let call = elem.as_mut_call().expect("expected call expression");
-
+    pub fn replace_children(
+        &self,
+        call: &mut CallExpr,
+        keypath: &[&str],
+        children: Vec<ExprOrSpread>,
+    ) {
         let props = call
             .args
             .get_mut(1)
@@ -302,11 +303,11 @@ impl JSXFactory {
                 // unwrap the array if there's only one child
                 let children = if children.len() > 1 {
                     Some(Box::from(Expr::from(ArrayLit {
-                        elems: children.into_iter().map(|c| Some((*c).into())).collect(),
+                        elems: children.into_iter().map(Some).collect(),
                         span: Default::default(),
                     })))
                 } else {
-                    children.into_iter().last()
+                    children.into_iter().last().and_then(|expr| Some(expr.expr))
                 };
                 if let Some(content) = children {
                     set_object(props, &["children"][..], content);
@@ -315,18 +316,24 @@ impl JSXFactory {
             _ => {
                 // wrap children in Fragment if there's more than one
                 let children = if children.len() > 1 {
-                    Some(
-                        self.create(&JSXElement::Fragment)
-                            .children(Some(children))
-                            .build(),
-                    )
+                    let mut builder = self.create(&JSXElement::Fragment);
+                    builder.children = children;
+                    Some(Box::from(Expr::from(builder.build())))
                 } else {
-                    children.into_iter().last()
+                    children.into_iter().last().and_then(|expr| Some(expr.expr))
                 };
                 if let Some(content) = children {
                     set_object(props, keypath, content);
                 };
             }
+        }
+    }
+
+    pub fn prop_is_children(prop: &KeyValueProp) -> bool {
+        match prop.key {
+            PropName::Ident(Ident { ref sym, .. }) if sym.as_str() == "children" => true,
+            PropName::Str(Str { ref value, .. }) if value.as_str() == "children" => true,
+            _ => false,
         }
     }
 }
@@ -369,7 +376,6 @@ macro_rules! props {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
     use swc_core::{
         ecma::{
             ast::{Expr, Ident},
@@ -378,7 +384,7 @@ mod tests {
         testing::DebugUsingDisplay,
     };
 
-    use crate::{json::json_expr, props, testing::print_one};
+    use crate::testing::print_one;
 
     use super::{JSXElement, JSXFactory};
 
@@ -395,7 +401,7 @@ mod tests {
         let jsx = JSXFactory::default();
         let elem = jsx
             .create(&JSXElement::Intrinsic("div".into()))
-            .children(Some(vec![Box::from(Expr::from(Ident::from("foo")))]))
+            .children(vec![Box::from(Expr::from(Ident::from("foo")))])
             .build();
         let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
@@ -420,10 +426,14 @@ mod tests {
         let jsx = JSXFactory::default();
         let elem = jsx
             .create(&JSXElement::Intrinsic("div".into()))
-            .children(Some(vec![
-                jsx.create(&JSXElement::Intrinsic("span".into())).build(),
-                jsx.create(&JSXElement::Intrinsic("span".into())).build(),
-            ]))
+            .children(vec![
+                jsx.create(&JSXElement::Intrinsic("span".into()))
+                    .build()
+                    .into(),
+                jsx.create(&JSXElement::Intrinsic("span".into()))
+                    .build()
+                    .into(),
+            ])
             .build();
         let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(
@@ -437,10 +447,8 @@ mod tests {
         let jsx = JSXFactory::default();
         let elem = jsx
             .create(&JSXElement::Intrinsic("div".into()))
-            .props(Some(props!(json_expr(json!({
-                "className": "foo",
-                "id": "bar"
-            }),))))
+            .prop("className", "foo".into(), None)
+            .prop("id", "bar".into(), None)
             .build();
         let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
         assert_eq!(

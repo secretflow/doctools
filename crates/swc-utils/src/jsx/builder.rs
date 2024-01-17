@@ -5,7 +5,7 @@ use swc_core::{
 
 use crate::span::with_span;
 
-use super::factory::{JSXElement, JSXFactory};
+use super::factory::{JSXBuilder, JSXElement, JSXFactory};
 
 struct PropPath(Vec<String>);
 
@@ -50,15 +50,12 @@ impl DocumentBuilder {
     pub fn element(
         &mut self,
         name: &JSXElement,
-        props: Option<Box<Expr>>,
+        build: impl Fn(JSXBuilder) -> JSXBuilder,
         span: Option<Span>,
     ) -> &mut Self {
-        let elem = self.factory.create(name).props_with_children(props).build();
-        let elem = if let Some(span) = span {
-            with_span(span)(elem)
-        } else {
-            elem
-        };
+        let builder = self.factory.create(name);
+        let elem = build(builder).build().into();
+        let elem = with_span(span)(elem);
         self.push(elem);
         self
     }
@@ -87,8 +84,11 @@ impl DocumentBuilder {
             Some(v) => v,
             None => return self,
         };
-        self.factory
-            .set_children(&mut parent, &prop.as_strs()[..], children.0);
+        self.factory.replace_children(
+            &mut parent.as_mut_call().unwrap(),
+            &prop.as_strs()[..],
+            children.0.into_iter().map(|v| v.into()).collect(),
+        );
         self.push(parent);
         self
     }
@@ -98,7 +98,10 @@ impl DocumentBuilder {
         let name = self.snippet_name();
         self.element(
             &Ident::from(name.as_str()).into(),
-            Some(Ident::from("props").into()),
+            |mut builder| {
+                builder.arg1 = Some(Ident::from("props").into());
+                builder
+            },
             None,
         );
         self.snippets.push(JSXSnippet {
@@ -178,8 +181,9 @@ impl DocumentBuilder {
             } else {
                 self.factory
                     .create(&JSXElement::Fragment)
-                    .children(Some(elements))
+                    .children(elements)
                     .build()
+                    .into()
             }
         };
 
