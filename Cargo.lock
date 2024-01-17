@@ -2651,7 +2651,8 @@ dependencies = [
 name = "swc-ecma-transforms-lingui-auto"
 version = "0.1.0"
 dependencies = [
- "regex",
+ "base64 0.21.7",
+ "html5jsx",
  "serde",
  "serde_json",
  "swc-utils",

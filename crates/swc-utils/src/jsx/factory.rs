@@ -247,7 +247,11 @@ impl JSXFactory {
                                     Some(JSXElement::Intrinsic(value.as_str().into()))
                                 }
                                 Expr::Ident(Ident { sym, .. }) => {
-                                    Some(JSXElement::Ident(sym.as_str().into()))
+                                    if sym.as_str() == self.fragment.as_str() {
+                                        Some(JSXElement::Fragment)
+                                    } else {
+                                        Some(JSXElement::Ident(sym.as_str().into()))
+                                    }
                                 }
                                 _ => None,
                             },
