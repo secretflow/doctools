@@ -329,7 +329,9 @@ impl JSXFactory {
             _ => value,
         };
 
-        set_ast_by_path(props, path.iter().map(|k| Lit::from(*k)).collect(), value).unwrap();
+        let path = &path.iter().map(|k| Lit::from(*k)).collect::<Vec<_>>()[..];
+
+        set_ast_by_path(props, path, value).unwrap();
     }
 
     pub fn ensure_fragment(&self, path: &[&str], mut children: Vec<ExprOrSpread>) -> Box<Expr> {
@@ -378,6 +380,15 @@ impl Default for JSXFactory {
 
 #[macro_export]
 macro_rules! props {
+    ( $($key:literal = $value:expr),* ) => {
+        vec![
+        $(  swc_core::ecma::ast::Prop::KeyValue(swc_core::ecma::ast::KeyValueProp {
+                key: swc_core::ecma::ast::PropName::Str($key.into()),
+                value: swc_core::ecma::ast::Expr::from($value).into(),
+            })
+            .into(), )*
+        ]
+    };
     ($obj:expr) => {
         match *$obj {
             swc_core::ecma::ast::Expr::Object(obj) => obj
@@ -391,15 +402,16 @@ macro_rules! props {
             _ => unreachable!(),
         }
     };
-    ( $($key:literal = $value:expr),+ ) => {
-        vec![
-        $(  Prop::KeyValue(KeyValueProp {
-                key: PropName::Str($key.into()),
-                value: Expr::from($value).into(),
-            })
-            .into(), )*
-        ]
-    }
+}
+
+#[macro_export]
+macro_rules! object_lit {
+    ( $($key:literal = $value:expr),* ) => {
+        swc_core::ecma::ast::ObjectLit {
+            props: swc_utils::props!($($key = $value),*),
+            span: Default::default(),
+        }
+    };
 }
 
 #[cfg(test)]

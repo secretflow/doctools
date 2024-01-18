@@ -10,11 +10,7 @@ use swc_core::{
 };
 use swc_utils::jsx::factory::JSXFactory;
 
-use crate::message::{
-    is_empty_or_whitespace,
-    jsx::{JSXMessage, Palpable},
-    Message,
-};
+use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 
 /// For [phrasing][ContentModel::Phrasing] content, transform is done in two phases.
 ///
@@ -86,7 +82,7 @@ impl PhrasingContentPreflight {
 pub struct PhrasingContentCollector {
     factory: JSXFactory,
     trans: String,
-    message: JSXMessage,
+    message: MessageProps,
 }
 
 impl VisitMut for PhrasingContentCollector {
@@ -151,7 +147,7 @@ impl PhrasingContentCollector {
         Self {
             factory,
             trans: String::from(trans),
-            message: JSXMessage::new(pre),
+            message: MessageProps::new(pre),
         }
     }
 

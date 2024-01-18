@@ -1,20 +1,27 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Debug, vec};
 
+use attribute::translate_attribute;
 use flow_content::FlowContentCollector;
 use message::Message;
 use phrasing_content::{PhrasingContentCollector, PhrasingContentPreflight};
 use serde::{Deserialize, Serialize};
-use swc_core::ecma::{
-    ast::CallExpr,
-    visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _, VisitWith},
+use swc_core::{
+    common::Spanned,
+    ecma::{
+        ast::{CallExpr, Lit},
+        visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _, VisitWith},
+    },
 };
 
-use swc_utils::jsx::factory::{JSXElement, JSXFactory};
+use swc_utils::{
+    jsx::factory::{JSXElement, JSXFactory},
+    span::with_span,
+};
 
+mod attribute;
 mod flow_content;
 mod message;
 mod phrasing_content;
-mod prop;
 
 /// Content model determines how the element is translated.
 ///
@@ -128,7 +135,7 @@ impl Default for ContentModel {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TranslationOptions {
+pub struct TransOptions {
     /// Is the element preformatted like `<pre>` (whitespace is significant)?
     ///
     /// If not, then whitespace is collapsed according to HTML's whitespace rules.
@@ -141,7 +148,7 @@ pub struct TranslationOptions {
     pub content: ContentModel,
 }
 
-impl Default for TranslationOptions {
+impl Default for TransOptions {
     fn default() -> Self {
         Self {
             pre: false,
@@ -153,8 +160,12 @@ impl Default for TranslationOptions {
 #[derive(Debug)]
 pub struct Translator {
     factory: JSXFactory,
-    component: String,
-    translatables: HashMap<JSXElement, TranslationOptions>,
+    trans: String,
+    i18n: String,
+
+    elements: HashMap<JSXElement, TransOptions>,
+    props: HashMap<JSXElement, Vec<Vec<Lit>>>,
+
     messages: Vec<Message>,
 }
 
@@ -162,19 +173,35 @@ impl VisitMut for Translator {
     noop_visit_mut_type!();
 
     fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-        let translatable = match self.factory.call_is_jsx(call) {
-            None => None,
-            Some(elem) => self.translatables.get(&elem),
+        let element = self.factory.call_is_jsx(call);
+
+        let element = match element {
+            Some(elem) => elem,
+            None => {
+                call.visit_mut_children_with(self);
+                return;
+            }
         };
 
-        match translatable {
+        if let Some(props) = self.props.get(&element) {
+            let i18n = self.i18n.clone();
+            props.iter().for_each(|prop| {
+                if let Some(message) = translate_attribute(call, &prop, i18n.as_str()) {
+                    self.messages.push(message);
+                }
+            })
+        }
+
+        let options = self.elements.get(&element);
+
+        match options {
             None => call.visit_mut_children_with(self),
             Some(options) => {
                 match options.content {
                     ContentModel::Flow => {
                         let mut collector = FlowContentCollector::new(
                             self.factory.clone(),
-                            &self.component,
+                            &self.trans,
                             options.pre,
                         );
 
@@ -195,7 +222,7 @@ impl VisitMut for Translator {
                         if preflight.is_translatable() {
                             let mut collector = PhrasingContentCollector::new(
                                 self.factory.clone(),
-                                &self.component,
+                                &self.trans,
                                 options.pre,
                             );
 
@@ -203,7 +230,11 @@ impl VisitMut for Translator {
 
                             let (message, children) = collector.result();
 
-                            self.factory.set_prop(call, &["children"], children);
+                            self.factory.set_prop(
+                                call,
+                                &["children"],
+                                with_span(Some(call.span()))(children),
+                            );
 
                             self.messages.push(message);
                         }
@@ -219,8 +250,10 @@ impl Default for Translator {
     fn default() -> Self {
         Self {
             factory: Default::default(),
-            component: "Trans".into(),
-            translatables: Default::default(),
+            trans: "Trans".into(),
+            i18n: "i18n".into(),
+            elements: Default::default(),
+            props: Default::default(),
             messages: vec![],
         }
     }
@@ -239,9 +272,9 @@ impl Translator {
     }
 
     pub fn flow<E: Into<JSXElement>>(mut self, tag: E) -> Self {
-        self.translatables.insert(
+        self.elements.insert(
             tag.into(),
-            TranslationOptions {
+            TransOptions {
                 content: ContentModel::Flow,
                 ..Default::default()
             },
@@ -250,9 +283,9 @@ impl Translator {
     }
 
     pub fn phrasing<E: Into<JSXElement>>(mut self, tag: E) -> Self {
-        self.translatables.insert(
+        self.elements.insert(
             tag.into(),
-            TranslationOptions {
+            TransOptions {
                 content: ContentModel::Phrasing,
                 ..Default::default()
             },
@@ -261,19 +294,34 @@ impl Translator {
     }
 
     pub fn preformatted<E: Into<JSXElement>>(mut self, tag: E, content: ContentModel) -> Self {
-        self.translatables
-            .insert(tag.into(), TranslationOptions { pre: true, content });
+        self.elements.insert(
+            tag.into(),
+            TransOptions {
+                pre: true,
+                content,
+                ..Default::default()
+            },
+        );
         self
     }
 
     pub fn fragment(mut self) -> Self {
-        self.translatables.insert(
+        self.elements.insert(
             JSXElement::Fragment,
-            TranslationOptions {
+            TransOptions {
                 content: ContentModel::Flow,
                 ..Default::default()
             },
         );
+        self
+    }
+
+    pub fn prop<E: Into<JSXElement> + Debug>(mut self, prop: &[&str], tags: Vec<E>) -> Self {
+        tags.into_iter().for_each(|name| {
+            let tag = name.into();
+            let props = self.props.entry(tag).or_default();
+            props.push(prop.iter().map(|s| Lit::from(*s)).collect())
+        });
         self
     }
 
@@ -292,6 +340,7 @@ impl Translator {
             .phrasing("dfn")
             .phrasing("em")
             .phrasing("i")
+            .phrasing("img")
             .phrasing("ins")
             .phrasing("kbd")
             .phrasing("label")
@@ -314,6 +363,18 @@ impl Translator {
             .phrasing("time")
             .phrasing("u")
             .phrasing("var")
+            .prop(&["alt"], vec!["area", "img", "input"])
+            .prop(&["href"], vec!["a", "area", "link"])
+            .prop(&["label"], vec!["optgroup", "option", "track"])
+            .prop(&["placeholder"], vec!["input", "textarea"])
+            .prop(&["poster"], vec!["video"])
+            .prop(
+                &["src"],
+                vec![
+                    "audio", "embed", "iframe", "img", "input", "script", "source", "track",
+                    "video",
+                ],
+            )
     }
 
     pub fn paragraphs(self) -> Self {
@@ -386,8 +447,19 @@ mod tests {
     fn main() {
         let raw = r##"
 
-        <dl class="element"><dt><a href="dom.html#concept-element-categories" id="the-main-element:concept-element-categories">Categories</a>:</dt><dd><a id="the-main-element:flow-content-2" href="dom.html#flow-content-2">Flow content</a>.</dd><dd><a id="the-main-element:palpable-content-2" href="dom.html#palpable-content-2">Palpable content</a>.</dd><dt><a href="dom.html#concept-element-contexts" id="the-main-element:concept-element-contexts">Contexts in which this element can be used</a>:</dt><dd>Where <a id="the-main-element:flow-content-2-2" href="dom.html#flow-content-2">flow content</a> is expected, but only if it is a <a href="#hierarchically-correct-main-element" id="the-main-element:hierarchically-correct-main-element">hierarchically correct
-        <code>main</code> element</a>.</dd><dt><a href="dom.html#concept-element-content-model" id="the-main-element:concept-element-content-model">Content model</a>:</dt><dd><a id="the-main-element:flow-content-2-3" href="dom.html#flow-content-2">Flow content</a>.</dd><dt><a href="dom.html#concept-element-tag-omission" id="the-main-element:concept-element-tag-omission">Tag omission in text/html</a>:</dt><dd>Neither tag is omissible.</dd><dt><a href="dom.html#concept-element-attributes" id="the-main-element:concept-element-attributes">Content attributes</a>:</dt><dd><a id="the-main-element:global-attributes" href="dom.html#global-attributes">Global attributes</a></dd><dt><a href="dom.html#concept-element-accessibility-considerations" id="the-main-element:concept-element-accessibility-considerations">Accessibility considerations</a>:</dt><dd><a href="https://w3c.github.io/html-aria/#el-main">For authors</a>.</dd><dd><a href="https://w3c.github.io/html-aam/#el-main">For implementers</a>.</dd><dt><a href="dom.html#concept-element-dom" id="the-main-element:concept-element-dom">DOM interface</a>:</dt><dd>Uses <code id="the-main-element:htmlelement"><a href="dom.html#htmlelement">HTMLElement</a></code>.</dd></dl>
+        <section>
+        <h2>My Cats</h2>
+        You can play with my cat simulator.
+        <object data="cats.sim">
+         To see the cat simulator, use one of the following links:
+         <ul>
+          <li><a href="cats.sim">Download simulator file</a>
+          <li><a href="https://sims.example.com/watch?v=LYds5xY4INU">Use online simulator</a>
+         </ul>
+         Alternatively, upgrade to the Mellblom Browser.
+        </object>
+        I'm quite proud of it.
+       </section>
 
         "##;
 

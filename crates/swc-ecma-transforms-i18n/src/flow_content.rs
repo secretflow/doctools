@@ -11,14 +11,11 @@ use swc_utils::{
     span::{union_span, with_span},
 };
 
-use crate::message::{
-    jsx::{JSXMessage, Palpable},
-    Message,
-};
+use crate::message::{Message, MessageProps, Palpable};
 
 #[derive(Debug)]
 enum Block {
-    Message(JSXMessage),
+    Message(MessageProps),
     Expr(ExprOrSpread),
 }
 
@@ -35,7 +32,7 @@ macro_rules! current_message {
         match $this.blocks.last_mut() {
             Some((Block::Message(message), span)) => (message, span),
             _ => {
-                let message = JSXMessage::new($this.pre);
+                let message = MessageProps::new($this.pre);
                 let span = Span::dummy();
                 $this.blocks.push((Block::Message(message), span));
                 current_message!($this, yes)

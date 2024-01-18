@@ -17,34 +17,33 @@ pub enum PropVisitorError {
     NotFound,
 }
 
-struct PropVisitor {
-    path: Vec<Lit>,
+struct PropVisitor<'path, T> {
+    path: &'path [Lit],
     ensure: bool,
     idx: usize,
-    callback: Box<dyn FnMut(&mut Box<Expr>)>,
-    error: Option<PropVisitorError>,
+    callback: &'path mut dyn FnMut(&mut Box<Expr>) -> T,
+    result: Result<T, PropVisitorError>,
 }
 
 macro_rules! item_getter_error {
     ($this:ident, $error:path, $msg:literal $(, $arg:expr)*) => {{
-        $this.error = Some($error(format!($msg, $($arg),*).to_string()));
+        $this.result = Err($error(format!($msg, $($arg),*).to_string()));
         return;
     }};
     ($this:ident, $error:path) => {{
-        $this.error = Some($error);
+        $this.result = Err($error);
         return;
     }};
 }
 
-impl PropVisitor {
+impl<T> PropVisitor<'_, T> {
     fn traverse<N: VisitMutWith<Self>>(&mut self, expr: &mut N) {
         self.idx += 1;
         expr.visit_mut_with(self);
     }
 
     fn found(&mut self, found: &mut Box<Expr>) {
-        (self.callback)(found);
-        self.error = None;
+        self.result = Ok((self.callback)(found));
     }
 
     fn process_array_elems(&mut self, elems: &mut Vec<Option<ExprOrSpread>>) {
@@ -58,6 +57,15 @@ impl PropVisitor {
                     PropVisitorError::InvalidPath,
                     "invalid array index {}",
                     num.value
+                ),
+            },
+            Lit::Str(str) => match str.value.parse::<usize>() {
+                Ok(idx) => idx,
+                Err(_) => item_getter_error!(
+                    self,
+                    PropVisitorError::InvalidPath,
+                    "invalid array index {}",
+                    str.value
                 ),
             },
             _ => item_getter_error!(
@@ -218,7 +226,7 @@ impl PropVisitor {
     }
 }
 
-impl VisitMut for PropVisitor {
+impl<T> VisitMut for PropVisitor<'_, T> {
     fn visit_mut_array_lit(&mut self, array: &mut ArrayLit) {
         self.process_array_elems(&mut array.elems);
     }
@@ -234,17 +242,40 @@ impl VisitMut for PropVisitor {
     }
 }
 
-pub fn mut_ast_by_path(
-    ast: &mut Box<Expr>,
-    path: Vec<Lit>,
-    callback: impl FnMut(&mut Box<Expr>) + 'static,
-) -> Result<bool, PropVisitorError> {
+pub fn mut_call_by_path<T>(
+    call: &mut CallExpr,
+    path: &[Lit],
+    mut callback: impl FnMut(&mut Box<Expr>) -> T,
+) -> Result<T, PropVisitorError> {
     let mut setter = PropVisitor {
         path,
         idx: 0,
         ensure: false,
-        callback: Box::from(callback),
-        error: PropVisitorError::NotFound.into(),
+        // This cannot be boxed because of the lifetime.
+        //
+        // With Box<dyn FnMut>, rustc asks for callback to be 'static
+        // which limits what kind of closures can be passed
+        // (essentially cannot borrow anything whose lifetime is shorter than 'static).
+        //
+        // I still don't know why Box requires 'static though.
+        callback: &mut callback,
+        result: Err(PropVisitorError::NotFound),
+    };
+    call.visit_mut_with(&mut setter);
+    setter.result
+}
+
+pub fn mut_ast_by_path<T>(
+    ast: &mut Expr,
+    path: &[Lit],
+    mut callback: impl FnMut(&mut Box<Expr>) -> T,
+) -> Result<T, PropVisitorError> {
+    let mut setter = PropVisitor {
+        path,
+        idx: 0,
+        ensure: false,
+        callback: &mut callback,
+        result: Err(PropVisitorError::NotFound),
     };
     if let Some(object) = ast.as_mut_object() {
         object.visit_mut_with(&mut setter)
@@ -255,26 +286,20 @@ pub fn mut_ast_by_path(
     } else {
         unreachable!("unsupported expression {:?}", ast)
     };
-    match setter.error {
-        Some(error) => match error {
-            PropVisitorError::NotFound => Ok(false),
-            _ => Err(error),
-        },
-        None => Ok(true),
-    }
+    setter.result
 }
 
 pub fn set_ast_by_path(
-    ast: &mut Box<Expr>,
-    path: Vec<Lit>,
+    ast: &mut Expr,
+    path: &[Lit],
     mut value: Box<Expr>,
 ) -> Result<(), PropVisitorError> {
     let mut setter = PropVisitor {
         path,
         idx: 0,
         ensure: true,
-        callback: Box::from(move |expr: &mut Box<Expr>| *expr = value.take().into()),
-        error: None,
+        callback: &mut move |expr: &mut Box<Expr>| *expr = value.take().into(),
+        result: Ok(()),
     };
     if let Some(object) = ast.as_mut_object() {
         object.visit_mut_with(&mut setter)
@@ -285,11 +310,7 @@ pub fn set_ast_by_path(
     } else {
         unreachable!("unsupported expression {:?}", ast)
     };
-    if let Some(error) = setter.error {
-        Err(error)
-    } else {
-        Ok(())
-    }
+    setter.result
 }
 
 fn prop_is_named(key: &str) -> impl Fn(&PropOrSpread) -> bool + '_ {
@@ -332,7 +353,7 @@ mod tests {
 
         set_ast_by_path(
             &mut expr,
-            vec![Lit::from("children")],
+            &[Lit::from("children")],
             Box::from(json_expr(json!([]))),
         )
         .unwrap();
@@ -359,7 +380,7 @@ mod tests {
 
         set_ast_by_path(
             &mut expr,
-            vec![
+            &[
                 Lit::from("lorem"),
                 Lit::from("ipsum"),
                 Lit::from("dolor"),
@@ -532,11 +553,11 @@ mod tests {
         assert_eq!(
             mut_ast_by_path(
                 &mut expr,
-                vec![
+                &[
                     Lit::from(1),
                     Lit::from("props"),
                     Lit::from("href"),
-                    Lit::from(2),
+                    Lit::from("2"),
                 ],
                 |expr| {
                     *expr = Lit::from(
@@ -546,7 +567,7 @@ mod tests {
                 },
             )
             .unwrap(),
-            true
+            ()
         );
 
         let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
