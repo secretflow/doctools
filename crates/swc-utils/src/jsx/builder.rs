@@ -1,6 +1,6 @@
 use swc_core::{
     common::Span,
-    ecma::ast::{Expr, Ident},
+    ecma::ast::{ArrayLit, Expr, Ident},
 };
 
 use crate::span::with_span;
@@ -84,12 +84,15 @@ impl DocumentBuilder {
             Some(v) => v,
             None => return self,
         };
-        self.factory.replace_children(
+        let children = Box::from(Expr::from(ArrayLit {
+            elems: children.0.into_iter().map(|x| Some(x.into())).collect(),
+            span: Default::default(),
+        }));
+        self.factory.set_prop(
             &mut parent.as_mut_call().unwrap(),
             &prop.as_strs()[..],
-            children.0.into_iter().map(|v| v.into()).collect(),
+            children,
         );
-        self.push(parent);
         self
     }
 

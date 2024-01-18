@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 use swc_core::{
     atoms::Atom,
-    common::Span,
+    common::{util::take::Take, Span},
     ecma::ast::{
         ArrayLit, CallExpr, Callee, Expr, ExprOrSpread, Ident, ImportDecl, ImportNamedSpecifier,
-        ImportSpecifier, KeyValueProp, Lit, ObjectLit, Prop, PropName, PropOrSpread, Str,
+        ImportSpecifier, KeyValueProp, Lit, Null, ObjectLit, Prop, PropName, PropOrSpread, Str,
     },
 };
 
-use crate::{json::set_object, span::with_span};
+use crate::{ast::set_ast_by_path, span::with_span};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub enum JSXElement {
@@ -272,68 +272,96 @@ impl JSXFactory {
         }
     }
 
-    pub fn replace_children(
-        &self,
-        call: &mut CallExpr,
-        keypath: &[&str],
-        children: Vec<ExprOrSpread>,
-    ) {
+    pub fn prop_is_children(prop: &KeyValueProp) -> bool {
+        match prop.key {
+            PropName::Ident(Ident { ref sym, .. }) if sym.as_str() == "children" => true,
+            PropName::Str(Str { ref value, .. }) if value.as_str() == "children" => true,
+            _ => false,
+        }
+    }
+
+    pub fn set_prop(&self, call: &mut CallExpr, path: &[&str], mut value: Box<Expr>) {
         let props = call
             .args
             .get_mut(1)
             .and_then(|a| Some(&mut a.expr))
             .expect("expected props in argument");
 
-        match keypath[..] {
+        let value = match path[..] {
             ["children"] => {
-                // ensure JSX factory function is correct
-                match call.callee.as_mut_expr().and_then(|e| e.as_mut_ident()) {
-                    Some(ident) => {
-                        if children.len() > 1 {
-                            ident.sym = self.jsxs.as_str().into();
+                // ensure JSX factory function is correct and unwrap array if necessary
+                let func = call
+                    .callee
+                    .as_mut_expr()
+                    .and_then(|e| e.as_mut_ident())
+                    .expect("expected jsx or jsxs");
+                match *value {
+                    Expr::Array(ArrayLit { ref mut elems, .. }) => {
+                        if elems.len() > 1 {
+                            func.sym = self.jsxs.as_str().into();
+                            value
+                        } else if elems.len() == 1 {
+                            func.sym = self.jsx.as_str().into();
+                            match elems.last_mut().unwrap() {
+                                Some(ref mut expr) => {
+                                    if expr.spread.is_some() {
+                                        value
+                                    } else {
+                                        expr.expr.take()
+                                    }
+                                }
+                                None => value,
+                            }
                         } else {
-                            ident.sym = self.jsx.as_str().into();
+                            func.sym = self.jsx.as_str().into();
+                            Expr::Lit(Lit::Null(Null {
+                                span: Default::default(),
+                            }))
+                            .into()
                         }
                     }
-                    _ => unreachable!(
-                        "expected callee to be a string literal, got {:?}",
-                        call.callee
-                    ),
-                };
-                // unwrap the array if there's only one child
-                let children = if children.len() > 1 {
-                    Some(Box::from(Expr::from(ArrayLit {
-                        elems: children.into_iter().map(Some).collect(),
-                        span: Default::default(),
-                    })))
-                } else {
-                    children.into_iter().last().and_then(|expr| Some(expr.expr))
-                };
-                if let Some(content) = children {
-                    set_object(props, &["children"][..], content);
-                };
+                    _ => {
+                        func.sym = self.jsx.as_str().into();
+                        value
+                    }
+                }
             }
-            _ => {
-                // wrap children in Fragment if there's more than one
-                let children = if children.len() > 1 {
-                    let mut builder = self.create(&JSXElement::Fragment);
-                    builder.children = children;
-                    Some(Box::from(Expr::from(builder.build())))
-                } else {
-                    children.into_iter().last().and_then(|expr| Some(expr.expr))
-                };
-                if let Some(content) = children {
-                    set_object(props, keypath, content);
-                };
-            }
-        }
+            _ => value,
+        };
+
+        set_ast_by_path(props, path.iter().map(|k| Lit::from(*k)).collect(), value).unwrap();
     }
 
-    pub fn prop_is_children(prop: &KeyValueProp) -> bool {
-        match prop.key {
-            PropName::Ident(Ident { ref sym, .. }) if sym.as_str() == "children" => true,
-            PropName::Str(Str { ref value, .. }) if value.as_str() == "children" => true,
-            _ => false,
+    pub fn ensure_fragment(&self, path: &[&str], mut children: Vec<ExprOrSpread>) -> Box<Expr> {
+        match path {
+            ["children"] => {
+                if children.len() > 1 {
+                    Box::from(Expr::from(ArrayLit {
+                        elems: children.into_iter().map(|x| Some(x)).collect(),
+                        span: Default::default(),
+                    }))
+                } else if children.len() == 1 {
+                    Box::from(children.first_mut().unwrap().expr.take())
+                } else {
+                    Box::from(Expr::Lit(Lit::Null(Null {
+                        span: Default::default(),
+                    })))
+                }
+            }
+            _ => {
+                if children.len() > 1 {
+                    self.create(&JSXElement::Fragment)
+                        .children(children.into_iter().map(|x| x.expr).collect())
+                        .build()
+                        .into()
+                } else if children.len() == 1 {
+                    children.first_mut().unwrap().expr.take()
+                } else {
+                    Box::from(Expr::Lit(Lit::Null(Null {
+                        span: Default::default(),
+                    })))
+                }
+            }
         }
     }
 }

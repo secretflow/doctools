@@ -5,6 +5,3 @@ publish = false
 version = "0.1.0"
 
 [dependencies]
-serde_json = "1.0.111"
-swc-utils = { version = "0.1.0", path = "../swc-utils" }
-swc_core = {version = "0.87.21", features = ["ecma_codegen", "ecma_ast", "ecma_ast_serde"]}

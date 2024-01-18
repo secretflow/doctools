@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+pub mod js;
 pub mod jsx;
 
 /// Represents a message to be translated

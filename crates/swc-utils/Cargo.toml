@@ -9,4 +9,4 @@ serde_json = "1.0.111"
 swc_core = {version = "0.87.21", features = ["ecma_ast", "ecma_visit", "ecma_utils", "ecma_codegen"]}
 
 [dev-dependencies]
-swc_core = {version = "0.87.21", features = ["testing"]}
+swc_core = {version = "0.87.21", features = ["ecma_ast_serde", "testing"]}

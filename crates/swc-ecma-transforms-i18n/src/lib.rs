@@ -14,6 +14,7 @@ use swc_utils::jsx::factory::{JSXElement, JSXFactory};
 mod flow_content;
 mod message;
 mod phrasing_content;
+mod prop;
 
 /// Content model determines how the element is translated.
 ///
@@ -181,7 +182,9 @@ impl VisitMut for Translator {
 
                         let (messages, children) = collector.results();
 
-                        self.factory.replace_children(call, &["children"], children);
+                        let children = self.factory.ensure_fragment(&["children"], children);
+                        self.factory.set_prop(call, &["children"], children);
+
                         self.messages.extend(messages);
                     }
                     ContentModel::Phrasing => {
@@ -200,11 +203,7 @@ impl VisitMut for Translator {
 
                             let (message, children) = collector.result();
 
-                            self.factory.replace_children(
-                                call,
-                                &["children"],
-                                vec![children.into()],
-                            );
+                            self.factory.set_prop(call, &["children"], children);
 
                             self.messages.push(message);
                         }

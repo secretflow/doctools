@@ -1822,11 +1822,6 @@ dependencies = [
 [[package]]
 name = "playground"
 version = "0.1.0"
-dependencies = [
- "serde_json",
- "swc-utils",
- "swc_core",
-]
 
 [[package]]
 name = "pmutil"
