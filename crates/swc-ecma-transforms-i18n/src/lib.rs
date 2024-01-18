@@ -167,6 +167,7 @@ pub struct Translator {
     props: HashMap<JSXElement, Vec<Vec<Lit>>>,
 
     messages: Vec<Message>,
+    pre: bool,
 }
 
 impl VisitMut for Translator {
@@ -183,10 +184,30 @@ impl VisitMut for Translator {
             }
         };
 
+        if matches!(element, JSXElement::Intrinsic(_)) {
+            [
+                &[Lit::from("title")],
+                &[Lit::from("aria-label")],
+                &[Lit::from("aria-placeholder")],
+                &[Lit::from("aria-roledescription")],
+                &[Lit::from("aria-valuetext")],
+            ]
+            .iter()
+            .for_each(|attr| {
+                if let Some(message) =
+                    translate_attribute(&self.factory, self.i18n.as_str(), call, *attr)
+                {
+                    self.messages.push(message);
+                }
+            })
+        }
+
         if let Some(props) = self.props.get(&element) {
             let i18n = self.i18n.clone();
             props.iter().for_each(|prop| {
-                if let Some(message) = translate_attribute(call, &prop, i18n.as_str()) {
+                if let Some(message) =
+                    translate_attribute(&self.factory, i18n.as_str(), call, &prop)
+                {
                     self.messages.push(message);
                 }
             })
@@ -197,13 +218,13 @@ impl VisitMut for Translator {
         match options {
             None => call.visit_mut_children_with(self),
             Some(options) => {
+                let parent_pre = self.pre;
+                self.pre = self.pre || options.pre;
+
                 match options.content {
                     ContentModel::Flow => {
-                        let mut collector = FlowContentCollector::new(
-                            self.factory.clone(),
-                            &self.trans,
-                            options.pre,
-                        );
+                        let mut collector =
+                            FlowContentCollector::new(self.factory.clone(), &self.trans, self.pre);
 
                         call.visit_mut_children_with(&mut collector);
 
@@ -240,7 +261,10 @@ impl VisitMut for Translator {
                         }
                     }
                 };
+
                 call.visit_mut_children_with(self);
+
+                self.pre = parent_pre;
             }
         }
     }
@@ -255,6 +279,7 @@ impl Default for Translator {
             elements: Default::default(),
             props: Default::default(),
             messages: vec![],
+            pre: false,
         }
     }
 }
@@ -429,6 +454,8 @@ impl Translator {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Read;
+
     use base64::{prelude::BASE64_STANDARD, Engine};
     use swc_core::{
         common::{sync::Lrc, FileName, SourceMap},
@@ -445,26 +472,12 @@ mod tests {
 
     #[test]
     fn main() {
-        let raw = r##"
-
-        <section>
-        <h2>My Cats</h2>
-        You can play with my cat simulator.
-        <object data="cats.sim">
-         To see the cat simulator, use one of the following links:
-         <ul>
-          <li><a href="cats.sim">Download simulator file</a>
-          <li><a href="https://sims.example.com/watch?v=LYds5xY4INU">Use online simulator</a>
-         </ul>
-         Alternatively, upgrade to the Mellblom Browser.
-        </object>
-        I'm quite proud of it.
-       </section>
-
-        "##;
+        let mut input = vec![];
+        std::io::stdin().read_to_end(&mut input).unwrap();
+        let source = String::from_utf8(input).unwrap();
 
         let sourcemap = Lrc::new(SourceMap::default());
-        let source = sourcemap.new_source_file(FileName::Anon, raw.to_string());
+        let source = sourcemap.new_source_file(FileName::Anon, source);
 
         let jsx = JSXFactory::default();
         let mut fragment = html_to_jsx(&source, Some(jsx.clone())).unwrap();
@@ -501,10 +514,6 @@ mod tests {
         let mut result = String::from_utf8(code).unwrap();
         result.push_str("\n//# sourceMappingURL=data:application/json;base64,");
         BASE64_STANDARD.encode_string(srcmap, &mut result);
-
-        translator.messages.iter().for_each(|msg| {
-            println!("msgid: {}", msg.message);
-        });
 
         println!("{}", result);
     }

@@ -1,5 +1,5 @@
 use swc_core::{
-    common::util::take::Take as _,
+    common::{util::take::Take as _, Spanned as _},
     ecma::{
         ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, KeyValueProp, Lit, ObjectLit, Str},
         visit::{
@@ -107,7 +107,7 @@ impl VisitMut for PhrasingContentCollector {
         children
             .into_iter()
             .for_each(|mut expr| match *expr.take() {
-                Expr::Lit(Lit::Str(lit)) => match self.message.text(&lit.value) {
+                Expr::Lit(Lit::Str(lit)) => match self.message.text(&lit.value, lit.span()) {
                     Palpable(true) => (),
                     Palpable(false) => (),
                 },

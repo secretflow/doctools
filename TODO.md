@@ -14,7 +14,8 @@
     - [x] nesting rules
     - [x] potentially empty messages
     - [x] top-level Fragments
-    - [ ] attributes
+    - [x] attributes
+    - [ ] ordering
   - [ ] .po compile
 - [ ] search
   - [ ] deno + orama

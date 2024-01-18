@@ -2650,6 +2650,7 @@ dependencies = [
  "html5jsx",
  "serde",
  "serde_json",
+ "sha2",
  "swc-utils",
  "swc_core",
  "tracing",

@@ -50,8 +50,7 @@ macro_rules! current_message {
 impl FlowContentCollector {
     fn text(&mut self, lit: Str) {
         let (message, span) = current_message!(self);
-        let text = &*lit.value;
-        match message.text(text) {
+        match message.text(lit.value.as_str(), lit.span()) {
             Palpable(true) => *span = union_span(*span, lit.span()),
             Palpable(false) => self.other(Expr::from(lit).into()),
         }
