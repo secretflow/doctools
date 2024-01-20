@@ -1,14 +1,15 @@
 [package]
 edition = "2021"
 name = "swc-ecma-transforms-i18n"
-version = "0.1.0"
+publish = false
+version = "0.0.0"
 
 [dependencies]
 base64 = "0.21.7"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = "1.0.111"
 sha2 = "0.10.8"
-swc-utils = {version = "0.1.0", path = "../swc-utils"}
+swc-utils = {version = "0.0.0", path = "../swc-utils"}
 tracing = "0.1.40"
 
 [dependencies.swc_core]
@@ -21,7 +22,7 @@ features = [
 version = "0.87.21"
 
 [dev-dependencies]
-html5jsx = {version = "0.1.0", path = "../html5jsx"}
+html5jsx = {version = "0.0.0", path = "../html5jsx"}
 tracing-subscriber = "0.3.18"
 
 [dev-dependencies.swc_core]

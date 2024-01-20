@@ -1,7 +1,8 @@
 [package]
 edition = "2021"
 name = "swc-utils"
-version = "0.1.0"
+publish = false
+version = "0.0.0"
 
 [dependencies]
 serde = {version = "1", features = ["derive"]}
@@ -9,4 +10,5 @@ serde_json = "1.0.111"
 swc_core = {version = "0.87.21", features = ["ecma_ast", "ecma_visit", "ecma_utils", "ecma_codegen"]}
 
 [dev-dependencies]
+serde_json = {version = "1.0.111", features = ["preserve_order"]}
 swc_core = {version = "0.87.21", features = ["ecma_ast_serde", "testing"]}

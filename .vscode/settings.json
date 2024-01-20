@@ -1,32 +1,10 @@
 {
-  "[css]": {
+  "[css][javascript][javascriptreact][json][jsonc][typescript][typescriptreact]": {
     "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
       "source.fixAll.stylelint": "explicit"
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "[javascript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "[javascriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
     "editor.quickSuggestions": {
@@ -46,34 +24,6 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true
   },
-  "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "[typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2
-  },
-  "black-formatter.args": ["--config", "pyproject.toml"],
-  "cSpell.allowCompoundWords": true,
-  "cSpell.enabled": true,
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "editor.rulers": [88],
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "mdx"
-  ],
-  "stylelint.validate": ["css", "postcss", "typescript", "typescriptreact"],
   "files.associations": {
     "**/tooling/tsconfig/*.json": "jsonc",
     "**/tooling/tsconfig/package.json": "json",
@@ -84,16 +34,24 @@
     "tsconfig.json": "jsonc",
     "*.js.jinja": "jinja"
   },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "mdx"
+  ],
+  "stylelint.validate": ["css", "postcss", "typescript", "typescriptreact"],
   "typescript.tsdk": "node_modules/typescript/lib",
+  "black-formatter.args": ["--config", "pyproject.toml"],
   "python.analysis.diagnosticMode": "workspace",
   "python.testing.pytestArgs": ["pyprojects"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  "[javascript][javascriptreact][typescript][typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit"
-    }
-  },
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  "rust-analyzer.procMacro.enable": true,
+  "cSpell.allowCompoundWords": true,
+  "cSpell.enabled": true,
   "cSpell.words": [
     "elems",
     "aiofiles",

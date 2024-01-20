@@ -1,4 +1,4 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'pyprojects/*'
+  - "crates/*"
+  - "packages/*"
+  - "pyprojects/*"

@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "crates/deno-runtime-web-subset",
   "crates/esm-serve",
   "crates/html5jsx",
   "crates/html5jsx/bin",

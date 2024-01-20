@@ -1,29 +1,29 @@
 use once_cell::sync::Lazy;
 use swc_core::ecma::{
-    parser::{Syntax, TsConfig},
-    transforms::testing::test,
+  parser::{Syntax, TsConfig},
+  transforms::testing::test,
 };
 
 use esm_serve::{externalize_modules, ExternalPackages};
 
 static PACKAGES_ESM_SH: Lazy<ExternalPackages> = Lazy::new(|| {
-    ExternalPackages::new()
-        .import_from("https://esm.sh/{{package}}@{{version}}{{path}}")
-        .package("react", "18.2.0")
-        .package("react-dom", "18.2.0")
-        .package("lodash", "4.17.21")
-        .package("vite", "^5")
+  ExternalPackages::new()
+    .import_from("https://esm.sh/{{package}}@{{version}}{{path}}")
+    .package("react", "18.2.0")
+    .package("react-dom", "18.2.0")
+    .package("lodash", "4.17.21")
+    .package("vite", "^5")
 });
 
 test!(
-    Syntax::Typescript(TsConfig {
-        tsx: true,
-        decorators: true,
-        ..Default::default()
-    }),
-    |_| externalize_modules(&PACKAGES_ESM_SH),
-    everything,
-    r#"
+  Syntax::Typescript(TsConfig {
+    tsx: true,
+    decorators: true,
+    ..Default::default()
+  }),
+  |_| externalize_modules(&PACKAGES_ESM_SH),
+  everything,
+  r#"
     import "vite/client";
 
     import React from "react";

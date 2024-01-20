@@ -1,6 +1,7 @@
 [package]
 edition = "2021"
 name = "maturin-utils"
+publish = false
 version = "0.0.0"
 
 [dependencies]

@@ -4,6 +4,7 @@
     - [ ] Ident collect
   - [ ] JSX-in-HTML
   - [ ] Sourcemap
+    - [ ] Correctness & debug_assertion
 - [ ] ESM
   - [ ] SWC + PyO3
 - [ ] Python symbols
@@ -15,8 +16,9 @@
     - [x] potentially empty messages
     - [x] top-level Fragments
     - [x] attributes
-    - [ ] ordering
+    - [x] ordering (span)
   - [ ] .po compile
+    - [ ] Babel
 - [ ] search
   - [ ] deno + orama
   - [ ] vector search, transformer
