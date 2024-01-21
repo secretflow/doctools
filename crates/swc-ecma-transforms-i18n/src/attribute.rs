@@ -12,7 +12,7 @@ use crate::message::{Message, MessageProps};
 
 pub fn translate_attribute<'a>(
   factory: &JSXFactory,
-  i18n: &'a str,
+  gettext: &'a str,
   call: &mut CallExpr,
   path: &[Lit],
 ) -> Option<Message> {
@@ -22,13 +22,14 @@ pub fn translate_attribute<'a>(
     path,
   ]
   .concat();
+
   let result = mut_call_by_path(call, &path[..], |source| {
     let expr = *source.take();
     match expr {
       Expr::Lit(Lit::Str(lit)) => {
         let mut message = MessageProps::new(true);
         let _ = message.text(lit.value.as_str(), lit.span());
-        let (message, result) = message.make_i18n(factory, i18n);
+        let (message, result) = message.make_i18n(factory, gettext);
         *source = result;
         Some(message)
       }
@@ -43,7 +44,11 @@ pub fn translate_attribute<'a>(
           match i % 2 {
             0 => {
               let chunk = &quasis[i / 2];
-              let _ = message.text(&chunk.raw, chunk.span());
+              let text = match chunk.cooked {
+                Some(ref text) => text,
+                None => "",
+              };
+              message.raw(&text, chunk.span());
             }
             1 => {
               message.interpolate(exprs[i / 2].take());
@@ -51,7 +56,7 @@ pub fn translate_attribute<'a>(
             _ => unreachable!(),
           };
         }
-        let (message, result) = message.make_i18n(factory, i18n);
+        let (message, result) = message.make_i18n(factory, gettext);
         *source = with_span(Some(span))(result);
         Some(message)
       }

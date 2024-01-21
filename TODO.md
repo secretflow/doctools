@@ -32,3 +32,6 @@
 - [ ] OpenAPI
   - [ ] deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser
 - [ ] dependency tracking
+- [ ] Web vitals
+- [ ] CDN
+- [ ] status page

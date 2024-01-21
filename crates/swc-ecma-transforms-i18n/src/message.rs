@@ -1,7 +1,9 @@
 use base64::{prelude::BASE64_URL_SAFE, Engine};
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use swc_core::{
+  atoms::Atom,
   common::{util::take::Take as _, Span, Spanned as _},
   ecma::ast::{
     CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, ObjectLit, Prop, PropName,
@@ -27,16 +29,24 @@ pub struct Message {
 #[derive(Debug)]
 enum MessageToken {
   Text(String),
-  Interpolation((String, Box<Expr>)),
-  OpeningTag((usize,)),
-  ClosingTag((usize, Box<Expr>)),
-  NewLine,
+  Interpolation(Atom),
+  OpeningTag(Atom),
+  ClosingTag(Atom),
+  LineFeed,
+  LessThan,
+  GreaterThan,
+  LeftCurly,
+  RightCurly,
 }
 
 #[derive(Debug)]
 pub struct MessageProps {
   pre: bool,
+
   tokens: Vec<MessageToken>,
+  values: IndexMap<Atom, Box<Expr>>,
+  components: IndexMap<Atom, Option<Box<Expr>>>,
+
   span: Span,
 }
 
@@ -45,7 +55,11 @@ pub struct MessageProps {
 pub struct Palpable(pub bool);
 
 impl MessageProps {
-  /// Returns [Err] if `text` is empty or whitespace.
+  pub fn raw(&mut self, text: &str, span: Span) {
+    self.tokens.push(MessageToken::Text(text.to_string()));
+    self.span = union_span(self.span, span);
+  }
+
   #[must_use]
   pub fn text(&mut self, text: &str, span: Span) -> Palpable {
     if is_empty_or_whitespace(text) {
@@ -60,73 +74,106 @@ impl MessageProps {
         _ => {}
       }
     }
-    if self.pre {
-      // currently, newlines need to be converted to <br>s
-      text.split_inclusive('\n').for_each(|line| {
-        self.span = union_span(self.span, span);
-        self.tokens.push(MessageToken::Text(line.to_string()));
-        if line.ends_with('\n') {
-          self.tokens.push(MessageToken::NewLine);
+
+    let text = if self.pre {
+      text.to_string()
+    } else {
+      collapse_ascii_whitespace(text)
+    };
+
+    text
+      .split_inclusive(['\n', '<', '>', '{', '}'])
+      .for_each(|chunk| {
+        let chunk = chunk.to_string();
+        let (chunk, delimiter) = match chunk.chars().last() {
+          Some(c) => match c {
+            '\n' | '<' | '>' | '{' | '}' => (chunk[..chunk.len() - 1].to_string(), Some(c)),
+            _ => (chunk, None),
+          },
+          None => unreachable!(),
+        };
+        let chunk = match self.tokens.last() {
+          Some(MessageToken::Text(last)) => match last.chars().last() {
+            Some(c1) => match chunk.chars().next() {
+              Some(c2) => {
+                if c1.is_ascii_whitespace() && c2.is_ascii_whitespace() {
+                  chunk.trim_start().to_string()
+                } else {
+                  chunk
+                }
+              }
+              None => chunk,
+            },
+            None => chunk,
+          },
+          _ => chunk,
+        };
+        self.tokens.push(MessageToken::Text(chunk));
+        match delimiter {
+          Some('\n') => self.tokens.push(MessageToken::LineFeed),
+          Some('<') => self.tokens.push(MessageToken::LessThan),
+          Some('>') => self.tokens.push(MessageToken::GreaterThan),
+          Some('{') => self.tokens.push(MessageToken::LeftCurly),
+          Some('}') => self.tokens.push(MessageToken::RightCurly),
+          _ => {}
         }
       });
-      Palpable(true)
-    } else {
-      let this = collapse_ascii_whitespace(text);
-      let text = match self.tokens.last() {
-        Some(MessageToken::Text(last)) => match last.chars().last() {
-          Some(c1) => match this.chars().next() {
-            Some(c2) => {
-              if c1.is_ascii_whitespace() && c2.is_ascii_whitespace() {
-                this.trim_start().to_string()
-              } else {
-                this
-              }
-            }
-            None => this,
-          },
-          None => this,
-        },
-        _ => this,
-      };
-      self.span = union_span(self.span, span);
-      self.tokens.push(MessageToken::Text(text));
-      Palpable(true)
-    }
+
+    self.span = union_span(self.span, span);
+
+    Palpable(true)
   }
 
-  /// Index starts at 1 because this is for humans.
   pub fn interpolate(&mut self, expr: Box<Expr>) {
-    let placeholder = match *expr {
-      Expr::Ident(Ident { ref sym, .. }) => sym.to_string(),
-      _ => (self
-        .tokens
-        .iter()
-        .filter(|t| matches!(t, MessageToken::Interpolation(_)))
-        .count()
-        + 1)
-        .to_string(),
-    };
     self.span = union_span(self.span, expr.span());
+
+    let idx = self.values.len();
+    let name = match *expr {
+      Expr::Ident(Ident { ref sym, .. }) => Atom::from(sym.as_str()),
+      _ => Atom::from(idx.to_string().as_str()),
+    };
+
+    let name = match name.as_str() {
+      "LF" | "LT" | "GT" | "LC" | "RC" => Atom::from(format!("{}_", name)),
+      _ => name,
+    };
+
     self
       .tokens
-      .push(MessageToken::Interpolation((placeholder, expr)));
+      .push(MessageToken::Interpolation(name.as_ref().into()));
+
+    self.values.insert(name, expr);
   }
 
-  /// Index starts at 1 because this is for humans.
-  pub fn enter(&mut self) -> usize {
-    let idx = self
+  pub fn enter(&mut self, name: Option<Atom>) -> Atom {
+    let idx = self.components.len();
+
+    let name = match name {
+      Some(name) => {
+        if self.components.get(&name).is_none() {
+          name
+        } else {
+          Atom::from(format!("{}{}", name, idx))
+        }
+      }
+      None => idx.to_string().into(),
+    };
+
+    self
       .tokens
-      .iter()
-      .filter(|t| matches!(t, MessageToken::OpeningTag(_)))
-      .count()
-      + 1;
-    self.tokens.push(MessageToken::OpeningTag((idx,)));
-    idx
+      .push(MessageToken::OpeningTag(name.as_str().into()));
+    self.components.insert(name.as_str().into(), None);
+
+    name
   }
 
-  pub fn exit(&mut self, idx: usize, expr: Box<Expr>) {
+  pub fn exit(&mut self, name: Atom, expr: Box<Expr>) {
     self.span = union_span(self.span, expr.span());
-    self.tokens.push(MessageToken::ClosingTag((idx, expr)));
+
+    self
+      .tokens
+      .push(MessageToken::ClosingTag(name.as_str().into()));
+    self.components.get_mut(&name).unwrap().replace(expr);
   }
 
   pub fn is_empty(&self) -> bool {
@@ -136,83 +183,138 @@ impl MessageProps {
       .any(|t| matches!(t, MessageToken::Text(_)))
   }
 
-  fn to_message(&self) -> (String, String) {
-    let message = self
-      .tokens
-      .iter()
-      .map(|token| match token {
-        MessageToken::Text(text) => text
-          // https://github.com/lingui/js-lingui/issues/1075
-          .replace("{", "'{")
-          .replace("}", "}'")
-          .to_string(),
-        MessageToken::Interpolation((idx, _)) => format!("{{{}}}", idx),
-        MessageToken::OpeningTag((idx,)) => format!("<{}>", idx),
-        MessageToken::ClosingTag((idx, _)) => format!("</{}>", idx),
-        MessageToken::NewLine => "<0/>".to_string(),
-      })
-      .collect::<Vec<_>>()
-      .join("")
-      .trim()
-      .to_string();
-    let id = self.generate_id(&message);
-    (message, id)
-  }
+  fn to_props(mut self, factory: &JSXFactory) -> Props {
+    let mut message = String::new();
+    let mut plaintext = String::new();
 
-  fn to_plaintext(&self) -> String {
-    (self
-      .tokens
-      .iter()
-      .map(|c| match c {
-        MessageToken::Text(text) => text.trim().to_string(),
-        MessageToken::Interpolation(_) => String::from("..."),
-        MessageToken::OpeningTag(_) => "".into(),
-        MessageToken::ClosingTag(_) => "".into(),
-        MessageToken::NewLine => " ".into(),
-      })
-      .collect::<Vec<_>>()
-      .join(" ")
-      .trim())
-    .trim()
-    .to_string()
-  }
+    macro_rules! make_prop {
+      ($name:expr, $expr:expr) => {
+        PropOrSpread::Prop(
+          Prop::from(KeyValueProp {
+            key: PropName::Str($name.into()),
+            value: $expr.into(),
+          })
+          .into(),
+        )
+      };
+    }
 
-  fn to_props(mut self, factory: &JSXFactory) -> (ObjectLit, ObjectLit) {
+    let mut has_newline = false;
+    let mut has_less_than = false;
+    let mut has_greater_than = false;
+    let mut has_left_curly = false;
+    let mut has_right_curly = false;
+
+    self.tokens.drain(..).for_each(|token| match token {
+      MessageToken::Text(text) => {
+        message.push_str(&text);
+        plaintext.push_str(&text);
+      }
+      MessageToken::Interpolation(name) => {
+        message.push_str(&format!("{{{}}}", name));
+        plaintext.push_str(" ... ");
+      }
+      MessageToken::OpeningTag(name) => {
+        message.push_str(&format!("<{}>", name));
+      }
+      MessageToken::ClosingTag(name) => {
+        message.push_str(&format!("</{}>", name));
+      }
+      MessageToken::LineFeed => {
+        message.push_str("{LF}");
+        plaintext.push_str(" ");
+        has_newline = true;
+      }
+      MessageToken::LeftCurly => {
+        message.push_str("{LC}");
+        plaintext.push_str("{");
+        has_left_curly = true;
+      }
+      MessageToken::RightCurly => {
+        message.push_str("{RC}");
+        plaintext.push_str("}");
+        has_right_curly = true;
+      }
+      MessageToken::LessThan => {
+        message.push_str("{LT}");
+        plaintext.push_str("<");
+        has_less_than = true;
+      }
+      MessageToken::GreaterThan => {
+        message.push_str("{GT}");
+        plaintext.push_str(">");
+        has_greater_than = true;
+      }
+    });
+
     let mut components: Vec<PropOrSpread> = vec![];
     let mut values: Vec<PropOrSpread> = vec![];
 
-    let insert = |arr: &mut Vec<PropOrSpread>, mut expr: Box<Expr>, idx: &str| {
-      arr.push(PropOrSpread::Prop(
-        Prop::from(KeyValueProp {
-          key: PropName::Str(idx.into()),
-          value: expr.take(),
-        })
-        .into(),
-      ))
-    };
-
-    insert(
-      &mut components,
-      factory.create(&"br".into()).build().into(),
-      "0",
-    );
-
-    self.tokens.drain(..).for_each(|token| match token {
-      MessageToken::ClosingTag((idx, expr)) => insert(&mut components, expr, &idx.to_string()),
-      MessageToken::Interpolation((idx, expr)) => insert(&mut values, expr, &idx),
-      _ => {}
+    self.components.drain(..).for_each(|(name, expr)| {
+      components.push(make_prop!(name, expr.unwrap().as_mut().take()));
     });
 
-    (
-      ObjectLit {
+    self.values.drain(..).for_each(|(name, mut expr)| {
+      values.push(make_prop!(name, expr.take()));
+    });
+
+    if has_newline {
+      values.push(make_prop!("LF", factory.create(&"br".into()).build()));
+    }
+
+    if has_less_than {
+      values.push(make_prop!(
+        "LT",
+        factory
+          .create(&JSXElement::Fragment)
+          .children(vec!["<".into()])
+          .build()
+      ));
+    }
+
+    if has_greater_than {
+      values.push(make_prop!(
+        "GT",
+        factory
+          .create(&JSXElement::Fragment)
+          .children(vec![">".into()])
+          .build()
+      ));
+    }
+
+    if has_left_curly {
+      values.push(make_prop!(
+        "LC",
+        factory
+          .create(&JSXElement::Fragment)
+          .children(vec!["{".into()])
+          .build()
+      ));
+    }
+
+    if has_right_curly {
+      values.push(make_prop!(
+        "RC",
+        factory
+          .create(&JSXElement::Fragment)
+          .children(vec!["}".into()])
+          .build()
+      ));
+    }
+
+    Props {
+      id: self.generate_id(&message),
+      message,
+      plaintext,
+      components: ObjectLit {
         props: components,
         span: self.span,
       },
-      ObjectLit {
+      values: ObjectLit {
         props: values,
         span: self.span,
       },
-    )
+    }
   }
 
   fn generate_id(&self, msg: &str) -> String {
@@ -233,15 +335,17 @@ impl MessageProps {
   pub fn make_trans(self, factory: &JSXFactory, trans: &str) -> (Message, Box<Expr>) {
     let span = self.span;
 
-    let (message, id) = self.to_message();
+    let Props {
+      id,
+      message,
+      plaintext,
+      components,
+      values,
+    } = self.to_props(factory);
 
     if is_empty_or_whitespace(&message) {
       unreachable!("Message is empty")
     }
-
-    let plaintext = self.to_plaintext();
-
-    let (components, values) = self.to_props(factory);
 
     let trans = with_span(Some(span))(
       factory
@@ -267,11 +371,13 @@ impl MessageProps {
   pub fn make_i18n(self, factory: &JSXFactory, i18n: &str) -> (Message, Box<Expr>) {
     let span = self.span;
 
-    let (message, id) = self.to_message();
-
-    let plaintext = self.to_plaintext();
-
-    let (_, values) = self.to_props(factory);
+    let Props {
+      id,
+      message,
+      plaintext,
+      components: _,
+      values,
+    } = self.to_props(factory);
 
     let call = Expr::Call(CallExpr {
       callee: Callee::Expr(Ident::from(i18n).into()),
@@ -304,8 +410,18 @@ impl MessageProps {
       pre,
       tokens: vec![],
       span: Default::default(),
+      values: Default::default(),
+      components: Default::default(),
     }
   }
+}
+
+struct Props {
+  id: String,
+  message: String,
+  plaintext: String,
+  components: ObjectLit,
+  values: ObjectLit,
 }
 
 pub fn is_empty_or_whitespace(str: &str) -> bool {

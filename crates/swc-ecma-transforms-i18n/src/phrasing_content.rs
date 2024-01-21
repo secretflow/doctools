@@ -7,7 +7,8 @@ use swc_core::{
     },
   },
 };
-use swc_utils::jsx::factory::JSXFactory;
+
+use swc_utils::jsx::factory::{JSXElement, JSXFactory};
 
 use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 
@@ -111,10 +112,15 @@ impl VisitMut for PhrasingContentCollector {
           Palpable(false) => (),
         },
         Expr::Call(mut call) => match self.factory.call_is_jsx(&call) {
-          Some(_) => {
-            let idx = self.message.enter();
+          Some(elem) => {
+            let name = match elem {
+              JSXElement::Fragment => None,
+              JSXElement::Ident(name) => Some(name),
+              JSXElement::Intrinsic(name) => Some(name),
+            };
+            let name = self.message.enter(name);
             call.visit_mut_children_with(self);
-            self.message.exit(idx, Box::from(call.take()));
+            self.message.exit(name, Box::from(call.take()));
           }
           None => {
             self.message.interpolate(Box::from(call.take()));

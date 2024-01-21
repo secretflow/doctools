@@ -1,0 +1,15 @@
+{
+  "Trans": "Trans",
+  "elements": [
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "span",
+        "type": "Intrinsic"
+      }
+    }
+  ],
+  "i18n._": "i18n"
+}

@@ -121,8 +121,7 @@ use crate::phrasing_content::{PhrasingContentCollector, PhrasingContentPreflight
 /// "Content model" describes what kind of content the element can contain, while
 /// "content category" describes what kind of content the element is. For example,
 /// `<p>` is classified as "flow content", but its content model is "phrasing content".
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(tag = "type")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ContentModel {
   Flow,
   Phrasing,
@@ -134,26 +133,99 @@ impl Default for ContentModel {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TransOptions {
+pub struct Translatable {
+  /// What element is this?
+  pub tag: JSXElement,
   /// Is the element preformatted like `<pre>` (whitespace is significant)?
-  ///
   /// If not, then whitespace is collapsed according to HTML's whitespace rules.
-  ///
   /// Default is `false`.
   #[serde(default)]
   pub pre: bool,
   /// How will this element be translated? See [ContentModel].
   #[serde(default)]
   pub content: ContentModel,
+  /// List of props to translate.
+  pub props: Vec<Vec<String>>,
 }
 
-impl Default for TransOptions {
+impl Default for Translatable {
   fn default() -> Self {
     Self {
+      tag: JSXElement::Fragment,
+      content: ContentModel::Flow,
       pre: false,
-      content: ContentModel::default(),
+      props: vec![],
+    }
+  }
+}
+
+impl Translatable {
+  pub fn flow<E: Into<JSXElement>>(tag: E) -> Self {
+    Self {
+      tag: tag.into(),
+      content: ContentModel::Flow,
+      pre: false,
+      props: vec![],
+    }
+  }
+
+  pub fn phrasing<E: Into<JSXElement>>(tag: E) -> Self {
+    Self {
+      tag: tag.into(),
+      content: ContentModel::Phrasing,
+      pre: false,
+      props: vec![],
+    }
+  }
+
+  pub fn preformatted<E: Into<JSXElement>>(tag: E, content: ContentModel) -> Self {
+    Self {
+      tag: tag.into(),
+      content,
+      pre: true,
+      props: vec![],
+    }
+  }
+
+  pub fn prop(mut self, prop: &[&str]) -> Self {
+    self.props.push(prop.iter().map(|s| (*s).into()).collect());
+    self
+  }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TranslatorOptions {
+  #[serde(rename = "Trans")]
+  #[serde(default = "TranslatorOptions::default_trans")]
+  trans: String,
+
+  #[serde(rename = "i18n._")]
+  #[serde(default = "TranslatorOptions::default_gettext")]
+  gettext: String,
+
+  #[serde(default)]
+  elements: Vec<Translatable>,
+}
+
+impl TranslatorOptions {
+  fn default_trans() -> String {
+    "Trans".into()
+  }
+
+  fn default_gettext() -> String {
+    "i18n".into()
+  }
+}
+
+impl Default for TranslatorOptions {
+  fn default() -> Self {
+    Self {
+      trans: TranslatorOptions::default_trans(),
+      gettext: TranslatorOptions::default_gettext(),
+      elements: vec![],
     }
   }
 }
@@ -161,11 +233,9 @@ impl Default for TransOptions {
 #[derive(Debug)]
 pub struct Translator {
   factory: JSXFactory,
-  trans: String,
-  i18n: String,
+  options: TranslatorOptions,
 
-  elements: HashMap<JSXElement, TransOptions>,
-  props: HashMap<JSXElement, Vec<Vec<Lit>>>,
+  elements: HashMap<JSXElement, Translatable>,
 
   messages: Vec<Message>,
   pre: bool,
@@ -175,9 +245,7 @@ impl VisitMut for Translator {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let element = self.factory.call_is_jsx(call);
-
-    let element = match element {
+    let element = match self.factory.call_is_jsx(call) {
       Some(elem) => elem,
       None => {
         call.visit_mut_children_with(self);
@@ -195,33 +263,38 @@ impl VisitMut for Translator {
       ]
       .iter()
       .for_each(|attr| {
-        if let Some(message) = translate_attribute(&self.factory, self.i18n.as_str(), call, *attr) {
+        if let Some(message) =
+          translate_attribute(&self.factory, &self.options.gettext.as_str(), call, *attr)
+        {
           self.messages.push(message);
         }
       })
     }
 
-    if let Some(props) = self.props.get(&element) {
-      let i18n = self.i18n.clone();
-      props.iter().for_each(|prop| {
-        if let Some(message) = translate_attribute(&self.factory, i18n.as_str(), call, &prop) {
-          self.messages.push(message);
-        }
-      })
-    }
+    let translatable = self.elements.get(&element);
 
-    let options = self.elements.get(&element);
-
-    match options {
-      None => call.visit_mut_children_with(self),
+    match translatable {
       Some(options) => {
-        let parent_pre = self.pre;
+        let props = &options.props;
+        let gettext = &self.options.gettext.as_str();
+
+        props.iter().for_each(|prop| {
+          let path = prop
+            .iter()
+            .map(|s| Lit::from(s.as_str()))
+            .collect::<Vec<_>>();
+          if let Some(message) = translate_attribute(&self.factory, gettext, call, &path) {
+            self.messages.push(message);
+          }
+        });
+
+        let pre_parent = self.pre;
         self.pre = self.pre || options.pre;
 
         match options.content {
           ContentModel::Flow => {
             let mut collector =
-              FlowContentCollector::new(self.factory.clone(), &self.trans, self.pre);
+              FlowContentCollector::new(self.factory.clone(), &self.options.trans, self.pre);
 
             call.visit_mut_children_with(&mut collector);
 
@@ -238,8 +311,11 @@ impl VisitMut for Translator {
             call.visit_children_with(&mut preflight);
 
             if preflight.is_translatable() {
-              let mut collector =
-                PhrasingContentCollector::new(self.factory.clone(), &self.trans, options.pre);
+              let mut collector = PhrasingContentCollector::new(
+                self.factory.clone(),
+                &self.options.trans,
+                options.pre,
+              );
 
               call.visit_mut_children_with(&mut collector);
 
@@ -256,8 +332,9 @@ impl VisitMut for Translator {
 
         call.visit_mut_children_with(self);
 
-        self.pre = parent_pre;
+        self.pre = pre_parent;
       }
+      None => call.visit_mut_children_with(self),
     }
   }
 }
@@ -266,10 +343,8 @@ impl Default for Translator {
   fn default() -> Self {
     Self {
       factory: Default::default(),
-      trans: "Trans".into(),
-      i18n: "i18n".into(),
+      options: Default::default(),
       elements: Default::default(),
-      props: Default::default(),
       messages: vec![],
       pre: false,
     }
@@ -277,21 +352,26 @@ impl Default for Translator {
 }
 
 impl Translator {
-  pub fn new() -> Self {
-    Self {
-      ..Default::default()
-    }
-  }
+  pub fn new(factory: JSXFactory, mut options: TranslatorOptions) -> Self {
+    let mut elements: HashMap<JSXElement, Translatable> = Default::default();
 
-  pub fn factory(mut self, factory: JSXFactory) -> Self {
-    self.factory = factory;
-    self
+    options.elements.drain(..).for_each(|elem| {
+      elements.insert(elem.tag.clone(), elem);
+    });
+
+    Self {
+      factory,
+      options,
+      elements,
+      messages: vec![],
+      pre: false,
+    }
   }
 
   pub fn flow<E: Into<JSXElement>>(mut self, tag: E) -> Self {
     self.elements.insert(
       tag.into(),
-      TransOptions {
+      Translatable {
         content: ContentModel::Flow,
         ..Default::default()
       },
@@ -302,7 +382,7 @@ impl Translator {
   pub fn phrasing<E: Into<JSXElement>>(mut self, tag: E) -> Self {
     self.elements.insert(
       tag.into(),
-      TransOptions {
+      Translatable {
         content: ContentModel::Phrasing,
         ..Default::default()
       },
@@ -313,7 +393,7 @@ impl Translator {
   pub fn preformatted<E: Into<JSXElement>>(mut self, tag: E, content: ContentModel) -> Self {
     self.elements.insert(
       tag.into(),
-      TransOptions {
+      Translatable {
         pre: true,
         content,
         ..Default::default()
@@ -325,7 +405,7 @@ impl Translator {
   pub fn fragment(mut self) -> Self {
     self.elements.insert(
       JSXElement::Fragment,
-      TransOptions {
+      Translatable {
         content: ContentModel::Flow,
         ..Default::default()
       },
@@ -336,8 +416,10 @@ impl Translator {
   pub fn prop<E: Into<JSXElement> + Debug>(mut self, prop: &[&str], tags: Vec<E>) -> Self {
     tags.into_iter().for_each(|name| {
       let tag = name.into();
-      let props = self.props.entry(tag).or_default();
-      props.push(prop.iter().map(|s| Lit::from(*s)).collect())
+      let translatable = self.elements.entry(tag).or_default();
+      translatable
+        .props
+        .push(prop.iter().map(|s| (*s).into()).collect())
     });
     self
   }
@@ -443,72 +525,5 @@ impl Translator {
 
   pub fn build(self) -> Self {
     self
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use std::io::Read;
-
-  use base64::{prelude::BASE64_STANDARD, Engine};
-  use swc_core::{
-    common::{sync::Lrc, FileName, SourceMap},
-    ecma::{
-      codegen::{text_writer::JsWriter, Emitter, Node as _},
-      visit::VisitMutWith,
-    },
-  };
-  use swc_utils::jsx::factory::JSXFactory;
-
-  use html5jsx::html_to_jsx;
-
-  use super::Translator;
-
-  #[test]
-  fn main() {
-    let mut input = vec![];
-    // std::io::stdin().read_to_end(&mut input).unwrap();
-    let source = String::from_utf8(input).unwrap();
-
-    let sourcemap = Lrc::new(SourceMap::default());
-    let source = sourcemap.new_source_file(FileName::Anon, source);
-
-    let jsx = JSXFactory::default();
-    let mut fragment = html_to_jsx(&source, Some(jsx.clone())).unwrap();
-
-    let mut translator = Translator::new()
-      .factory(jsx)
-      .fragment()
-      .inline()
-      .sections()
-      .paragraphs()
-      .pre()
-      .build();
-
-    fragment.body.visit_mut_with(&mut translator);
-
-    let mut code = vec![];
-    let mut srcmap = vec![];
-
-    {
-      let mut srcmap_raw = vec![];
-      let mut emitter = Emitter {
-        cfg: Default::default(),
-        cm: sourcemap.clone(),
-        comments: None,
-        wr: JsWriter::new(sourcemap.clone(), "\n", &mut code, Some(&mut srcmap_raw)),
-      };
-      (*fragment.body).emit_with(&mut emitter).unwrap();
-      sourcemap
-        .build_source_map(&srcmap_raw)
-        .to_writer(&mut srcmap)
-        .unwrap();
-    }
-
-    let mut result = String::from_utf8(code).unwrap();
-    result.push_str("\n//# sourceMappingURL=data:application/json;base64,");
-    BASE64_STANDARD.encode_string(srcmap, &mut result);
-
-    println!("{}", result);
   }
 }

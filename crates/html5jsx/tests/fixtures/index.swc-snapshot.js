@@ -10,91 +10,91 @@ jsx("title", {
 });
 jsxs(Fragment, {
     "children": [
-        "\n\n    \n        ",
-        "\n        ",
-        "\n        ",
-        "\n    \n    \n        ",
+        "\n\n  \n    ",
+        "\n    ",
+        "\n    ",
+        "\n  \n  \n    ",
         jsx("h1", {
             "children": "The Crushing Bore"
         }),
-        "\n        ",
+        "\n    ",
         jsx("p", {
             "children": "By Chris Mills"
         }),
-        "\n        ",
+        "\n    ",
         jsx("h2", {
             "children": "Chapter 1: The dark night"
         }),
-        "\n        ",
+        "\n    ",
         jsx("p", {
-            "children": "\n            It was a dark night. Somewhere, an owl hooted. The rain lashed down on the…\n        "
+            "children": "It was a dark night. Somewhere, an owl hooted. The rain lashed down on the…"
         }),
-        "\n        ",
+        "\n    ",
         jsx("h2", {
             "children": "Chapter 2: The eternal silence"
         }),
-        "\n        ",
+        "\n    ",
         jsx("p", {
             "children": "Our protagonist could not so much as a whisper out of the shadowy figure…"
         }),
-        "\n        ",
+        "\n    ",
         jsx("h3", {
             "children": "The specter speaks"
         }),
-        "\n        ",
+        "\n    ",
         jsx("p", {
-            "children": '\n            Several more hours had passed, when all of a sudden the specter sat bolt\n            upright and exclaimed, "Please have mercy on my soul!"\n        '
+            "children": '\n      Several more hours had passed, when all of a sudden the specter sat bolt upright\n      and exclaimed, "Please have mercy on my soul!"\n    '
         }),
-        "\n        ",
+        "\n    ",
         jsxs("ol", {
             "children": [
-                "\n            ",
+                "\n      ",
                 jsx("li", {
                     "children": "Drive to the end of the road"
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("li", {
                     "children": "Turn right"
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("li", {
                     "children": "Go straight across the first two roundabouts"
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("li", {
                     "children": "Turn left at the third roundabout"
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("li", {
                     "children": "The school is on your right, 300 meters up the road"
                 }),
-                "\n        "
+                "\n    "
             ]
         }),
-        "\n        ",
+        "\n    ",
         jsxs("p", {
             "children": [
-                "\n            According to the\n            ",
+                "\n      According to the\n      ",
                 jsxs("a", {
                     "href": "/en-US/docs/Web/HTML/Element/blockquote",
                     "children": [
-                        "\n                ",
+                        "\n        ",
                         jsx("cite", {
                             "children": "MDN blockquote page"
                         })
                     ]
                 }),
-                ":\n        "
+                ":\n    "
             ]
         }),
-        "\n        ",
+        "\n    ",
         jsxs("blockquote", {
             "cite": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote",
             "children": [
-                "\n            ",
+                "\n      ",
                 jsxs("p", {
                     "children": [
-                        "\n                The ",
+                        "\n        The ",
                         jsxs("strong", {
                             "children": [
                                 "HTML ",
@@ -104,38 +104,38 @@ jsxs(Fragment, {
                                 " Element"
                             ]
                         }),
-                        " (or\n                ",
+                        " (or\n        ",
                         jsx("em", {
                             "children": "HTML Block Quotation Element"
                         }),
-                        ") indicates that the enclosed text\n                is an extended quotation.\n            "
+                        ") indicates that the enclosed text is an\n        extended quotation.\n      "
                     ]
                 }),
-                "\n        "
+                "\n    "
             ]
         }),
-        "\n        ",
+        "\n    ",
         jsxs("p", {
             "children": [
-                "\n            The quote element — ",
+                "\n      The quote element — ",
                 jsx("code", {
                     "children": "<q>"
                 }),
-                " — is\n            ",
+                " — is\n      ",
                 jsx("q", {
                     "cite": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/q",
-                    "children": "\n                intended for short quotations that don't require paragraph breaks.\n            "
+                    "children": "\n        intended for short quotations that don't require paragraph breaks.\n      "
                 }),
-                "\n            — ",
+                "\n      — ",
                 jsx("a", {
                     "href": "/en-US/docs/Web/HTML/Element/q",
                     "children": jsx("cite", {
                         "children": "MDN q page"
                     })
                 }),
-                ".\n        "
+                ".\n    "
             ]
         }),
-        "\n    \n\n"
+        "\n  \n\n"
     ]
 });

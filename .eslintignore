@@ -6,6 +6,6 @@
 **/dist/**/*.cjs
 **/dist/**/*.mjs
 
-# swc tests
-**/__swc_snapshots__/**
-**/tests/fixtures/**/*.js
+# swc test output
+**/*.swc-snapshot.js
+**/__swc_snapshots__/**/*

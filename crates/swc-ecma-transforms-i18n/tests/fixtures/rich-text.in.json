@@ -1,0 +1,51 @@
+{
+  "Trans": "Trans",
+  "elements": [
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "p",
+        "type": "Intrinsic"
+      }
+    },
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "em",
+        "type": "Intrinsic"
+      }
+    },
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "strong",
+        "type": "Intrinsic"
+      }
+    },
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [["href"]],
+      "tag": {
+        "name": "a",
+        "type": "Intrinsic"
+      }
+    },
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "span",
+        "type": "Intrinsic"
+      }
+    }
+  ],
+  "i18n._": "i18n"
+}

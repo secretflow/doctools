@@ -11,6 +11,7 @@ use swc_core::{
 use crate::{ast::set_ast_by_path, span::with_span};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
+#[serde(tag = "type", content = "name")]
 pub enum JSXElement {
   Intrinsic(Atom),
   Ident(Atom),

@@ -17,9 +17,6 @@ pnpm-lock.yaml
 **/*_pb.ts
 **/*_connect.ts
 
-# sphinx_jsx tests
-**/tests/**/expect/**/*
-
 # vendored files
 **/vendor/**
 
@@ -30,8 +27,6 @@ pnpm-lock.yaml
 **/src/locales/*.mjs
 **/src/locales/*.ts
 
-# swc tests
-**/__swc_snapshots__/**
-**/tests/fixtures/**/*.js
-!**/tests/fixtures/**/*.in.js
-**/tests/fixtures/**/*.html
+# swc test output
+**/*.swc-snapshot.js
+**/__swc_snapshots__/**/*

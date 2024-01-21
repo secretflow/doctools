@@ -13,10 +13,10 @@ jsxs(Fragment, {
         jsxs("div", {
             "className": "jsx-styled-38090ec1",
             "children": [
-                "\n    ",
+                "\n  ",
                 jsx("blockquote", {
                     "className": "blockquote jsx-styled-b3e61195",
-                    "children": "\n        A quick brown fox jumps over the lazy dog.\n    "
+                    "children": "\n    A quick brown fox jumps over the lazy dog.\n  "
                 }),
                 "\n"
             ]

@@ -17,39 +17,39 @@ jsx("meta", {
 });
 jsxs(Fragment, {
     "children": [
-        "\n\n    \n        ",
-        "\n        ",
-        "\n        ",
-        "\n    \n    \n        ",
+        "\n\n  \n    ",
+        "\n    ",
+        "\n    ",
+        "\n  \n  \n    ",
         jsxs("svg", {
             "viewBox": "0 0 100 100",
             "preserveAspectRatio": "xMidYMid slice",
             "role": "img",
             "children": [
-                "\n            ",
+                "\n      ",
                 jsx("title", {
                     "children": "A gradient"
                 }),
-                "\n            ",
+                "\n      ",
                 jsxs("linearGradient", {
                     "id": "gradient",
                     "children": [
-                        "\n                ",
+                        "\n        ",
                         jsx("stop", {
                             "offset": "0%",
                             "stopColor": "red",
                             "className": "begin"
                         }),
-                        "\n                ",
+                        "\n        ",
                         jsx("stop", {
                             "offset": "100%",
                             "stopColor": "black",
                             "className": "end"
                         }),
-                        "\n            "
+                        "\n      "
                     ]
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("rect", {
                     "x": "0",
                     "y": "0",
@@ -57,16 +57,16 @@ jsxs(Fragment, {
                     "height": "100",
                     "className": "jsx-styled-4a9b0717"
                 }),
-                "\n            ",
+                "\n      ",
                 jsx("circle", {
                     "cx": "50",
                     "cy": "50",
                     "r": "30",
                     "className": "jsx-styled-4a9b0717"
                 }),
-                "\n        "
+                "\n    "
             ]
         }),
-        "\n    \n\n"
+        "\n  \n\n"
     ]
 });

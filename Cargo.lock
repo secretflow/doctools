@@ -2587,6 +2587,10 @@ checksum = "626dec3cac7cc0e1577a2ec3fc496277ec2baa084bebad95bb6fdbfae235f84c"
 [[package]]
 name = "playground"
 version = "0.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "pmutil"
@@ -3630,8 +3634,10 @@ dependencies = [
 name = "swc-ecma-transforms-i18n"
 version = "0.0.0"
 dependencies = [
+ "ansi_term",
  "base64 0.21.7",
  "html5jsx",
+ "indexmap 2.1.0",
  "serde",
  "serde_json",
  "sha2",

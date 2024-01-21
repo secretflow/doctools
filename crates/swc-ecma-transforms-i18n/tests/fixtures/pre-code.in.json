@@ -1,0 +1,24 @@
+{
+  "Trans": "Trans",
+  "elements": [
+    {
+      "content": "Phrasing",
+      "pre": true,
+      "props": [],
+      "tag": {
+        "name": "pre",
+        "type": "Intrinsic"
+      }
+    },
+    {
+      "content": "Phrasing",
+      "pre": false,
+      "props": [],
+      "tag": {
+        "name": "code",
+        "type": "Intrinsic"
+      }
+    }
+  ],
+  "i18n._": "i18n"
+}

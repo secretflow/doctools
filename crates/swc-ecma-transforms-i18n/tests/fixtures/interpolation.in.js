@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 jsxs("span", {
-    children: ["© Copyright ", year, " ", company, ". All rights reserved."],
+  children: ["© Copyright ", year, "-", year, " ", company, ". All rights reserved."],
 });

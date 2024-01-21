@@ -50,7 +50,7 @@ fn compile(module: &Module) -> Result<String> {
   Ok(String::from_utf8(output)?)
 }
 
-#[fixture("tests/fixtures/expects/*.html")]
+#[fixture("tests/fixtures/*.html")]
 fn test_conversion(input: PathBuf) {
   let jsx: JSXFactory = std::fs::read_to_string(input.clone().with_extension("json"))
     // exits on deserialize error
@@ -63,7 +63,7 @@ fn test_conversion(input: PathBuf) {
     // default on file not found
     .unwrap_or_default();
 
-  let expected = std::fs::read_to_string(input.clone().with_extension("js")).unwrap();
+  let expected = std::fs::read_to_string(input.clone().with_extension("swc-snapshot.js")).unwrap();
   let expected = expected.trim();
 
   let sourcemap: Lrc<SourceMap> = Default::default();
@@ -83,13 +83,13 @@ fn test_conversion(input: PathBuf) {
 
   print!(
     ">>>>> {} <<<<<\n\n{}\n\n",
-    Color::Green.paint("Orig"),
-    source.src
+    Color::Blue.paint("Source"),
+    Color::Blue.paint(source.src.as_str()),
   );
   print!(
     ">>>>> {} <<<<<\n\n{}\n\n",
-    Color::Green.paint("Code"),
-    actual
+    Color::Yellow.paint("Transformed"),
+    Color::Yellow.paint(actual),
   );
 
   if actual != expected {
