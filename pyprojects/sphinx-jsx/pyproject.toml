@@ -10,7 +10,7 @@ dependencies = [
   "orjson~=3.9",
   "pydantic~=1.10",
   "pillow~=8.0",
-  "fastapi<100",
+  "fastapi>=0.100",
   "pyhumps~=3.8",
 ]
 description = "JSX builder for Sphinx"
