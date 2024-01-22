@@ -83,7 +83,7 @@ pub fn assert_versions() -> Result<()> {
   }
 }
 
-pub fn include_libpython_in_dev() -> Result<()> {
+pub fn include_libpython_in_dev(name: &str) -> Result<()> {
   match env::var("PYO3_PYTHON") {
     // building with maturin
     Ok(_) => return Ok(()),
@@ -97,7 +97,7 @@ pub fn include_libpython_in_dev() -> Result<()> {
     .output()?;
   let base_prefix = String::from_utf8(output.stdout)?.trim().to_string();
   let lib_path = format!("{}/lib", base_prefix);
-  println!("cargo:warning=Using libpython from {}", lib_path);
+  println!("cargo:warning={}: Using libpython from {}", name, lib_path);
   // for cargo build
   println!("cargo:rustc-link-search=crate={}", lib_path);
   // for cargo run/test

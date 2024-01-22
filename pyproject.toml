@@ -29,6 +29,8 @@ dev-dependencies = [
   "pytest-cov~=4.1",
   "pytest~=7.4.0",
   "ruff>=0.0.284",
+  "snakeviz>=2.2.0",
+  "watchfiles>=0.21.0",
 ]
 managed = true
 

@@ -13,7 +13,7 @@ dependencies = [
   "fastapi<100",
   "pyhumps~=3.8",
 ]
-description = "MDX builder for Sphinx"
+description = "JSX builder for Sphinx"
 name = "sphinx-jsx"
 readme = "README.md"
 requires-python = ">=3.8.15, <3.11"

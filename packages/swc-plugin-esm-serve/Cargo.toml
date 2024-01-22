@@ -10,4 +10,4 @@ crate-type = ["cdylib"]
 [dependencies]
 esm-serve = {version = "0.0.0", path = "../../crates/esm-serve"}
 serde_json = "1.0.111"
-swc_core = {version = "0.87.*", features = ["ecma_parser"]}
+swc_core = {version = "0.88", features = ["ecma_parser"]}

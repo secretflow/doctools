@@ -360,7 +360,7 @@ mod tests {
 
     let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"{"children":[]}"#)
     );
   }
@@ -393,7 +393,7 @@ mod tests {
     let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
 
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(
         r#"{"lorem":{"ipsum":{"dolor":["sit","amet","consectetur adipiscing elit"]}}}"#
       )
@@ -572,7 +572,7 @@ mod tests {
     let code = print_one(&expr, None, Some(Config::default().with_minify(true)));
 
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(
         r#"jsx("a",{"props":{"href":_url("external",null,"https://fr.wikipedia.org/wiki/Portez_ce_vieux_whisky_au_juge_blond_qui_fume")}})"#
       )

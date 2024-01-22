@@ -28,7 +28,7 @@ pub fn translate_attribute<'a>(
     match expr {
       Expr::Lit(Lit::Str(lit)) => {
         let mut message = MessageProps::new(true);
-        let _ = message.text(lit.value.as_str(), lit.span());
+        message.raw(lit.value.as_str(), lit.span());
         let (message, result) = message.make_i18n(factory, gettext);
         *source = result;
         Some(message)

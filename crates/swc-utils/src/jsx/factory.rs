@@ -56,14 +56,6 @@ pub struct JSXFactory {
   jsxs: Atom,
 }
 
-pub struct JSXBuilder<'a> {
-  factory: &'a JSXFactory,
-  name: &'a JSXElement,
-  pub arg1: Option<Box<Expr>>,
-  pub props: Vec<Box<Prop>>,
-  pub children: Vec<ExprOrSpread>,
-}
-
 impl JSXFactory {
   pub fn new() -> Self {
     Self::default()
@@ -103,6 +95,14 @@ impl JSXFactory {
       children: vec![],
     }
   }
+}
+
+pub struct JSXBuilder<'factory> {
+  factory: &'factory JSXFactory,
+  name: &'factory JSXElement,
+  pub arg1: Option<Box<Expr>>,
+  pub props: Vec<Box<Prop>>,
+  pub children: Vec<ExprOrSpread>,
 }
 
 impl JSXBuilder<'_> {
@@ -230,6 +230,7 @@ impl JSXFactory {
       type_only: false,
       with: None,
       span: Default::default(),
+      phase: Default::default(),
     }
   }
 
@@ -432,7 +433,7 @@ mod tests {
   fn test_fragment() {
     let jsx = JSXFactory::default();
     let elem = jsx.create(&JSXElement::Fragment).build();
-    let code = print_one(&elem, None, None);
+    let code = print_one(&elem, None, None).unwrap();
     assert_eq!(code, "jsx(Fragment, {})");
   }
 
@@ -445,7 +446,7 @@ mod tests {
       .build();
     let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx("div",{"children":foo})"#)
     );
   }
@@ -456,7 +457,7 @@ mod tests {
     let elem = jsx.create(&JSXElement::Ident("Foo".into())).build();
     let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx(Foo,{})"#)
     );
   }
@@ -479,7 +480,7 @@ mod tests {
       .build();
     let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsxs("div",{"children":[jsx("span",{}),jsx("span",{})]})"#)
     );
   }
@@ -494,7 +495,7 @@ mod tests {
       .build();
     let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx("div",{"className":"foo","id":"bar"})"#)
     );
   }

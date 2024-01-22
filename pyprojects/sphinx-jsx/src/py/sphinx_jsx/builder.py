@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterator, Optional, Set, cast
+from typing import Iterator, Optional, Set
 
 from docutils import nodes
 from loguru import logger
@@ -14,14 +14,13 @@ from sphinx.util.display import progress_message
 from sphinx.util.inventory import InventoryFile
 
 from .options import parse_options
-from .translator import SphinxJSXTranslator
 
 
 class SphinxJSXBuilder(Builder):
     name = "jsx"
     format = "jsx"
 
-    default_translator_class = SphinxJSXTranslator
+    # default_translator_class = SphinxJSXTranslator
 
     versioning_method = "none"
     versioning_compare = False
@@ -67,9 +66,10 @@ class SphinxJSXBuilder(Builder):
 
     @logger.catch(reraise=True)
     def write_doc(self, docname: str, doctree: nodes.document) -> None:
-        translator = cast(SphinxJSXTranslator, self.create_translator(doctree, self))
-        doctree.walkabout(translator)
-        translator.render()
+        raise NotImplementedError
+        # translator = cast(SphinxJSXTranslator, self.create_translator(doctree, self))
+        # doctree.walkabout(translator)
+        # translator.render()
 
     @progress_message(__("dumping object inventory"))
     def dump_inventory(self) -> None:

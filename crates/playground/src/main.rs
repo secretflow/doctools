@@ -1,26 +1,18 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
+use swc_core::ecma::ast::Expr;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
-#[serde(tag = "type", content = "name")]
-pub enum JSXElement {
-  Intrinsic(String),
-  Ident(String),
-  Fragment,
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum ECMAValue {
+  Expression(Expr),
+  Null,
+  Bool(bool),
+  Number(f64),
+  String(String),
+  Array(Vec<ECMAValue>),
+  Object(HashMap<String, ECMAValue>),
 }
 
-fn main() {
-  println!(
-    "{}",
-    serde_json::to_string_pretty(&JSXElement::Ident("div".into())).unwrap()
-  );
-
-  let t = "impl Feature for Struct;";
-
-  t.split_inclusive(['\n', '<', '>', '<', '>'])
-    .for_each(|chunk| match chunk.chars().last() {
-      Some(c) => {
-        println!("{} {}", c, chunk);
-      }
-      None => unreachable!(),
-    })
-}
+fn main() {}

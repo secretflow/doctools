@@ -35,3 +35,8 @@
 - [ ] Web vitals
 - [ ] CDN
 - [ ] status page
+- [ ] Sphinx
+  - [ ] mermaid
+  - [ ] graphviz
+  - [ ] nbsphinx
+  - [ ] sphinx-design

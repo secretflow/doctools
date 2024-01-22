@@ -13,12 +13,11 @@ name = "sphinx_jsx"
 
 [dependencies]
 anyhow = "1.0.79"
-html5jsx = {version = "0.0.0", path = "../../crates/html5jsx"}
-indexmap = "2.1.0"
-katex = "0.4.6"
 pyo3 = "0.20.0"
+pyo3-utils = {version = "0.0.0", path = "../../crates/pyo3-utils"}
 serde_json = "1.0.111"
-swc_core = {version = "0.87", features = ["ecma_ast", "ecma_codegen"]}
+swc-utils = {version = "0.0.0", path = "../../crates/swc-utils"}
+swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen"]}
 
 [build-dependencies]
 maturin-utils = {path = "../../crates/maturin-utils"}

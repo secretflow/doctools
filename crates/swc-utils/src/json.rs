@@ -66,7 +66,7 @@ mod tests {
       Some(Config::default().with_minify(true)),
     );
     assert_eq!(
-      DebugUsingDisplay(code.as_str()),
+      DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(
         r#"{"null":null,"bool":true,"number":1,"string":"string","array":[42,[{"object":true}]]}"#
       )

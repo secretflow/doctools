@@ -1,19 +1,17 @@
 {
-  "name": "sphinx-jsx",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
+  "devDependencies": {},
   "files": [],
+  "name": "sphinx-jsx",
+  "private": true,
   "scripts": {
+    "build:maturin": "VIRTUAL_ENV=../../.venv python -m maturin build --release --out ./dist",
+    "dev:maturin": "python -m maturin_utils watch",
     "format:black": "python -m black --check .",
     "lint:ruff": "python -m ruff check",
+    "publish:maturin": "python -m maturin publish --out ./dist",
     "test:pytest": "python -m pytest",
-    "typecheck:pyright": "pyright",
-    "dev:maturin": "python -m maturin develop --skip-install",
-    "build:maturin": "VIRTUAL_ENV=../../.venv python -m maturin build --release --out ./dist",
-    "publish:maturin": "python -m maturin publish --out ./dist"
+    "typecheck:pyright": "pyright"
   },
-  "devDependencies": {
-    "property-information": "^6.2.0"
-  }
+  "type": "module",
+  "version": "0.0.0"
 }
