@@ -51,9 +51,11 @@ impl From<Ident> for JSXElement {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JSXFactory {
   #[serde(rename = "Fragment")]
-  fragment: Atom,
-  jsx: Atom,
-  jsxs: Atom,
+  sym_fragment: Atom,
+  #[serde(rename = "jsx")]
+  sym_jsx: Atom,
+  #[serde(rename = "jsxs")]
+  sym_jsxs: Atom,
 }
 
 impl JSXFactory {
@@ -62,25 +64,25 @@ impl JSXFactory {
   }
 
   pub fn jsx(mut self, jsx: &str) -> Self {
-    self.jsx = jsx.into();
+    self.sym_jsx = jsx.into();
     self
   }
 
   pub fn jsxs(mut self, jsxs: &str) -> Self {
-    self.jsxs = jsxs.into();
+    self.sym_jsxs = jsxs.into();
     self
   }
 
   pub fn fragment(mut self, fragment: &str) -> Self {
-    self.fragment = fragment.into();
+    self.sym_fragment = fragment.into();
     self
   }
 
   pub fn names(&self) -> [&str; 3] {
     [
-      self.fragment.as_str(),
-      self.jsx.as_str(),
-      self.jsxs.as_str(),
+      self.sym_fragment.as_str(),
+      self.sym_jsx.as_str(),
+      self.sym_jsxs.as_str(),
     ]
   }
 }
@@ -133,55 +135,60 @@ impl JSXBuilder<'_> {
 
   pub fn build(mut self) -> CallExpr {
     let jsx = if self.children.len() > 1 {
-      &*self.factory.jsxs
+      &*self.factory.sym_jsxs
     } else {
-      &*self.factory.jsx
+      &*self.factory.sym_jsx
     };
 
-    if self.arg1.is_some() && !(self.props.is_empty() || !self.children.is_empty()) {
-      unreachable!("arg1 is set but props and children are not empty");
-    }
-
-    let props = {
-      let mut props = self.props;
-
-      if self.children.len() > 1 {
-        // { "children": [jsx(...), jsxs(...), ...] }
-        props.push(
-          Prop::from(KeyValueProp {
-            key: PropName::Str("children".into()),
-            value: ArrayLit {
-              elems: self
-                .children
-                .drain(..)
-                .map(|expr| Some(expr.into()))
-                .collect(),
-              span: Default::default(),
-            }
-            .into(),
-          })
-          .into(),
-        )
-      } else if self.children.len() == 1 {
-        // { "children": jsx(...) }
-        // { "children": null }
-        let value = self.children.pop().unwrap();
-        props.push(
-          Prop::from(KeyValueProp {
-            key: PropName::Str("children".into()),
-            value: value.expr,
-          })
-          .into(),
-        )
+    let props = match self.arg1 {
+      Some(props) => {
+        if !(self.props.is_empty() || !self.children.is_empty()) {
+          unreachable!("arg1 is set but props and children are not empty");
+        }
+        props
       }
+      None => {
+        let mut props = self.props;
 
-      Expr::from(ObjectLit {
-        props: props
-          .into_iter()
-          .map(|prop| PropOrSpread::Prop(prop.into()))
-          .collect(),
-        span: Default::default(),
-      })
+        if self.children.len() > 1 {
+          // { "children": [jsx(...), jsxs(...), ...] }
+          props.push(
+            Prop::from(KeyValueProp {
+              key: PropName::Str("children".into()),
+              value: ArrayLit {
+                elems: self
+                  .children
+                  .drain(..)
+                  .map(|expr| Some(expr.into()))
+                  .collect(),
+                span: Default::default(),
+              }
+              .into(),
+            })
+            .into(),
+          )
+        } else if self.children.len() == 1 {
+          // { "children": jsx(...) }
+          // { "children": null }
+          let value = self.children.pop().unwrap();
+          props.push(
+            Prop::from(KeyValueProp {
+              key: PropName::Str("children".into()),
+              value: value.expr,
+            })
+            .into(),
+          )
+        }
+
+        Expr::from(ObjectLit {
+          props: props
+            .into_iter()
+            .map(|prop| PropOrSpread::Prop(prop.into()))
+            .collect(),
+          span: Default::default(),
+        })
+        .into()
+      }
     };
 
     // jsx("tag", { ...attrs, children: jsx(...) })
@@ -193,7 +200,9 @@ impl JSXBuilder<'_> {
         match self.name {
           JSXElement::Intrinsic(tag) => Expr::from(tag.as_str()).into(),
           JSXElement::Ident(tag) => Expr::from(Ident::from(tag.as_str())).into(),
-          JSXElement::Fragment => Expr::from(Ident::from(self.factory.fragment.as_str())).into(),
+          JSXElement::Fragment => {
+            Expr::from(Ident::from(self.factory.sym_fragment.as_str())).into()
+          }
         },
         props.into(),
       ],
@@ -208,19 +217,19 @@ impl JSXFactory {
     ImportDecl {
       specifiers: vec![
         ImportSpecifier::Named(ImportNamedSpecifier {
-          local: Ident::from(self.jsx.as_str()),
+          local: Ident::from(self.sym_jsx.as_str()),
           imported: None,
           is_type_only: false,
           span: Default::default(),
         }),
         ImportSpecifier::Named(ImportNamedSpecifier {
-          local: Ident::from(self.jsxs.as_str()),
+          local: Ident::from(self.sym_jsxs.as_str()),
           imported: None,
           is_type_only: false,
           span: Default::default(),
         }),
         ImportSpecifier::Named(ImportNamedSpecifier {
-          local: Ident::from(self.fragment.as_str()),
+          local: Ident::from(self.sym_fragment.as_str()),
           imported: None,
           is_type_only: false,
           span: Default::default(),
@@ -238,14 +247,14 @@ impl JSXFactory {
     match &call.callee {
       Callee::Expr(callee) => match &**callee {
         Expr::Ident(Ident { sym: caller, .. }) => {
-          if caller == &self.jsx || caller == &self.jsxs {
+          if caller == &self.sym_jsx || caller == &self.sym_jsxs {
             match call.args.get(0) {
               Some(ExprOrSpread { expr, .. }) => match &**expr {
                 Expr::Lit(Lit::Str(Str { value, .. })) => {
                   Some(JSXElement::Intrinsic(value.as_str().into()))
                 }
                 Expr::Ident(Ident { sym, .. }) => {
-                  if sym.as_str() == self.fragment.as_str() {
+                  if sym.as_str() == self.sym_fragment.as_str() {
                     Some(JSXElement::Fragment)
                   } else {
                     Some(JSXElement::Ident(sym.as_str().into()))
@@ -298,10 +307,10 @@ impl JSXFactory {
         match *value {
           Expr::Array(ArrayLit { ref mut elems, .. }) => {
             if elems.len() > 1 {
-              func.sym = self.jsxs.as_str().into();
+              func.sym = self.sym_jsxs.as_str().into();
               value
             } else if elems.len() == 1 {
-              func.sym = self.jsx.as_str().into();
+              func.sym = self.sym_jsx.as_str().into();
               match elems.last_mut().unwrap() {
                 Some(ref mut expr) => {
                   if expr.spread.is_some() {
@@ -313,7 +322,7 @@ impl JSXFactory {
                 None => value,
               }
             } else {
-              func.sym = self.jsx.as_str().into();
+              func.sym = self.sym_jsx.as_str().into();
               Expr::Lit(Lit::Null(Null {
                 span: Default::default(),
               }))
@@ -321,7 +330,7 @@ impl JSXFactory {
             }
           }
           _ => {
-            func.sym = self.jsx.as_str().into();
+            func.sym = self.sym_jsx.as_str().into();
             value
           }
         }
@@ -372,9 +381,9 @@ impl JSXFactory {
 impl Default for JSXFactory {
   fn default() -> Self {
     Self {
-      fragment: "Fragment".into(),
-      jsx: "jsx".into(),
-      jsxs: "jsxs".into(),
+      sym_fragment: "Fragment".into(),
+      sym_jsx: "jsx".into(),
+      sym_jsxs: "jsxs".into(),
     }
   }
 }

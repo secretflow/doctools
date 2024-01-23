@@ -58,7 +58,7 @@ impl DocumentBuilder {
   pub fn element(
     &mut self,
     name: &JSXElement,
-    build: impl Fn(JSXBuilder) -> JSXBuilder,
+    mut build: impl FnMut(JSXBuilder) -> JSXBuilder,
     span: Option<Span>,
   ) -> &mut Self {
     let builder = self.factory.create(name);
@@ -68,11 +68,6 @@ impl DocumentBuilder {
     self
   }
 
-  /// TODO: Explain why this isn't
-  ///
-  /// ```rs
-  /// pub fn enter<F: FnOnce(&mut Self) -> &mut Self>(&mut self, path: &[&str], ctx: F) -> &mut Self
-  /// ```
   pub fn enter(&mut self, path: &[&str]) -> &mut Self {
     let parent = self.pop();
     self.context.push(Context {

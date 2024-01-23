@@ -30,6 +30,7 @@ pub fn with_span<T: VisitMutWith<SetSpan>>(span: Option<Span>) -> impl Fn(T) -> 
   }
 }
 
+/// See also https://rustdoc.swc.rs/swc_common/source_map/struct.SourceMap.html#method.merge_spans
 pub fn union_span(low: Span, high: Span) -> Span {
   if low.lo() > high.hi() {
     unreachable!()

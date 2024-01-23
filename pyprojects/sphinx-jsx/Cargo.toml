@@ -14,9 +14,11 @@ path = "src/rs/lib.rs"
 
 [dependencies]
 anyhow = "1.0.79"
-pyo3 = "0.20.0"
+indexmap = "2.1.0"
+pyo3 = {version = "0.20.0", features = ["indexmap"]}
 pyo3-utils = {path = "../../crates/pyo3-utils"}
-serde_json = "1.0.111"
+serde = {version = "1.0.195", features = ["derive"]}
+serde_json = {version = "1.0.111", features = ["preserve_order"]}
 swc-utils = {path = "../../crates/swc-utils"}
 swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen"]}
 

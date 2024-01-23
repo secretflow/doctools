@@ -5,30 +5,6 @@
   "version": "0.2.0",
   "inputs": [
     {
-      "id": "sphinxBuildFormat",
-      "type": "promptString",
-      "description": "Sphinx build format",
-      "default": "mdx"
-    },
-    {
-      "id": "sphinxBuildSource",
-      "type": "promptString",
-      "description": "Sphinx source dir",
-      "default": "source"
-    },
-    {
-      "id": "sphinxBuildTarget",
-      "type": "promptString",
-      "description": "Sphinx target dir",
-      "default": "build"
-    },
-    {
-      "id": "sphinxBuildLanguage",
-      "type": "promptString",
-      "description": "Sphinx build language",
-      "default": "en"
-    },
-    {
       "id": "pytestFilter",
       "type": "promptString",
       "description": "Pytest filter",
@@ -37,12 +13,22 @@
   ],
   "configurations": [
     {
-      "name": "doctools: pytest",
+      "name": "sphinx-jsx: pytest",
       "type": "python",
       "request": "launch",
       "module": "pytest",
       "args": ["-vv", "-s", "-k", "${input:pytestFilter}"],
       "cwd": "${workspaceFolder}/pyprojects/sphinx-jsx",
+      "justMyCode": false
+    },
+    {
+      "name": "build sphinx-rtd docs",
+      "type": "python",
+      "request": "launch",
+      "python": "${workspaceFolder}/extern/readthedocs/sphinx_rtd_theme/.venv/bin/python",
+      "module": "sphinx",
+      "args": ["-T", "-E", "-b", "jsx", ".", "_build/jsx"],
+      "cwd": "${workspaceFolder}/extern/readthedocs/sphinx_rtd_theme/docs",
       "justMyCode": false
     }
   ]

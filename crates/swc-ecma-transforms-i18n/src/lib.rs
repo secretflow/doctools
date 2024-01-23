@@ -2,6 +2,7 @@ use std::{collections::HashMap, fmt::Debug};
 
 use serde::{Deserialize, Serialize};
 use swc_core::{
+  atoms::Atom,
   common::Spanned,
   ecma::{
     ast::{CallExpr, Lit},
@@ -200,22 +201,36 @@ impl Translatable {
 pub struct TranslatorOptions {
   #[serde(rename = "Trans")]
   #[serde(default = "TranslatorOptions::default_trans")]
-  trans: String,
+  sym_trans: Atom,
 
-  #[serde(rename = "i18n._")]
+  #[serde(rename = "_")]
   #[serde(default = "TranslatorOptions::default_gettext")]
-  gettext: String,
+  sym_gettext: Atom,
 
   #[serde(default)]
   elements: Vec<Translatable>,
 }
 
 impl TranslatorOptions {
-  fn default_trans() -> String {
+  pub fn new() -> Self {
+    Self::default()
+  }
+
+  pub fn trans(&mut self, sym: Atom) -> &mut Self {
+    self.sym_trans = sym;
+    self
+  }
+
+  pub fn gettext(&mut self, sym: Atom) -> &mut Self {
+    self.sym_gettext = sym;
+    self
+  }
+
+  fn default_trans() -> Atom {
     "Trans".into()
   }
 
-  fn default_gettext() -> String {
+  fn default_gettext() -> Atom {
     "i18n".into()
   }
 }
@@ -223,8 +238,8 @@ impl TranslatorOptions {
 impl Default for TranslatorOptions {
   fn default() -> Self {
     Self {
-      trans: TranslatorOptions::default_trans(),
-      gettext: TranslatorOptions::default_gettext(),
+      sym_trans: TranslatorOptions::default_trans(),
+      sym_gettext: TranslatorOptions::default_gettext(),
       elements: vec![],
     }
   }
@@ -232,7 +247,7 @@ impl Default for TranslatorOptions {
 
 #[derive(Debug)]
 pub struct Translator {
-  factory: JSXFactory,
+  jsx: JSXFactory,
   options: TranslatorOptions,
 
   elements: HashMap<JSXElement, Translatable>,
@@ -245,7 +260,7 @@ impl VisitMut for Translator {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let element = match self.factory.call_is_jsx(call) {
+    let element = match self.jsx.call_is_jsx(call) {
       Some(elem) => elem,
       None => {
         call.visit_mut_children_with(self);
@@ -264,7 +279,7 @@ impl VisitMut for Translator {
       .iter()
       .for_each(|attr| {
         if let Some(message) =
-          translate_attribute(&self.factory, &self.options.gettext.as_str(), call, *attr)
+          translate_attribute(&self.jsx, &self.options.sym_gettext.as_str(), call, *attr)
         {
           self.messages.push(message);
         }
@@ -276,14 +291,14 @@ impl VisitMut for Translator {
     match translatable {
       Some(options) => {
         let props = &options.props;
-        let gettext = &self.options.gettext.as_str();
+        let gettext = &self.options.sym_gettext.as_str();
 
         props.iter().for_each(|prop| {
           let path = prop
             .iter()
             .map(|s| Lit::from(s.as_str()))
             .collect::<Vec<_>>();
-          if let Some(message) = translate_attribute(&self.factory, gettext, call, &path) {
+          if let Some(message) = translate_attribute(&self.jsx, gettext, call, &path) {
             self.messages.push(message);
           }
         });
@@ -294,14 +309,14 @@ impl VisitMut for Translator {
         match options.content {
           ContentModel::Flow => {
             let mut collector =
-              FlowContentCollector::new(self.factory.clone(), &self.options.trans, self.pre);
+              FlowContentCollector::new(self.jsx.clone(), &self.options.sym_trans, self.pre);
 
             call.visit_mut_children_with(&mut collector);
 
             let (messages, children) = collector.results();
 
-            let children = self.factory.ensure_fragment(&["children"], children);
-            self.factory.set_prop(call, &["children"], children);
+            let children = self.jsx.ensure_fragment(&["children"], children);
+            self.jsx.set_prop(call, &["children"], children);
 
             self.messages.extend(messages);
           }
@@ -312,8 +327,8 @@ impl VisitMut for Translator {
 
             if preflight.is_translatable() {
               let mut collector = PhrasingContentCollector::new(
-                self.factory.clone(),
-                &self.options.trans,
+                self.jsx.clone(),
+                &self.options.sym_trans,
                 options.pre,
               );
 
@@ -322,7 +337,7 @@ impl VisitMut for Translator {
               let (message, children) = collector.result();
 
               self
-                .factory
+                .jsx
                 .set_prop(call, &["children"], with_span(Some(call.span()))(children));
 
               self.messages.push(message);
@@ -342,7 +357,7 @@ impl VisitMut for Translator {
 impl Default for Translator {
   fn default() -> Self {
     Self {
-      factory: Default::default(),
+      jsx: Default::default(),
       options: Default::default(),
       elements: Default::default(),
       messages: vec![],
@@ -360,7 +375,7 @@ impl Translator {
     });
 
     Self {
-      factory,
+      jsx: factory,
       options,
       elements,
       messages: vec![],

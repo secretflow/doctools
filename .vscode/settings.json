@@ -56,6 +56,9 @@
   "rust-analyzer.cargo.extraEnv": {
     "PYO3_PYTHON": "${workspaceFolder}/.venv/bin/python3"
   },
+  "rust-analyzer.runnables.extraEnv": {
+    "PYO3_PYTHON": "${workspaceFolder}/.venv/bin/python3"
+  },
   "cSpell.allowCompoundWords": true,
   "cSpell.enabled": true,
   "cSpell.words": [

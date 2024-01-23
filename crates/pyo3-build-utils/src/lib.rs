@@ -100,28 +100,28 @@ pub fn assert_versions_in_sync() -> anyhow::Result<()> {
 
 /// Set PYO3_PYTHON to the python interpreter in the virtualenv if it isn't already set
 pub fn use_libpython_from_venv(package_name: &str, manifest_dir: &str) {
-  if env::var("PYO3_PYTHON").is_ok() {
-    return;
-  }
-
-  let interpreter_path = match get_cargo_workspace(manifest_dir) {
-    Err(_) => {
-      println!(
-        "cargo:warning={}: failed to get cargo workspace. will not configure PYO3_PYTHON",
-        package_name
-      );
-      return;
-    }
-    Ok(workspace) => match workspace.join(".venv/bin/python").canonicalize() {
+  let interpreter_path = if let Ok(envvar) = env::var("PYO3_PYTHON") {
+    PathBuf::from(envvar)
+  } else {
+    match get_cargo_workspace(manifest_dir) {
       Err(_) => {
         println!(
-          "cargo:warning={}: cannot resolve virtualenv executable. will not configure PYO3_PYTHON",
-          package_name,
+          "cargo:warning={}: failed to get cargo workspace. will not configure PYO3_PYTHON",
+          package_name
         );
         return;
       }
-      Ok(path) => path,
-    },
+      Ok(workspace) => match workspace.join(".venv/bin/python").canonicalize() {
+        Err(_) => {
+          println!(
+            "cargo:warning={}: cannot resolve virtualenv executable. will not configure PYO3_PYTHON",
+            package_name,
+          );
+          return;
+        }
+        Ok(path) => path,
+      },
+    }
   };
 
   let lib_path = match interpreter_path.join("../../lib").canonicalize() {
@@ -142,7 +142,6 @@ pub fn use_libpython_from_venv(package_name: &str, manifest_dir: &str) {
   );
 
   println!("cargo:rerun-if-env-changed=PYO3_PYTHON");
-
   // for cargo build
   println!("cargo:rustc-env=PYO3_PYTHON={}", interpreter_path.display());
   println!("cargo:rustc-link-search=crate={}", lib_path.display());

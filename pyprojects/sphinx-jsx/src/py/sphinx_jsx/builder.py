@@ -13,14 +13,16 @@ from sphinx.locale import __
 from sphinx.util.display import progress_message
 from sphinx.util.inventory import InventoryFile
 
-from .options import parse_options
+from ._lib import SphinxBundler
+from .symbols import JSXSymbols
+from .translator import SphinxJSXTranslator
 
 
 class SphinxJSXBuilder(Builder):
     name = "jsx"
     format = "jsx"
 
-    # default_translator_class = SphinxJSXTranslator
+    default_translator_class = SphinxJSXTranslator
 
     versioning_method = "none"
     versioning_compare = False
@@ -34,7 +36,7 @@ class SphinxJSXBuilder(Builder):
     def __init__(self, app: Sphinx, env: BuildEnvironment) -> None:
         super().__init__(app, env)
         self.build_info: BuildInfo
-        self.build_options = parse_options(app, self)
+        self.bundler = SphinxBundler(JSXSymbols())
 
     @property
     def source_root(self) -> Path:
@@ -58,7 +60,6 @@ class SphinxJSXBuilder(Builder):
         return BuildInfo(self.config, self.tags, ["jsx"])
 
     def get_outdated_docs(self) -> Iterator[str]:
-        # mostly from sphinx
         yield from self.env.found_docs
 
     def prepare_writing(self, docnames: Set[str]) -> None:
@@ -66,10 +67,11 @@ class SphinxJSXBuilder(Builder):
 
     @logger.catch(reraise=True)
     def write_doc(self, docname: str, doctree: nodes.document) -> None:
-        raise NotImplementedError
-        # translator = cast(SphinxJSXTranslator, self.create_translator(doctree, self))
-        # doctree.walkabout(translator)
-        # translator.render()
+        translator = self.create_translator(doctree, self)
+        if not isinstance(translator, SphinxJSXTranslator):
+            raise TypeError("translator must be a SphinxJSXTranslator")
+        doctree.walkabout(translator)
+        self.bundler.seal_document(translator.ast)
 
     @progress_message(__("dumping object inventory"))
     def dump_inventory(self) -> None:
