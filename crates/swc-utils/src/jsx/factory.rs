@@ -429,7 +429,7 @@ mod tests {
   use swc_core::{
     ecma::{
       ast::{Expr, Ident},
-      codegen::Config,
+      codegen,
     },
     testing::DebugUsingDisplay,
   };
@@ -453,7 +453,11 @@ mod tests {
       .create(&JSXElement::Intrinsic("div".into()))
       .children(vec![Box::from(Expr::from(Ident::from("foo")))])
       .build();
-    let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
+    let code = print_one(
+      &elem,
+      None,
+      Some(codegen::Config::default().with_minify(true)),
+    );
     assert_eq!(
       DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx("div",{"children":foo})"#)
@@ -464,7 +468,11 @@ mod tests {
   fn test_component() {
     let jsx = JSXFactory::default();
     let elem = jsx.create(&JSXElement::Ident("Foo".into())).build();
-    let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
+    let code = print_one(
+      &elem,
+      None,
+      Some(codegen::Config::default().with_minify(true)),
+    );
     assert_eq!(
       DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx(Foo,{})"#)
@@ -487,7 +495,11 @@ mod tests {
           .into(),
       ])
       .build();
-    let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
+    let code = print_one(
+      &elem,
+      None,
+      Some(codegen::Config::default().with_minify(true)),
+    );
     assert_eq!(
       DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsxs("div",{"children":[jsx("span",{}),jsx("span",{})]})"#)
@@ -502,7 +514,11 @@ mod tests {
       .prop("className", "foo".into(), None)
       .prop("id", "bar".into(), None)
       .build();
-    let code = print_one(&elem, None, Some(Config::default().with_minify(true)));
+    let code = print_one(
+      &elem,
+      None,
+      Some(codegen::Config::default().with_minify(true)),
+    );
     assert_eq!(
       DebugUsingDisplay(code.unwrap().as_str()),
       DebugUsingDisplay(r#"jsx("div",{"className":"foo","id":"bar"})"#)

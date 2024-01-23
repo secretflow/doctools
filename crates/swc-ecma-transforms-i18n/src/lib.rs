@@ -246,17 +246,17 @@ impl Default for TranslatorOptions {
 }
 
 #[derive(Debug)]
-pub struct Translator {
+pub struct Translator<'messages> {
   jsx: JSXFactory,
   options: TranslatorOptions,
 
   elements: HashMap<JSXElement, Translatable>,
 
-  messages: Vec<Message>,
+  messages: &'messages mut Vec<Message>,
   pre: bool,
 }
 
-impl VisitMut for Translator {
+impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
@@ -354,20 +354,12 @@ impl VisitMut for Translator {
   }
 }
 
-impl Default for Translator {
-  fn default() -> Self {
-    Self {
-      jsx: Default::default(),
-      options: Default::default(),
-      elements: Default::default(),
-      messages: vec![],
-      pre: false,
-    }
-  }
-}
-
-impl Translator {
-  pub fn new(factory: JSXFactory, mut options: TranslatorOptions) -> Self {
+impl<'messages> Translator<'messages> {
+  pub fn new(
+    factory: JSXFactory,
+    mut options: TranslatorOptions,
+    output: &'messages mut Vec<Message>,
+  ) -> Self {
     let mut elements: HashMap<JSXElement, Translatable> = Default::default();
 
     options.elements.drain(..).for_each(|elem| {
@@ -378,7 +370,7 @@ impl Translator {
       jsx: factory,
       options,
       elements,
-      messages: vec![],
+      messages: output,
       pre: false,
     }
   }

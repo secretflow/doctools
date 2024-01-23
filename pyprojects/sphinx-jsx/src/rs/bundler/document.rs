@@ -68,7 +68,7 @@ impl SphinxDocument {
   ) -> PyResult<()> {
     let element = JSXElement::Ident(name.into());
 
-    let mut props = match props {
+    let props = match props {
       None => None,
       Some(props) => Some(json_expr(
         serde_json::from_str(props)
@@ -93,16 +93,7 @@ impl SphinxDocument {
 
     let builder = self.get_builder()?;
 
-    builder.element(
-      &element,
-      |mut builder| {
-        if let Some(props) = props.take() {
-          builder.arg1 = Some(props);
-        };
-        builder
-      },
-      span,
-    );
+    builder.element(&element, props, span);
 
     Ok(())
   }

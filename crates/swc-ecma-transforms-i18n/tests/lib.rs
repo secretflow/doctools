@@ -57,7 +57,10 @@ fn test_i18n(input: PathBuf) {
     .map_err(|e| panic!("{:?}", e))
     .unwrap();
 
-  let mut translator = Translator::new(Default::default(), options);
+  let jsx = Default::default();
+  let mut messages = vec![];
+
+  let mut translator = Translator::new(jsx, options, &mut messages);
 
   module.visit_mut_children_with(&mut translator);
 

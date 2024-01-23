@@ -39,7 +39,6 @@ pub struct JSXSnippet {
 pub struct JSXDocument {
   pub head: Box<Expr>,
   pub body: Box<Expr>,
-  pub snippets: Vec<JSXSnippet>,
 }
 
 #[derive(Debug)]
@@ -51,18 +50,20 @@ pub struct DocumentBuilder {
 
   head: Children,
   body: Children,
-  snippets: Vec<JSXSnippet>,
 }
 
 impl DocumentBuilder {
   pub fn element(
     &mut self,
     name: &JSXElement,
-    mut build: impl FnMut(JSXBuilder) -> JSXBuilder,
+    props: Option<Box<Expr>>,
     span: Option<Span>,
   ) -> &mut Self {
-    let builder = self.factory.create(name);
-    let elem = build(builder).build().into();
+    let mut builder = self.factory.create(name);
+    if let Some(arg1) = props {
+      builder.arg1 = Some(arg1)
+    }
+    let elem = builder.build().into();
     let elem = with_span(span)(elem);
     self.push(elem);
     self
@@ -102,25 +103,6 @@ impl DocumentBuilder {
       children,
     );
     self.push(parent);
-    self
-  }
-
-  pub fn id(&mut self, id: String) -> &mut Self {
-    let tree = self.pop();
-    let name = self.snippet_name();
-    self.element(
-      &Ident::from(name.as_str()).into(),
-      |mut builder| {
-        builder.arg1 = Some(Ident::from("props").into());
-        builder
-      },
-      None,
-    );
-    self.snippets.push(JSXSnippet {
-      html_id: id,
-      name: Ident::from(name.as_str()),
-      tree,
-    });
     self
   }
 
@@ -169,10 +151,6 @@ impl DocumentBuilder {
     }
   }
 
-  fn snippet_name(&self) -> String {
-    format!("$snippet{}", self.snippets.len())
-  }
-
   pub fn new(jsx: JSXFactory) -> Self {
     Self {
       factory: jsx,
@@ -180,7 +158,6 @@ impl DocumentBuilder {
       context: vec![],
       head: Children(vec![]),
       body: Children(vec![]),
-      snippets: vec![],
     }
   }
 
@@ -201,16 +178,156 @@ impl DocumentBuilder {
     let head = wrap_tree(self.head.0);
     let body = wrap_tree(self.body.0);
 
-    JSXDocument {
-      head,
-      body,
-      snippets: self.snippets,
-    }
+    JSXDocument { head, body }
+  }
+
+  pub fn noop(builder: JSXBuilder) -> JSXBuilder {
+    builder
   }
 }
 
 impl PropPath {
   fn as_strs(&self) -> Vec<&str> {
     self.0.iter().map(String::as_str).collect()
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use serde_json::json;
+  use swc_core::{ecma::codegen, testing::DebugUsingDisplay};
+
+  use crate::{json::json_expr, jsx::factory::JSXElement, testing::print_one};
+
+  use super::DocumentBuilder;
+
+  fn test(build: impl Fn(&mut DocumentBuilder), head: &str, body: &str) {
+    let jsx = Default::default();
+    let mut builder = DocumentBuilder::new(jsx);
+    build(&mut builder);
+    let document = builder.declare();
+    assert_eq!(
+      DebugUsingDisplay(
+        print_one(
+          &document.head,
+          None,
+          Some(codegen::Config::default().with_minify(true))
+        )
+        .unwrap()
+        .as_str()
+      ),
+      DebugUsingDisplay(head),
+    );
+    assert_eq!(
+      DebugUsingDisplay(
+        print_one(
+          &document.body,
+          None,
+          Some(codegen::Config::default().with_minify(true))
+        )
+        .unwrap()
+        .as_str()
+      ),
+      DebugUsingDisplay(body),
+    )
+  }
+
+  #[test]
+  fn test_fragment() {
+    test(
+      |builder| {
+        builder.element(&JSXElement::Fragment, None, None);
+      },
+      "jsx(Fragment,{})",
+      "jsx(Fragment,{})",
+    );
+  }
+
+  #[test]
+  fn test_intrinsic() {
+    test(
+      |builder| {
+        builder
+          .element(&"div".into(), None, None)
+          .enter(&["children"])
+          .value("foo".into())
+          .exit();
+      },
+      "jsx(Fragment,{})",
+      r#"jsx("div",{"children":"foo"})"#,
+    )
+  }
+
+  #[test]
+  fn test_jsxs() {
+    test(
+      |builder| {
+        builder
+          .element(&"div".into(), None, None)
+          .enter(&["children"])
+          .element(&"span".into(), None, None)
+          .enter(&["children"])
+          .value("Lorem ipsum".into())
+          .exit()
+          .value(" ".into())
+          .element(&"span".into(), None, None)
+          .enter(&["children"])
+          .value("dolor sit amet".into())
+          .exit()
+          .exit();
+      },
+      "jsx(Fragment,{})",
+      r#"jsxs("div",{"children":[jsx("span",{"children":"Lorem ipsum"})," ",jsx("span",{"children":"dolor sit amet"})]})"#,
+    )
+  }
+
+  #[test]
+  fn test_props() {
+    test(
+      |builder| {
+        builder
+          .element(
+            &"a".into(),
+            Some(json_expr(
+              json!({"href": "https://example.com", "title": "Example"}),
+            )),
+            None,
+          )
+          .enter(&["children"])
+          .value("Example".into())
+          .exit();
+      },
+      "jsx(Fragment,{})",
+      r#"jsx("a",{"href":"https://example.com","title":"Example","children":"Example"})"#,
+    );
+  }
+
+  #[test]
+  fn test_head() {
+    test(
+      |builder| {
+        builder
+          .element(&"section".into(), None, None)
+          .enter(&["children"])
+          .element(&"style".into(), None, None)
+          .enter(&["children"])
+          .value("p { background: #fff; }".into())
+          .exit()
+          .element(
+            &"link".into(),
+            Some(json_expr(
+              json!({"rel": "preconnect", "href": "https://rsms.me/"}),
+            )),
+            None,
+          )
+          .element(&"p".into(), None, None)
+          .enter(&["children"])
+          .value("Lorem ipsum".into())
+          .exit()
+          .exit();
+      },
+      r#"jsxs(Fragment,{"children":[jsx("style",{"children":"p { background: #fff; }"}),jsx("link",{"rel":"preconnect","href":"https://rsms.me/"})]})"#,
+      r#"jsx("section",{"children":jsx("p",{"children":"Lorem ipsum"})})"#,
+    );
   }
 }
