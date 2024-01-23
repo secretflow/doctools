@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use swc_core::{
   common::Span,
   ecma::ast::{ArrayLit, Expr, Ident},
@@ -7,34 +8,41 @@ use crate::span::with_span;
 
 use super::factory::{JSXBuilder, JSXElement, JSXFactory};
 
+#[derive(Debug)]
 struct PropPath(Vec<String>);
 
+#[derive(Debug)]
 struct Children(Vec<Box<Expr>>);
 
+#[derive(Debug)]
 struct Context {
   parent: Box<Expr>,
   prop: PropPath,
   children: Children,
 }
 
+#[derive(Debug)]
 enum LastElement {
   Head,
   Body,
   Context,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct JSXSnippet {
   pub name: Ident,
   pub tree: Box<Expr>,
   pub html_id: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct JSXDocument {
   pub head: Box<Expr>,
   pub body: Box<Expr>,
   pub snippets: Vec<JSXSnippet>,
 }
 
+#[derive(Debug)]
 pub struct DocumentBuilder {
   factory: JSXFactory,
 
@@ -60,6 +68,11 @@ impl DocumentBuilder {
     self
   }
 
+  /// TODO: Explain why this isn't
+  ///
+  /// ```rs
+  /// pub fn enter<F: FnOnce(&mut Self) -> &mut Self>(&mut self, path: &[&str], ctx: F) -> &mut Self
+  /// ```
   pub fn enter(&mut self, path: &[&str]) -> &mut Self {
     let parent = self.pop();
     self.context.push(Context {
@@ -93,6 +106,7 @@ impl DocumentBuilder {
       &prop.as_strs()[..],
       children,
     );
+    self.push(parent);
     self
   }
 

@@ -13,7 +13,7 @@ pub(crate) struct Testing;
 #[pymethods]
 impl Testing {
   #[staticmethod]
-  fn ast_string_to_ecma(ast: &str) -> PyResult<String> {
+  pub fn ast_string_to_ecma(ast: &str) -> PyResult<String> {
     let expr: Expr = serde_json::from_str(ast)
       .context("cannot deserialize JSON string as SWC AST")
       .map_err(raise::<PyValueError, _>)?;

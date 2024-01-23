@@ -89,12 +89,28 @@ pub fn include_libpython_in_dev(name: &str) -> Result<()> {
     Ok(_) => return Ok(()),
     _ => (),
   };
+
   // figure out sys.base_prefix by executing python. this is icky.
   // (ignoring venv since lib won't be there)
-  let output = std::process::Command::new("python")
+  let proc = std::process::Command::new("python")
     .arg("-c")
     .arg("import sys\nsys.stdout.write(sys.base_prefix)")
-    .output()?;
+    .output();
+
+  let output = match proc {
+    Ok(output) => output,
+    Err(err) => match err.kind() {
+      std::io::ErrorKind::NotFound => {
+        println!(
+          "cargo:warning={}: python not found, skipping libpython linking",
+          name
+        );
+        return Ok(());
+      }
+      _ => return Err(err.into()),
+    },
+  };
+
   let base_prefix = String::from_utf8(output.stdout)?.trim().to_string();
   let lib_path = format!("{}/lib", base_prefix);
   println!("cargo:warning={}: Using libpython from {}", name, lib_path);
@@ -104,5 +120,6 @@ pub fn include_libpython_in_dev(name: &str) -> Result<()> {
   println!("cargo:rustc-env=DYLD_LIBRARY_PATH={}", lib_path);
   // for cargo run/test
   println!("cargo:rustc-env=LD_LIBRARY_PATH={}", lib_path);
+
   Ok(())
 }

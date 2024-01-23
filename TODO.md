@@ -8,6 +8,7 @@
 - [ ] ESM
   - [ ] SWC + PyO3
 - [ ] Python symbols
+  - [ ] any symbols / "twoslash"
 - [ ] i18n
   - [ ] lingui format
   - [ ] .po extract

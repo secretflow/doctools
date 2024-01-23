@@ -10,6 +10,7 @@ version = "0.0.0"
 [lib]
 crate-type = ["cdylib"]
 name = "sphinx_jsx"
+path = "src/rs/lib.rs"
 
 [dependencies]
 anyhow = "1.0.79"

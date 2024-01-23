@@ -1,4 +1,5 @@
 import cProfile
+import pstats
 import timeit
 from textwrap import dedent
 
@@ -72,6 +73,22 @@ def test_ecma_call():
 
 
 def bench():
+    call = ecma_call(
+        "jsx",
+        "a",
+        {
+            "href": ecma_call("_url", "external", None, "https://swc.rs/"),
+            "children": ecma_call(
+                "jsx", Ident(value="Fragment"), {"children": "Speedy Web Compiler"}
+            ),
+        },
+    ).json()
+
+    def to_bench():
+        testing.ast_string_to_ecma(call)
+
     with cProfile.Profile() as pr:
-        timeit.Timer(test_ecma_call).autorange()
-    pr.print_stats()
+        print(timeit.Timer(to_bench).autorange())
+
+    stats = pstats.Stats(pr)
+    stats.dump_stats("bench.prof")

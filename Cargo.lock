@@ -2469,6 +2469,7 @@ dependencies = [
  "pyo3",
  "serde",
  "serde_json",
+ "swc-utils",
  "swc_core",
 ]
 
