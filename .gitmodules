@@ -1,0 +1,3 @@
+[submodule "extern/readthedocs/sphinx_rtd_theme"]
+	path = extern/readthedocs/sphinx_rtd_theme
+	url = https://github.com/readthedocs/sphinx_rtd_theme

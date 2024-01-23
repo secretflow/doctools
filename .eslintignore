@@ -9,3 +9,5 @@
 # swc test output
 **/*.swc-snapshot.js
 **/__swc_snapshots__/**/*
+
+/extern
