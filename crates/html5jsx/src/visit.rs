@@ -1,5 +1,6 @@
-use adler::adler32_slice;
-use std::{collections::HashSet, vec};
+use std::collections::HashSet;
+
+use sha2::{Digest, Sha256};
 use swc_core::{atoms::Atom, ecma::ast::Expr};
 use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
@@ -18,12 +19,19 @@ pub struct DOMVisitor {
   styles: HashSet<Atom>,
 }
 
+fn style_hash(style: &str) -> String {
+  let mut hasher = Sha256::new();
+  hasher.update(style.as_bytes());
+  let result = hasher.finalize();
+  format!("{:x}", result)[..7].to_string()
+}
+
 fn style_selector(style: &str) -> String {
-  format!(".jsx-styled-{:x}{{", adler32_slice(style.as_bytes()))
+  format!(".jsx-styled-{}{{", style_hash(&style))
 }
 
 fn style_classname(style: &str) -> String {
-  format!("jsx-styled-{:x}", adler32_slice(style.as_bytes()))
+  format!("jsx-styled-{}", style_hash(&style))
 }
 
 impl Visit for DOMVisitor {

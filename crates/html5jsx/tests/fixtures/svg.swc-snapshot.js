@@ -1,6 +1,6 @@
 jsxs("style", {
     "children": [
-        ".jsx-styled-4a9b0717{",
+        ".jsx-styled-a23d57d{",
         "fill: url(#gradient)",
         "}"
     ]
@@ -55,14 +55,14 @@ jsxs(Fragment, {
                     "y": "0",
                     "width": "100",
                     "height": "100",
-                    "className": "jsx-styled-4a9b0717"
+                    "className": "jsx-styled-a23d57d"
                 }),
                 "\n      ",
                 jsx("circle", {
                     "cx": "50",
                     "cy": "50",
                     "r": "30",
-                    "className": "jsx-styled-4a9b0717"
+                    "className": "jsx-styled-a23d57d"
                 }),
                 "\n    "
             ]

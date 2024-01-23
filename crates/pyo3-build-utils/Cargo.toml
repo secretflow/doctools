@@ -1,11 +1,11 @@
 [package]
 edition = "2021"
-name = "maturin-utils"
+name = "pyo3-build-utils"
 publish = false
 version = "0.0.0"
 
 [dependencies]
-anyhow = "1.0.77"
+anyhow = "1.0.79"
 serde = {version = "1.0.193", features = ["derive"]}
 serde_json = "1.0.108"
 toml = "0.8.8"

@@ -1,6 +1,5 @@
-use maturin_utils::{include_libpython_in_dev, Result};
+use pyo3_build_utils::use_libpython_from_venv;
 
-fn main() -> Result<()> {
-  include_libpython_in_dev(env!("CARGO_PKG_NAME"))?;
-  Ok(())
+fn main() {
+  use_libpython_from_venv(env!("CARGO_PKG_NAME"), env!("CARGO_MANIFEST_DIR"))
 }

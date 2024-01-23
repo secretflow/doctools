@@ -1604,11 +1604,11 @@ dependencies = [
 name = "html5jsx"
 version = "0.0.0"
 dependencies = [
- "adler",
  "ansi_term",
  "anyhow",
  "serde",
  "serde_json",
+ "sha2",
  "swc-utils",
  "swc_core",
  "swc_html_ast",
@@ -1914,16 +1914,6 @@ dependencies = [
  "url",
  "wild",
  "zip",
-]
-
-[[package]]
-name = "maturin-utils"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "serde",
- "serde_json",
- "toml 0.8.8",
 ]
 
 [[package]]
@@ -2471,6 +2461,9 @@ dependencies = [
  "serde_json",
  "swc-utils",
  "swc_core",
+ "swc_xml_ast",
+ "swc_xml_parser",
+ "swc_xml_visit",
 ]
 
 [[package]]
@@ -2622,6 +2615,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pyo3-build-utils"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "toml 0.8.8",
+]
+
+[[package]]
 name = "pyo3-ffi"
 version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2659,9 +2662,8 @@ dependencies = [
 name = "pyo3-utils"
 version = "0.0.0"
 dependencies = [
- "anyhow",
- "maturin-utils",
  "pyo3",
+ "pyo3-build-utils",
 ]
 
 [[package]]
@@ -3386,8 +3388,8 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "maturin",
- "maturin-utils",
  "pyo3",
+ "pyo3-build-utils",
  "pyo3-utils",
  "serde_json",
  "swc-utils",
@@ -3937,6 +3939,42 @@ dependencies = [
  "quote",
  "swc_macros_common",
  "syn 2.0.48",
+]
+
+[[package]]
+name = "swc_xml_ast"
+version = "0.12.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec837f5bf050253589714d3f9277094d67f0e179811029afcbf6f7d4a42d138e"
+dependencies = [
+ "is-macro",
+ "string_enum",
+ "swc_atoms",
+ "swc_common",
+]
+
+[[package]]
+name = "swc_xml_parser"
+version = "0.13.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2bdd2afcd132b74c041ad332306027ddf6f11440777e73067fdc5001f559366"
+dependencies = [
+ "swc_atoms",
+ "swc_common",
+ "swc_xml_ast",
+]
+
+[[package]]
+name = "swc_xml_visit"
+version = "0.12.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc2b09c5ebb44820c156bb51edb935256d21b5910d298319d649f66024a43ec6"
+dependencies = [
+ "serde",
+ "swc_atoms",
+ "swc_common",
+ "swc_visit",
+ "swc_xml_ast",
 ]
 
 [[package]]

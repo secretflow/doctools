@@ -1,7 +1,7 @@
-use maturin_utils::{assert_versions, include_libpython_in_dev, Result};
+use pyo3_build_utils::{assert_versions_in_sync, use_libpython_from_venv};
 
-fn main() -> Result<()> {
-  assert_versions()?;
-  include_libpython_in_dev(env!("CARGO_PKG_NAME"))?;
+fn main() -> anyhow::Result<()> {
+  assert_versions_in_sync()?;
+  use_libpython_from_venv(env!("CARGO_PKG_NAME"), env!("CARGO_MANIFEST_DIR"));
   Ok(())
 }

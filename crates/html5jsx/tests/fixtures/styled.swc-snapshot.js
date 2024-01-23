@@ -1,9 +1,9 @@
 jsxs("style", {
     "children": [
-        ".jsx-styled-38090ec1{",
+        ".jsx-styled-770b968{",
         "background-color: deeppink; padding: 6px",
         "}",
-        ".jsx-styled-b3e61195{",
+        ".jsx-styled-8f10bf4{",
         "padding-left: 6px; border-left: 2px solid dimgray",
         "}"
     ]
@@ -11,11 +11,11 @@ jsxs("style", {
 jsxs(Fragment, {
     "children": [
         jsxs("div", {
-            "className": "jsx-styled-38090ec1",
+            "className": "jsx-styled-770b968",
             "children": [
                 "\n  ",
                 jsx("blockquote", {
-                    "className": "blockquote jsx-styled-b3e61195",
+                    "className": "blockquote jsx-styled-8f10bf4",
                     "children": "\n    A quick brown fox jumps over the lazy dog.\n  "
                 }),
                 "\n"

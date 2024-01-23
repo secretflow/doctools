@@ -15,13 +15,14 @@ path = "src/rs/lib.rs"
 [dependencies]
 anyhow = "1.0.79"
 pyo3 = "0.20.0"
-pyo3-utils = {version = "0.0.0", path = "../../crates/pyo3-utils"}
+pyo3-utils = {path = "../../crates/pyo3-utils"}
 serde_json = "1.0.111"
-swc-utils = {version = "0.0.0", path = "../../crates/swc-utils"}
+swc-utils = {path = "../../crates/swc-utils"}
 swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen"]}
 
 [build-dependencies]
-maturin-utils = {path = "../../crates/maturin-utils"}
+anyhow = "1.0.79"
+pyo3-build-utils = {path = "../../crates/pyo3-build-utils"}
 
 [dev-dependencies]
 maturin = "1.4.0"

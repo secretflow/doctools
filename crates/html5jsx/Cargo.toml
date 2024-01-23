@@ -5,8 +5,8 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-adler = "1.0.2"
 serde = {version = "1", features = ["derive"]}
+sha2 = "0.10.8"
 swc-utils = {version = "0.0.0", path = "../swc-utils"}
 swc_core = {version = "0.88", features = ["ecma_ast", "ecma_utils"]}
 swc_html_ast = "0.33.12"

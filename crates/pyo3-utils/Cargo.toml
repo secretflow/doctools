@@ -5,12 +5,7 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-anyhow = "1.0.79"
 pyo3 = "0.20.2"
 
-[lib]
-crate-type = ["rlib", "cdylib"]
-name = "pyo3_utils"
-
 [build-dependencies]
-maturin-utils = {path = "../maturin-utils"}
+pyo3-build-utils = {path = "../pyo3-build-utils"}
