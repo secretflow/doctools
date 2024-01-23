@@ -1,6 +1,8 @@
 [package]
 edition = "2021"
+license.workspace = true
 name = "html5jsx-bin"
+publish = false
 version = "0.0.0"
 
 [dependencies]

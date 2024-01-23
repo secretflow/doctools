@@ -30,15 +30,14 @@ class SphinxJSXTranslator(SphinxTranslator):
         self.builder = builder
         self.ast = builder.bundler.make_document(source_path, source)
 
+        self.current_line = 1
+        self.current_column = 1
+
     def visit_Element(self, node: nodes.Element):
         name = type(node).__name__
         props = dump_props(node.attributes)
-        if node.line:
-            # TODO: more precise position
-            position = (node.line, node.line)
-        else:
-            position = None
-        self.ast.element(name, props, position=position)
+        self.ast.element(name, props, position=None)
+        # TODO: source map by scanning for rawsource
         self.ast.enter()
 
     def depart_Element(self, node: nodes.Element):

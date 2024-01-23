@@ -27,8 +27,11 @@
       "request": "launch",
       "python": "${workspaceFolder}/extern/readthedocs/sphinx_rtd_theme/.venv/bin/python",
       "module": "sphinx",
-      "args": ["-T", "-E", "-b", "jsx", ".", "_build/jsx"],
+      "args": ["-T", "-b", "jsx", ".", "_build/jsx"],
       "cwd": "${workspaceFolder}/extern/readthedocs/sphinx_rtd_theme/docs",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      },
       "justMyCode": false
     }
   ]

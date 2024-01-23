@@ -1,7 +1,7 @@
 [package]
 build = "build.rs"
 edition = "2021"
-license = "MIT"
+license.workspace = true
 name = "sphinx-jsx"
 publish = false
 readme = "README.md"
@@ -14,13 +14,16 @@ path = "src/rs/lib.rs"
 
 [dependencies]
 anyhow = "1.0.79"
+base64 = "0.21.7"
+git2 = "0.18.1"
 indexmap = "2.1.0"
 pyo3 = {version = "0.20.0", features = ["indexmap"]}
 pyo3-utils = {path = "../../crates/pyo3-utils"}
+relative-path = "1.9.2"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = {version = "1.0.111", features = ["preserve_order"]}
 swc-utils = {path = "../../crates/swc-utils"}
-swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen"]}
+swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen", "common_sourcemap"]}
 
 [build-dependencies]
 anyhow = "1.0.79"

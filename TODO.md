@@ -31,6 +31,7 @@
   - [ ] jsDelivr
   - [ ] TNPM
 - [ ] OpenAPI
+- [ ] Compile time type checking via .d.ts
   - [ ] deal with polyfills: oas-normalize, swagger2openapi, jsonschema-ref-parser
 - [ ] dependency tracking
 - [ ] Web vitals

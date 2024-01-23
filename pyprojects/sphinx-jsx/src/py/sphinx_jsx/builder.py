@@ -14,7 +14,7 @@ from sphinx.util.display import progress_message
 from sphinx.util.inventory import InventoryFile
 
 from ._lib import SphinxBundler
-from .symbols import JSXSymbols
+from .options import BuildOptions, WellKnownSymbols
 from .translator import SphinxJSXTranslator
 
 
@@ -36,7 +36,7 @@ class SphinxJSXBuilder(Builder):
     def __init__(self, app: Sphinx, env: BuildEnvironment) -> None:
         super().__init__(app, env)
         self.build_info: BuildInfo
-        self.bundler = SphinxBundler(JSXSymbols())
+        self.bundler = SphinxBundler(WellKnownSymbols())
 
     @property
     def source_root(self) -> Path:
@@ -68,22 +68,31 @@ class SphinxJSXBuilder(Builder):
     @logger.catch(reraise=True)
     def write_doc(self, docname: str, doctree: nodes.document) -> None:
         translator = self.create_translator(doctree, self)
+
         if not isinstance(translator, SphinxJSXTranslator):
             raise TypeError("translator must be a SphinxJSXTranslator")
+
         doctree.walkabout(translator)
         self.bundler.seal_document(translator.ast)
 
-    @progress_message(__("dumping object inventory"))
-    def dump_inventory(self) -> None:
-        InventoryFile.dump(str(self.output_root / INVENTORY_FILENAME), self.env, self)
-
-    def write_buildinfo(self) -> None:
-        try:
-            with open(self.build_info_path, "w", encoding="utf-8") as fp:
-                self.build_info.dump(fp)
-        except OSError as exc:
-            logger.warning(__("Failed to write build info file: %r"), exc)
-
     def finish(self):
-        self.finish_tasks.add_task(self.dump_inventory)
-        self.finish_tasks.add_task(self.write_buildinfo)
+        options = BuildOptions(
+            srcdir=Path(self.srcdir),
+            outdir=Path(self.outdir),
+        )
+
+        self.bundler.build(options)
+
+        with progress_message(__("dumping object inventory")):
+            InventoryFile.dump(
+                str(self.output_root / INVENTORY_FILENAME),
+                self.env,
+                self,
+            )
+
+        with progress_message(__("emitting build info")):
+            try:
+                with open(self.build_info_path, "w", encoding="utf-8") as fp:
+                    self.build_info.dump(fp)
+            except OSError as exc:
+                logger.warning(__("Failed to write build info file: %r"), exc)

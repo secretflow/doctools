@@ -1,5 +1,6 @@
 [package]
 edition = "2021"
+license.workspace = true
 name = "swc-ecma-transforms-i18n"
 publish = false
 version = "0.0.0"
