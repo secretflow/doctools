@@ -8,5 +8,5 @@ version = "0.0.0"
 [dependencies]
 base64 = "0.21.7"
 html5jsx = {version = "0.0.0", path = ".."}
-swc-utils = {version = "0.0.0", path = "../../swc-utils"}
+swc-ecma-utils = {version = "0.0.0", path = "../../swc-ecma-utils"}
 swc_core = {version = "0.88", features = ["ecma_codegen", "common_sourcemap"]}

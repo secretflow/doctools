@@ -11,8 +11,8 @@ use swc_core::{
   },
 };
 
-use swc_utils::{
-  jsx::factory::{JSXElement, JSXFactory},
+use swc_ecma_utils::{
+  jsx::factory::{JSXFactory, JSXTagName},
   object_lit,
   span::{union_span, with_span},
 };
@@ -266,7 +266,7 @@ impl MessageProps {
       values.push(make_prop!(
         "LT",
         factory
-          .create(&JSXElement::Fragment)
+          .create(&JSXTagName::Fragment)
           .children(vec!["<".into()])
           .build()
       ));
@@ -276,7 +276,7 @@ impl MessageProps {
       values.push(make_prop!(
         "GT",
         factory
-          .create(&JSXElement::Fragment)
+          .create(&JSXTagName::Fragment)
           .children(vec![">".into()])
           .build()
       ));
@@ -286,7 +286,7 @@ impl MessageProps {
       values.push(make_prop!(
         "LC",
         factory
-          .create(&JSXElement::Fragment)
+          .create(&JSXTagName::Fragment)
           .children(vec!["{".into()])
           .build()
       ));
@@ -296,7 +296,7 @@ impl MessageProps {
       values.push(make_prop!(
         "RC",
         factory
-          .create(&JSXElement::Fragment)
+          .create(&JSXTagName::Fragment)
           .children(vec!["}".into()])
           .build()
       ));
@@ -349,7 +349,7 @@ impl MessageProps {
 
     let trans = with_span(Some(span))(
       factory
-        .create(&JSXElement::Ident(trans.into()))
+        .create(&JSXTagName::Ident(trans.into()))
         .prop("id", id.as_str().into(), None)
         .prop("message", message.as_str().into(), None)
         .prop("components", components.into(), None)

@@ -1,8 +1,8 @@
 use swc_core::{common::SourceFile, ecma::ast::Expr};
+use swc_ecma_utils::jsx::factory::JSXFactory;
 use swc_html_ast::{DocumentMode, Element, Namespace};
 use swc_html_parser::{error::Error, parse_file_as_document_fragment, parser::ParserConfig};
 use swc_html_visit::VisitWith as _;
-use swc_utils::jsx::factory::JSXFactory;
 
 mod props;
 mod visit;

@@ -5,13 +5,14 @@ use swc_core::{
   atoms::Atom,
   common::Spanned,
   ecma::{
-    ast::{CallExpr, Lit},
+    ast::CallExpr,
     visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _, VisitWith},
   },
 };
 
-use swc_utils::{
-  jsx::factory::{JSXElement, JSXFactory},
+use swc_ecma_utils::{
+  jsx::factory::{JSXFactory, JSXTagName},
+  jsx_or_pass,
   span::with_span,
 };
 
@@ -138,7 +139,7 @@ impl Default for ContentModel {
 #[serde(rename_all = "camelCase")]
 pub struct Translatable {
   /// What element is this?
-  pub tag: JSXElement,
+  pub tag: JSXTagName,
   /// Is the element preformatted like `<pre>` (whitespace is significant)?
   /// If not, then whitespace is collapsed according to HTML's whitespace rules.
   /// Default is `false`.
@@ -154,7 +155,7 @@ pub struct Translatable {
 impl Default for Translatable {
   fn default() -> Self {
     Self {
-      tag: JSXElement::Fragment,
+      tag: JSXTagName::Fragment,
       content: ContentModel::Flow,
       pre: false,
       props: vec![],
@@ -163,7 +164,7 @@ impl Default for Translatable {
 }
 
 impl Translatable {
-  pub fn flow<E: Into<JSXElement>>(tag: E) -> Self {
+  pub fn flow<E: Into<JSXTagName>>(tag: E) -> Self {
     Self {
       tag: tag.into(),
       content: ContentModel::Flow,
@@ -172,7 +173,7 @@ impl Translatable {
     }
   }
 
-  pub fn phrasing<E: Into<JSXElement>>(tag: E) -> Self {
+  pub fn phrasing<E: Into<JSXTagName>>(tag: E) -> Self {
     Self {
       tag: tag.into(),
       content: ContentModel::Phrasing,
@@ -181,7 +182,7 @@ impl Translatable {
     }
   }
 
-  pub fn preformatted<E: Into<JSXElement>>(tag: E, content: ContentModel) -> Self {
+  pub fn preformatted<E: Into<JSXTagName>>(tag: E, content: ContentModel) -> Self {
     Self {
       tag: tag.into(),
       content,
@@ -250,7 +251,7 @@ pub struct Translator<'messages> {
   jsx: JSXFactory,
   options: TranslatorOptions,
 
-  elements: HashMap<JSXElement, Translatable>,
+  elements: HashMap<JSXTagName, Translatable>,
 
   messages: &'messages mut Vec<Message>,
   pre: bool,
@@ -260,21 +261,15 @@ impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let element = match self.jsx.call_is_jsx(call) {
-      Some(elem) => elem,
-      None => {
-        call.visit_mut_children_with(self);
-        return;
-      }
-    };
+    let element = jsx_or_pass!(self, self.jsx, mut call);
 
-    if matches!(element, JSXElement::Intrinsic(_)) {
+    if matches!(element, JSXTagName::Intrinsic(_)) {
       [
-        &[Lit::from("title")],
-        &[Lit::from("aria-label")],
-        &[Lit::from("aria-placeholder")],
-        &[Lit::from("aria-roledescription")],
-        &[Lit::from("aria-valuetext")],
+        &["title"],
+        &["aria-label"],
+        &["aria-placeholder"],
+        &["aria-roledescription"],
+        &["aria-valuetext"],
       ]
       .iter()
       .for_each(|attr| {
@@ -294,10 +289,7 @@ impl VisitMut for Translator<'_> {
         let gettext = &self.options.sym_gettext.as_str();
 
         props.iter().for_each(|prop| {
-          let path = prop
-            .iter()
-            .map(|s| Lit::from(s.as_str()))
-            .collect::<Vec<_>>();
+          let path = prop.iter().map(|s| s.as_str()).collect::<Vec<_>>();
           if let Some(message) = translate_attribute(&self.jsx, gettext, call, &path) {
             self.messages.push(message);
           }
@@ -315,8 +307,7 @@ impl VisitMut for Translator<'_> {
 
             let (messages, children) = collector.results();
 
-            let children = self.jsx.ensure_fragment(&["children"], children);
-            self.jsx.set_prop(call, &["children"], children);
+            self.jsx.set_children(call, &["children"], children.into());
 
             self.messages.extend(messages);
           }
@@ -336,9 +327,9 @@ impl VisitMut for Translator<'_> {
 
               let (message, children) = collector.result();
 
-              self
-                .jsx
-                .set_prop(call, &["children"], with_span(Some(call.span()))(children));
+              let children = with_span(Some(call.span()))(children);
+
+              self.jsx.set_children(call, &["children"], children);
 
               self.messages.push(message);
             }
@@ -360,7 +351,7 @@ impl<'messages> Translator<'messages> {
     mut options: TranslatorOptions,
     output: &'messages mut Vec<Message>,
   ) -> Self {
-    let mut elements: HashMap<JSXElement, Translatable> = Default::default();
+    let mut elements: HashMap<JSXTagName, Translatable> = Default::default();
 
     options.elements.drain(..).for_each(|elem| {
       elements.insert(elem.tag.clone(), elem);
@@ -375,7 +366,7 @@ impl<'messages> Translator<'messages> {
     }
   }
 
-  pub fn flow<E: Into<JSXElement>>(mut self, tag: E) -> Self {
+  pub fn flow<E: Into<JSXTagName>>(mut self, tag: E) -> Self {
     self.elements.insert(
       tag.into(),
       Translatable {
@@ -386,7 +377,7 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn phrasing<E: Into<JSXElement>>(mut self, tag: E) -> Self {
+  pub fn phrasing<E: Into<JSXTagName>>(mut self, tag: E) -> Self {
     self.elements.insert(
       tag.into(),
       Translatable {
@@ -397,7 +388,7 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn preformatted<E: Into<JSXElement>>(mut self, tag: E, content: ContentModel) -> Self {
+  pub fn preformatted<E: Into<JSXTagName>>(mut self, tag: E, content: ContentModel) -> Self {
     self.elements.insert(
       tag.into(),
       Translatable {
@@ -411,7 +402,7 @@ impl<'messages> Translator<'messages> {
 
   pub fn fragment(mut self) -> Self {
     self.elements.insert(
-      JSXElement::Fragment,
+      JSXTagName::Fragment,
       Translatable {
         content: ContentModel::Flow,
         ..Default::default()
@@ -420,7 +411,7 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn prop<E: Into<JSXElement> + Debug>(mut self, prop: &[&str], tags: Vec<E>) -> Self {
+  pub fn prop<E: Into<JSXTagName> + Debug>(mut self, prop: &[&str], tags: Vec<E>) -> Self {
     tags.into_iter().for_each(|name| {
       let tag = name.into();
       let translatable = self.elements.entry(tag).or_default();

@@ -1,0 +1,16 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "swc-ecma-transforms-sphinx"
+version = "0.1.0"
+
+[dependencies]
+swc-ecma-utils = {path = "../swc-ecma-utils"}
+
+[dependencies.swc_core]
+features = [
+  "ecma_ast",
+  "ecma_utils",
+  "ecma_visit",
+]
+version = "0.88"

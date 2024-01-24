@@ -1,4 +1,5 @@
 use std::{
+  collections::HashSet,
   fs,
   io::Write as _,
   option,
@@ -7,11 +8,11 @@ use std::{
 
 use anyhow::Context;
 use base64::prelude::{Engine, BASE64_STANDARD};
+use itertools;
 use pyo3::{
   exceptions::{PyOSError, PyRuntimeError, PyUnicodeDecodeError, PyValueError},
   prelude::*,
 };
-use pyo3_utils::raise;
 use relative_path::RelativePathBuf;
 use serde::{Deserialize, Serialize};
 use swc_core::{
@@ -23,7 +24,9 @@ use swc_core::{
   ecma::codegen::{text_writer::JsWriter, Emitter, Node as _},
 };
 
-use swc_utils::{
+use pyo3_utils::raise;
+use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
+use swc_ecma_utils::{
   jsx::{builder::JSXDocument, factory::JSXFactory},
   testing::print_one,
 };
@@ -68,9 +71,9 @@ impl SphinxBundler {
     let source_file = self.sources.new_source_file(filename.clone(), source);
 
     let factory = JSXFactory::new()
-      .jsx(&self.symbols.jsx)
-      .jsxs(&self.symbols.jsxs)
-      .fragment(&self.symbols.fragment);
+      .with_jsx(&self.symbols.jsx)
+      .with_jsxs(&self.symbols.jsxs)
+      .with_fragment(&self.symbols.fragment);
 
     let document = SphinxDocument::new(factory, source_file.clone());
 
@@ -125,7 +128,15 @@ impl SphinxBundler {
 
     let pages: Vec<(PathBuf, String)> = vec![];
 
+    let undefined_bindings =
+      LintUndefinedBindings::new(vec![include_str!("../../js/theme.d.ts").to_string()])
+        .map_err(raise::<PyRuntimeError, _>)?;
+
+    let mut unsupported_components = HashSet::new();
+
     for (docname, document) in self.pages.drain(..) {
+      unsupported_components.extend(undefined_bindings.lint(&document.body));
+
       let mut code_buffer = vec![];
       let mut source_mapping = vec![];
       let mut source_map_buffer = vec![];
@@ -194,6 +205,11 @@ impl SphinxBundler {
         out_file.write_all(code.as_bytes())?;
       }
     }
+
+    println!(
+      "unsupported components: {}",
+      itertools::join(itertools::sorted(unsupported_components), ", ")
+    );
 
     Ok(())
   }

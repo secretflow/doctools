@@ -6,7 +6,8 @@ use swc_core::{
   },
 };
 
-use swc_utils::{
+use swc_ecma_utils::{
+  children_or_pass,
   jsx::factory::JSXFactory,
   span::{union_span, with_span},
 };
@@ -72,13 +73,9 @@ impl VisitMut for FlowContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_key_value_prop(&mut self, prop: &mut KeyValueProp) {
-    if !JSXFactory::prop_is_children(prop) {
-      return;
-    }
+    let mut children = children_or_pass!(take prop);
 
-    let mut value = *prop.value.take();
-
-    match value {
+    match children {
       Expr::Lit(Lit::Str(lit)) => self.text(lit),
       Expr::Array(ArrayLit { ref mut elems, .. }) => {
         elems.drain(..).for_each(|item| match item {
@@ -123,7 +120,7 @@ impl FlowContentCollector {
     }
   }
 
-  pub fn results(mut self) -> (Vec<Message>, Vec<ExprOrSpread>) {
+  pub fn results(mut self) -> (Vec<Message>, ArrayLit) {
     let mut messages = vec![];
     let mut children = vec![];
     self.blocks.drain(..).for_each(|(block, span)| match block {
@@ -133,10 +130,14 @@ impl FlowContentCollector {
         }
         let (message, elem) = message.make_trans(&self.factory, &self.trans);
         messages.push(message);
-        children.push(with_span(Some(span))(elem).into());
+        children.push(Some(with_span(Some(span))(elem).into()));
       }
-      Block::Expr(expr) => children.push(expr),
+      Block::Expr(expr) => children.push(Some(expr)),
     });
+    let children = ArrayLit {
+      span: Span::dummy(),
+      elems: children,
+    };
     (messages, children)
   }
 }

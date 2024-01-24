@@ -1625,7 +1625,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "swc-utils",
+ "swc-ecma-utils",
  "swc_core",
  "swc_html_ast",
  "swc_html_parser",
@@ -1638,7 +1638,7 @@ version = "0.0.0"
 dependencies = [
  "base64 0.21.7",
  "html5jsx",
- "swc-utils",
+ "swc-ecma-utils",
  "swc_core",
 ]
 
@@ -2539,7 +2539,7 @@ checksum = "626dec3cac7cc0e1577a2ec3fc496277ec2baa084bebad95bb6fdbfae235f84c"
 name = "playground"
 version = "0.0.0"
 dependencies = [
- "swc-utils",
+ "swc-ecma-utils",
  "swc_core",
 ]
 
@@ -3468,6 +3468,7 @@ dependencies = [
  "base64 0.21.7",
  "git2",
  "indexmap 2.1.0",
+ "itertools 0.12.0",
  "maturin",
  "pyo3",
  "pyo3-build-utils",
@@ -3475,8 +3476,8 @@ dependencies = [
  "relative-path",
  "serde",
  "serde_json",
- "swc-ecma-lint-undefined-bindings",
- "swc-utils",
+ "swc-ecma-lints",
+ "swc-ecma-utils",
  "swc_core",
 ]
 
@@ -3596,11 +3597,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-lint-undefined-bindings"
+name = "swc-ecma-lints"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "swc-utils",
+ "swc-ecma-utils",
  "swc_core",
 ]
 
@@ -3610,15 +3611,33 @@ version = "0.0.0"
 dependencies = [
  "ansi_term",
  "base64 0.21.7",
- "html5jsx",
  "indexmap 2.1.0",
  "serde",
  "serde_json",
  "sha2",
- "swc-utils",
+ "swc-ecma-utils",
  "swc_core",
  "tracing",
- "tracing-subscriber",
+]
+
+[[package]]
+name = "swc-ecma-transforms-sphinx"
+version = "0.1.0"
+dependencies = [
+ "swc-ecma-utils",
+ "swc_core",
+]
+
+[[package]]
+name = "swc-ecma-utils"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "swc_core",
+ "swc_error_reporters",
+ "thiserror",
 ]
 
 [[package]]
@@ -3628,18 +3647,6 @@ dependencies = [
  "esm-serve",
  "serde_json",
  "swc_core",
-]
-
-[[package]]
-name = "swc-utils"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "serde",
- "serde_json",
- "swc_core",
- "swc_error_reporters",
- "thiserror",
 ]
 
 [[package]]
@@ -3707,7 +3714,6 @@ dependencies = [
  "swc_plugin",
  "swc_plugin_macro",
  "swc_plugin_proxy",
- "swc_trace_macro",
  "testing",
  "vergen",
 ]

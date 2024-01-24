@@ -1,7 +1,8 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use swc_core::{
   atoms::Atom,
+  common::SyntaxContext,
   ecma::{
     ast::{Decl, ExportDecl, Ident, MemberExpr, Pat, PropName, VarDeclarator},
     parser::{parse_file_as_module, Syntax, TsConfig},
@@ -9,7 +10,7 @@ use swc_core::{
   },
 };
 
-use swc_utils::testing::parse_one;
+use swc_ecma_utils::testing::parse_one;
 
 struct CollectExportDeclares {
   idents: HashSet<Atom>,
@@ -48,9 +49,17 @@ impl VisitAll for CollectExportDeclares {
   }
 }
 
+impl CollectExportDeclares {
+  fn new() -> Self {
+    Self {
+      idents: HashSet::new(),
+    }
+  }
+}
+
 pub struct CollectIdents {
   idents: HashSet<Atom>,
-  defined: HashSet<Atom>,
+  defined: HashMap<Atom, SyntaxContext>,
 }
 
 impl Visit for CollectIdents {
@@ -73,22 +82,36 @@ impl Visit for CollectIdents {
         decl.name.visit_with(self);
       }
       Some(ref init) => {
-        let mut collector = CollectIdents {
-          idents: HashSet::new(),
-          defined: HashSet::new(),
-        };
+        let mut collector = CollectIdents::new();
         decl.name.visit_with(&mut collector);
-        self.defined.extend(collector.idents);
+        collector.idents.drain().for_each(|sym| {
+          self.defined.entry((&*sym).into()).and_modify(|ctx| {
+            if ctx < &mut decl.span.ctxt() {
+              *ctx = decl.span.ctxt();
+            };
+          });
+        });
         init.visit_with(self)
       }
     };
   }
 
   fn visit_ident(&mut self, ident: &Ident) {
-    if self.defined.contains(&(&*ident.sym).into()) {
-      return;
+    if let Some(defined) = self.defined.get(&(&*ident.sym).into()) {
+      if defined < &mut ident.span.ctxt() {
+        return;
+      }
     }
     self.idents.insert((&*ident.sym).into());
+  }
+}
+
+impl CollectIdents {
+  fn new() -> Self {
+    Self {
+      idents: HashSet::new(),
+      defined: HashMap::new(),
+    }
   }
 }
 
@@ -98,9 +121,7 @@ pub struct LintUndefinedBindings {
 
 impl LintUndefinedBindings {
   pub fn new(dts: Vec<String>) -> anyhow::Result<Self> {
-    let mut declared = CollectExportDeclares {
-      idents: HashSet::new(),
-    };
+    let mut declared = CollectExportDeclares::new();
 
     for src in dts {
       let ts = parse_one(
@@ -167,10 +188,10 @@ impl LintUndefinedBindings {
     self
   }
 
-  pub fn lint<N: VisitWith<CollectIdents>>(&self, expr: N) -> HashSet<Atom> {
+  pub fn lint<N: VisitWith<CollectIdents>>(&self, expr: &N) -> HashSet<Atom> {
     let mut collector = CollectIdents {
       idents: HashSet::new(),
-      defined: HashSet::new(),
+      defined: HashMap::new(),
     };
     expr.visit_with(&mut collector);
     let found = collector.idents;
@@ -201,7 +222,7 @@ mod tests {
 
     let expr = parse_one(&src, None, parse_file_as_module).unwrap();
 
-    let found = lint.lint(expr);
+    let found = lint.lint(&expr);
 
     assert_eq!(
       found,
@@ -216,7 +237,7 @@ mod tests {
         // in the test case:
         "x".into(),
         // declared except after it's used
-        // "y".into(), // false negative: declared but its scope ignored
+        "y".into(), // declared but its scope ignored
         // "z".into(), // declared
         "c".into(),
         // not declared

@@ -4,7 +4,7 @@ use serde_json;
 use swc_core::ecma::ast::Expr;
 
 use pyo3_utils::raise;
-use swc_utils::testing::print_one;
+use swc_ecma_utils::testing::print_one;
 
 #[pyclass]
 #[pyo3(name = "testing")]

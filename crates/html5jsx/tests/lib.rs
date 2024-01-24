@@ -11,7 +11,7 @@ use swc_core::{
   testing::{diff, fixture},
 };
 
-use swc_utils::jsx::factory::JSXFactory;
+use swc_ecma_utils::jsx::factory::JSXFactory;
 
 use html5jsx::{html_to_jsx, Fragment};
 
@@ -104,7 +104,7 @@ fn test_conversion(input: PathBuf) {
 mod test_rejections {
   use html5jsx::html_to_jsx;
   use swc_core::common::{sync::Lrc, FileName, SourceFile, SourceMap};
-  use swc_utils::jsx::factory::JSXFactory;
+  use swc_ecma_utils::jsx::factory::JSXFactory;
 
   fn make_source(text: &str) -> Lrc<SourceFile> {
     let sourcemap: Lrc<SourceMap> = Default::default();
@@ -177,7 +177,11 @@ mod test_rejections {
   #[test]
   #[should_panic = "JSX factories cannot contain 'eval' or 'Function' in name"]
   fn no_malicious_jsx() {
-    html_to_jsx(&make_source("<div>"), Some(JSXFactory::new().jsx("eval"))).unwrap();
+    html_to_jsx(
+      &make_source("<div>"),
+      Some(JSXFactory::new().with_jsx("eval")),
+    )
+    .unwrap();
   }
 
   #[test]
@@ -185,7 +189,7 @@ mod test_rejections {
   fn no_malicious_jsx_2() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXFactory::new().jsx("evaluate")),
+      Some(JSXFactory::new().with_jsx("evaluate")),
     )
     .unwrap();
   }
@@ -195,7 +199,7 @@ mod test_rejections {
   fn no_malicious_jsxs() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXFactory::new().jsxs("globalThis.eval")),
+      Some(JSXFactory::new().with_jsxs("globalThis.eval")),
     )
     .unwrap();
   }
@@ -205,7 +209,7 @@ mod test_rejections {
   fn no_malicious_fragment() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXFactory::new().fragment("window.Function")),
+      Some(JSXFactory::new().with_fragment("window.Function")),
     )
     .unwrap();
   }

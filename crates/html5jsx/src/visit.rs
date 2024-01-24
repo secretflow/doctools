@@ -5,8 +5,8 @@ use swc_core::{atoms::Atom, ecma::ast::Expr};
 use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
-use swc_utils::{
-  jsx::factory::{JSXElement, JSXFactory},
+use swc_ecma_utils::{
+  jsx::factory::{JSXFactory, JSXTagName},
   span::with_span,
 };
 
@@ -135,7 +135,7 @@ impl Visit for DOMVisitor {
 impl DOMVisitor {
   pub fn new(factory: JSXFactory) -> Self {
     if factory
-      .names()
+      .get_names()
       .iter()
       .any(|name| name.contains("eval") || name.contains("Function"))
     {
@@ -183,7 +183,7 @@ impl DOMVisitor {
     let children = self.ancestors.pop().unwrap_or(vec![]);
     let body = self
       .factory
-      .create(&JSXElement::Fragment)
+      .create(&JSXTagName::Fragment)
       .children(children)
       .build()
       .into();

@@ -576,18 +576,18 @@ pub fn convert_attribute(attr: &Attribute) -> Option<Prop> {
   };
 
   macro_rules! coerce_value {
-        ( $name:ident, $($prop:literal << [$convert:ident, $default:literal]),* ) => {
-            match $name {
-                $( $prop => {
-                    match create_value(&attr.value, $convert, $default.into()) {
-                        Some(value) => return create_attribute(&Atom::from($name), value),
-                        None => return None,
-                    }
-                }, )*
-                _ => ()
-            }
-        };
-    }
+    ( $name:ident, $($prop:literal << [$convert:ident, $default:literal]),* ) => {
+      match $name {
+        $( $prop => {
+          match create_value(&attr.value, $convert, $default.into()) {
+            Some(value) => return create_attribute(&Atom::from($name), value),
+            None => return None,
+          }
+        }, )*
+        _ => ()
+      }
+    };
+  }
 
   // https://github.com/facebook/react/blob/v18.2.0/packages/react-dom/src/shared/DOMProperty.js
   coerce_value!(

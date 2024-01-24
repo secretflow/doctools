@@ -6,7 +6,7 @@ use swc_core::{
 
 use crate::span::with_span;
 
-use super::factory::{JSXBuilder, JSXElement, JSXFactory};
+use super::factory::{JSXBuilder, JSXFactory, JSXTagName};
 
 #[derive(Debug)]
 struct PropPath(Vec<String>);
@@ -55,7 +55,7 @@ pub struct DocumentBuilder {
 impl DocumentBuilder {
   pub fn element(
     &mut self,
-    name: &JSXElement,
+    name: &JSXTagName,
     props: Option<Box<Expr>>,
     span: Option<Span>,
   ) -> &mut Self {
@@ -97,7 +97,7 @@ impl DocumentBuilder {
       elems: children.0.into_iter().map(|x| Some(x.into())).collect(),
       span: Default::default(),
     }));
-    self.factory.set_prop(
+    self.factory.set_children(
       &mut parent.as_mut_call().unwrap(),
       &prop.as_strs()[..],
       children,
@@ -168,7 +168,7 @@ impl DocumentBuilder {
       } else {
         self
           .factory
-          .create(&JSXElement::Fragment)
+          .create(&JSXTagName::Fragment)
           .children(elements)
           .build()
           .into()
@@ -197,7 +197,7 @@ mod tests {
   use serde_json::json;
   use swc_core::{ecma::codegen, testing::DebugUsingDisplay};
 
-  use crate::{json::json_expr, jsx::factory::JSXElement, testing::print_one};
+  use crate::{json::json_expr, jsx::factory::JSXTagName, testing::print_one};
 
   use super::DocumentBuilder;
 
@@ -236,7 +236,7 @@ mod tests {
   fn test_fragment() {
     test(
       |builder| {
-        builder.element(&JSXElement::Fragment, None, None);
+        builder.element(&JSXTagName::Fragment, None, None);
       },
       "jsx(Fragment,{})",
       "jsx(Fragment,{})",

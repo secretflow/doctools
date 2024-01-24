@@ -11,7 +11,7 @@ indexmap = "2.1.0"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = "1.0.111"
 sha2 = "0.10.8"
-swc-utils = {version = "0.0.0", path = "../swc-utils"}
+swc-ecma-utils = {version = "0.0.0", path = "../swc-ecma-utils"}
 tracing = "0.1.40"
 
 [dependencies.swc_core]
@@ -19,14 +19,11 @@ features = [
   "ecma_ast",
   "ecma_utils",
   "ecma_visit",
-  "trace_macro",
 ]
 version = "0.88"
 
 [dev-dependencies]
 ansi_term = "0.12.1"
-html5jsx = {version = "0.0.0", path = "../html5jsx"}
-tracing-subscriber = "0.3.18"
 
 [dev-dependencies.swc_core]
 features = [

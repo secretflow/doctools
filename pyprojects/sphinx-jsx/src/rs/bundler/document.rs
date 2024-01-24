@@ -6,11 +6,11 @@ use pyo3::{
 use pyo3_utils::raise;
 use swc_core::common::{sync::Lrc, FileName, SourceFile};
 
-use swc_utils::{
+use swc_ecma_utils::{
   json::json_expr,
   jsx::{
     builder::{DocumentBuilder, JSXDocument},
-    factory::{JSXElement, JSXFactory},
+    factory::{JSXFactory, JSXTagName},
   },
 };
 
@@ -66,7 +66,7 @@ impl SphinxDocument {
     props: Option<&str>,
     position: Option<SourcePosition>,
   ) -> PyResult<()> {
-    let element = JSXElement::Ident(name.into());
+    let element = JSXTagName::Ident(name.into());
 
     let props = match props {
       None => None,

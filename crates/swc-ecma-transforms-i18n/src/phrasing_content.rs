@@ -8,7 +8,10 @@ use swc_core::{
   },
 };
 
-use swc_utils::jsx::factory::{JSXElement, JSXFactory};
+use swc_ecma_utils::{
+  children_or_pass,
+  jsx::factory::{JSXFactory, JSXTagName},
+};
 
 use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 
@@ -44,11 +47,9 @@ impl Visit for PhrasingContentPreflight {
   }
 
   fn visit_key_value_prop(&mut self, prop: &KeyValueProp) {
-    if !JSXFactory::prop_is_children(prop) {
-      return;
-    }
+    let children = children_or_pass!(prop);
 
-    self.is_translatable = match &*prop.value {
+    self.is_translatable = match &children {
       Expr::Array(ArrayLit { ref elems, .. }) => elems.iter().any(|expr| match expr {
         Some(ExprOrSpread { expr, .. }) => match &**expr {
           Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(&value),
@@ -89,11 +90,9 @@ impl VisitMut for PhrasingContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_key_value_prop(&mut self, prop: &mut KeyValueProp) {
-    if !JSXFactory::prop_is_children(prop) {
-      return;
-    }
+    let children = children_or_pass!(take prop);
 
-    let children = match *prop.value.take() {
+    let children = match children {
       Expr::Array(ArrayLit { mut elems, .. }) => elems
         .iter_mut()
         .filter_map(|expr| match expr {
@@ -114,9 +113,9 @@ impl VisitMut for PhrasingContentCollector {
         Expr::Call(mut call) => match self.factory.call_is_jsx(&call) {
           Some(elem) => {
             let name = match elem {
-              JSXElement::Fragment => None,
-              JSXElement::Ident(name) => Some(name),
-              JSXElement::Intrinsic(name) => Some(name),
+              JSXTagName::Fragment => None,
+              JSXTagName::Ident(name) => Some(name),
+              JSXTagName::Intrinsic(name) => Some(name),
             };
             let name = self.message.enter(name);
             call.visit_mut_children_with(self);

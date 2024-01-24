@@ -5,15 +5,46 @@ use swc_core::{
   common::{sync::Lrc, FileName, SourceMap},
   ecma::{
     ast::{
-      BlockStmt, DefaultDecl, ExportDefaultDecl, FnExpr, Function, Module, ModuleItem, ReturnStmt,
-      Stmt,
+      BlockStmt, DefaultDecl, ExportDefaultDecl, FnExpr, Function, Ident, ImportDecl,
+      ImportNamedSpecifier, ImportSpecifier, Module, ModuleItem, ReturnStmt, Stmt, Str,
     },
     codegen::{text_writer::JsWriter, Emitter},
   },
 };
 
 use html5jsx::html_to_jsx;
-use swc_utils::jsx::factory::JSXFactory;
+use swc_ecma_utils::jsx::factory::JSXFactory;
+
+pub fn import_from(factory: &JSXFactory, src: &str) -> ImportDecl {
+  let [jsx, jsxs, fragment] = factory.get_names();
+  ImportDecl {
+    specifiers: vec![
+      ImportSpecifier::Named(ImportNamedSpecifier {
+        local: Ident::from(jsx),
+        imported: None,
+        is_type_only: false,
+        span: Default::default(),
+      }),
+      ImportSpecifier::Named(ImportNamedSpecifier {
+        local: Ident::from(jsxs),
+        imported: None,
+        is_type_only: false,
+        span: Default::default(),
+      }),
+      ImportSpecifier::Named(ImportNamedSpecifier {
+        local: Ident::from(fragment),
+        imported: None,
+        is_type_only: false,
+        span: Default::default(),
+      }),
+    ],
+    src: Box::from(Str::from(src)),
+    type_only: false,
+    with: None,
+    span: Default::default(),
+    phase: Default::default(),
+  }
+}
 
 fn main() {
   // read HTML from stdin
@@ -68,7 +99,7 @@ fn main() {
   // build
   let module = Module {
     body: vec![
-      ModuleItem::ModuleDecl(jsx.clone().import_from("react/jsx-runtime").into()),
+      ModuleItem::ModuleDecl(import_from(&jsx, "react/jsx-runtime").into()),
       ModuleItem::ModuleDecl(
         ExportDefaultDecl {
           decl: DefaultDecl::Fn(main.into()),

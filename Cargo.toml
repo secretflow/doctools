@@ -8,9 +8,10 @@ members = [
   "crates/playground/serde-jsx",
   "crates/pyo3-build-utils",
   "crates/pyo3-utils",
-  "crates/swc-ecma-lint-undefined-bindings",
+  "crates/swc-ecma-lints",
   "crates/swc-ecma-transforms-i18n",
-  "crates/swc-utils",
+  "crates/swc-ecma-transforms-sphinx",
+  "crates/swc-ecma-utils",
   "packages/swc-plugin-esm-serve",
   "pyprojects/sphinx-jsx",
 ]

@@ -2,11 +2,7 @@ use swc_core::{
   common::{util::take::Take as _, Spanned as _},
   ecma::ast::{CallExpr, Expr, Lit, Tpl},
 };
-use swc_utils::{
-  ast::{mut_call_by_path, PropVisitorError},
-  jsx::factory::JSXFactory,
-  span::with_span,
-};
+use swc_ecma_utils::{ast::PropLocatorError, jsx::factory::JSXFactory, span::with_span};
 
 use crate::message::{Message, MessageProps};
 
@@ -14,16 +10,11 @@ pub fn translate_attribute<'a>(
   factory: &JSXFactory,
   gettext: &'a str,
   call: &mut CallExpr,
-  path: &[Lit],
+  path: &[&str],
 ) -> Option<Message> {
-  let path = [
-    // argument 1, which is the props object
-    &[Lit::from(1)],
-    path,
-  ]
-  .concat();
+  let mut extracted: Option<Message> = None;
 
-  let result = mut_call_by_path(call, &path[..], |source| {
+  let result = factory.set_prop_with(call, path, &mut |source| {
     let expr = *source.take();
     match expr {
       Expr::Lit(Lit::Str(lit)) => {
@@ -31,7 +22,7 @@ pub fn translate_attribute<'a>(
         message.raw(lit.value.as_str(), lit.span());
         let (message, result) = message.make_i18n(factory, gettext);
         *source = result;
-        Some(message)
+        extracted.replace(message);
       }
       Expr::Tpl(Tpl {
         quasis,
@@ -58,18 +49,17 @@ pub fn translate_attribute<'a>(
         }
         let (message, result) = message.make_i18n(factory, gettext);
         *source = with_span(Some(span))(result);
-        Some(message)
+        extracted.replace(message);
       }
       _ => {
         *source = expr.into();
-        None
       }
     }
   });
 
   match result {
-    Ok(message) => message,
-    Err(PropVisitorError::NotFound) => None,
+    Ok(_) => extracted,
+    Err(PropLocatorError::NotFound) => None,
     _ => unreachable!("{:?}", result),
   }
 }
