@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import timeit
 from pathlib import Path
 from typing import Iterator, Optional, Set
 
@@ -81,7 +82,7 @@ class SphinxJSXBuilder(Builder):
             outdir=Path(self.outdir),
         )
 
-        self.bundler.build(options)
+        print(timeit.Timer(lambda: self.bundler.build(options)).timeit(1))
 
         with progress_message(__("dumping object inventory")):
             InventoryFile.dump(

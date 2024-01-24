@@ -197,7 +197,7 @@ mod tests {
   use serde_json::json;
   use swc_core::{ecma::codegen, testing::DebugUsingDisplay};
 
-  use crate::{json::json_expr, jsx::factory::JSXTagName, testing::print_one};
+  use crate::{ast::json_to_expr, jsx::factory::JSXTagName, testing::print_one};
 
   use super::DocumentBuilder;
 
@@ -288,7 +288,7 @@ mod tests {
         builder
           .element(
             &"a".into(),
-            Some(json_expr(
+            Some(json_to_expr(
               json!({"href": "https://example.com", "title": "Example"}),
             )),
             None,
@@ -315,7 +315,7 @@ mod tests {
           .exit()
           .element(
             &"link".into(),
-            Some(json_expr(
+            Some(json_to_expr(
               json!({"rel": "preconnect", "href": "https://rsms.me/"}),
             )),
             None,

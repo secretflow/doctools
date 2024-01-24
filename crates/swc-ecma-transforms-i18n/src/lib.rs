@@ -261,7 +261,7 @@ impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let element = jsx_or_pass!(self, self.jsx, mut call);
+    let (element, _) = jsx_or_pass!(self, self.jsx, mut call);
 
     if matches!(element, JSXTagName::Intrinsic(_)) {
       [

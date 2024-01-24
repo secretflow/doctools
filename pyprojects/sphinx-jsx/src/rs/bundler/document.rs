@@ -7,7 +7,7 @@ use pyo3_utils::raise;
 use swc_core::common::{sync::Lrc, FileName, SourceFile};
 
 use swc_ecma_utils::{
-  json::json_expr,
+  ast::json_to_expr,
   jsx::{
     builder::{DocumentBuilder, JSXDocument},
     factory::{JSXFactory, JSXTagName},
@@ -70,7 +70,7 @@ impl SphinxDocument {
 
     let props = match props {
       None => None,
-      Some(props) => Some(json_expr(
+      Some(props) => Some(json_to_expr(
         serde_json::from_str(props)
           .context("failed to parse props as JSON")
           .map_err(raise::<PyValueError, _>)?,

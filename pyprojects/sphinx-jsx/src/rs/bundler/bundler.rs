@@ -1,10 +1,4 @@
-use std::{
-  collections::HashSet,
-  fs,
-  io::Write as _,
-  option,
-  path::{Path, PathBuf},
-};
+use std::{collections::HashSet, fs, io::Write as _, path::PathBuf};
 
 use anyhow::Context;
 use base64::prelude::{Engine, BASE64_STANDARD};
@@ -16,20 +10,17 @@ use pyo3::{
 use relative_path::RelativePathBuf;
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{
-    source_map::{DefaultSourceMapGenConfig, SourceMapGenConfig},
-    sync::Lrc,
-    FileName, SourceMap,
+  common::{source_map::DefaultSourceMapGenConfig, sync::Lrc, FileName, SourceMap},
+  ecma::{
+    codegen::{text_writer::JsWriter, Emitter, Node as _},
+    visit::VisitMutWith,
   },
-  ecma::codegen::{text_writer::JsWriter, Emitter, Node as _},
 };
 
 use pyo3_utils::raise;
 use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
-use swc_ecma_utils::{
-  jsx::{builder::JSXDocument, factory::JSXFactory},
-  testing::print_one,
-};
+use swc_ecma_transforms_sphinx::built_in_props::built_in_props;
+use swc_ecma_utils::jsx::{builder::JSXDocument, factory::JSXFactory};
 
 use super::{document::SphinxDocument, symbols::WellKnownSymbols};
 
@@ -134,7 +125,7 @@ impl SphinxBundler {
 
     let mut unsupported_components = HashSet::new();
 
-    for (docname, document) in self.pages.drain(..) {
+    for (docname, mut document) in self.pages.drain(..) {
       unsupported_components.extend(undefined_bindings.lint(&document.body));
 
       let mut code_buffer = vec![];
@@ -154,6 +145,15 @@ impl SphinxBundler {
         comments: None,
         wr: Box::new(writer),
       };
+
+      let factory = JSXFactory::new()
+        .with_jsx(&self.symbols.jsx)
+        .with_jsxs(&self.symbols.jsxs)
+        .with_fragment(&self.symbols.fragment);
+
+      document
+        .body
+        .visit_mut_children_with(&mut built_in_props(&factory));
 
       document
         .body

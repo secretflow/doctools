@@ -9,7 +9,7 @@ use swc_core::{
 };
 
 use crate::{
-  ast::{PropLocator, PropLocatorResult},
+  ast::{json_to_expr, PropMutator, PropMutatorResult},
   jsx_or_pass,
   span::with_span,
 };
@@ -99,6 +99,182 @@ impl JSXFactory {
       arg1: None,
       props: vec![],
       children: vec![],
+    }
+  }
+}
+
+impl JSXFactory {
+  pub fn call_is_jsx(&self, call: &CallExpr) -> Option<JSXTagName> {
+    match &call.callee {
+      Callee::Expr(callee) => match &**callee {
+        Expr::Ident(Ident { sym: caller, .. }) => {
+          if caller == &self.sym_jsx || caller == &self.sym_jsxs {
+            match call.args.get(0) {
+              Some(ExprOrSpread { expr, .. }) => match &**expr {
+                Expr::Lit(Lit::Str(Str { value, .. })) => {
+                  Some(JSXTagName::Intrinsic(value.as_str().into()))
+                }
+                Expr::Ident(Ident { sym, .. }) => {
+                  if sym.as_str() == self.sym_fragment.as_str() {
+                    Some(JSXTagName::Fragment)
+                  } else {
+                    Some(JSXTagName::Ident(sym.as_str().into()))
+                  }
+                }
+                _ => None,
+              },
+              _ => None,
+            }
+          } else {
+            None
+          }
+        }
+        _ => None,
+      },
+      _ => None,
+    }
+  }
+
+  pub fn expr_is_jsx(&self, expr: &Box<Expr>) -> Option<JSXTagName> {
+    match &**expr {
+      Expr::Call(call) => self.call_is_jsx(call),
+      _ => None,
+    }
+  }
+
+  pub fn set_prop_with<F>(
+    &self,
+    call: &mut CallExpr,
+    path: &[&str],
+    mutator: &mut F,
+  ) -> PropMutatorResult
+  where
+    F: FnMut(&mut Box<Expr>),
+  {
+    jsx_or_pass!(self, call, unreachable);
+
+    let props = call
+      .args
+      .get_mut(1)
+      .and_then(|a| Some(&mut a.expr))
+      .expect("expected props in argument");
+
+    PropMutator::mut_with(props, path, mutator, false)
+  }
+
+  pub fn set_children(&self, call: &mut CallExpr, path: &[&str], mut value: Box<Expr>) {
+    jsx_or_pass!(self, call, ());
+
+    let props = call
+      .args
+      .get_mut(1)
+      .and_then(|a| Some(&mut a.expr))
+      .expect("expected props in argument");
+
+    let (mut children, count) = match *value {
+      Expr::Array(ArrayLit { ref mut elems, .. }) => {
+        if elems.len() > 1 {
+          match path {
+            ["children"] => {
+              let count = elems.len();
+              (value, count)
+            }
+            _ => (
+              self
+                .create(&JSXTagName::Fragment)
+                .children(
+                  elems
+                    .into_iter()
+                    .filter_map(|x| match x.as_mut() {
+                      None => None,
+                      Some(item) => Some(item.expr.take()),
+                    })
+                    .collect(),
+                )
+                .build()
+                .into(),
+              1,
+            ),
+          }
+        } else if elems.len() == 1 {
+          match elems.last_mut().unwrap() {
+            Some(ref mut expr) => {
+              if expr.spread.is_some() {
+                (value, 2)
+              } else {
+                (expr.expr.take(), 1)
+              }
+            }
+            None => unreachable!(),
+          }
+        } else {
+          (
+            Expr::Lit(Lit::Null(Null {
+              span: Default::default(),
+            }))
+            .into(),
+            1,
+          )
+        }
+      }
+      _ => (value, 1),
+    };
+
+    let func = call
+      .callee
+      .as_mut_expr()
+      .and_then(|e| e.as_mut_ident())
+      .expect("expected jsx or jsxs");
+
+    match (path, count) {
+      (["children"], 0 | 1) => func.sym = self.sym_jsx.as_str().into(),
+      (["children"], _) => func.sym = self.sym_jsxs.as_str().into(),
+      _ => {}
+    }
+
+    PropMutator::mut_with(
+      props,
+      path,
+      &mut |expr| *expr = children.take().into(),
+      true,
+    )
+    .unwrap();
+  }
+
+  pub fn replace_props<S>(&self, call: &mut CallExpr, value: S) -> Result<(), serde_json::Error>
+  where
+    S: Serialize,
+  {
+    let (_, props) = jsx_or_pass!(self, mut call, unreachable);
+
+    let mut children: Option<Box<Expr>> = None;
+
+    PropMutator::mut_with(
+      props,
+      &["children"],
+      &mut |expr| {
+        children.replace(expr.take());
+      },
+      false,
+    )
+    .ok();
+
+    *props = *json_to_expr(serde_json::to_value(value)?);
+
+    if let Some(children) = children {
+      self.set_children(call, &["children"], children);
+    }
+
+    Ok(())
+  }
+}
+
+impl Default for JSXFactory {
+  fn default() -> Self {
+    Self {
+      sym_fragment: "Fragment".into(),
+      sym_jsx: "jsx".into(),
+      sym_jsxs: "jsxs".into(),
     }
   }
 }
@@ -216,155 +392,6 @@ impl JSXBuilder<'_> {
   }
 }
 
-impl JSXFactory {
-  pub fn call_is_jsx(&self, call: &CallExpr) -> Option<JSXTagName> {
-    match &call.callee {
-      Callee::Expr(callee) => match &**callee {
-        Expr::Ident(Ident { sym: caller, .. }) => {
-          if caller == &self.sym_jsx || caller == &self.sym_jsxs {
-            match call.args.get(0) {
-              Some(ExprOrSpread { expr, .. }) => match &**expr {
-                Expr::Lit(Lit::Str(Str { value, .. })) => {
-                  Some(JSXTagName::Intrinsic(value.as_str().into()))
-                }
-                Expr::Ident(Ident { sym, .. }) => {
-                  if sym.as_str() == self.sym_fragment.as_str() {
-                    Some(JSXTagName::Fragment)
-                  } else {
-                    Some(JSXTagName::Ident(sym.as_str().into()))
-                  }
-                }
-                _ => None,
-              },
-              _ => None,
-            }
-          } else {
-            None
-          }
-        }
-        _ => None,
-      },
-      _ => None,
-    }
-  }
-
-  pub fn expr_is_jsx(&self, expr: &Box<Expr>) -> Option<JSXTagName> {
-    match &**expr {
-      Expr::Call(call) => self.call_is_jsx(call),
-      _ => None,
-    }
-  }
-
-  pub fn set_prop_with<F>(
-    &self,
-    call: &mut CallExpr,
-    path: &[&str],
-    mutator: &mut F,
-  ) -> PropLocatorResult
-  where
-    F: FnMut(&mut Box<Expr>),
-  {
-    jsx_or_pass!(self, call, unreachable);
-
-    let props = call
-      .args
-      .get_mut(1)
-      .and_then(|a| Some(&mut a.expr))
-      .expect("expected props in argument");
-
-    PropLocator::mut_with(props, path, mutator, false)
-  }
-
-  pub fn set_children(&self, call: &mut CallExpr, path: &[&str], mut value: Box<Expr>) {
-    jsx_or_pass!(self, call);
-
-    let props = call
-      .args
-      .get_mut(1)
-      .and_then(|a| Some(&mut a.expr))
-      .expect("expected props in argument");
-
-    let (mut children, count) = match *value {
-      Expr::Array(ArrayLit { ref mut elems, .. }) => {
-        if elems.len() > 1 {
-          match path {
-            ["children"] => {
-              let count = elems.len();
-              (value, count)
-            }
-            _ => (
-              self
-                .create(&JSXTagName::Fragment)
-                .children(
-                  elems
-                    .into_iter()
-                    .filter_map(|x| match x.as_mut() {
-                      None => None,
-                      Some(item) => Some(item.expr.take()),
-                    })
-                    .collect(),
-                )
-                .build()
-                .into(),
-              1,
-            ),
-          }
-        } else if elems.len() == 1 {
-          match elems.last_mut().unwrap() {
-            Some(ref mut expr) => {
-              if expr.spread.is_some() {
-                (value, 2)
-              } else {
-                (expr.expr.take(), 1)
-              }
-            }
-            None => unreachable!(),
-          }
-        } else {
-          (
-            Expr::Lit(Lit::Null(Null {
-              span: Default::default(),
-            }))
-            .into(),
-            1,
-          )
-        }
-      }
-      _ => (value, 1),
-    };
-
-    let func = call
-      .callee
-      .as_mut_expr()
-      .and_then(|e| e.as_mut_ident())
-      .expect("expected jsx or jsxs");
-
-    match (path, count) {
-      (["children"], 0 | 1) => func.sym = self.sym_jsx.as_str().into(),
-      (["children"], _) => func.sym = self.sym_jsxs.as_str().into(),
-      _ => {}
-    }
-
-    PropLocator::mut_with(
-      props,
-      path,
-      &mut |expr| *expr = children.take().into(),
-      true,
-    )
-    .unwrap();
-  }
-}
-
-impl Default for JSXFactory {
-  fn default() -> Self {
-    Self {
-      sym_fragment: "Fragment".into(),
-      sym_jsx: "jsx".into(),
-      sym_jsxs: "jsxs".into(),
-    }
-  }
-}
-
 #[macro_export]
 macro_rules! props {
   ( $($key:literal = $value:expr),* ) => {
@@ -403,36 +430,50 @@ macro_rules! object_lit {
 
 #[macro_export]
 macro_rules! jsx_or_pass {
-  ($factory:expr, $call:expr) => {
-    match $factory.call_is_jsx($call) {
-      Some(elem) => elem,
-      None => return,
-    }
-  };
   ($factory:expr, $call:expr, unreachable) => {
     match $factory.call_is_jsx($call) {
-      Some(elem) => elem,
+      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
       None => unreachable!(),
     }
   };
-  ($visitor:ident, $factory:expr, mut $call:expr) => {
+  ($factory:expr, mut $call:expr, unreachable) => {
     match $factory.call_is_jsx($call) {
-      Some(elem) => elem,
-      None => {
-        $call.visit_mut_children_with($visitor);
-        return;
-      }
+      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
+      None => unreachable!(),
     }
   };
-  ($visitor:ident, $factory:expr, $call:expr) => {
+  ($factory:expr, $call:expr, $ret:expr) => {
     match $factory.call_is_jsx($call) {
-      Some(elem) => elem,
+      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
+      None => return $ret,
+    }
+  };
+  ($factory:expr, mut $call:expr, $ret:expr) => {
+    match $factory.call_is_jsx($call) {
+      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
+      None => return $ret,
+    }
+  };
+  ($visitor:ident, $factory:expr, $call:expr) => {{
+    use swc_core::ecma::visit::VisitWith;
+    match $factory.call_is_jsx($call) {
+      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
       None => {
         $call.visit_children_with($visitor);
         return;
       }
     }
-  };
+  }};
+  ($visitor:ident, $factory:expr, mut $call:expr) => {{
+    use swc_core::ecma::visit::VisitMutWith;
+    match $factory.call_is_jsx($call) {
+      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
+      None => {
+        $call.visit_mut_children_with($visitor);
+        return;
+      }
+    }
+  }};
 }
 
 #[macro_export]

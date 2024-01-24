@@ -2,30 +2,191 @@ use swc_core::{
   atoms::Atom,
   ecma::{
     ast::{
-      ArrayLit, CallExpr, Expr, ExprOrSpread, Ident, KeyValueProp, Number, ObjectLit, Prop,
-      PropName, PropOrSpread, Str,
+      ArrayLit, Bool, CallExpr, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, Null, Number,
+      ObjectLit, Prop, PropName, PropOrSpread, Regex, Str,
     },
     visit::{VisitMut, VisitMutWith},
   },
 };
 
-use crate::json::null;
+pub fn json_to_expr(value: serde_json::Value) -> Box<Expr> {
+  use serde_json::Value::*;
+  match value {
+    Null => null().into(),
+    Bool(value) => value.into(),
+    String(value) => value.into(),
+    Number(number) => number
+      .as_f64()
+      .and_then(|f| Some(Expr::from(f)))
+      .unwrap_or_else(|| Expr::from(Ident::from("NaN")))
+      .into(),
+    Array(elems) => ArrayLit {
+      elems: elems
+        .into_iter()
+        .map(|v| Some(json_to_expr(v).into()))
+        .collect(),
+      span: Default::default(),
+    }
+    .into(),
+    Object(props) => ObjectLit {
+      props: props
+        .into_iter()
+        .map(|(k, v)| {
+          Prop::from(KeyValueProp {
+            key: PropName::Str(k.into()),
+            value: json_to_expr(v),
+          })
+          .into()
+        })
+        .collect(),
+      span: Default::default(),
+    }
+    .into(),
+  }
+}
+
+pub(crate) fn null() -> Null {
+  Null {
+    span: Default::default(),
+  }
+}
+
+pub enum JSONLossy<'ast> {
+  _Expr(&'ast Expr),
+  _Null,
+  _String(&'ast Str),
+  _Number(&'ast Number),
+  _Boolean(&'ast Bool),
+  _Array(&'ast ArrayLit),
+  _Object(&'ast ObjectLit),
+  _Call(&'ast CallExpr),
+}
+
+impl<'ast> serde::ser::Serialize for JSONLossy<'ast> {
+  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+  where
+    S: serde::ser::Serializer,
+  {
+    use serde::{ser::SerializeMap as _, ser::SerializeSeq as _};
+    use JSONLossy::*;
+
+    match *self {
+      _Expr(Expr::Array(array)) | _Array(array) => {
+        let elems = array
+          .elems
+          .iter()
+          .filter_map(|e| match *e {
+            Some(ExprOrSpread { ref expr, .. }) => Some(_Expr(&**expr)),
+            None => None,
+          })
+          .collect::<Vec<_>>();
+        let mut seq = serializer.serialize_seq(Some(elems.len()))?;
+        for elem in elems {
+          seq.serialize_element(&elem)?
+        }
+        seq.end()
+      }
+
+      _Expr(Expr::Object(object)) | _Object(object) => {
+        let props = object
+          .props
+          .iter()
+          .filter_map(|prop| match prop {
+            PropOrSpread::Prop(prop) => match &**prop {
+              Prop::KeyValue(KeyValueProp { key, value, .. }) => match key {
+                PropName::Ident(Ident { sym, .. }) => Some((sym, &**value)),
+                PropName::Str(Str { value: key, .. }) => Some((key, &**value)),
+                _ => None,
+              },
+              _ => None,
+            },
+            _ => None,
+          })
+          .collect::<Vec<_>>();
+        let mut map = serializer.serialize_map(Some(props.len()))?;
+        for (key, value) in props {
+          map.serialize_entry(key, &_Expr(value))?
+        }
+        map.end()
+      }
+
+      _Expr(Expr::Call(call)) | _Call(call) => {
+        let mut seq = serializer.serialize_seq(Some(call.args.len()))?;
+        for ExprOrSpread { expr, .. } in &call.args {
+          seq.serialize_element(&_Expr(&*expr))?
+        }
+        seq.end()
+      }
+
+      _Expr(Expr::Lit(Lit::Str(Str { value, .. }))) | _String(Str { value, .. }) => {
+        serializer.serialize_str(&**value)
+      }
+
+      _Expr(Expr::Lit(Lit::Num(Number { value, .. }))) | _Number(Number { value, .. }) => {
+        if value.fract() == 0.0 {
+          serializer.serialize_i64(value.trunc() as i64)
+        } else {
+          serializer.serialize_f64(*value)
+        }
+      }
+
+      _Expr(Expr::Lit(Lit::Bool(Bool { value, .. }))) | _Boolean(Bool { value, .. }) => {
+        serializer.serialize_bool(*value)
+      }
+
+      _Expr(Expr::Lit(Lit::Null(_))) | _Null => serializer.serialize_none(),
+
+      _Expr(Expr::Lit(Lit::Regex(Regex { exp, .. }))) => serializer.serialize_str(&**exp),
+
+      _Expr(Expr::Lit(Lit::BigInt(bigint))) => bigint.value.serialize(serializer),
+
+      _ => serializer.serialize_none(),
+    }
+  }
+}
+
+macro_rules! into_json_lossy {
+  ($ty:ty, $variant:ident) => {
+    impl<'ast> Into<JSONLossy<'ast>> for &'ast $ty {
+      fn into(self) -> JSONLossy<'ast> {
+        JSONLossy::$variant(self)
+      }
+    }
+  };
+}
+
+into_json_lossy!(Expr, _Expr);
+into_json_lossy!(Str, _String);
+into_json_lossy!(Number, _Number);
+into_json_lossy!(Bool, _Boolean);
+into_json_lossy!(ArrayLit, _Array);
+into_json_lossy!(ObjectLit, _Object);
+into_json_lossy!(CallExpr, _Call);
+
+pub fn expr_to_json_lossy<'ast, E, T>(from: E) -> Result<T, serde_json::Error>
+where
+  E: Into<JSONLossy<'ast>>,
+  T: serde::de::DeserializeOwned,
+{
+  let intermediate = serde_json::to_string(&from.into())?;
+  serde_json::from_str(&intermediate)
+}
 
 #[derive(Debug)]
 #[must_use]
-pub enum PropLocatorError {
+pub enum PropMutatorError {
   NotFound,
   InvalidPath(String),
 }
 
-pub type PropLocatorResult = Result<(), PropLocatorError>;
+pub type PropMutatorResult = Result<(), PropMutatorError>;
 
-pub struct PropLocator<'callback> {
+pub struct PropMutator<'callback> {
   path: Vec<Atom>,
   set_intermediate_path: bool,
   idx: usize,
   callback: &'callback mut dyn FnMut(&mut Box<Expr>),
-  result: PropLocatorResult,
+  result: PropMutatorResult,
 }
 
 macro_rules! item_getter_error {
@@ -39,7 +200,7 @@ macro_rules! item_getter_error {
   }};
 }
 
-impl PropLocator<'_> {
+impl PropMutator<'_> {
   fn traverse<N: VisitMutWith<Self>>(&mut self, expr: &mut N) {
     self.idx += 1;
     expr.visit_mut_with(self);
@@ -57,7 +218,7 @@ impl PropLocator<'_> {
       Ok(idx) => idx,
       Err(_) => item_getter_error!(
         self,
-        PropLocatorError::InvalidPath,
+        PropMutatorError::InvalidPath,
         "invalid array index {}",
         subscript
       ),
@@ -77,7 +238,7 @@ impl PropLocator<'_> {
           },
         })
       } else {
-        item_getter_error!(self, PropLocatorError::NotFound)
+        item_getter_error!(self, PropMutatorError::NotFound)
       }
     };
 
@@ -110,7 +271,7 @@ impl PropLocator<'_> {
               *next = ensure_object();
               self.traverse(next.as_mut().unwrap().expr.as_mut());
             } else {
-              item_getter_error!(self, PropLocatorError::NotFound)
+              item_getter_error!(self, PropMutatorError::NotFound)
             }
           }
         },
@@ -120,7 +281,7 @@ impl PropLocator<'_> {
             elems[index] = ensure_object();
             self.traverse(elems[index].as_mut().unwrap().expr.as_mut());
           } else {
-            item_getter_error!(self, PropLocatorError::NotFound)
+            item_getter_error!(self, PropMutatorError::NotFound)
           }
         }
       };
@@ -161,7 +322,7 @@ impl PropLocator<'_> {
               .into(),
             )
           } else {
-            item_getter_error!(self, PropLocatorError::NotFound)
+            item_getter_error!(self, PropMutatorError::NotFound)
           }
         }
       }
@@ -195,7 +356,7 @@ impl PropLocator<'_> {
                 .as_mut(),
             );
           } else {
-            item_getter_error!(self, PropLocatorError::NotFound)
+            item_getter_error!(self, PropMutatorError::NotFound)
           }
         }
       }
@@ -203,7 +364,7 @@ impl PropLocator<'_> {
   }
 }
 
-impl VisitMut for PropLocator<'_> {
+impl VisitMut for PropMutator<'_> {
   fn visit_mut_array_lit(&mut self, array: &mut ArrayLit) {
     self.process_array_elems(&mut array.elems);
   }
@@ -228,27 +389,27 @@ impl VisitMut for PropLocator<'_> {
   }
 }
 
-impl PropLocator<'_> {
+impl PropMutator<'_> {
   pub fn mut_with<E, F>(
     ast: &mut E,
     path: &[&str],
     callback: &mut F,
     set_default: bool,
-  ) -> PropLocatorResult
+  ) -> PropMutatorResult
   where
-    E: for<'callback> VisitMutWith<PropLocator<'callback>>,
+    E: for<'callback> VisitMutWith<PropMutator<'callback>>,
     F: FnMut(&mut Box<Expr>),
   {
-    let mut visitor = PropLocator {
+    let mut visitor = PropMutator {
       path: path.iter().map(|p| (*p).into()).collect(),
       set_intermediate_path: set_default,
       idx: 0,
-      result: Err(PropLocatorError::NotFound),
+      result: Err(PropMutatorError::NotFound),
       callback,
     };
     ast.visit_mut_with(&mut visitor);
     match visitor.result {
-      Err(PropLocatorError::NotFound) => {
+      Err(PropMutatorError::NotFound) => {
         if set_default {
           Ok(())
         } else {
@@ -274,26 +435,95 @@ fn prop_is_named(key: &str) -> impl Fn(&PropOrSpread) -> bool + '_ {
 
 #[cfg(test)]
 mod tests {
+  use serde::Deserialize;
   use serde_json::json;
   use swc_core::{
     ecma::{
       ast::{CallExpr, Lit},
       codegen::Config,
+      parser::parse_file_as_expr,
     },
     testing::DebugUsingDisplay,
   };
 
-  use super::PropLocator;
-  use crate::{json::json_expr, testing::print_one};
+  use crate::{
+    ast::expr_to_json_lossy,
+    testing::{parse_one, print_one},
+  };
+
+  use super::{json_to_expr, PropMutator};
+
+  #[test]
+  fn test_json_expr() {
+    let value = json!({
+        "null": null,
+        "bool": true,
+        "number": 1,
+        "string": "string",
+        "array": [42, [{"object": true}]],
+    });
+    let code = print_one(
+      &json_to_expr(value),
+      None,
+      Some(Config::default().with_minify(true)),
+    );
+    assert_eq!(
+      DebugUsingDisplay(code.unwrap().as_str()),
+      DebugUsingDisplay(
+        r#"{"null":null,"bool":true,"number":1,"string":"string","array":[42,[{"object":true}]]}"#
+      )
+    );
+  }
+
+  #[test]
+  fn test_expr_json() {
+    #[derive(Deserialize, Debug, PartialEq, Eq)]
+    struct Test {
+      string: String,
+      number: i64,
+      boolean: bool,
+      #[serde(rename = "tuple")]
+      array: (i64, i64, i64, i64),
+      #[serde(default)]
+      optional: Option<String>,
+    }
+
+    let expr = parse_one(
+      r#"
+      {
+          string: "Lorem ipsum",
+          number: 128,
+          boolean: true,
+          tuple: [1, 2, 4, 8],
+      }
+      "#,
+      None,
+      parse_file_as_expr,
+    )
+    .unwrap();
+
+    let test: Test = expr_to_json_lossy(&*expr).unwrap();
+
+    assert_eq!(
+      test,
+      Test {
+        string: "Lorem ipsum".to_string(),
+        number: 128,
+        boolean: true,
+        array: (1, 2, 4, 8),
+        optional: None,
+      }
+    );
+  }
 
   #[test]
   fn test_set_object() {
-    let mut expr = json_expr(json!({}));
+    let mut expr = json_to_expr(json!({}));
 
-    PropLocator::mut_with(
+    PropMutator::mut_with(
       &mut expr,
       &["children"],
-      &mut |expr| *expr = json_expr(json!([])),
+      &mut |expr| *expr = json_to_expr(json!([])),
       true,
     )
     .unwrap();
@@ -307,7 +537,7 @@ mod tests {
 
   #[test]
   fn test_set_object_deeply() {
-    let mut expr = json_expr(json!({
+    let mut expr = json_to_expr(json!({
         "lorem": {
             "ipsum": {
                 "dolor": [
@@ -318,10 +548,10 @@ mod tests {
         }
     }));
 
-    PropLocator::mut_with(
+    PropMutator::mut_with(
       &mut expr,
       &["lorem", "ipsum", "dolor", "2"],
-      &mut |expr| *expr = json_expr(json!("consectetur adipiscing elit")),
+      &mut |expr| *expr = json_to_expr(json!("consectetur adipiscing elit")),
       true,
     )
     .unwrap();
@@ -485,7 +715,7 @@ mod tests {
         ).unwrap();
 
     assert_eq!(
-      PropLocator::mut_with(
+      PropMutator::mut_with(
         &mut call,
         &["1", "props", "href", "2",],
         &mut |expr| *expr =

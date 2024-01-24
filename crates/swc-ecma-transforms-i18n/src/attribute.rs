@@ -2,7 +2,7 @@ use swc_core::{
   common::{util::take::Take as _, Spanned as _},
   ecma::ast::{CallExpr, Expr, Lit, Tpl},
 };
-use swc_ecma_utils::{ast::PropLocatorError, jsx::factory::JSXFactory, span::with_span};
+use swc_ecma_utils::{ast::PropMutatorError, jsx::factory::JSXFactory, span::with_span};
 
 use crate::message::{Message, MessageProps};
 
@@ -59,7 +59,7 @@ pub fn translate_attribute<'a>(
 
   match result {
     Ok(_) => extracted,
-    Err(PropLocatorError::NotFound) => None,
+    Err(PropMutatorError::NotFound) => None,
     _ => unreachable!("{:?}", result),
   }
 }

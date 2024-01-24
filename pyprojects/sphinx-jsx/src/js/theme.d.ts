@@ -3,9 +3,9 @@ import type { Trans } from "@lingui/react";
 import type { Fragment, PropsWithChildren } from "react";
 
 type BuiltinProps = {
-  id?: string;
-  ids?: string;
-  className?: string;
+  id: string | null;
+  ids: string | null;
+  className: string | null;
 };
 
 type VoidElementProps = BuiltinProps;
