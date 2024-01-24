@@ -1,0 +1,11 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "swc-ecma-lint-undefined-bindings"
+publish = false
+version = "0.0.0"
+
+[dependencies]
+anyhow = "1.0.79"
+swc-utils = {version = "0.0.0", path = "../swc-utils"}
+swc_core = {version = "0.88.3", features = ["ecma_parser", "ecma_visit", "ecma_ast", "ecma_parser_typescript"]}

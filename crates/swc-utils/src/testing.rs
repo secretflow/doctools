@@ -1,10 +1,10 @@
 use swc_core::{
-  common::{input::StringInput, sync::Lrc, FileName, SourceMap},
+  common::{comments::Comments, sync::Lrc, FileName, SourceFile, SourceMap},
   ecma::{
     self,
     ast::EsVersion,
     codegen::{text_writer::JsWriter, Config, Emitter, Node},
-    parser::{lexer::Lexer, Parser, Syntax},
+    parser::Syntax,
   },
 };
 use swc_error_reporters::handler::try_with_handler;
@@ -33,23 +33,25 @@ pub fn parse_one<N, F>(
 ) -> Result<N, anyhow::Error>
 where
   N: Node,
-  F: FnMut(&mut Parser<Lexer<'_>>) -> Result<N, ecma::parser::error::Error>,
+  F: FnMut(
+    &SourceFile,
+    Syntax,
+    EsVersion,
+    Option<&dyn Comments>,
+    &mut Vec<ecma::parser::error::Error>,
+  ) -> Result<N, ecma::parser::error::Error>,
 {
   let sourcemap: Lrc<SourceMap> = Default::default();
   let source = sourcemap.new_source_file(FileName::Anon, source.to_string());
 
-  let lexer = Lexer::new(
-    syntax.unwrap_or_default(),
-    EsVersion::latest(),
-    StringInput::from(&*source),
-    None,
-  );
+  let syntax = syntax.unwrap_or_default();
+  let target = EsVersion::latest();
+  let mut errors: Vec<ecma::parser::error::Error> = vec![];
 
   try_with_handler(sourcemap.clone(), Default::default(), |reporter| {
-    let mut parser = Parser::new_from(lexer);
-    parse_fn(&mut parser)
+    parse_fn(&source, syntax, target, None, &mut errors)
       .and_then(|result| {
-        for err in parser.take_errors() {
+        for err in errors {
           err.into_diagnostic(&reporter).emit();
         }
         Ok(result)
@@ -63,12 +65,14 @@ where
 
 #[cfg(test)]
 mod tests {
+  use swc_core::ecma::parser::{parse_file_as_expr, parse_file_as_module};
+
   use super::{parse_one, print_one};
 
   #[test]
   fn test_parse_print_expr() {
     let source = "42";
-    let parsed = parse_one(source, None, |p| p.parse_expr()).unwrap();
+    let parsed = parse_one(source, None, parse_file_as_expr).unwrap();
     let output = print_one(&parsed, None, None).unwrap();
     assert_eq!(source, output);
   }
@@ -76,15 +80,22 @@ mod tests {
   #[test]
   fn test_parse_print_module() {
     let source = "export const foo = 42;";
-    let parsed = parse_one(source, None, |p| p.parse_module()).unwrap();
+    let parsed = parse_one(source, None, parse_file_as_module).unwrap();
     let output = print_one(&parsed, None, None).unwrap();
     assert_eq!(source.trim(), output.trim());
+  }
+
+  #[test]
+  #[should_panic(expected = "Unexpected eof")]
+  fn test_parse_recoverable_error() {
+    let source = "{";
+    let _ = parse_one(source, None, parse_file_as_expr).unwrap();
   }
 
   #[test]
   #[should_panic(expected = "Expected ';', '}' or <eof>")]
   fn test_parse_error() {
     let source = "a b";
-    let _ = parse_one(source, None, |p| p.parse_module()).unwrap();
+    let _ = parse_one(source, None, parse_file_as_module).unwrap();
   }
 }
