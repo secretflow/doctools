@@ -1,4 +1,4 @@
-jsx("p", {
+jsxs("p", {
     "children": jsx(Trans, {
         "id": "kgRMmJ1C3o2h4gbi01H57dY0xHgaIk7o2OTr2RHcrwc=",
         "message": "The quick <em>brown</em> fox <strong>jumps</strong> over the <a>lazy <span>dog</span></a>.",

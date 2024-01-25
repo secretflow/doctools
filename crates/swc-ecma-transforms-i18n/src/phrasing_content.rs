@@ -1,7 +1,7 @@
 use swc_core::{
   common::{util::take::Take as _, Spanned as _},
   ecma::{
-    ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, KeyValueProp, Lit, ObjectLit, Str},
+    ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, Str},
     visit::{
       noop_visit_mut_type, noop_visit_type, Visit, VisitMut, VisitMutWith as _, VisitWith as _,
     },
@@ -9,8 +9,9 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  children_or_pass,
+  ast::SelectNode,
   jsx::factory::{JSXFactory, JSXTagName},
+  jsx_or_pass,
 };
 
 use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
@@ -33,6 +34,7 @@ use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 /// [AST node taking][swc_core::common::util::take::Take]. This is much less ergonomic and
 /// more error-prone than just visiting the tree twice.
 pub struct PhrasingContentPreflight {
+  factory: JSXFactory,
   is_translatable: bool,
 }
 
@@ -43,33 +45,31 @@ impl Visit for PhrasingContentPreflight {
     if self.is_translatable {
       return;
     }
-    call.visit_children_with(self);
-  }
 
-  fn visit_key_value_prop(&mut self, prop: &KeyValueProp) {
-    let children = children_or_pass!(prop);
+    let (_, props) = jsx_or_pass!(self, self.factory, call);
+
+    let children = SelectNode::from_key(props, "children").get();
 
     self.is_translatable = match &children {
-      Expr::Array(ArrayLit { ref elems, .. }) => elems.iter().any(|expr| match expr {
+      Some(Expr::Array(ArrayLit { ref elems, .. })) => elems.iter().any(|expr| match expr {
         Some(ExprOrSpread { expr, .. }) => match &**expr {
           Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(&value),
           _ => false,
         },
         None => false,
       }),
-      Expr::Lit(Lit::Str(text)) => !is_empty_or_whitespace(&text.value),
+      Some(Expr::Lit(Lit::Str(text))) => !is_empty_or_whitespace(&text.value),
       _ => false,
     };
 
-    if !self.is_translatable {
-      prop.visit_children_with(self);
-    }
+    call.visit_children_with(self);
   }
 }
 
 impl PhrasingContentPreflight {
-  pub fn new() -> Self {
+  pub fn new(factory: JSXFactory) -> Self {
     Self {
+      factory,
       is_translatable: false,
     }
   }
@@ -89,8 +89,16 @@ pub struct PhrasingContentCollector {
 impl VisitMut for PhrasingContentCollector {
   noop_visit_mut_type!();
 
-  fn visit_mut_key_value_prop(&mut self, prop: &mut KeyValueProp) {
-    let children = children_or_pass!(take prop);
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    jsx_or_pass!(self, self.factory, mut call);
+
+    let children = match self
+      .factory
+      .take_prop(self.factory.as_mut_jsx_props(call).unwrap(), &["children"])
+    {
+      Some(children) => children,
+      None => return,
+    };
 
     let children = match children {
       Expr::Array(ArrayLit { mut elems, .. }) => elems
@@ -110,15 +118,15 @@ impl VisitMut for PhrasingContentCollector {
           Palpable(true) => (),
           Palpable(false) => (),
         },
-        Expr::Call(mut call) => match self.factory.call_is_jsx(&call) {
-          Some(elem) => {
+        Expr::Call(mut call) => match self.factory.as_jsx(&call) {
+          Some((elem, _)) => {
             let name = match elem {
               JSXTagName::Fragment => None,
               JSXTagName::Ident(name) => Some(name),
               JSXTagName::Intrinsic(name) => Some(name),
             };
             let name = self.message.enter(name);
-            call.visit_mut_children_with(self);
+            call.visit_mut_with(self);
             self.message.exit(name, Box::from(call.take()));
           }
           None => {
@@ -129,11 +137,9 @@ impl VisitMut for PhrasingContentCollector {
           self.message.interpolate(Box::from(expr));
         }
       });
-  }
 
-  fn visit_mut_object_lit(&mut self, object: &mut ObjectLit) {
-    object.visit_mut_children_with(self);
-    object.props = object
+    let props = self.factory.as_mut_jsx_props(call).unwrap();
+    props.props = props
       .props
       .drain(..)
       .filter(|prop| {

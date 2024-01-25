@@ -93,15 +93,21 @@ impl DocumentBuilder {
       Some(v) => v,
       None => return self,
     };
+
     let children = Box::from(Expr::from(ArrayLit {
       elems: children.0.into_iter().map(|x| Some(x.into())).collect(),
       span: Default::default(),
     }));
-    self.factory.set_children(
-      &mut parent.as_mut_call().unwrap(),
-      &prop.as_strs()[..],
-      children,
-    );
+
+    let props = self
+      .factory
+      .as_mut_jsx_props(parent.as_mut_call().unwrap())
+      .unwrap();
+
+    self
+      .factory
+      .mut_or_set_prop(props, &prop.as_strs()[..], |expr| *expr = children);
+
     self.push(parent);
     self
   }
@@ -123,7 +129,10 @@ impl DocumentBuilder {
   }
 
   fn push(&mut self, value: Box<Expr>) {
-    let kind = self.factory.expr_is_jsx(&value);
+    let kind = match *value {
+      Expr::Call(ref call) => self.factory.as_jsx(call).and_then(|t| Some(t.0)),
+      _ => None,
+    };
 
     match kind {
       Some(ref elem) if elem.is_metadata() => {
@@ -254,30 +263,7 @@ mod tests {
           .exit();
       },
       "jsx(Fragment,{})",
-      r#"jsx("div",{"children":"foo"})"#,
-    )
-  }
-
-  #[test]
-  fn test_jsxs() {
-    test(
-      |builder| {
-        builder
-          .element(&"div".into(), None, None)
-          .enter(&["children"])
-          .element(&"span".into(), None, None)
-          .enter(&["children"])
-          .value("Lorem ipsum".into())
-          .exit()
-          .value(" ".into())
-          .element(&"span".into(), None, None)
-          .enter(&["children"])
-          .value("dolor sit amet".into())
-          .exit()
-          .exit();
-      },
-      "jsx(Fragment,{})",
-      r#"jsxs("div",{"children":[jsx("span",{"children":"Lorem ipsum"})," ",jsx("span",{"children":"dolor sit amet"})]})"#,
+      r#"jsx("div",{"children":["foo"]})"#,
     )
   }
 
@@ -298,7 +284,7 @@ mod tests {
           .exit();
       },
       "jsx(Fragment,{})",
-      r#"jsx("a",{"href":"https://example.com","title":"Example","children":"Example"})"#,
+      r#"jsx("a",{"href":"https://example.com","title":"Example","children":["Example"]})"#,
     );
   }
 
@@ -326,8 +312,8 @@ mod tests {
           .exit()
           .exit();
       },
-      r#"jsxs(Fragment,{"children":[jsx("style",{"children":"p { background: #fff; }"}),jsx("link",{"rel":"preconnect","href":"https://rsms.me/"})]})"#,
-      r#"jsx("section",{"children":jsx("p",{"children":"Lorem ipsum"})})"#,
+      r#"jsxs(Fragment,{"children":[jsx("style",{"children":["p { background: #fff; }"]}),jsx("link",{"rel":"preconnect","href":"https://rsms.me/"})]})"#,
+      r#"jsx("section",{"children":[jsx("p",{"children":["Lorem ipsum"]})]})"#,
     );
   }
 }

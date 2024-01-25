@@ -3,16 +3,12 @@ use swc_core::{
   atoms::Atom,
   common::{util::take::Take, Span},
   ecma::ast::{
-    ArrayLit, CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, Null, ObjectLit,
-    Prop, PropName, PropOrSpread, Str,
+    ArrayLit, CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, ObjectLit, Prop,
+    PropName, PropOrSpread, Str,
   },
 };
 
-use crate::{
-  ast::{json_to_expr, PropMutator, PropMutatorResult},
-  jsx_or_pass,
-  span::with_span,
-};
+use crate::{ast::PropMutator, span::with_span};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 #[serde(tag = "type", content = "name")]
@@ -104,7 +100,7 @@ impl JSXFactory {
 }
 
 impl JSXFactory {
-  pub fn call_is_jsx(&self, call: &CallExpr) -> Option<JSXTagName> {
+  fn as_jsx_tag(&self, call: &CallExpr) -> Option<JSXTagName> {
     match &call.callee {
       Callee::Expr(callee) => match &**callee {
         Expr::Ident(Ident { sym: caller, .. }) => {
@@ -112,13 +108,13 @@ impl JSXFactory {
             match call.args.get(0) {
               Some(ExprOrSpread { expr, .. }) => match &**expr {
                 Expr::Lit(Lit::Str(Str { value, .. })) => {
-                  Some(JSXTagName::Intrinsic(value.as_str().into()))
+                  Some(JSXTagName::Intrinsic((&**value).into()))
                 }
                 Expr::Ident(Ident { sym, .. }) => {
-                  if sym.as_str() == self.sym_fragment.as_str() {
+                  if &**sym == &*self.sym_fragment {
                     Some(JSXTagName::Fragment)
                   } else {
-                    Some(JSXTagName::Ident(sym.as_str().into()))
+                    Some(JSXTagName::Ident((&**sym).into()))
                   }
                 }
                 _ => None,
@@ -135,137 +131,51 @@ impl JSXFactory {
     }
   }
 
-  pub fn expr_is_jsx(&self, expr: &Box<Expr>) -> Option<JSXTagName> {
-    match &**expr {
-      Expr::Call(call) => self.call_is_jsx(call),
+  pub fn as_jsx<'ast>(&self, call: &'ast CallExpr) -> Option<(JSXTagName, &'ast ObjectLit)> {
+    let tag_name = self.as_jsx_tag(call);
+
+    let props = call.args.get(1).and_then(|a| a.expr.as_object());
+
+    match (tag_name, props) {
+      (Some(tag_name), Some(props)) => Some((tag_name, props)),
       _ => None,
     }
   }
 
-  pub fn set_prop_with<F>(
+  pub fn as_mut_jsx_tag<'ast>(&self, call: &'ast mut CallExpr) -> Option<&'ast mut Expr> {
+    call.args.get_mut(0).and_then(|a| Some(&mut *a.expr))
+  }
+
+  pub fn as_mut_jsx_props<'ast>(&self, call: &'ast mut CallExpr) -> Option<&'ast mut ObjectLit> {
+    call.args.get_mut(1).and_then(|a| a.expr.as_mut_object())
+  }
+
+  pub fn mut_prop<'ast, F, T>(
     &self,
-    call: &mut CallExpr,
+    props: &'ast mut ObjectLit,
     path: &[&str],
-    mutator: &mut F,
-  ) -> PropMutatorResult
+    mutator: F,
+  ) -> Option<T>
   where
-    F: FnMut(&mut Box<Expr>),
+    F: FnOnce(&mut Box<Expr>) -> T + 'ast,
   {
-    jsx_or_pass!(self, call, unreachable);
-
-    let props = call
-      .args
-      .get_mut(1)
-      .and_then(|a| Some(&mut a.expr))
-      .expect("expected props in argument");
-
     PropMutator::mut_with(props, path, mutator, false)
   }
 
-  pub fn set_children(&self, call: &mut CallExpr, path: &[&str], mut value: Box<Expr>) {
-    jsx_or_pass!(self, call, ());
-
-    let props = call
-      .args
-      .get_mut(1)
-      .and_then(|a| Some(&mut a.expr))
-      .expect("expected props in argument");
-
-    let (mut children, count) = match *value {
-      Expr::Array(ArrayLit { ref mut elems, .. }) => {
-        if elems.len() > 1 {
-          match path {
-            ["children"] => {
-              let count = elems.len();
-              (value, count)
-            }
-            _ => (
-              self
-                .create(&JSXTagName::Fragment)
-                .children(
-                  elems
-                    .into_iter()
-                    .filter_map(|x| match x.as_mut() {
-                      None => None,
-                      Some(item) => Some(item.expr.take()),
-                    })
-                    .collect(),
-                )
-                .build()
-                .into(),
-              1,
-            ),
-          }
-        } else if elems.len() == 1 {
-          match elems.last_mut().unwrap() {
-            Some(ref mut expr) => {
-              if expr.spread.is_some() {
-                (value, 2)
-              } else {
-                (expr.expr.take(), 1)
-              }
-            }
-            None => unreachable!(),
-          }
-        } else {
-          (
-            Expr::Lit(Lit::Null(Null {
-              span: Default::default(),
-            }))
-            .into(),
-            1,
-          )
-        }
-      }
-      _ => (value, 1),
-    };
-
-    let func = call
-      .callee
-      .as_mut_expr()
-      .and_then(|e| e.as_mut_ident())
-      .expect("expected jsx or jsxs");
-
-    match (path, count) {
-      (["children"], 0 | 1) => func.sym = self.sym_jsx.as_str().into(),
-      (["children"], _) => func.sym = self.sym_jsxs.as_str().into(),
-      _ => {}
-    }
-
-    PropMutator::mut_with(
-      props,
-      path,
-      &mut |expr| *expr = children.take().into(),
-      true,
-    )
-    .unwrap();
+  pub fn mut_or_set_prop<'ast, F, T>(
+    &self,
+    props: &'ast mut ObjectLit,
+    path: &[&str],
+    mutator: F,
+  ) -> Option<T>
+  where
+    F: FnOnce(&mut Box<Expr>) -> T + 'ast,
+  {
+    PropMutator::mut_with(props, path, mutator, true)
   }
 
-  pub fn replace_props<S>(&self, call: &mut CallExpr, value: S) -> Result<(), serde_json::Error>
-  where
-    S: Serialize,
-  {
-    let (_, props) = jsx_or_pass!(self, mut call, unreachable);
-
-    let mut children: Option<Box<Expr>> = None;
-
-    PropMutator::mut_with(
-      props,
-      &["children"],
-      &mut |expr| {
-        children.replace(expr.take());
-      },
-      false,
-    )
-    .ok();
-
-    *props = *json_to_expr(serde_json::to_value(value)?);
-
-    if let Some(children) = children {
-      self.set_children(call, &["children"], children);
-    }
-
-    Ok(())
+  pub fn take_prop(&self, props: &mut ObjectLit, path: &[&str]) -> Option<Expr> {
+    PropMutator::mut_with(props, path, |expr| *expr.take(), false)
   }
 }
 
@@ -430,34 +340,10 @@ macro_rules! object_lit {
 
 #[macro_export]
 macro_rules! jsx_or_pass {
-  ($factory:expr, $call:expr, unreachable) => {
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
-      None => unreachable!(),
-    }
-  };
-  ($factory:expr, mut $call:expr, unreachable) => {
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
-      None => unreachable!(),
-    }
-  };
-  ($factory:expr, $call:expr, $ret:expr) => {
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
-      None => return $ret,
-    }
-  };
-  ($factory:expr, mut $call:expr, $ret:expr) => {
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
-      None => return $ret,
-    }
-  };
   ($visitor:ident, $factory:expr, $call:expr) => {{
     use swc_core::ecma::visit::VisitWith;
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &*$call.args.get(1).unwrap().expr),
+    match $factory.as_jsx($call) {
+      Some((elem, props)) => (elem, props),
       None => {
         $call.visit_children_with($visitor);
         return;
@@ -466,49 +352,13 @@ macro_rules! jsx_or_pass {
   }};
   ($visitor:ident, $factory:expr, mut $call:expr) => {{
     use swc_core::ecma::visit::VisitMutWith;
-    match $factory.call_is_jsx($call) {
-      Some(elem) => (elem, &mut *$call.args.get_mut(1).unwrap().expr),
+    match $factory.as_jsx($call) {
+      Some((elem, props)) => (elem, props),
       None => {
         $call.visit_mut_children_with($visitor);
         return;
       }
     }
-  }};
-}
-
-#[macro_export]
-macro_rules! children_or_pass {
-  ($prop:expr) => {{
-    let prop = match $prop.key {
-      swc_core::ecma::ast::PropName::Ident(swc_core::ecma::ast::Ident { ref sym, .. })
-        if sym.as_str() == "children" =>
-      {
-        $prop
-      }
-      swc_core::ecma::ast::PropName::Str(swc_core::ecma::ast::Str { ref value, .. })
-        if value.as_str() == "children" =>
-      {
-        $prop
-      }
-      _ => return,
-    };
-    &*prop.value
-  }};
-  (take $prop:expr) => {{
-    let prop = match $prop.key {
-      swc_core::ecma::ast::PropName::Ident(swc_core::ecma::ast::Ident { ref sym, .. })
-        if sym.as_str() == "children" =>
-      {
-        $prop
-      }
-      swc_core::ecma::ast::PropName::Str(swc_core::ecma::ast::Str { ref value, .. })
-        if value.as_str() == "children" =>
-      {
-        $prop
-      }
-      _ => return,
-    };
-    *prop.value.take()
   }};
 }
 

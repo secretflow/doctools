@@ -1,13 +1,12 @@
 use swc_core::{
   common::{util::take::Take as _, Span, Spanned},
   ecma::{
-    ast::{ArrayLit, Expr, ExprOrSpread, KeyValueProp, Lit, Str},
+    ast::{ArrayLit, Expr, ExprOrSpread, Lit, ObjectLit, Str},
     visit::{noop_visit_mut_type, VisitMut},
   },
 };
 
 use swc_ecma_utils::{
-  children_or_pass,
   jsx::factory::JSXFactory,
   span::{union_span, with_span},
 };
@@ -72,8 +71,11 @@ impl FlowContentCollector {
 impl VisitMut for FlowContentCollector {
   noop_visit_mut_type!();
 
-  fn visit_mut_key_value_prop(&mut self, prop: &mut KeyValueProp) {
-    let mut children = children_or_pass!(take prop);
+  fn visit_mut_object_lit(&mut self, props: &mut ObjectLit) {
+    let mut children = match self.factory.take_prop(props, &["children"]) {
+      Some(children) => children,
+      None => return,
+    };
 
     match children {
       Expr::Lit(Lit::Str(lit)) => self.text(lit),
@@ -86,7 +88,7 @@ impl VisitMut for FlowContentCollector {
             } else {
               match *expr.expr.take() {
                 Expr::Lit(Lit::Str(lit)) => self.text(lit),
-                Expr::Call(call) => match self.factory.call_is_jsx(&call) {
+                Expr::Call(call) => match self.factory.as_jsx(&call) {
                   Some(_) => {
                     self.other(ExprOrSpread {
                       expr: Box::from(call),

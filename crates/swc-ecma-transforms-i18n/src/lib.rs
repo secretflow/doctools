@@ -5,7 +5,7 @@ use swc_core::{
   atoms::Atom,
   common::Spanned,
   ecma::{
-    ast::CallExpr,
+    ast::{CallExpr, Expr},
     visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _, VisitWith},
   },
 };
@@ -123,7 +123,7 @@ use crate::phrasing_content::{PhrasingContentCollector, PhrasingContentPreflight
 /// "Content model" describes what kind of content the element can contain, while
 /// "content category" describes what kind of content the element is. For example,
 /// `<p>` is classified as "flow content", but its content model is "phrasing content".
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum ContentModel {
   Flow,
   Phrasing,
@@ -248,7 +248,7 @@ impl Default for TranslatorOptions {
 
 #[derive(Debug)]
 pub struct Translator<'messages> {
-  jsx: JSXFactory,
+  factory: JSXFactory,
   options: TranslatorOptions,
 
   elements: HashMap<JSXTagName, Translatable>,
@@ -257,91 +257,112 @@ pub struct Translator<'messages> {
   pre: bool,
 }
 
+impl Translator<'_> {
+  fn translate_prop(&self, call: &mut CallExpr, attr: &[&str]) -> Option<Message> {
+    let props = self.factory.as_mut_jsx_props(call).unwrap();
+    translate_attribute(
+      &self.factory,
+      &self.options.sym_gettext.as_str(),
+      props,
+      attr,
+    )
+  }
+}
+
 impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let (element, _) = jsx_or_pass!(self, self.jsx, mut call);
+    let (element, _) = jsx_or_pass!(self, self.factory, mut call);
 
     if matches!(element, JSXTagName::Intrinsic(_)) {
-      [
-        &["title"],
-        &["aria-label"],
-        &["aria-placeholder"],
-        &["aria-roledescription"],
-        &["aria-valuetext"],
-      ]
-      .iter()
-      .for_each(|attr| {
-        if let Some(message) =
-          translate_attribute(&self.jsx, &self.options.sym_gettext.as_str(), call, *attr)
-        {
+      self.messages.extend(
+        [
+          &["title"],
+          &["aria-label"],
+          &["aria-placeholder"],
+          &["aria-roledescription"],
+          &["aria-valuetext"],
+        ]
+        .iter()
+        .filter_map(|attr| self.translate_prop(call, *attr))
+        .collect::<Vec<_>>(),
+      );
+    }
+
+    let options = match self.elements.get(&element) {
+      Some(options) => options,
+      None => {
+        call.visit_mut_children_with(self);
+        return;
+      }
+    };
+
+    self.messages.extend(
+      options
+        .props
+        .iter()
+        .filter_map(|attr| {
+          let attr = attr.iter().map(|s| s.as_str()).collect::<Vec<_>>();
+          self.translate_prop(call, &attr[..])
+        })
+        .collect::<Vec<_>>(),
+    );
+
+    let pre_parent = self.pre;
+    self.pre = self.pre || options.pre;
+
+    match options.content {
+      ContentModel::Flow => {
+        let mut collector =
+          FlowContentCollector::new(self.factory.clone(), &self.options.sym_trans, self.pre);
+
+        let props = self.factory.as_mut_jsx_props(call).unwrap();
+
+        props.visit_mut_with(&mut collector);
+
+        let (messages, children) = collector.results();
+
+        self.factory.mut_or_set_prop(
+          self.factory.as_mut_jsx_props(call).unwrap(),
+          &["children"],
+          |expr| *expr = Box::new(Expr::Array(children)),
+        );
+
+        self.messages.extend(messages);
+      }
+      ContentModel::Phrasing => {
+        let mut preflight = PhrasingContentPreflight::new(self.factory.clone());
+
+        call.visit_with(&mut preflight);
+
+        if preflight.is_translatable() {
+          let mut collector = PhrasingContentCollector::new(
+            self.factory.clone(),
+            &self.options.sym_trans,
+            options.pre,
+          );
+
+          call.visit_mut_with(&mut collector);
+
+          let (message, children) = collector.result();
+
+          let children = with_span(Some(call.span()))(children);
+
+          self.factory.mut_or_set_prop(
+            self.factory.as_mut_jsx_props(call).unwrap(),
+            &["children"],
+            |expr| *expr = children,
+          );
+
           self.messages.push(message);
         }
-      })
-    }
-
-    let translatable = self.elements.get(&element);
-
-    match translatable {
-      Some(options) => {
-        let props = &options.props;
-        let gettext = &self.options.sym_gettext.as_str();
-
-        props.iter().for_each(|prop| {
-          let path = prop.iter().map(|s| s.as_str()).collect::<Vec<_>>();
-          if let Some(message) = translate_attribute(&self.jsx, gettext, call, &path) {
-            self.messages.push(message);
-          }
-        });
-
-        let pre_parent = self.pre;
-        self.pre = self.pre || options.pre;
-
-        match options.content {
-          ContentModel::Flow => {
-            let mut collector =
-              FlowContentCollector::new(self.jsx.clone(), &self.options.sym_trans, self.pre);
-
-            call.visit_mut_children_with(&mut collector);
-
-            let (messages, children) = collector.results();
-
-            self.jsx.set_children(call, &["children"], children.into());
-
-            self.messages.extend(messages);
-          }
-          ContentModel::Phrasing => {
-            let mut preflight = PhrasingContentPreflight::new();
-
-            call.visit_children_with(&mut preflight);
-
-            if preflight.is_translatable() {
-              let mut collector = PhrasingContentCollector::new(
-                self.jsx.clone(),
-                &self.options.sym_trans,
-                options.pre,
-              );
-
-              call.visit_mut_children_with(&mut collector);
-
-              let (message, children) = collector.result();
-
-              let children = with_span(Some(call.span()))(children);
-
-              self.jsx.set_children(call, &["children"], children);
-
-              self.messages.push(message);
-            }
-          }
-        };
-
-        call.visit_mut_children_with(self);
-
-        self.pre = pre_parent;
       }
-      None => call.visit_mut_children_with(self),
-    }
+    };
+
+    call.visit_mut_children_with(self);
+
+    self.pre = pre_parent;
   }
 }
 
@@ -358,7 +379,7 @@ impl<'messages> Translator<'messages> {
     });
 
     Self {
-      jsx: factory,
+      factory,
       options,
       elements,
       messages: output,

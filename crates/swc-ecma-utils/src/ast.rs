@@ -59,7 +59,6 @@ pub enum JSONLossy<'ast> {
   _Boolean(&'ast Bool),
   _Array(&'ast ArrayLit),
   _Object(&'ast ObjectLit),
-  _Call(&'ast CallExpr),
 }
 
 impl<'ast> serde::ser::Serialize for JSONLossy<'ast> {
@@ -110,14 +109,6 @@ impl<'ast> serde::ser::Serialize for JSONLossy<'ast> {
         map.end()
       }
 
-      _Expr(Expr::Call(call)) | _Call(call) => {
-        let mut seq = serializer.serialize_seq(Some(call.args.len()))?;
-        for ExprOrSpread { expr, .. } in &call.args {
-          seq.serialize_element(&_Expr(&*expr))?
-        }
-        seq.end()
-      }
-
       _Expr(Expr::Lit(Lit::Str(Str { value, .. }))) | _String(Str { value, .. }) => {
         serializer.serialize_str(&**value)
       }
@@ -161,7 +152,6 @@ into_json_lossy!(Number, _Number);
 into_json_lossy!(Bool, _Boolean);
 into_json_lossy!(ArrayLit, _Array);
 into_json_lossy!(ObjectLit, _Object);
-into_json_lossy!(CallExpr, _Call);
 
 pub fn expr_to_json_lossy<'ast, E, T>(from: E) -> Result<T, serde_json::Error>
 where
@@ -172,43 +162,111 @@ where
   serde_json::from_str(&intermediate)
 }
 
-#[derive(Debug)]
-#[must_use]
-pub enum PropMutatorError {
+pub enum SelectNode<'ast> {
+  Found(&'ast Expr),
   NotFound,
-  InvalidPath(String),
 }
 
-pub type PropMutatorResult = Result<(), PropMutatorError>;
+impl<'ast> From<&'ast Expr> for SelectNode<'ast> {
+  fn from(expr: &'ast Expr) -> Self {
+    Self::Found(expr)
+  }
+}
 
-pub struct PropMutator<'callback> {
+impl<'ast> SelectNode<'ast> {
+  pub fn key(self, key: &str) -> Self {
+    match self {
+      Self::NotFound => Self::NotFound,
+      Self::Found(Expr::Object(object)) => SelectNode::from_key(object, key),
+      _ => Self::NotFound,
+    }
+  }
+
+  pub fn index(self, index: usize) -> Self {
+    match self {
+      Self::NotFound => Self::NotFound,
+      Self::Found(Expr::Array(array)) => SelectNode::from_index(array, index),
+      _ => Self::NotFound,
+    }
+  }
+
+  pub fn get(self) -> Option<&'ast Expr> {
+    match self {
+      Self::NotFound => None,
+      Self::Found(expr) => Some(expr),
+    }
+  }
+
+  pub fn as_string(self) -> Option<&'ast str> {
+    match self {
+      Self::NotFound => None,
+      Self::Found(Expr::Lit(Lit::Str(Str { ref value, .. }))) => Some(&**value),
+      _ => None,
+    }
+  }
+
+  pub fn as_number(self) -> Option<f64> {
+    match self {
+      Self::NotFound => None,
+      Self::Found(Expr::Lit(Lit::Num(Number { value, .. }))) => Some(*value),
+      _ => None,
+    }
+  }
+}
+
+impl<'ast> SelectNode<'ast> {
+  pub fn from_key(object: &'ast ObjectLit, key: &str) -> Self {
+    let props = &object.props;
+    let found = props.iter().find_map(|p| {
+      let entry = p.as_prop().and_then(|p| p.as_key_value());
+      if let Some(entry) = entry {
+        let target = match entry.key {
+          PropName::Ident(Ident { ref sym, .. }) => Some((&**sym).to_string()),
+          PropName::Str(Str { ref value, .. }) => Some((&**value).to_string()),
+          PropName::Num(Number { ref value, .. }) => Some(value.to_string()),
+          _ => None,
+        };
+        match target {
+          Some(target) if target == key => Some(&entry.value),
+          _ => None,
+        }
+      } else {
+        None
+      }
+    });
+    match found {
+      Some(expr) => Self::Found(&*expr),
+      _ => Self::NotFound,
+    }
+  }
+
+  pub fn from_index(object: &'ast ArrayLit, index: usize) -> Self {
+    let elems = &object.elems;
+    let found = elems.get(index).and_then(|e| e.as_ref());
+    match found {
+      Some(expr) => Self::Found(&*expr.expr),
+      _ => Self::NotFound,
+    }
+  }
+}
+
+pub struct PropMutator<'callback, T> {
   path: Vec<Atom>,
   set_intermediate_path: bool,
   idx: usize,
-  callback: &'callback mut dyn FnMut(&mut Box<Expr>),
-  result: PropMutatorResult,
+  callback: Option<Box<dyn FnOnce(&mut Box<Expr>) -> T + 'callback>>,
+  result: Option<T>,
 }
 
-macro_rules! item_getter_error {
-  ($this:ident, $error:path, $msg:literal $(, $arg:expr)*) => {{
-    $this.result = Err($error(format!($msg, $($arg),*).to_string()));
-    return;
-  }};
-  ($this:ident, $error:path) => {{
-    $this.result = Err($error);
-    return;
-  }};
-}
-
-impl PropMutator<'_> {
+impl<T> PropMutator<'_, T> {
   fn traverse<N: VisitMutWith<Self>>(&mut self, expr: &mut N) {
     self.idx += 1;
     expr.visit_mut_with(self);
   }
 
   fn found(&mut self, found: &mut Box<Expr>) {
-    (self.callback)(found);
-    self.result = Ok(());
+    let callback = self.callback.take().expect("callback already taken");
+    self.result = Some((callback)(found))
   }
 
   fn process_array_elems(&mut self, elems: &mut Vec<Option<ExprOrSpread>>) {
@@ -216,13 +274,14 @@ impl PropMutator<'_> {
 
     let index = match subscript.parse::<usize>() {
       Ok(idx) => idx,
-      Err(_) => item_getter_error!(
-        self,
-        PropMutatorError::InvalidPath,
-        "invalid array index {}",
-        subscript
-      ),
+      Err(_) => {
+        self.result = None;
+        return;
+      }
     };
+
+    let idx = self.idx;
+    let path_len = self.path.len();
 
     let mut set_default = |arr: &mut Vec<Option<ExprOrSpread>>| {
       if self.set_intermediate_path {
@@ -233,12 +292,13 @@ impl PropMutator<'_> {
           spread: None,
           expr: {
             let mut new = Box::from(null());
-            (self.callback)(&mut new);
+            self.found(&mut new);
             new
           },
         })
       } else {
-        item_getter_error!(self, PropMutatorError::NotFound)
+        self.result = None;
+        return;
       }
     };
 
@@ -252,7 +312,7 @@ impl PropMutator<'_> {
       })
     };
 
-    if self.idx == self.path.len() - 1 {
+    if idx == path_len - 1 {
       match elems.get_mut(index) {
         Some(item) => match item {
           Some(ExprOrSpread { expr, .. }) => {
@@ -271,7 +331,8 @@ impl PropMutator<'_> {
               *next = ensure_object();
               self.traverse(next.as_mut().unwrap().expr.as_mut());
             } else {
-              item_getter_error!(self, PropMutatorError::NotFound)
+              self.result = None;
+              return;
             }
           }
         },
@@ -281,7 +342,8 @@ impl PropMutator<'_> {
             elems[index] = ensure_object();
             self.traverse(elems[index].as_mut().unwrap().expr.as_mut());
           } else {
-            item_getter_error!(self, PropMutatorError::NotFound)
+            self.result = None;
+            return;
           }
         }
       };
@@ -313,7 +375,7 @@ impl PropMutator<'_> {
                   key: PropName::Str((&*key).into()),
                   value: {
                     let mut new = Box::from(null());
-                    (self.callback)(&mut new);
+                    self.found(&mut new);
                     new
                   },
                 })
@@ -322,7 +384,8 @@ impl PropMutator<'_> {
               .into(),
             )
           } else {
-            item_getter_error!(self, PropMutatorError::NotFound)
+            self.result = None;
+            return;
           }
         }
       }
@@ -356,7 +419,8 @@ impl PropMutator<'_> {
                 .as_mut(),
             );
           } else {
-            item_getter_error!(self, PropMutatorError::NotFound)
+            self.result = None;
+            return;
           }
         }
       }
@@ -364,7 +428,7 @@ impl PropMutator<'_> {
   }
 }
 
-impl VisitMut for PropMutator<'_> {
+impl<T> VisitMut for PropMutator<'_, T> {
   fn visit_mut_array_lit(&mut self, array: &mut ArrayLit) {
     self.process_array_elems(&mut array.elems);
   }
@@ -389,35 +453,26 @@ impl VisitMut for PropMutator<'_> {
   }
 }
 
-impl PropMutator<'_> {
+impl<'callback, T> PropMutator<'callback, T> {
   pub fn mut_with<E, F>(
-    ast: &mut E,
+    ast: &'callback mut E,
     path: &[&str],
-    callback: &mut F,
+    callback: F,
     set_default: bool,
-  ) -> PropMutatorResult
+  ) -> Option<T>
   where
-    E: for<'callback> VisitMutWith<PropMutator<'callback>>,
-    F: FnMut(&mut Box<Expr>),
+    E: VisitMutWith<PropMutator<'callback, T>>,
+    F: FnOnce(&mut Box<Expr>) -> T + 'callback,
   {
     let mut visitor = PropMutator {
       path: path.iter().map(|p| (*p).into()).collect(),
       set_intermediate_path: set_default,
       idx: 0,
-      result: Err(PropMutatorError::NotFound),
-      callback,
+      result: None,
+      callback: Some(Box::new(callback)),
     };
     ast.visit_mut_with(&mut visitor);
-    match visitor.result {
-      Err(PropMutatorError::NotFound) => {
-        if set_default {
-          Ok(())
-        } else {
-          visitor.result
-        }
-      }
-      _ => visitor.result,
-    }
+    visitor.result
   }
 }
 
@@ -523,7 +578,7 @@ mod tests {
     PropMutator::mut_with(
       &mut expr,
       &["children"],
-      &mut |expr| *expr = json_to_expr(json!([])),
+      |expr| *expr = json_to_expr(json!([])),
       true,
     )
     .unwrap();
@@ -551,7 +606,7 @@ mod tests {
     PropMutator::mut_with(
       &mut expr,
       &["lorem", "ipsum", "dolor", "2"],
-      &mut |expr| *expr = json_to_expr(json!("consectetur adipiscing elit")),
+      |expr| *expr = json_to_expr(json!("consectetur adipiscing elit")),
       true,
     )
     .unwrap();
@@ -718,7 +773,7 @@ mod tests {
       PropMutator::mut_with(
         &mut call,
         &["1", "props", "href", "2",],
-        &mut |expr| *expr =
+        |expr| *expr =
           Lit::from("https://fr.wikipedia.org/wiki/Portez_ce_vieux_whisky_au_juge_blond_qui_fume")
             .into(),
         false

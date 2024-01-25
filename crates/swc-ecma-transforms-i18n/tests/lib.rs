@@ -82,16 +82,16 @@ fn test_i18n(input: PathBuf) {
     return;
   }
 
-  print!(
-    ">>>>> {} <<<<<\n\n{}\n\n",
-    Color::Blue.paint("Source"),
-    Color::Blue.paint(source.src.as_str()),
-  );
-  print!(
-    ">>>>> {} <<<<<\n\n{}\n\n",
-    Color::Yellow.paint("Transformed"),
-    Color::Yellow.paint(actual),
-  );
+  // print!(
+  //   ">>>>> {} <<<<<\n\n{}\n\n",
+  //   Color::Blue.paint("Source"),
+  //   Color::Blue.paint(source.src.as_str()),
+  // );
+  // print!(
+  //   ">>>>> {} <<<<<\n\n{}\n\n",
+  //   Color::Yellow.paint("Transformed"),
+  //   Color::Yellow.paint(actual),
+  // );
 
   if actual != expected {
     panic!(

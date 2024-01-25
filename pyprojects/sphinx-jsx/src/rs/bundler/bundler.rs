@@ -19,7 +19,6 @@ use swc_core::{
 
 use pyo3_utils::raise;
 use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
-use swc_ecma_transforms_sphinx::built_in_props::built_in_props;
 use swc_ecma_utils::jsx::{builder::JSXDocument, factory::JSXFactory};
 
 use super::{document::SphinxDocument, symbols::WellKnownSymbols};
@@ -150,10 +149,6 @@ impl SphinxBundler {
         .with_jsx(&self.symbols.jsx)
         .with_jsxs(&self.symbols.jsxs)
         .with_fragment(&self.symbols.fragment);
-
-      document
-        .body
-        .visit_mut_children_with(&mut built_in_props(&factory));
 
       document
         .body
