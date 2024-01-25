@@ -64,10 +64,11 @@ impl SphinxBundler {
 
     let source_file = self.sources.new_source_file(filename.clone(), source);
 
-    let factory = JSXRuntime::new()
-      .with_jsx(&self.symbols.jsx)
-      .with_jsxs(&self.symbols.jsxs)
-      .with_fragment(&self.symbols.fragment);
+    let factory = JSXRuntime::aliased(
+      &self.symbols.jsx,
+      &self.symbols.jsxs,
+      &self.symbols.fragment,
+    );
 
     let document = SphinxDocument::new(factory, source_file.clone());
 
@@ -120,12 +121,11 @@ impl SphinxBundler {
       .context("failed to parse output path")
       .map_err(raise::<PyOSError, _>)?;
 
-    let runtime = Lrc::new(
-      JSXRuntime::new()
-        .with_jsx(&self.symbols.jsx)
-        .with_jsxs(&self.symbols.jsxs)
-        .with_fragment(&self.symbols.fragment),
-    );
+    let runtime = Lrc::new(JSXRuntime::aliased(
+      &self.symbols.jsx,
+      &self.symbols.jsxs,
+      &self.symbols.fragment,
+    ));
 
     let pages: Vec<(PathBuf, String)> = vec![];
 

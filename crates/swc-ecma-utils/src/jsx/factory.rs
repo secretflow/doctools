@@ -66,19 +66,12 @@ impl JSXRuntime {
     Self::default()
   }
 
-  pub fn with_jsx(mut self, jsx: &str) -> Self {
-    self.sym_jsx = jsx.into();
-    self
-  }
-
-  pub fn with_jsxs(mut self, jsxs: &str) -> Self {
-    self.sym_jsxs = jsxs.into();
-    self
-  }
-
-  pub fn with_fragment(mut self, fragment: &str) -> Self {
-    self.sym_fragment = fragment.into();
-    self
+  pub fn aliased(jsx: &str, jsxs: &str, fragment: &str) -> Self {
+    Self {
+      sym_fragment: fragment.into(),
+      sym_jsx: jsx.into(),
+      sym_jsxs: jsxs.into(),
+    }
   }
 
   pub fn jsx(&self) -> Callee {
@@ -367,6 +360,18 @@ macro_rules! object_lit {
         span: Default::default(),
     }
   };
+}
+
+#[macro_export]
+macro_rules! jsx_or_return {
+  ($factory:expr, $call:expr) => {{
+    match $factory.as_jsx($call) {
+      Some((elem, props)) => (elem, props),
+      None => {
+        return;
+      }
+    }
+  }};
 }
 
 #[macro_export]

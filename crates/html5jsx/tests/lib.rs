@@ -95,7 +95,7 @@ mod test_rejections {
   fn no_malicious_jsx() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXRuntime::new().with_jsx("eval")),
+      Some(JSXRuntime::aliased("eval", "jsxs", "Fragment")),
     )
     .unwrap();
   }
@@ -105,7 +105,7 @@ mod test_rejections {
   fn no_malicious_jsx_2() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXRuntime::new().with_jsx("evaluate")),
+      Some(JSXRuntime::aliased("evaluate", "jsxs", "Fragment")),
     )
     .unwrap();
   }
@@ -115,7 +115,7 @@ mod test_rejections {
   fn no_malicious_jsxs() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXRuntime::new().with_jsxs("globalThis.eval")),
+      Some(JSXRuntime::aliased("jsxDEV", "globalThis.eval", "Fragment")),
     )
     .unwrap();
   }
@@ -125,7 +125,7 @@ mod test_rejections {
   fn no_malicious_fragment() {
     html_to_jsx(
       &make_source("<div>"),
-      Some(JSXRuntime::new().with_fragment("window.Function")),
+      Some(JSXRuntime::aliased("jsx", "jsxs", "window.Function")),
     )
     .unwrap();
   }
