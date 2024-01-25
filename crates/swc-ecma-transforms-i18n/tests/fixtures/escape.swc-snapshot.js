@@ -1,4 +1,4 @@
-jsxs("pre", {
+jsx("pre", {
     title: i18n({
         "id": "hzhBuSgn8YXn_ZmRaxz_WnANKVHVrlV1vLH2tFHOW5g=",
         "message": "impl<'a, {LF_}> Borrow<{LF_}> for Cow<'a, {LF_}>\nwhere\n    {LF_}: ToOwned + ?Sized\n{ ... }",

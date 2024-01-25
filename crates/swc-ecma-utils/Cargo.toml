@@ -20,9 +20,10 @@ features = [
   "ecma_visit",
   "ecma_utils",
   "ecma_codegen",
+  "testing",
+  "testing_transform",
 ]
 version = "0.88"
 
 [dev-dependencies]
 serde_json = {version = "1.0.111", features = ["preserve_order"]}
-swc_core = {version = "0.88", features = ["testing", "testing_transform"]}

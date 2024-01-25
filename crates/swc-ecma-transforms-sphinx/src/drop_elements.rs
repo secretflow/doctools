@@ -5,14 +5,14 @@ use swc_core::{
   common::{sync::Lrc, util::take::Take},
   ecma::{
     ast::CallExpr,
-    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut},
+    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
   },
 };
 
 use swc_ecma_utils::{
   continue_visit,
   jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_continue_visit,
+  jsx_or_return, tag,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -24,22 +24,48 @@ pub enum Drop {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ElementDropperOptions {
+pub struct DropElements {
   elements: HashMap<JSXTagName, Drop>,
+}
+
+impl Default for DropElements {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl DropElements {
+  pub fn new() -> Self {
+    Self {
+      elements: HashMap::new(),
+    }
+  }
+
+  pub fn unwrap(&mut self, tag: JSXTagName) -> &mut Self {
+    self.elements.insert(tag, Drop::Unwrap);
+    self
+  }
+
+  pub fn delete(&mut self, tag: JSXTagName) -> &mut Self {
+    self.elements.insert(tag, Drop::Delete);
+    self
+  }
 }
 
 struct ElementDropper {
   runtime: Lrc<JSXRuntime>,
-  options: ElementDropperOptions,
+  options: DropElements,
 }
 
 impl VisitMut for ElementDropper {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let (tag, _) = jsx_or_continue_visit!(self, self.runtime, mut elem);
+    elem.visit_mut_children_with(self);
 
-    let drop = match self.options.elements.get(&tag) {
+    let (name, _) = jsx_or_return!(self.runtime, elem);
+
+    let drop = match self.options.elements.get(&name) {
       Some(drop) => drop,
       None => continue_visit!(self, mut elem),
     };
@@ -52,7 +78,7 @@ impl VisitMut for ElementDropper {
           Some(children) => {
             *elem = self
               .runtime
-              .create(&JSXTagName::Fragment)
+              .create(&tag!(<>))
               .arg1(Box::new(children))
               .build();
           }
@@ -68,15 +94,11 @@ impl VisitMut for ElementDropper {
   }
 }
 
-pub fn drop_elements(runtime: Lrc<JSXRuntime>) -> impl Fold + VisitMut {
-  as_folder(ElementDropper {
-    runtime,
-    options: ElementDropperOptions {
-      elements: {
-        let mut elements = HashMap::new();
-        elements.insert(JSXTagName::Ident("comment".into()), Drop::Delete);
-        elements
-      },
-    },
-  })
+pub fn drop_elements(
+  runtime: Lrc<JSXRuntime>,
+  configurer: impl Fn(&mut DropElements) -> &mut DropElements,
+) -> impl Fold + VisitMut {
+  let mut options = DropElements::new();
+  configurer(&mut options);
+  as_folder(ElementDropper { runtime, options })
 }

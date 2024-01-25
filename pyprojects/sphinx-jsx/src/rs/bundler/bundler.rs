@@ -13,15 +13,20 @@ use swc_core::{
   common::{chain, source_map::DefaultSourceMapGenConfig, sync::Lrc, FileName, SourceMap},
   ecma::{
     codegen::{text_writer::JsWriter, Emitter, Node as _},
-    visit::VisitMutWith,
+    transforms::base::pass::noop,
+    visit::{FoldWith, VisitMutWith},
   },
 };
 
 use pyo3_utils::raise;
 use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
-use swc_ecma_transforms_sphinx::drop::drop_elements;
+use swc_ecma_transforms_sphinx::drop_elements::drop_elements;
 use swc_ecma_utils::{
-  jsx::{builder::JSXDocument, factory::JSXRuntime},
+  jsx::{
+    builder::JSXDocument,
+    factory::{JSXRuntime, JSXTagName},
+    sanitize::sanitize_jsx,
+  },
   testing::document_as_module,
 };
 
@@ -135,12 +140,18 @@ impl SphinxBundler {
 
     let mut unsupported_components = HashSet::new();
 
-    for (docname, mut document) in self.pages.drain(..) {
-      document
-        .body
-        .visit_mut_with(&mut drop_elements(runtime.clone()));
+    for (docname, document) in self.pages.drain(..) {
+      let module = document_as_module(document);
 
-      unsupported_components.extend(undefined_bindings.lint(&document.body));
+      let module = module.fold_with(&mut chain!(
+        drop_elements(runtime.clone(), |c| {
+          c.delete(JSXTagName::Ident("comment".into()))
+            .delete(JSXTagName::Ident("substitution_definition".into()))
+        }),
+        sanitize_jsx(runtime.clone())
+      ));
+
+      unsupported_components.extend(undefined_bindings.lint(&module));
 
       let mut code_buffer = vec![];
       let mut source_mapping = vec![];
@@ -160,7 +171,7 @@ impl SphinxBundler {
         wr: Box::new(writer),
       };
 
-      document_as_module(document)
+      module
         .emit_with(&mut emitter)
         .context("failed to generate ECMAScript")
         .map_err(raise::<PyRuntimeError, _>)?;

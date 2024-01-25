@@ -12,9 +12,10 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  jsx::factory::{JSXRuntime, JSXTagName},
+  jsx::factory::JSXRuntime,
   object_lit,
   span::{union_span, with_span},
+  tag,
 };
 
 /// Represents a message to be translated
@@ -265,40 +266,28 @@ impl MessageProps {
     if has_less_than {
       values.push(make_prop!(
         "LT",
-        runtime
-          .create(&JSXTagName::Fragment)
-          .children(vec!["<".into()])
-          .build()
+        runtime.create(&tag!(<>)).children(vec!["<".into()]).build()
       ));
     }
 
     if has_greater_than {
       values.push(make_prop!(
         "GT",
-        runtime
-          .create(&JSXTagName::Fragment)
-          .children(vec![">".into()])
-          .build()
+        runtime.create(&tag!(<>)).children(vec![">".into()]).build()
       ));
     }
 
     if has_left_curly {
       values.push(make_prop!(
         "LC",
-        runtime
-          .create(&JSXTagName::Fragment)
-          .children(vec!["{".into()])
-          .build()
+        runtime.create(&tag!(<>)).children(vec!["{".into()]).build()
       ));
     }
 
     if has_right_curly {
       values.push(make_prop!(
         "RC",
-        runtime
-          .create(&JSXTagName::Fragment)
-          .children(vec!["}".into()])
-          .build()
+        runtime.create(&tag!(<>)).children(vec!["}".into()]).build()
       ));
     }
 
@@ -349,7 +338,7 @@ impl MessageProps {
 
     let trans = with_span(Some(span))(
       runtime
-        .create(&JSXTagName::Ident((&*trans).into()))
+        .create(&tag!(=> &*trans))
         .prop("id", id.as_str().into(), None)
         .prop("message", message.as_str().into(), None)
         .prop("components", components.into(), None)

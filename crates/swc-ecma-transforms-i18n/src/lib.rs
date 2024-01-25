@@ -12,7 +12,7 @@ use swc_core::{
 
 use swc_ecma_utils::{
   jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_continue_visit,
+  jsx_or_continue_visit, tag,
 };
 
 mod attribute;
@@ -154,7 +154,7 @@ pub struct Translatable {
 impl Default for Translatable {
   fn default() -> Self {
     Self {
-      tag: JSXTagName::Fragment,
+      tag: tag!(<>),
       content: ContentModel::Flow,
       pre: false,
       props: vec![],
@@ -260,7 +260,7 @@ impl VisitMut for Translator<'_> {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     let (element, _) = jsx_or_continue_visit!(self, self.runtime, mut elem);
 
-    if matches!(element, JSXTagName::Intrinsic(_)) {
+    if matches!(element, tag!("*")) {
       let props = self.runtime.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
         self.runtime.clone(),
@@ -366,7 +366,7 @@ impl<'messages> Translator<'messages> {
 
   pub fn fragment(mut self) -> Self {
     self.elements.insert(
-      JSXTagName::Fragment,
+      tag!(<>),
       Translatable {
         content: ContentModel::Flow,
         ..Default::default()

@@ -51,6 +51,37 @@ impl From<Ident> for JSXTagName {
   }
 }
 
+#[macro_export]
+macro_rules! tag {
+  (<>) => {
+    $crate::jsx::factory::JSXTagName::Fragment
+  };
+  ("*") => {
+    $crate::jsx::factory::JSXTagName::Intrinsic(_)
+  };
+  (let *) => {
+    $crate::jsx::factory::JSXTagName::Ident(_)
+  };
+  ($tag:literal) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic($tag.into())
+  };
+  (<$tag:ident>) => {
+    $crate::jsx::factory::JSXTagName::Ident(stringify!($tag).into())
+  };
+  ("" $tag:expr) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic(($tag).into())
+  };
+  (=> $tag:expr) => {
+    $crate::jsx::factory::JSXTagName::Ident(($tag).into())
+  };
+  ("*" $tag:ident) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic($tag)
+  };
+  (let $tag:ident) => {
+    $crate::jsx::factory::JSXTagName::Ident($tag)
+  };
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JSXRuntime {
   #[serde(rename = "Fragment")]

@@ -25,7 +25,7 @@ impl VisitMut for CleanUpTakenValues {
       .drain(..)
       .filter(|prop| match prop {
         PropOrSpread::Prop(prop) => match **prop {
-          Prop::KeyValue(KeyValueProp { ref value, .. }) => !value.is_invalid(),
+          Prop::KeyValue(KeyValueProp { ref value, .. }) => !is_invalid(value),
           _ => true,
         },
         _ => true,
@@ -40,10 +40,18 @@ impl VisitMut for CleanUpTakenValues {
       .elems
       .drain(..)
       .filter(|elem| match elem {
-        Some(ExprOrSpread { ref expr, .. }) => !expr.is_invalid(),
+        Some(ExprOrSpread { ref expr, .. }) => !is_invalid(expr),
         _ => true,
       })
       .collect();
+  }
+}
+
+fn is_invalid(value: &Box<Expr>) -> bool {
+  match **value {
+    Expr::Invalid(_) => true,
+    Expr::Call(ref call) => call.callee.is_super_(),
+    _ => false,
   }
 }
 

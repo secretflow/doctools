@@ -9,11 +9,7 @@ use swc_core::{
   },
 };
 
-use swc_ecma_utils::{
-  jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_continue_visit,
-  span::with_span,
-};
+use swc_ecma_utils::{jsx::factory::JSXRuntime, jsx_or_continue_visit, span::with_span, tag};
 
 use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 
@@ -122,9 +118,9 @@ impl VisitMut for PhrasingContentCollector {
         Expr::Call(mut call) => match self.runtime.as_jsx(&call) {
           Some((elem, _)) => {
             let name = match elem {
-              JSXTagName::Fragment => None,
-              JSXTagName::Ident(name) => Some(name),
-              JSXTagName::Intrinsic(name) => Some(name),
+              tag!(<>) => None,
+              tag!("*" name) => Some(name),
+              tag!(let name) => Some(name),
             };
             let name = self.message.enter(name);
             call.visit_mut_with(self);
