@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use swc_core::{
   atoms::Atom,
-  common::{util::take::Take as _, Span, Spanned as _},
+  common::{sync::Lrc, util::take::Take as _, Span, Spanned as _},
   ecma::ast::{
     CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, ObjectLit, Prop, PropName,
     PropOrSpread,
@@ -12,7 +12,7 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  jsx::factory::{JSXFactory, JSXTagName},
+  jsx::factory::{JSXRuntime, JSXTagName},
   object_lit,
   span::{union_span, with_span},
 };
@@ -183,7 +183,7 @@ impl MessageProps {
       .any(|t| matches!(t, MessageToken::Text(_)))
   }
 
-  fn to_props(mut self, factory: &JSXFactory) -> Props {
+  fn to_props(mut self, runtime: Lrc<JSXRuntime>) -> Props {
     let mut message = String::new();
     let mut plaintext = String::new();
 
@@ -259,13 +259,13 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.push(make_prop!("LF", factory.create(&"br".into()).build()));
+      values.push(make_prop!("LF", runtime.create(&"br".into()).build()));
     }
 
     if has_less_than {
       values.push(make_prop!(
         "LT",
-        factory
+        runtime
           .create(&JSXTagName::Fragment)
           .children(vec!["<".into()])
           .build()
@@ -275,7 +275,7 @@ impl MessageProps {
     if has_greater_than {
       values.push(make_prop!(
         "GT",
-        factory
+        runtime
           .create(&JSXTagName::Fragment)
           .children(vec![">".into()])
           .build()
@@ -285,7 +285,7 @@ impl MessageProps {
     if has_left_curly {
       values.push(make_prop!(
         "LC",
-        factory
+        runtime
           .create(&JSXTagName::Fragment)
           .children(vec!["{".into()])
           .build()
@@ -295,7 +295,7 @@ impl MessageProps {
     if has_right_curly {
       values.push(make_prop!(
         "RC",
-        factory
+        runtime
           .create(&JSXTagName::Fragment)
           .children(vec!["}".into()])
           .build()
@@ -332,7 +332,7 @@ impl MessageProps {
   ///
   /// Since calling this function implies the end of a [swc_core::ecma::visit::VisitMut],
   /// mutating the tree only to result in an empty message is unexpected and likely a bug
-  pub fn make_trans(self, factory: &JSXFactory, trans: &Atom) -> (Message, Box<Expr>) {
+  pub fn make_trans(self, runtime: Lrc<JSXRuntime>, trans: Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -341,15 +341,15 @@ impl MessageProps {
       plaintext,
       components,
       values,
-    } = self.to_props(factory);
+    } = self.to_props(runtime.clone());
 
     if is_empty_or_whitespace(&message) {
       unreachable!("Message is empty")
     }
 
     let trans = with_span(Some(span))(
-      factory
-        .create(&JSXTagName::Ident((&**trans).into()))
+      runtime
+        .create(&JSXTagName::Ident((&*trans).into()))
         .prop("id", id.as_str().into(), None)
         .prop("message", message.as_str().into(), None)
         .prop("components", components.into(), None)
@@ -368,7 +368,7 @@ impl MessageProps {
     )
   }
 
-  pub fn make_i18n(self, factory: &JSXFactory, i18n: &Atom) -> (Message, Box<Expr>) {
+  pub fn make_i18n(self, runtime: Lrc<JSXRuntime>, i18n: Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -377,10 +377,10 @@ impl MessageProps {
       plaintext,
       components: _,
       values,
-    } = self.to_props(factory);
+    } = self.to_props(runtime);
 
     let call = Expr::Call(CallExpr {
-      callee: Callee::Expr(Ident::from(&**i18n).into()),
+      callee: Callee::Expr(Ident::from(&*i18n).into()),
       args: vec![ExprOrSpread {
         expr: object_lit!(
           "id" = id.as_str(),

@@ -3,6 +3,7 @@ use std::{collections::HashMap, fmt::Debug};
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
+  common::sync::Lrc,
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
@@ -10,8 +11,8 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  jsx::factory::{JSXFactory, JSXTagName},
-  jsx_or_pass,
+  jsx::factory::{JSXRuntime, JSXTagName},
+  jsx_or_continue_visit,
 };
 
 mod attribute;
@@ -246,7 +247,7 @@ impl Default for TranslatorOptions {
 
 #[derive(Debug)]
 struct Translator<'messages> {
-  factory: JSXFactory,
+  runtime: Lrc<JSXRuntime>,
   options: TranslatorOptions,
   elements: HashMap<JSXTagName, Translatable>,
   pre: bool,
@@ -256,14 +257,14 @@ struct Translator<'messages> {
 impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let (element, _) = jsx_or_pass!(self, self.factory, mut call);
+  fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
+    let (element, _) = jsx_or_continue_visit!(self, self.runtime, mut elem);
 
     if matches!(element, JSXTagName::Intrinsic(_)) {
-      let props = self.factory.as_mut_jsx_props(call).unwrap();
+      let props = self.runtime.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
-        &self.factory,
-        &self.options.sym_gettext,
+        self.runtime.clone(),
+        self.options.sym_gettext.clone(),
         props,
         vec![
           vec!["title"],
@@ -278,7 +279,7 @@ impl VisitMut for Translator<'_> {
     let options = match self.elements.get(&element) {
       Some(options) => options,
       None => {
-        call.visit_mut_children_with(self);
+        elem.visit_mut_children_with(self);
         return;
       }
     };
@@ -289,10 +290,10 @@ impl VisitMut for Translator<'_> {
         .iter()
         .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
         .collect::<Vec<_>>();
-      let props = self.factory.as_mut_jsx_props(call).unwrap();
+      let props = self.runtime.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
-        &self.factory,
-        &self.options.sym_gettext,
+        self.runtime.clone(),
+        self.options.sym_gettext.clone(),
         props,
         attrs,
       ))
@@ -304,22 +305,25 @@ impl VisitMut for Translator<'_> {
     match options.content {
       ContentModel::Flow => {
         self.messages.extend(translate_block(
-          &self.factory,
-          &self.options.sym_trans,
+          self.runtime.clone(),
+          self.options.sym_trans.clone(),
           options.pre,
-          call,
+          elem,
         ));
       }
       ContentModel::Phrasing => {
-        if let Some(message) =
-          translate_phrase(&self.factory, &self.options.sym_trans, options.pre, call)
-        {
+        if let Some(message) = translate_phrase(
+          self.runtime.clone(),
+          self.options.sym_trans.clone(),
+          options.pre,
+          elem,
+        ) {
           self.messages.push(message);
         }
       }
     };
 
-    call.visit_mut_children_with(self);
+    elem.visit_mut_children_with(self);
 
     self.pre = pre_parent;
   }
@@ -483,7 +487,7 @@ impl<'messages> Translator<'messages> {
 }
 
 pub fn i18n(
-  factory: JSXFactory,
+  runtime: Lrc<JSXRuntime>,
   options: TranslatorOptions,
   output: &mut Vec<Message>,
 ) -> impl Fold + VisitMut + '_ {
@@ -495,7 +499,7 @@ pub fn i18n(
   });
 
   as_folder(Translator {
-    factory,
+    runtime,
     options,
     elements,
     messages: output,

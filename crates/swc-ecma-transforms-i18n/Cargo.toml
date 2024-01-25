@@ -22,9 +22,6 @@ features = [
 ]
 version = "0.88"
 
-[dev-dependencies]
-ansi_term = "0.12.1"
-
 [dev-dependencies.swc_core]
 features = [
   "ecma_codegen",

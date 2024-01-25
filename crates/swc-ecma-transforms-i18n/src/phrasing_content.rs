@@ -1,6 +1,6 @@
 use swc_core::{
   atoms::Atom,
-  common::{util::take::Take as _, Spanned as _},
+  common::{sync::Lrc, util::take::Take as _, Spanned as _},
   ecma::{
     ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, Str},
     visit::{
@@ -10,9 +10,8 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  ast::SelectNode,
-  jsx::factory::{JSXFactory, JSXTagName},
-  jsx_or_pass,
+  jsx::factory::{JSXRuntime, JSXTagName},
+  jsx_or_continue_visit,
   span::with_span,
 };
 
@@ -36,7 +35,7 @@ use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 /// [AST node taking][swc_core::common::util::take::Take]. This is much less ergonomic and
 /// more error-prone than just visiting the tree twice.
 struct PhrasingContentPreflight {
-  factory: JSXFactory,
+  runtime: Lrc<JSXRuntime>,
   is_translatable: bool,
 }
 
@@ -48,9 +47,9 @@ impl Visit for PhrasingContentPreflight {
       return;
     }
 
-    let (_, props) = jsx_or_pass!(self, self.factory, call);
+    let (_, props) = jsx_or_continue_visit!(self, self.runtime, call);
 
-    let children = SelectNode::from_key(props, "children").get();
+    let children = self.runtime.get_prop(props, &["children"]).get();
 
     self.is_translatable = match &children {
       Some(Expr::Array(ArrayLit { ref elems, .. })) => elems.iter().any(|expr| match expr {
@@ -69,9 +68,9 @@ impl Visit for PhrasingContentPreflight {
 }
 
 impl PhrasingContentPreflight {
-  pub fn new(factory: JSXFactory) -> Self {
+  pub fn new(runtime: Lrc<JSXRuntime>) -> Self {
     Self {
-      factory,
+      runtime,
       is_translatable: false,
     }
   }
@@ -82,21 +81,21 @@ impl PhrasingContentPreflight {
 }
 
 #[derive(Debug)]
-pub struct PhrasingContentCollector<'f> {
-  factory: &'f JSXFactory,
-  sym_trans: &'f Atom,
+pub struct PhrasingContentCollector {
+  runtime: Lrc<JSXRuntime>,
+  sym_trans: Atom,
   message: MessageProps,
 }
 
-impl VisitMut for PhrasingContentCollector<'_> {
+impl VisitMut for PhrasingContentCollector {
   noop_visit_mut_type!();
 
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    jsx_or_pass!(self, self.factory, mut call);
+  fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
+    jsx_or_continue_visit!(self, self.runtime, mut elem);
 
     let children = match self
-      .factory
-      .take_prop(self.factory.as_mut_jsx_props(call).unwrap(), &["children"])
+      .runtime
+      .take_prop(self.runtime.as_mut_jsx_props(elem).unwrap(), &["children"])
     {
       Some(children) => children,
       None => return,
@@ -120,7 +119,7 @@ impl VisitMut for PhrasingContentCollector<'_> {
           Palpable(true) => (),
           Palpable(false) => (),
         },
-        Expr::Call(mut call) => match self.factory.as_jsx(&call) {
+        Expr::Call(mut call) => match self.runtime.as_jsx(&call) {
           Some((elem, _)) => {
             let name = match elem {
               JSXTagName::Fragment => None,
@@ -140,7 +139,7 @@ impl VisitMut for PhrasingContentCollector<'_> {
         }
       });
 
-    let props = self.factory.as_mut_jsx_props(call).unwrap();
+    let props = self.runtime.as_mut_jsx_props(elem).unwrap();
     props.props = props
       .props
       .drain(..)
@@ -155,32 +154,32 @@ impl VisitMut for PhrasingContentCollector<'_> {
   }
 }
 
-impl<'f> PhrasingContentCollector<'f> {
-  pub fn new(factory: &'f JSXFactory, sym_trans: &'f Atom, pre: bool) -> Self {
+impl PhrasingContentCollector {
+  pub fn new(runtime: Lrc<JSXRuntime>, sym_trans: Atom, pre: bool) -> Self {
     Self {
-      factory,
+      runtime,
       sym_trans,
       message: MessageProps::new(pre),
     }
   }
 
   pub fn result(self) -> (Message, Box<Expr>) {
-    self.message.make_trans(&self.factory, &self.sym_trans)
+    self.message.make_trans(self.runtime, self.sym_trans)
   }
 }
 
 pub fn translate_phrase(
-  factory: &JSXFactory,
-  sym_trans: &Atom,
+  runtime: Lrc<JSXRuntime>,
+  sym_trans: Atom,
   pre: bool,
   jsx: &mut CallExpr,
 ) -> Option<Message> {
-  let mut preflight = PhrasingContentPreflight::new(factory.clone());
+  let mut preflight = PhrasingContentPreflight::new(runtime.clone());
 
   jsx.visit_with(&mut preflight);
 
   if preflight.is_translatable() {
-    let mut collector = PhrasingContentCollector::new(factory, sym_trans, pre);
+    let mut collector = PhrasingContentCollector::new(runtime.clone(), sym_trans.clone(), pre);
 
     jsx.visit_mut_with(&mut collector);
 
@@ -188,8 +187,8 @@ pub fn translate_phrase(
 
     let children = with_span(Some(jsx.span()))(children);
 
-    factory.mut_or_set_prop(
-      factory.as_mut_jsx_props(jsx).unwrap(),
+    runtime.mut_or_set_prop(
+      runtime.as_mut_jsx_props(jsx).unwrap(),
       &["children"],
       |expr| *expr = children,
     );

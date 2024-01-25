@@ -1,2 +1,2 @@
 pub mod drop;
-pub mod inline;
+pub mod html;

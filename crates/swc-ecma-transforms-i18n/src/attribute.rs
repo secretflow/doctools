@@ -1,23 +1,23 @@
 use swc_core::{
   atoms::Atom,
-  common::{util::take::Take as _, Spanned as _},
+  common::{sync::Lrc, util::take::Take as _, Spanned as _},
   ecma::ast::{Expr, Lit, ObjectLit, Tpl},
 };
-use swc_ecma_utils::{jsx::factory::JSXFactory, span::with_span};
+use swc_ecma_utils::{jsx::factory::JSXRuntime, span::with_span};
 
 use crate::message::{Message, MessageProps};
 
-fn translate_one<'f>(
-  factory: &'f JSXFactory,
-  sym_gettext: &'f Atom,
-) -> impl FnMut(&mut Box<Expr>) -> Option<Message> + 'f {
-  |attr| {
+fn translate_one(
+  runtime: Lrc<JSXRuntime>,
+  sym_gettext: Atom,
+) -> impl FnMut(&mut Box<Expr>) -> Option<Message> {
+  move |attr| {
     let expr = *attr.take();
     match expr {
       Expr::Lit(Lit::Str(lit)) => {
         let mut message = MessageProps::new(true);
         message.raw(lit.value.as_str(), lit.span());
-        let (message, result) = message.make_i18n(factory, sym_gettext);
+        let (message, result) = message.make_i18n(runtime.clone(), sym_gettext.clone());
         *attr = result;
         Some(message)
       }
@@ -44,7 +44,7 @@ fn translate_one<'f>(
             _ => unreachable!(),
           };
         }
-        let (message, result) = message.make_i18n(factory, sym_gettext);
+        let (message, result) = message.make_i18n(runtime.clone(), sym_gettext.clone());
         *attr = with_span(Some(span))(result);
         Some(message)
       }
@@ -57,15 +57,19 @@ fn translate_one<'f>(
 }
 
 pub fn translate_attrs(
-  factory: &JSXFactory,
-  sym_gettext: &Atom,
+  runtime: Lrc<JSXRuntime>,
+  sym_gettext: Atom,
   props: &mut ObjectLit,
   attrs: Vec<Vec<&str>>,
 ) -> Vec<Message> {
   attrs
     .iter()
     .filter_map(|path| {
-      let message = factory.mut_prop(props, path, translate_one(factory, sym_gettext));
+      let message = runtime.mut_prop(
+        props,
+        path,
+        translate_one(runtime.clone(), sym_gettext.clone()),
+      );
       match message {
         Some(Some(message)) => Some(message),
         _ => None,

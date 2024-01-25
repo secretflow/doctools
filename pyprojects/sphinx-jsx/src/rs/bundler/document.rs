@@ -10,7 +10,7 @@ use swc_ecma_utils::{
   ast::json_to_expr,
   jsx::{
     builder::{DocumentBuilder, JSXDocument},
-    factory::{JSXFactory, JSXTagName},
+    factory::{JSXRuntime, JSXTagName},
   },
 };
 
@@ -24,10 +24,10 @@ pub struct SphinxDocument {
 }
 
 impl SphinxDocument {
-  pub fn new(jsx: JSXFactory, source_file: Lrc<SourceFile>) -> Self {
+  pub fn new(runtime: JSXRuntime, source_file: Lrc<SourceFile>) -> Self {
     Self {
       source: source_file,
-      builder: Some(DocumentBuilder::new(jsx)),
+      builder: Some(DocumentBuilder::new(runtime)),
     }
   }
 

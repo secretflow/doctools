@@ -1620,7 +1620,6 @@ dependencies = [
 name = "html5jsx"
 version = "0.0.0"
 dependencies = [
- "ansi_term",
  "anyhow",
  "serde",
  "serde_json",
@@ -3610,7 +3609,6 @@ dependencies = [
 name = "swc-ecma-transforms-i18n"
 version = "0.0.0"
 dependencies = [
- "ansi_term",
  "base64 0.21.7",
  "indexmap 2.1.0",
  "serde",

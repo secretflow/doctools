@@ -10,7 +10,7 @@ use pyo3::{
 use relative_path::RelativePathBuf;
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{source_map::DefaultSourceMapGenConfig, sync::Lrc, FileName, SourceMap},
+  common::{chain, source_map::DefaultSourceMapGenConfig, sync::Lrc, FileName, SourceMap},
   ecma::{
     codegen::{text_writer::JsWriter, Emitter, Node as _},
     visit::VisitMutWith,
@@ -19,7 +19,11 @@ use swc_core::{
 
 use pyo3_utils::raise;
 use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
-use swc_ecma_utils::jsx::{builder::JSXDocument, factory::JSXFactory};
+use swc_ecma_transforms_sphinx::drop::drop_elements;
+use swc_ecma_utils::{
+  jsx::{builder::JSXDocument, factory::JSXRuntime},
+  testing::document_as_module,
+};
 
 use super::{document::SphinxDocument, symbols::WellKnownSymbols};
 
@@ -60,7 +64,7 @@ impl SphinxBundler {
 
     let source_file = self.sources.new_source_file(filename.clone(), source);
 
-    let factory = JSXFactory::new()
+    let factory = JSXRuntime::new()
       .with_jsx(&self.symbols.jsx)
       .with_jsxs(&self.symbols.jsxs)
       .with_fragment(&self.symbols.fragment);
@@ -116,6 +120,13 @@ impl SphinxBundler {
       .context("failed to parse output path")
       .map_err(raise::<PyOSError, _>)?;
 
+    let runtime = Lrc::new(
+      JSXRuntime::new()
+        .with_jsx(&self.symbols.jsx)
+        .with_jsxs(&self.symbols.jsxs)
+        .with_fragment(&self.symbols.fragment),
+    );
+
     let pages: Vec<(PathBuf, String)> = vec![];
 
     let undefined_bindings =
@@ -125,6 +136,10 @@ impl SphinxBundler {
     let mut unsupported_components = HashSet::new();
 
     for (docname, mut document) in self.pages.drain(..) {
+      document
+        .body
+        .visit_mut_with(&mut drop_elements(runtime.clone()));
+
       unsupported_components.extend(undefined_bindings.lint(&document.body));
 
       let mut code_buffer = vec![];
@@ -145,13 +160,7 @@ impl SphinxBundler {
         wr: Box::new(writer),
       };
 
-      let factory = JSXFactory::new()
-        .with_jsx(&self.symbols.jsx)
-        .with_jsxs(&self.symbols.jsxs)
-        .with_fragment(&self.symbols.fragment);
-
-      document
-        .body
+      document_as_module(document)
         .emit_with(&mut emitter)
         .context("failed to generate ECMAScript")
         .map_err(raise::<PyRuntimeError, _>)?;

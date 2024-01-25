@@ -1,6 +1,6 @@
 use swc_core::{
   atoms::Atom,
-  common::{util::take::Take as _, Span, Spanned},
+  common::{sync::Lrc, util::take::Take as _, Span, Spanned},
   ecma::{
     ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, ObjectLit, Str},
     visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _},
@@ -8,7 +8,7 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  jsx::factory::JSXFactory,
+  jsx::factory::JSXRuntime,
   span::{union_span, with_span},
 };
 
@@ -21,9 +21,9 @@ enum Block {
 }
 
 #[derive(Debug)]
-struct FlowContentCollector<'f> {
-  factory: &'f JSXFactory,
-  sym_trans: &'f Atom,
+struct FlowContentCollector {
+  runtime: Lrc<JSXRuntime>,
+  sym_trans: Atom,
   pre: bool,
   blocks: Vec<(Block, Span)>,
 }
@@ -48,7 +48,7 @@ macro_rules! current_message {
   }};
 }
 
-impl FlowContentCollector<'_> {
+impl FlowContentCollector {
   fn text(&mut self, lit: Str) {
     let (message, span) = current_message!(self);
     match message.text(lit.value.as_str(), lit.span()) {
@@ -69,11 +69,11 @@ impl FlowContentCollector<'_> {
   }
 }
 
-impl VisitMut for FlowContentCollector<'_> {
+impl VisitMut for FlowContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_object_lit(&mut self, props: &mut ObjectLit) {
-    let mut children = match self.factory.take_prop(props, &["children"]) {
+    let mut children = match self.runtime.take_prop(props, &["children"]) {
       Some(children) => children,
       None => return,
     };
@@ -89,7 +89,7 @@ impl VisitMut for FlowContentCollector<'_> {
             } else {
               match *expr.expr.take() {
                 Expr::Lit(Lit::Str(lit)) => self.text(lit),
-                Expr::Call(call) => match self.factory.as_jsx(&call) {
+                Expr::Call(call) => match self.runtime.as_jsx(&call) {
                   Some(_) => {
                     self.other(ExprOrSpread {
                       expr: Box::from(call),
@@ -113,10 +113,10 @@ impl VisitMut for FlowContentCollector<'_> {
   }
 }
 
-impl<'f> FlowContentCollector<'f> {
-  pub fn new(factory: &'f JSXFactory, sym_trans: &'f Atom, pre: bool) -> Self {
+impl FlowContentCollector {
+  pub fn new(runtime: Lrc<JSXRuntime>, sym_trans: Atom, pre: bool) -> Self {
     Self {
-      factory,
+      runtime,
       sym_trans,
       pre,
       blocks: vec![],
@@ -131,7 +131,7 @@ impl<'f> FlowContentCollector<'f> {
         if message.is_empty() {
           return;
         }
-        let (message, elem) = message.make_trans(self.factory, self.sym_trans);
+        let (message, elem) = message.make_trans(self.runtime.clone(), self.sym_trans.clone());
         messages.push(message);
         children.push(Some(with_span(Some(span))(elem).into()));
       }
@@ -146,21 +146,21 @@ impl<'f> FlowContentCollector<'f> {
 }
 
 pub fn translate_block(
-  factory: &JSXFactory,
-  sym_trans: &Atom,
+  runtime: Lrc<JSXRuntime>,
+  sym_trans: Atom,
   pre: bool,
   jsx: &mut CallExpr,
 ) -> Vec<Message> {
-  let mut collector = FlowContentCollector::new(factory, sym_trans, pre);
+  let mut collector = FlowContentCollector::new(runtime.clone(), sym_trans, pre);
 
-  let props = factory.as_mut_jsx_props(jsx).unwrap();
+  let props = runtime.as_mut_jsx_props(jsx).unwrap();
 
   props.visit_mut_with(&mut collector);
 
   let (messages, children) = collector.results();
 
-  factory.mut_or_set_prop(
-    factory.as_mut_jsx_props(jsx).unwrap(),
+  runtime.mut_or_set_prop(
+    runtime.as_mut_jsx_props(jsx).unwrap(),
     &["children"],
     |expr| *expr = Box::new(Expr::Array(children)),
   );

@@ -1,7 +1,8 @@
-jsx("link", {
-    "rel": "stylesheet",
-    "href": "style.css"
-});
-jsx(Fragment, {
-    "children": "\n"
-});
+export const head = [
+    jsx("link", {
+        "rel": "stylesheet",
+        "href": "style.css"
+    })
+], body = [
+    "\n"
+];

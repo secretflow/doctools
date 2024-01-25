@@ -1,1 +1,1 @@
-jsx(Fragment, {});
+export const head = [], body = [];

@@ -1,13 +1,23 @@
+use std::path::PathBuf;
+
+use serde::de::DeserializeOwned;
 use swc_core::{
   common::{comments::Comments, sync::Lrc, FileName, SourceFile, SourceMap},
   ecma::{
     self,
-    ast::EsVersion,
+    ast::{
+      ArrayLit, Decl, EsVersion, ExportDecl, Expr, ExprOrSpread, Ident, Module, ModuleDecl,
+      ModuleItem, VarDecl, VarDeclKind, VarDeclarator,
+    },
     codegen::{text_writer::JsWriter, Config, Emitter, Node},
     parser::Syntax,
+    visit::{Fold, FoldWith as _},
   },
+  testing::diff,
 };
 use swc_error_reporters::handler::try_with_handler;
+
+use crate::jsx::{builder::JSXDocument, factory::JSXRuntime};
 
 pub fn print_one<N: Node>(
   node: &N,
@@ -24,6 +34,10 @@ pub fn print_one<N: Node>(
   };
   node.emit_with(&mut emitter)?;
   Ok(String::from_utf8_lossy(&buf[..]).to_string())
+}
+
+pub fn print_one_unwrap<N: Node>(node: &N) -> String {
+  print_one(node, None, None).unwrap()
 }
 
 pub fn parse_one<N, F>(
@@ -61,6 +75,144 @@ where
         anyhow::anyhow!("trying to parse string as valid ECMAScript")
       })
   })
+}
+
+fn get_snapshot_path(source_path: PathBuf) -> PathBuf {
+  let mut source_path = source_path;
+  loop {
+    if source_path.extension().is_some() {
+      source_path = source_path.with_extension("");
+    } else {
+      break;
+    }
+  }
+  source_path.with_extension("swc-snapshot.js")
+}
+
+pub fn test_fixture<Config, Parse, Transform, Folder>(
+  source_path: PathBuf,
+  parse: Parse,
+  transform: Transform,
+) where
+  Config: DeserializeOwned + Default,
+  Parse: FnOnce(Lrc<SourceFile>) -> Module,
+  Transform: FnOnce(Lrc<JSXRuntime>, Config) -> Folder,
+  Folder: Fold,
+{
+  let config_path = source_path.clone().with_extension("json");
+  let config: Config = std::fs::read_to_string(config_path)
+    // exits on deserialize error
+    .and_then(|s| match serde_json::from_str(&s) {
+      Ok(v) => Ok(v),
+      Err(e) => {
+        panic!("Error: {}", e);
+      }
+    })
+    // default on file not found
+    .unwrap_or_default();
+
+  let runtime = Lrc::new(JSXRuntime::default());
+
+  let snapshot_path = get_snapshot_path(source_path.clone());
+  let snapshot = std::fs::read_to_string(snapshot_path).unwrap();
+  let snapshot = snapshot.trim();
+
+  let sourcemap: Lrc<SourceMap> = Default::default();
+  let source = sourcemap.new_source_file(
+    FileName::Anon,
+    std::fs::read_to_string(source_path.clone()).unwrap(),
+  );
+
+  let mut transform = transform(runtime, config);
+
+  let module = parse(source.clone());
+
+  let module = module.fold_with(&mut transform);
+
+  let mut code = vec![];
+  let mut emitter = Emitter {
+    cfg: Default::default(),
+    cm: sourcemap.clone(),
+    comments: None,
+    wr: JsWriter::new(sourcemap.clone(), "\n", &mut code, None),
+  };
+  module.emit_with(&mut emitter).unwrap();
+
+  let actual = String::from_utf8(code).unwrap();
+  let actual = actual.trim();
+
+  if actual == snapshot {
+    return;
+  }
+
+  print!(">>>>> Source <<<<<\n\n{}\n\n", source.src.as_str());
+  print!(">>>>> Transformed <<<<<\n\n{}\n\n", actual);
+  panic!(
+    "assertion failed (actual != expected)\n{}",
+    diff(&actual, snapshot)
+  )
+}
+
+pub fn document_as_module(mut document: JSXDocument) -> Module {
+  Module {
+    span: Default::default(),
+    body: vec![ModuleItem::ModuleDecl(ModuleDecl::ExportDecl(ExportDecl {
+      span: Default::default(),
+      decl: Decl::Var(
+        VarDecl {
+          span: Default::default(),
+          kind: VarDeclKind::Const,
+          declare: false,
+          decls: vec![
+            VarDeclarator {
+              definite: false,
+              span: Default::default(),
+              name: Ident::from("head").into(),
+              init: Some(
+                Expr::from(ArrayLit {
+                  elems: document
+                    .head
+                    .drain(..)
+                    .map(|e| {
+                      Some(ExprOrSpread {
+                        expr: e,
+                        spread: None,
+                      })
+                    })
+                    .collect(),
+                  span: Default::default(),
+                })
+                .into(),
+              ),
+            },
+            VarDeclarator {
+              definite: false,
+              span: Default::default(),
+              name: Ident::from("body").into(),
+              init: Some(
+                Expr::from(ArrayLit {
+                  elems: document
+                    .body
+                    .drain(..)
+                    .map(|e| {
+                      Some(ExprOrSpread {
+                        expr: e,
+                        spread: None,
+                      })
+                    })
+                    .collect(),
+                  span: Default::default(),
+                })
+                .into(),
+              ),
+            },
+          ],
+        }
+        .into(),
+      ),
+    }))],
+    shebang: None,
+  }
 }
 
 #[cfg(test)]

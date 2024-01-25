@@ -8,14 +8,13 @@ version = "0.0.0"
 [dependencies]
 serde = {version = "1", features = ["derive"]}
 sha2 = "0.10.8"
-swc-ecma-utils = {version = "0.0.0", path = "../swc-ecma-utils"}
+swc-ecma-utils = {path = "../swc-ecma-utils"}
 swc_core = {version = "0.88", features = ["ecma_ast", "ecma_utils"]}
 swc_html_ast = "0.33.12"
 swc_html_parser = "0.39.17"
 swc_html_visit = "0.33.12"
 
 [dev-dependencies]
-ansi_term = "0.12.1"
 anyhow = "1.0.79"
 serde_json = "1.0.111"
 swc_core = {version = "0.88", features = ["ecma_codegen", "testing"]}

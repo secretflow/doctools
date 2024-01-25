@@ -6,14 +6,14 @@ use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
 use swc_ecma_utils::{
-  jsx::factory::{JSXFactory, JSXTagName},
+  jsx::{builder::JSXDocument, factory::JSXRuntime},
   span::with_span,
 };
 
-use crate::{props::convert_attribute, Fragment};
+use crate::props::convert_attribute;
 
 pub struct DOMVisitor {
-  factory: JSXFactory,
+  runtime: JSXRuntime,
   head: Vec<Box<Expr>>,
   ancestors: Vec<Vec<Box<Expr>>>,
   styles: HashSet<Atom>,
@@ -57,7 +57,7 @@ impl Visit for DOMVisitor {
     let children = self.ancestors.pop().expect("expected children");
 
     let name = elem.tag_name.as_str().into();
-    let mut builder = self.factory.create(&name);
+    let mut builder = self.runtime.create(&name);
 
     let mut classes = String::new();
     let mut styled: Option<String> = None;
@@ -133,8 +133,8 @@ impl Visit for DOMVisitor {
 }
 
 impl DOMVisitor {
-  pub fn new(factory: JSXFactory) -> Self {
-    if factory
+  pub fn new(runtime: JSXRuntime) -> Self {
+    if runtime
       .get_names()
       .iter()
       .any(|name| name.contains("eval") || name.contains("Function"))
@@ -142,14 +142,14 @@ impl DOMVisitor {
       panic!("JSX factories cannot contain 'eval' or 'Function' in name");
     }
     Self {
-      factory,
+      runtime,
       ancestors: vec![],
       head: vec![],
       styles: HashSet::new(),
     }
   }
 
-  pub fn get(mut self) -> Result<Fragment, swc_html_parser::error::Error> {
+  pub fn get(mut self) -> Result<JSXDocument, swc_html_parser::error::Error> {
     let mut head = vec![];
 
     let mut stylesheet: Vec<Box<Expr>> = vec![];
@@ -170,7 +170,7 @@ impl DOMVisitor {
     if stylesheet.len() > 0 {
       head.push(
         self
-          .factory
+          .runtime
           .create(&"style".into())
           .children(stylesheet)
           .build()
@@ -181,13 +181,10 @@ impl DOMVisitor {
     head.append(&mut self.head);
 
     let children = self.ancestors.pop().unwrap_or(vec![]);
-    let body = self
-      .factory
-      .create(&JSXTagName::Fragment)
-      .children(children)
-      .build()
-      .into();
 
-    Ok(Fragment { head, body })
+    Ok(JSXDocument {
+      head,
+      body: children,
+    })
   }
 }

@@ -13,9 +13,9 @@ use swc_core::{
 };
 
 use html5jsx::html_to_jsx;
-use swc_ecma_utils::jsx::factory::JSXFactory;
+use swc_ecma_utils::jsx::factory::JSXRuntime;
 
-pub fn import_from(factory: &JSXFactory, src: &str) -> ImportDecl {
+pub fn import_from(factory: &JSXRuntime, src: &str) -> ImportDecl {
   let [jsx, jsxs, fragment] = factory.get_names();
   ImportDecl {
     specifiers: vec![
@@ -55,7 +55,7 @@ fn main() {
   let source = sourcemap.new_source_file(FileName::Anon, html);
 
   // parse
-  let jsx = JSXFactory::default();
+  let jsx = JSXRuntime::default();
   let fragment = html_to_jsx(&source, Some(jsx.clone())).unwrap();
 
   let html = jsx
@@ -68,7 +68,7 @@ fn main() {
         .into(),
       jsx
         .create(&"body".into())
-        .children(vec![fragment.body])
+        .children(fragment.body)
         .build()
         .into(),
     ])

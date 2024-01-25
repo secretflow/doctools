@@ -8,7 +8,10 @@ use swc_core::{
   },
 };
 
-use crate::{ast::PropMutator, span::with_span};
+use crate::{
+  ast::{PropMutator, SelectNode},
+  span::with_span,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 #[serde(tag = "type", content = "name")]
@@ -49,7 +52,7 @@ impl From<Ident> for JSXTagName {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct JSXFactory {
+pub struct JSXRuntime {
   #[serde(rename = "Fragment")]
   sym_fragment: Atom,
   #[serde(rename = "jsx")]
@@ -58,7 +61,7 @@ pub struct JSXFactory {
   sym_jsxs: Atom,
 }
 
-impl JSXFactory {
+impl JSXRuntime {
   pub fn new() -> Self {
     Self::default()
   }
@@ -78,6 +81,14 @@ impl JSXFactory {
     self
   }
 
+  pub fn jsx(&self) -> Callee {
+    Callee::Expr(Expr::Ident(Ident::from(&*self.sym_jsx)).into())
+  }
+
+  pub fn jsxs(&self) -> Callee {
+    Callee::Expr(Expr::Ident(Ident::from(&*self.sym_jsxs)).into())
+  }
+
   pub fn get_names(&self) -> [&str; 3] {
     [
       self.sym_fragment.as_str(),
@@ -87,10 +98,10 @@ impl JSXFactory {
   }
 }
 
-impl JSXFactory {
+impl JSXRuntime {
   pub fn create<'a>(&'a self, name: &'a JSXTagName) -> JSXBuilder<'a> {
     JSXBuilder {
-      factory: self,
+      runtime: self,
       name,
       arg1: None,
       props: vec![],
@@ -99,7 +110,7 @@ impl JSXFactory {
   }
 }
 
-impl JSXFactory {
+impl JSXRuntime {
   fn as_jsx_tag(&self, call: &CallExpr) -> Option<JSXTagName> {
     match &call.callee {
       Callee::Expr(callee) => match &**callee {
@@ -150,6 +161,21 @@ impl JSXFactory {
     call.args.get_mut(1).and_then(|a| a.expr.as_mut_object())
   }
 
+  pub fn get_prop<'ast>(&self, props: &'ast ObjectLit, keys: &[&str]) -> SelectNode<'ast> {
+    let mut keys = keys.iter();
+    let key = match keys.next() {
+      None => unreachable!(),
+      Some(key) => *key,
+    };
+    let mut selector = SelectNode::from_key(props, key);
+    loop {
+      match keys.next() {
+        None => return selector,
+        Some(key) => selector = selector.key(key),
+      }
+    }
+  }
+
   pub fn mut_prop<'ast, F, T>(
     &self,
     props: &'ast mut ObjectLit,
@@ -179,7 +205,7 @@ impl JSXFactory {
   }
 }
 
-impl Default for JSXFactory {
+impl Default for JSXRuntime {
   fn default() -> Self {
     Self {
       sym_fragment: "Fragment".into(),
@@ -190,7 +216,7 @@ impl Default for JSXFactory {
 }
 
 pub struct JSXBuilder<'factory> {
-  factory: &'factory JSXFactory,
+  runtime: &'factory JSXRuntime,
   name: &'factory JSXTagName,
   pub arg1: Option<Box<Expr>>,
   pub props: Vec<Box<Prop>>,
@@ -213,6 +239,11 @@ impl JSXBuilder<'_> {
     self
   }
 
+  pub fn arg1(mut self, arg1: Box<Expr>) -> Self {
+    self.arg1 = Some(arg1);
+    self
+  }
+
   pub fn children(mut self, mut children: Vec<Box<Expr>>) -> Self {
     self.children.append(
       &mut children
@@ -225,9 +256,9 @@ impl JSXBuilder<'_> {
 
   pub fn build(mut self) -> CallExpr {
     let jsx = if self.children.len() > 1 {
-      &*self.factory.sym_jsxs
+      &*self.runtime.sym_jsxs
     } else {
-      &*self.factory.sym_jsx
+      &*self.runtime.sym_jsx
     };
 
     let props = match self.arg1 {
@@ -291,7 +322,7 @@ impl JSXBuilder<'_> {
           JSXTagName::Intrinsic(tag) => Expr::from(tag.as_str()).into(),
           JSXTagName::Ident(tag) => Expr::from(Ident::from(tag.as_str())).into(),
           JSXTagName::Fragment => {
-            Expr::from(Ident::from(self.factory.sym_fragment.as_str())).into()
+            Expr::from(Ident::from(self.runtime.sym_fragment.as_str())).into()
           }
         },
         props.into(),
@@ -339,9 +370,9 @@ macro_rules! object_lit {
 }
 
 #[macro_export]
-macro_rules! jsx_or_pass {
+macro_rules! jsx_or_continue_visit {
   ($visitor:ident, $factory:expr, $call:expr) => {{
-    use swc_core::ecma::visit::VisitWith;
+    use swc_core::ecma::visit::VisitWith as _;
     match $factory.as_jsx($call) {
       Some((elem, props)) => (elem, props),
       None => {
@@ -351,7 +382,7 @@ macro_rules! jsx_or_pass {
     }
   }};
   ($visitor:ident, $factory:expr, mut $call:expr) => {{
-    use swc_core::ecma::visit::VisitMutWith;
+    use swc_core::ecma::visit::VisitMutWith as _;
     match $factory.as_jsx($call) {
       Some((elem, props)) => (elem, props),
       None => {
@@ -362,104 +393,16 @@ macro_rules! jsx_or_pass {
   }};
 }
 
-#[cfg(test)]
-mod tests {
-  use swc_core::{
-    ecma::{
-      ast::{Expr, Ident},
-      codegen,
-    },
-    testing::DebugUsingDisplay,
-  };
-
-  use crate::testing::print_one;
-
-  use super::{JSXFactory, JSXTagName};
-
-  #[test]
-  fn test_fragment() {
-    let jsx = JSXFactory::default();
-    let elem = jsx.create(&JSXTagName::Fragment).build();
-    let code = print_one(&elem, None, None).unwrap();
-    assert_eq!(code, "jsx(Fragment, {})");
-  }
-
-  #[test]
-  fn test_intrinsic() {
-    let jsx = JSXFactory::default();
-    let elem = jsx
-      .create(&JSXTagName::Intrinsic("div".into()))
-      .children(vec![Box::from(Expr::from(Ident::from("foo")))])
-      .build();
-    let code = print_one(
-      &elem,
-      None,
-      Some(codegen::Config::default().with_minify(true)),
-    );
-    assert_eq!(
-      DebugUsingDisplay(code.unwrap().as_str()),
-      DebugUsingDisplay(r#"jsx("div",{"children":foo})"#)
-    );
-  }
-
-  #[test]
-  fn test_component() {
-    let jsx = JSXFactory::default();
-    let elem = jsx.create(&JSXTagName::Ident("Foo".into())).build();
-    let code = print_one(
-      &elem,
-      None,
-      Some(codegen::Config::default().with_minify(true)),
-    );
-    assert_eq!(
-      DebugUsingDisplay(code.unwrap().as_str()),
-      DebugUsingDisplay(r#"jsx(Foo,{})"#)
-    );
-  }
-
-  #[test]
-  fn test_jsxs() {
-    let jsx = JSXFactory::default();
-    let elem = jsx
-      .create(&JSXTagName::Intrinsic("div".into()))
-      .children(vec![
-        jsx
-          .create(&JSXTagName::Intrinsic("span".into()))
-          .build()
-          .into(),
-        jsx
-          .create(&JSXTagName::Intrinsic("span".into()))
-          .build()
-          .into(),
-      ])
-      .build();
-    let code = print_one(
-      &elem,
-      None,
-      Some(codegen::Config::default().with_minify(true)),
-    );
-    assert_eq!(
-      DebugUsingDisplay(code.unwrap().as_str()),
-      DebugUsingDisplay(r#"jsxs("div",{"children":[jsx("span",{}),jsx("span",{})]})"#)
-    );
-  }
-
-  #[test]
-  fn test_props() {
-    let jsx = JSXFactory::default();
-    let elem = jsx
-      .create(&JSXTagName::Intrinsic("div".into()))
-      .prop("className", "foo".into(), None)
-      .prop("id", "bar".into(), None)
-      .build();
-    let code = print_one(
-      &elem,
-      None,
-      Some(codegen::Config::default().with_minify(true)),
-    );
-    assert_eq!(
-      DebugUsingDisplay(code.unwrap().as_str()),
-      DebugUsingDisplay(r#"jsx("div",{"className":"foo","id":"bar"})"#)
-    );
-  }
+#[macro_export]
+macro_rules! continue_visit {
+  ($visitor:ident, $call:expr) => {{
+    use swc_core::ecma::visit::VisitWith as _;
+    $call.visit_children_with($visitor);
+    return;
+  }};
+  ($visitor:ident, mut $call:expr) => {{
+    use swc_core::ecma::visit::VisitMutWith as _;
+    $call.visit_mut_children_with($visitor);
+    return;
+  }};
 }
