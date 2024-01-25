@@ -1,8 +1,9 @@
 use swc_core::{
+  atoms::Atom,
   common::{util::take::Take as _, Span, Spanned},
   ecma::{
-    ast::{ArrayLit, Expr, ExprOrSpread, Lit, ObjectLit, Str},
-    visit::{noop_visit_mut_type, VisitMut},
+    ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, ObjectLit, Str},
+    visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _},
   },
 };
 
@@ -20,10 +21,10 @@ enum Block {
 }
 
 #[derive(Debug)]
-pub struct FlowContentCollector {
-  factory: JSXFactory,
+struct FlowContentCollector<'f> {
+  factory: &'f JSXFactory,
+  sym_trans: &'f Atom,
   pre: bool,
-  trans: String,
   blocks: Vec<(Block, Span)>,
 }
 
@@ -47,7 +48,7 @@ macro_rules! current_message {
   }};
 }
 
-impl FlowContentCollector {
+impl FlowContentCollector<'_> {
   fn text(&mut self, lit: Str) {
     let (message, span) = current_message!(self);
     match message.text(lit.value.as_str(), lit.span()) {
@@ -68,7 +69,7 @@ impl FlowContentCollector {
   }
 }
 
-impl VisitMut for FlowContentCollector {
+impl VisitMut for FlowContentCollector<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_object_lit(&mut self, props: &mut ObjectLit) {
@@ -112,12 +113,12 @@ impl VisitMut for FlowContentCollector {
   }
 }
 
-impl FlowContentCollector {
-  pub fn new(factory: JSXFactory, trans: &str, pre: bool) -> Self {
+impl<'f> FlowContentCollector<'f> {
+  pub fn new(factory: &'f JSXFactory, sym_trans: &'f Atom, pre: bool) -> Self {
     Self {
       factory,
+      sym_trans,
       pre,
-      trans: String::from(trans),
       blocks: vec![],
     }
   }
@@ -130,7 +131,7 @@ impl FlowContentCollector {
         if message.is_empty() {
           return;
         }
-        let (message, elem) = message.make_trans(&self.factory, &self.trans);
+        let (message, elem) = message.make_trans(self.factory, self.sym_trans);
         messages.push(message);
         children.push(Some(with_span(Some(span))(elem).into()));
       }
@@ -142,4 +143,27 @@ impl FlowContentCollector {
     };
     (messages, children)
   }
+}
+
+pub fn translate_block(
+  factory: &JSXFactory,
+  sym_trans: &Atom,
+  pre: bool,
+  jsx: &mut CallExpr,
+) -> Vec<Message> {
+  let mut collector = FlowContentCollector::new(factory, sym_trans, pre);
+
+  let props = factory.as_mut_jsx_props(jsx).unwrap();
+
+  props.visit_mut_with(&mut collector);
+
+  let (messages, children) = collector.results();
+
+  factory.mut_or_set_prop(
+    factory.as_mut_jsx_props(jsx).unwrap(),
+    &["children"],
+    |expr| *expr = Box::new(Expr::Array(children)),
+  );
+
+  messages
 }

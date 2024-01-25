@@ -332,7 +332,7 @@ impl MessageProps {
   ///
   /// Since calling this function implies the end of a [swc_core::ecma::visit::VisitMut],
   /// mutating the tree only to result in an empty message is unexpected and likely a bug
-  pub fn make_trans(self, factory: &JSXFactory, trans: &str) -> (Message, Box<Expr>) {
+  pub fn make_trans(self, factory: &JSXFactory, trans: &Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -349,7 +349,7 @@ impl MessageProps {
 
     let trans = with_span(Some(span))(
       factory
-        .create(&JSXTagName::Ident(trans.into()))
+        .create(&JSXTagName::Ident((&**trans).into()))
         .prop("id", id.as_str().into(), None)
         .prop("message", message.as_str().into(), None)
         .prop("components", components.into(), None)
@@ -368,7 +368,7 @@ impl MessageProps {
     )
   }
 
-  pub fn make_i18n(self, factory: &JSXFactory, i18n: &str) -> (Message, Box<Expr>) {
+  pub fn make_i18n(self, factory: &JSXFactory, i18n: &Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -380,7 +380,7 @@ impl MessageProps {
     } = self.to_props(factory);
 
     let call = Expr::Call(CallExpr {
-      callee: Callee::Expr(Ident::from(i18n).into()),
+      callee: Callee::Expr(Ident::from(&**i18n).into()),
       args: vec![ExprOrSpread {
         expr: object_lit!(
           "id" = id.as_str(),

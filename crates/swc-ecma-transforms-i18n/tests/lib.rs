@@ -11,7 +11,7 @@ use swc_core::{
   testing::{diff, fixture},
 };
 
-use swc_ecma_transforms_i18n::{Translator, TranslatorOptions};
+use swc_ecma_transforms_i18n::{i18n, TranslatorOptions};
 
 #[fixture("tests/fixtures/*.in.js")]
 fn test_i18n(input: PathBuf) {
@@ -60,7 +60,7 @@ fn test_i18n(input: PathBuf) {
   let jsx = Default::default();
   let mut messages = vec![];
 
-  let mut translator = Translator::new(jsx, options, &mut messages);
+  let mut translator = i18n(jsx, options, &mut messages);
 
   module.visit_mut_children_with(&mut translator);
 
@@ -82,16 +82,16 @@ fn test_i18n(input: PathBuf) {
     return;
   }
 
-  // print!(
-  //   ">>>>> {} <<<<<\n\n{}\n\n",
-  //   Color::Blue.paint("Source"),
-  //   Color::Blue.paint(source.src.as_str()),
-  // );
-  // print!(
-  //   ">>>>> {} <<<<<\n\n{}\n\n",
-  //   Color::Yellow.paint("Transformed"),
-  //   Color::Yellow.paint(actual),
-  // );
+  print!(
+    ">>>>> {} <<<<<\n\n{}\n\n",
+    Color::Blue.paint("Source"),
+    Color::Blue.paint(source.src.as_str()),
+  );
+  print!(
+    ">>>>> {} <<<<<\n\n{}\n\n",
+    Color::Yellow.paint("Transformed"),
+    Color::Yellow.paint(actual),
+  );
 
   if actual != expected {
     panic!(

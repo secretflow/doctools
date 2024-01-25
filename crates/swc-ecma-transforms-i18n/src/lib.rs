@@ -3,17 +3,15 @@ use std::{collections::HashMap, fmt::Debug};
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
-  common::Spanned,
   ecma::{
-    ast::{CallExpr, Expr},
-    visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _, VisitWith},
+    ast::CallExpr,
+    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
   },
 };
 
 use swc_ecma_utils::{
   jsx::factory::{JSXFactory, JSXTagName},
   jsx_or_pass,
-  span::with_span,
 };
 
 mod attribute;
@@ -21,10 +19,10 @@ mod flow_content;
 mod message;
 mod phrasing_content;
 
-use crate::attribute::translate_attribute;
-use crate::flow_content::FlowContentCollector;
+use crate::attribute::translate_attrs;
+use crate::flow_content::translate_block;
 use crate::message::Message;
-use crate::phrasing_content::{PhrasingContentCollector, PhrasingContentPreflight};
+use crate::phrasing_content::translate_phrase;
 
 /// Content model determines how the element is translated.
 ///
@@ -247,26 +245,12 @@ impl Default for TranslatorOptions {
 }
 
 #[derive(Debug)]
-pub struct Translator<'messages> {
+struct Translator<'messages> {
   factory: JSXFactory,
   options: TranslatorOptions,
-
   elements: HashMap<JSXTagName, Translatable>,
-
-  messages: &'messages mut Vec<Message>,
   pre: bool,
-}
-
-impl Translator<'_> {
-  fn translate_prop(&self, call: &mut CallExpr, attr: &[&str]) -> Option<Message> {
-    let props = self.factory.as_mut_jsx_props(call).unwrap();
-    translate_attribute(
-      &self.factory,
-      &self.options.sym_gettext.as_str(),
-      props,
-      attr,
-    )
-  }
+  messages: &'messages mut Vec<Message>,
 }
 
 impl VisitMut for Translator<'_> {
@@ -276,18 +260,19 @@ impl VisitMut for Translator<'_> {
     let (element, _) = jsx_or_pass!(self, self.factory, mut call);
 
     if matches!(element, JSXTagName::Intrinsic(_)) {
-      self.messages.extend(
-        [
-          &["title"],
-          &["aria-label"],
-          &["aria-placeholder"],
-          &["aria-roledescription"],
-          &["aria-valuetext"],
-        ]
-        .iter()
-        .filter_map(|attr| self.translate_prop(call, *attr))
-        .collect::<Vec<_>>(),
-      );
+      let props = self.factory.as_mut_jsx_props(call).unwrap();
+      self.messages.extend(translate_attrs(
+        &self.factory,
+        &self.options.sym_gettext,
+        props,
+        vec![
+          vec!["title"],
+          vec!["aria-label"],
+          vec!["aria-placeholder"],
+          vec!["aria-roledescription"],
+          vec!["aria-valuetext"],
+        ],
+      ));
     }
 
     let options = match self.elements.get(&element) {
@@ -298,63 +283,37 @@ impl VisitMut for Translator<'_> {
       }
     };
 
-    self.messages.extend(
-      options
+    {
+      let attrs = options
         .props
         .iter()
-        .filter_map(|attr| {
-          let attr = attr.iter().map(|s| s.as_str()).collect::<Vec<_>>();
-          self.translate_prop(call, &attr[..])
-        })
-        .collect::<Vec<_>>(),
-    );
+        .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+      let props = self.factory.as_mut_jsx_props(call).unwrap();
+      self.messages.extend(translate_attrs(
+        &self.factory,
+        &self.options.sym_gettext,
+        props,
+        attrs,
+      ))
+    };
 
     let pre_parent = self.pre;
     self.pre = self.pre || options.pre;
 
     match options.content {
       ContentModel::Flow => {
-        let mut collector =
-          FlowContentCollector::new(self.factory.clone(), &self.options.sym_trans, self.pre);
-
-        let props = self.factory.as_mut_jsx_props(call).unwrap();
-
-        props.visit_mut_with(&mut collector);
-
-        let (messages, children) = collector.results();
-
-        self.factory.mut_or_set_prop(
-          self.factory.as_mut_jsx_props(call).unwrap(),
-          &["children"],
-          |expr| *expr = Box::new(Expr::Array(children)),
-        );
-
-        self.messages.extend(messages);
+        self.messages.extend(translate_block(
+          &self.factory,
+          &self.options.sym_trans,
+          options.pre,
+          call,
+        ));
       }
       ContentModel::Phrasing => {
-        let mut preflight = PhrasingContentPreflight::new(self.factory.clone());
-
-        call.visit_with(&mut preflight);
-
-        if preflight.is_translatable() {
-          let mut collector = PhrasingContentCollector::new(
-            self.factory.clone(),
-            &self.options.sym_trans,
-            options.pre,
-          );
-
-          call.visit_mut_with(&mut collector);
-
-          let (message, children) = collector.result();
-
-          let children = with_span(Some(call.span()))(children);
-
-          self.factory.mut_or_set_prop(
-            self.factory.as_mut_jsx_props(call).unwrap(),
-            &["children"],
-            |expr| *expr = children,
-          );
-
+        if let Some(message) =
+          translate_phrase(&self.factory, &self.options.sym_trans, options.pre, call)
+        {
           self.messages.push(message);
         }
       }
@@ -367,26 +326,6 @@ impl VisitMut for Translator<'_> {
 }
 
 impl<'messages> Translator<'messages> {
-  pub fn new(
-    factory: JSXFactory,
-    mut options: TranslatorOptions,
-    output: &'messages mut Vec<Message>,
-  ) -> Self {
-    let mut elements: HashMap<JSXTagName, Translatable> = Default::default();
-
-    options.elements.drain(..).for_each(|elem| {
-      elements.insert(elem.tag.clone(), elem);
-    });
-
-    Self {
-      factory,
-      options,
-      elements,
-      messages: output,
-      pre: false,
-    }
-  }
-
   pub fn flow<E: Into<JSXTagName>>(mut self, tag: E) -> Self {
     self.elements.insert(
       tag.into(),
@@ -541,8 +480,25 @@ impl<'messages> Translator<'messages> {
   pub fn pre(self) -> Self {
     self.preformatted("pre", ContentModel::Phrasing)
   }
+}
 
-  pub fn build(self) -> Self {
-    self
-  }
+pub fn i18n(
+  factory: JSXFactory,
+  options: TranslatorOptions,
+  output: &mut Vec<Message>,
+) -> impl Fold + VisitMut + '_ {
+  let mut options = options;
+  let mut elements: HashMap<JSXTagName, Translatable> = Default::default();
+
+  options.elements.drain(..).for_each(|elem| {
+    elements.insert(elem.tag.clone(), elem);
+  });
+
+  as_folder(Translator {
+    factory,
+    options,
+    elements,
+    messages: output,
+    pre: false,
+  })
 }
