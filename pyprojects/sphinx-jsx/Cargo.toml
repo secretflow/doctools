@@ -23,10 +23,14 @@ pyo3-utils = {path = "../../crates/pyo3-utils"}
 relative-path = "1.9.2"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = {version = "1.0.111", features = ["preserve_order"]}
-swc-ecma-lints = {path = "../../crates/swc-ecma-lints"}
-swc-ecma-transforms-sphinx = {version = "0.1.0", path = "../../crates/swc-ecma-transforms-sphinx"}
+swc-ecma-lint-linkcheck = {path = "../../crates/swc-ecma-lint-linkcheck"}
+swc-ecma-lint-sphinx-theme = {path = "../../crates/swc-ecma-lint-sphinx-theme"}
+swc-ecma-transform-i18n = {path = "../../crates/swc-ecma-transform-i18n"}
+swc-ecma-transform-sphinx = {path = "../../crates/swc-ecma-transform-sphinx"}
 swc-ecma-utils = {path = "../../crates/swc-ecma-utils"}
 swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen", "common_sourcemap"]}
+swc_error_reporters = "0.17.13"
+url = "2.5.0"
 
 [build-dependencies]
 anyhow = "1.0.79"

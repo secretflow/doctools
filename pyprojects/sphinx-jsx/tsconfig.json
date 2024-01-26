@@ -3,5 +3,5 @@
   "compilerOptions": {
     "composite": true
   },
-  "include": ["src/js"]
+  "references": [{ "path": "./tsconfig.theme.json" }]
 }

@@ -7,7 +7,7 @@ use swc_ecma_utils::{
   testing::{parse_one, test_fixture},
 };
 
-use swc_ecma_transforms_i18n::i18n;
+use swc_ecma_transform_i18n::i18n;
 
 #[fixture("tests/fixtures/*.in.js")]
 fn test_i18n(source_path: PathBuf) {

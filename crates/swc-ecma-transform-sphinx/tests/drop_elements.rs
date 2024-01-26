@@ -6,7 +6,7 @@ use swc_core::{
   ecma::transforms::testing::test,
 };
 
-use swc_ecma_transforms_sphinx::drop_elements::drop_elements;
+use swc_ecma_transform_sphinx::drop_elements::drop_elements;
 use swc_ecma_utils::{
   jsx::{factory::JSXRuntime, sanitize::sanitize_jsx},
   tag,

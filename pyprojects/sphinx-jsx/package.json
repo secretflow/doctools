@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "@jupyterlab/application": "^4.0.0",
+    "@jupyterlab/settingregistry": "^4.0.0",
     "@lingui/core": "^4.6.0",
     "@lingui/react": "^4.6.0",
     "@types/react": "^18.2.43",

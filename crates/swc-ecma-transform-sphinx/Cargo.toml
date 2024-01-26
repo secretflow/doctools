@@ -1,8 +1,9 @@
 [package]
 edition = "2021"
 license.workspace = true
-name = "swc-ecma-transforms-sphinx"
-version = "0.1.0"
+name = "swc-ecma-transform-sphinx"
+publish = false
+version = "0.0.0"
 
 [dependencies]
 itertools = "0.12.0"

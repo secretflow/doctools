@@ -10,23 +10,28 @@ use pyo3::{
 use relative_path::RelativePathBuf;
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{chain, source_map::DefaultSourceMapGenConfig, sync::Lrc, FileName, SourceMap},
+  common::{
+    chain,
+    errors::{DiagnosticBuilder, Handler, Level},
+    source_map::SourceMapGenConfig,
+    sync::Lrc,
+    FileName, MultiSpan, SourceMap,
+  },
   ecma::{
     codegen::{text_writer::JsWriter, Emitter, Node as _},
-    transforms::base::pass::noop,
-    visit::{FoldWith, VisitMutWith},
+    visit::FoldWith,
   },
 };
+use swc_error_reporters::handler::try_with_handler;
+use url::Url;
 
 use pyo3_utils::raise;
-use swc_ecma_lints::undefined_bindings::LintUndefinedBindings;
-use swc_ecma_transforms_sphinx::drop_elements::drop_elements;
+use swc_ecma_lint_linkcheck::{collect_links, Link};
+use swc_ecma_lint_sphinx_theme::LintUndefinedBindings;
+use swc_ecma_transform_sphinx::drop_elements::drop_elements;
 use swc_ecma_utils::{
-  jsx::{
-    builder::JSXDocument,
-    factory::{JSXRuntime, JSXTagName},
-    sanitize::sanitize_jsx,
-  },
+  jsx::{builder::JSXDocument, factory::JSXRuntime, sanitize::sanitize_jsx},
+  tag,
   testing::document_as_module,
 };
 
@@ -43,6 +48,18 @@ pub struct SphinxBundler {
 pub struct BuildOptions {
   srcdir: PathBuf,
   outdir: PathBuf,
+}
+
+struct SourceMapConfig;
+
+impl SourceMapGenConfig for SourceMapConfig {
+  fn file_name_to_source(&self, f: &FileName) -> String {
+    f.to_string()
+  }
+
+  fn inline_sources_content(&self, _: &FileName) -> bool {
+    true
+  }
 }
 
 #[pymethods]
@@ -132,24 +149,65 @@ impl SphinxBundler {
       &self.symbols.fragment,
     ));
 
-    let pages: Vec<(PathBuf, String)> = vec![];
-
     let undefined_bindings =
       LintUndefinedBindings::new(vec![include_str!("../../js/theme.d.ts").to_string()])
         .map_err(raise::<PyRuntimeError, _>)?;
 
     let mut unsupported_components = HashSet::new();
 
+    let mut internal_links: Vec<(Url, MultiSpan)> = Default::default();
+    let mut external_links: Vec<(Url, MultiSpan)> = Default::default();
+    let mut known_docs: HashSet<Url> = Default::default();
+
+    let src_dir_url = Url::from_directory_path("/")
+      .unwrap()
+      .join(format!("{}/", src_dir).as_str())
+      .unwrap();
+
     for (docname, document) in self.pages.drain(..) {
+      let source_file = self
+        .sources
+        .get_source_file(&docname)
+        .expect("source file unexpectedly not found");
+
+      let docname = file_name_to_relpath(&docname)
+        .context("failed to parse output path")
+        .map_err(raise::<PyOSError, _>)?;
+
+      let docname = src_dir.relative(&docname);
+
+      known_docs.insert(src_dir_url.join(docname.as_str()).unwrap());
+
+      let out_path = out_dir.join(docname.with_extension("js")).to_path("/");
+
       let module = document_as_module(document);
 
+      let mut links = Default::default();
+
       let module = module.fold_with(&mut chain!(
+        collect_links(runtime.clone(), &mut links),
         drop_elements(runtime.clone(), |c| {
-          c.delete(JSXTagName::Ident("comment".into()))
-            .delete(JSXTagName::Ident("substitution_definition".into()))
+          c.delete(tag!(<comment>))
+            .delete(tag!(<substitution_definition>))
         }),
         sanitize_jsx(runtime.clone())
       ));
+
+      links.iter().for_each(|(link, span)| match link {
+        Link::URL(link) => {
+          let url = Url::parse(link).unwrap();
+          external_links.push((url, span.clone()));
+        }
+        Link::Internal(link) => {
+          let url = src_dir_url
+            .join(docname.as_str())
+            .unwrap()
+            .join(link)
+            .unwrap();
+          internal_links.push((url, span.clone()));
+        }
+        _ => {}
+      });
 
       unsupported_components.extend(undefined_bindings.lint(&module));
 
@@ -178,7 +236,7 @@ impl SphinxBundler {
 
       self
         .sources
-        .build_source_map_with_config(&source_mapping, None, DefaultSourceMapGenConfig {})
+        .build_source_map_with_config(&source_mapping, None, SourceMapConfig)
         .to_writer(&mut source_map_buffer)
         .context("failed to generate source map")
         .map_err(raise::<PyRuntimeError, _>)?;
@@ -189,19 +247,6 @@ impl SphinxBundler {
 
       code.push_str("\n//# sourceMappingURL=data:application/json;base64,");
       BASE64_STANDARD.encode_string(&source_map_buffer, &mut code);
-
-      let source_file = self
-        .sources
-        .get_source_file(&docname)
-        .expect("source file unexpectedly not found");
-
-      let docname = file_name_to_relpath(&docname)
-        .context("failed to parse output path")
-        .map_err(raise::<PyOSError, _>)?;
-
-      let docname = src_dir.relative(&docname);
-
-      let out_path = out_dir.join(docname.with_extension("js")).to_path("/");
 
       let parent_dir = out_path
         .parent()
@@ -218,6 +263,15 @@ impl SphinxBundler {
           .map_err(raise::<PyOSError, _>)?;
 
         out_file.write_all(code.as_bytes())?;
+      }
+    }
+
+    match try_with_handler(self.sources.clone(), Default::default(), |handler| {
+      check_internal_links(handler, internal_links, known_docs)
+    }) {
+      Ok(()) => {}
+      Err(err) => {
+        return Err(raise::<PyRuntimeError, _>(err));
       }
     }
 
@@ -242,4 +296,40 @@ fn file_name_to_relpath(filename: &FileName) -> anyhow::Result<RelativePathBuf> 
     FileName::Real(path_buf) => abspath_to_relpath(path_buf),
     _ => unreachable!("unexpected filename type {:?}", filename),
   }
+}
+
+fn check_internal_links(
+  handler: &Handler,
+  links: Vec<(Url, MultiSpan)>,
+  known_docs: HashSet<Url>,
+) -> anyhow::Result<()> {
+  links.iter().for_each(|(link, span)| {
+    let expected_path = link.to_file_path().unwrap();
+
+    let found_doc = known_docs.iter().any(|doc| {
+      // TODO: preferably we should get docnames from Sphinx directly
+      let generated_path = doc.to_file_path().unwrap().with_extension("");
+      expected_path == generated_path
+    });
+
+    if found_doc {
+      return;
+    }
+
+    let mut builder = DiagnosticBuilder::new(handler, Level::Error, "invalid link format");
+
+    span.span_labels().iter().for_each(|label| {
+      if label.is_primary {
+        builder.set_span(label.span);
+      } else if label.label.is_some() {
+        let message = label.label.clone().unwrap();
+        builder.sub(Level::Error, message.as_str(), Some(label.span));
+      } else {
+        unreachable!();
+      }
+    });
+
+    builder.emit();
+  });
+  Ok(())
 }

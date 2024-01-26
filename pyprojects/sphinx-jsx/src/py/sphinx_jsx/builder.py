@@ -82,7 +82,13 @@ class SphinxJSXBuilder(Builder):
             outdir=Path(self.outdir),
         )
 
-        print(timeit.Timer(lambda: self.bundler.build(options)).timeit(1))
+        try:
+            logger.info("Checking link validity...")
+            print(timeit.Timer(lambda: self.bundler.build(options)).timeit(1))
+        except RuntimeError as e:
+            logger.exception("Failed to build")
+            print(e)
+            exit(1)
 
         with progress_message(__("dumping object inventory")):
             InventoryFile.dump(

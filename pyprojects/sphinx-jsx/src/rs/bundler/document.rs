@@ -81,11 +81,13 @@ impl SphinxDocument {
       Some(position) => match position.reify(&self.source) {
         Some(span) => Some(span),
         None => {
-          return Err(raise::<PyValueError, _>(anyhow::anyhow!(
-            "Invalid source position {} for file {}",
-            position,
-            self.source.name
-          )))
+          None
+          // return Err(raise::<PyValueError, _>(anyhow::anyhow!(
+          //   "Invalid source position {} for file {}",
+          //   position,
+          //   self.source.name
+          // )))
+          // FIXME:
         }
       },
       None => None,

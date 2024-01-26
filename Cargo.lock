@@ -3475,10 +3475,14 @@ dependencies = [
  "relative-path",
  "serde",
  "serde_json",
- "swc-ecma-lints",
- "swc-ecma-transforms-sphinx",
+ "swc-ecma-lint-linkcheck",
+ "swc-ecma-lint-sphinx-theme",
+ "swc-ecma-transform-i18n",
+ "swc-ecma-transform-sphinx",
  "swc-ecma-utils",
  "swc_core",
+ "swc_error_reporters",
+ "url",
 ]
 
 [[package]]
@@ -3597,7 +3601,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-lints"
+name = "swc-ecma-lint-linkcheck"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "swc-ecma-utils",
+ "swc_core",
+ "url",
+]
+
+[[package]]
+name = "swc-ecma-lint-sphinx-theme"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -3606,7 +3621,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-transforms-i18n"
+name = "swc-ecma-transform-i18n"
 version = "0.0.0"
 dependencies = [
  "base64 0.21.7",
@@ -3620,8 +3635,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-transforms-sphinx"
-version = "0.1.0"
+name = "swc-ecma-transform-sphinx"
+version = "0.0.0"
 dependencies = [
  "itertools 0.12.0",
  "serde",
