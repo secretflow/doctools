@@ -1,14 +1,11 @@
-use swc_core::{
-  common::{chain, sync::Lrc},
-  ecma::transforms::testing::test,
-};
+use swc_core::{common::chain, ecma::transforms::testing::test};
 
 use swc_ecma_utils::jsx::{factory::JSXRuntime, sanitize};
 
 test!(
   Default::default(),
   |_| chain!(
-    sanitize::fold_fragments(Lrc::new(JSXRuntime::aliased("_jsx", "_jsxs", "_Fragment"))),
+    sanitize::fold_fragments(JSXRuntime::playground()),
     sanitize::remove_invalid()
   ),
   fold_fragments,
@@ -34,7 +31,7 @@ test!(
 test!(
   Default::default(),
   |_| chain!(
-    sanitize::fold_fragments(Lrc::new(Default::default())),
+    sanitize::fold_fragments(Default::default()),
     sanitize::remove_invalid()
   ),
   fold_fragments_deep,
@@ -69,7 +66,7 @@ test!(
 test!(
   Default::default(),
   |_| chain!(
-    sanitize::sanitize_jsx(Lrc::new(JSXRuntime::aliased("_jsx", "_jsxs", "_Fragment"))),
+    sanitize::sanitize_jsx(JSXRuntime::playground()),
     sanitize::remove_invalid()
   ),
   sanitize_jsx,

@@ -6,5 +6,3 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-swc-ecma-utils = {version = "0.0.0", path = "../swc-ecma-utils"}
-swc_core = {version = "0.88.1", features = ["ecma_ast", "ecma_ast_serde", "ecma_utils"]}

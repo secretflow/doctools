@@ -1,6 +1,6 @@
 use swc_core::{
   atoms::Atom,
-  common::{sync::Lrc, util::take::Take as _, Span, Spanned},
+  common::{util::take::Take as _, Span, Spanned},
   ecma::{
     ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, ObjectLit, Str},
     visit::{noop_visit_mut_type, VisitMut, VisitMutWith as _},
@@ -22,7 +22,7 @@ enum Block {
 
 #[derive(Debug)]
 struct FlowContentCollector {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   sym_trans: Atom,
   pre: bool,
   blocks: Vec<(Block, Span)>,
@@ -73,7 +73,7 @@ impl VisitMut for FlowContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_object_lit(&mut self, props: &mut ObjectLit) {
-    let mut children = match self.runtime.take_prop(props, &["children"]) {
+    let mut children = match self.jsx.take_prop(props, &["children"]) {
       Some(children) => children,
       None => return,
     };
@@ -89,7 +89,7 @@ impl VisitMut for FlowContentCollector {
             } else {
               match *expr.expr.take() {
                 Expr::Lit(Lit::Str(lit)) => self.text(lit),
-                Expr::Call(call) => match self.runtime.as_jsx(&call) {
+                Expr::Call(call) => match self.jsx.as_jsx(&call) {
                   Some(_) => {
                     self.other(ExprOrSpread {
                       expr: Box::from(call),
@@ -114,9 +114,9 @@ impl VisitMut for FlowContentCollector {
 }
 
 impl FlowContentCollector {
-  pub fn new(runtime: Lrc<JSXRuntime>, sym_trans: Atom, pre: bool) -> Self {
+  pub fn new(jsx: JSXRuntime, sym_trans: Atom, pre: bool) -> Self {
     Self {
-      runtime,
+      jsx,
       sym_trans,
       pre,
       blocks: vec![],
@@ -131,7 +131,7 @@ impl FlowContentCollector {
         if message.is_empty() {
           return;
         }
-        let (message, elem) = message.make_trans(self.runtime.clone(), self.sym_trans.clone());
+        let (message, elem) = message.make_trans(self.jsx.clone(), self.sym_trans.clone());
         messages.push(message);
         children.push(Some(with_span(Some(span))(elem).into()));
       }
@@ -146,24 +146,22 @@ impl FlowContentCollector {
 }
 
 pub fn translate_block(
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   sym_trans: Atom,
   pre: bool,
-  jsx: &mut CallExpr,
+  elem: &mut CallExpr,
 ) -> Vec<Message> {
-  let mut collector = FlowContentCollector::new(runtime.clone(), sym_trans, pre);
+  let mut collector = FlowContentCollector::new(jsx.clone(), sym_trans, pre);
 
-  let props = runtime.as_mut_jsx_props(jsx).unwrap();
+  let props = jsx.as_mut_jsx_props(elem).unwrap();
 
   props.visit_mut_with(&mut collector);
 
   let (messages, children) = collector.results();
 
-  runtime.mut_or_set_prop(
-    runtime.as_mut_jsx_props(jsx).unwrap(),
-    &["children"],
-    |expr| *expr = Box::new(Expr::Array(children)),
-  );
+  jsx.mut_or_set_prop(jsx.as_mut_jsx_props(elem).unwrap(), &["children"], |expr| {
+    *expr = Box::new(Expr::Array(children))
+  });
 
   messages
 }

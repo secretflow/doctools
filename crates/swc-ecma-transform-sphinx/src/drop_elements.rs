@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{sync::Lrc, util::take::Take},
+  common::util::take::Take,
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
@@ -53,7 +53,7 @@ impl DropElements {
 }
 
 struct ElementDropper {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   options: DropElements,
 }
 
@@ -63,7 +63,7 @@ impl VisitMut for ElementDropper {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (name, _) = jsx_or_return!(self.runtime, elem);
+    let (name, _) = jsx_or_return!(self.jsx, elem);
 
     let drop = match self.options.elements.get(&name) {
       Some(drop) => drop,
@@ -72,15 +72,11 @@ impl VisitMut for ElementDropper {
 
     match drop {
       Drop::Unwrap => {
-        let props = self.runtime.as_mut_jsx_props(elem).unwrap();
-        let children = self.runtime.take_prop(props, &["children"]);
+        let props = self.jsx.as_mut_jsx_props(elem).unwrap();
+        let children = self.jsx.take_prop(props, &["children"]);
         match children {
           Some(children) => {
-            *elem = self
-              .runtime
-              .create(&tag!(<>))
-              .arg1(Box::new(children))
-              .build();
+            *elem = self.jsx.create(&tag!(<>)).arg1(Box::new(children)).build();
           }
           None => {
             elem.take();
@@ -95,10 +91,10 @@ impl VisitMut for ElementDropper {
 }
 
 pub fn drop_elements(
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   configurer: impl Fn(&mut DropElements) -> &mut DropElements,
 ) -> impl Fold + VisitMut {
   let mut options = DropElements::new();
   configurer(&mut options);
-  as_folder(ElementDropper { runtime, options })
+  as_folder(ElementDropper { jsx, options })
 }

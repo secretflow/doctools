@@ -20,8 +20,8 @@ features = [
   "ecma_utils",
   "ecma_visit",
 ]
-version = "0.88"
+version = "*"
 
 [dev-dependencies.swc_core]
 features = ["testing"]
-version = "0.88"
+version = "*"

@@ -30,7 +30,6 @@ import * as file from "ext:deno_web/09_file.js";
 import * as fileReader from "ext:deno_web/10_filereader.js";
 import * as compression from "ext:deno_web/14_compression.js";
 import * as performance from "ext:deno_web/15_performance.js";
-import * as imageData from "ext:deno_web/16_image_data.js";
 import * as webidl from "ext:deno_webidl/00_webidl.js";
 
 // not including these in globalThis, but
@@ -151,7 +150,6 @@ import "ext:deno_web/13_message_port.js";
 
   Object.defineProperties(globalThis, {
     DOMException: frozen(DOMException),
-    ImageData: frozen(imageData.ImageData),
     atob: frozen(base64.atob),
     btoa: frozen(base64.btoa),
     clearInterval: frozen(timers.clearInterval),

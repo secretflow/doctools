@@ -34,6 +34,15 @@ pub struct JSXDocument {
   pub body: Vec<Box<Expr>>,
 }
 
+impl Default for JSXDocument {
+  fn default() -> Self {
+    Self {
+      head: vec![],
+      body: vec![],
+    }
+  }
+}
+
 #[derive(Debug)]
 pub struct DocumentBuilder {
   runtime: JSXRuntime,

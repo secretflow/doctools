@@ -1,6 +1,6 @@
 use swc_core::{
   atoms::Atom,
-  common::{sync::Lrc, util::take::Take as _, Spanned as _},
+  common::{util::take::Take as _, Spanned as _},
   ecma::{
     ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, Str},
     visit::{
@@ -31,7 +31,7 @@ use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 /// [AST node taking][swc_core::common::util::take::Take]. This is much less ergonomic and
 /// more error-prone than just visiting the tree twice.
 struct PhrasingContentPreflight {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   is_translatable: bool,
 }
 
@@ -43,9 +43,9 @@ impl Visit for PhrasingContentPreflight {
       return;
     }
 
-    let (_, props) = jsx_or_continue_visit!(self, self.runtime, call);
+    let (_, props) = jsx_or_continue_visit!(self, self.jsx, call);
 
-    let children = self.runtime.get_prop(props, &["children"]).get();
+    let children = self.jsx.get_prop(props, &["children"]).get();
 
     self.is_translatable = match &children {
       Some(Expr::Array(ArrayLit { ref elems, .. })) => elems.iter().any(|expr| match expr {
@@ -64,9 +64,9 @@ impl Visit for PhrasingContentPreflight {
 }
 
 impl PhrasingContentPreflight {
-  pub fn new(runtime: Lrc<JSXRuntime>) -> Self {
+  pub fn new(jsx: JSXRuntime) -> Self {
     Self {
-      runtime,
+      jsx,
       is_translatable: false,
     }
   }
@@ -78,7 +78,7 @@ impl PhrasingContentPreflight {
 
 #[derive(Debug)]
 pub struct PhrasingContentCollector {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   sym_trans: Atom,
   message: MessageProps,
 }
@@ -87,11 +87,11 @@ impl VisitMut for PhrasingContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    jsx_or_continue_visit!(self, self.runtime, mut elem);
+    jsx_or_continue_visit!(self, self.jsx, mut elem);
 
     let children = match self
-      .runtime
-      .take_prop(self.runtime.as_mut_jsx_props(elem).unwrap(), &["children"])
+      .jsx
+      .take_prop(self.jsx.as_mut_jsx_props(elem).unwrap(), &["children"])
     {
       Some(children) => children,
       None => return,
@@ -115,7 +115,7 @@ impl VisitMut for PhrasingContentCollector {
           Palpable(true) => (),
           Palpable(false) => (),
         },
-        Expr::Call(mut call) => match self.runtime.as_jsx(&call) {
+        Expr::Call(mut call) => match self.jsx.as_jsx(&call) {
           Some((elem, _)) => {
             let name = match elem {
               tag!(<>) => None,
@@ -135,7 +135,7 @@ impl VisitMut for PhrasingContentCollector {
         }
       });
 
-    let props = self.runtime.as_mut_jsx_props(elem).unwrap();
+    let props = self.jsx.as_mut_jsx_props(elem).unwrap();
     props.props = props
       .props
       .drain(..)
@@ -151,43 +151,41 @@ impl VisitMut for PhrasingContentCollector {
 }
 
 impl PhrasingContentCollector {
-  pub fn new(runtime: Lrc<JSXRuntime>, sym_trans: Atom, pre: bool) -> Self {
+  pub fn new(jsx: JSXRuntime, sym_trans: Atom, pre: bool) -> Self {
     Self {
-      runtime,
+      jsx,
       sym_trans,
       message: MessageProps::new(pre),
     }
   }
 
   pub fn result(self) -> (Message, Box<Expr>) {
-    self.message.make_trans(self.runtime, self.sym_trans)
+    self.message.make_trans(self.jsx, self.sym_trans)
   }
 }
 
 pub fn translate_phrase(
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   sym_trans: Atom,
   pre: bool,
-  jsx: &mut CallExpr,
+  elem: &mut CallExpr,
 ) -> Option<Message> {
-  let mut preflight = PhrasingContentPreflight::new(runtime.clone());
+  let mut preflight = PhrasingContentPreflight::new(jsx.clone());
 
-  jsx.visit_with(&mut preflight);
+  elem.visit_with(&mut preflight);
 
   if preflight.is_translatable() {
-    let mut collector = PhrasingContentCollector::new(runtime.clone(), sym_trans.clone(), pre);
+    let mut collector = PhrasingContentCollector::new(jsx.clone(), sym_trans.clone(), pre);
 
-    jsx.visit_mut_with(&mut collector);
+    elem.visit_mut_with(&mut collector);
 
     let (message, children) = collector.result();
 
-    let children = with_span(Some(jsx.span()))(children);
+    let children = with_span(Some(elem.span()))(children);
 
-    runtime.mut_or_set_prop(
-      runtime.as_mut_jsx_props(jsx).unwrap(),
-      &["children"],
-      |expr| *expr = children,
-    );
+    jsx.mut_or_set_prop(jsx.as_mut_jsx_props(elem).unwrap(), &["children"], |expr| {
+      *expr = children
+    });
 
     Some(message)
   } else {

@@ -97,12 +97,16 @@ impl JSXRuntime {
     Self::default()
   }
 
-  pub fn aliased(jsx: &str, jsxs: &str, fragment: &str) -> Self {
+  pub fn aliased(jsx: Atom, jsxs: Atom, fragment: Atom) -> Self {
     Self {
       sym_fragment: fragment.into(),
       sym_jsx: jsx.into(),
       sym_jsxs: jsxs.into(),
     }
+  }
+
+  pub fn playground() -> Self {
+    Self::aliased("_jsx".into(), "_jsxs".into(), "_Fragment".into())
   }
 
   pub fn jsx(&self) -> Callee {
@@ -113,12 +117,8 @@ impl JSXRuntime {
     Callee::Expr(Expr::Ident(Ident::from(&*self.sym_jsxs)).into())
   }
 
-  pub fn get_names(&self) -> [&str; 3] {
-    [
-      self.sym_fragment.as_str(),
-      self.sym_jsx.as_str(),
-      self.sym_jsxs.as_str(),
-    ]
+  pub fn fragment(&self) -> Callee {
+    Callee::Expr(Expr::Ident(Ident::from(&*self.sym_fragment)).into())
   }
 }
 
@@ -345,9 +345,7 @@ impl JSXBuilder<'_> {
         match self.name {
           JSXTagName::Intrinsic(tag) => Expr::from(tag.as_str()).into(),
           JSXTagName::Ident(tag) => Expr::from(Ident::from(tag.as_str())).into(),
-          JSXTagName::Fragment => {
-            Expr::from(Ident::from(self.runtime.sym_fragment.as_str())).into()
-          }
+          JSXTagName::Fragment => Expr::from(Ident::from(&*self.runtime.sym_fragment)).into(),
         },
         props.into(),
       ],
@@ -395,8 +393,8 @@ macro_rules! object_lit {
 
 #[macro_export]
 macro_rules! jsx_or_return {
-  ($factory:expr, $call:expr) => {{
-    match $factory.as_jsx($call) {
+  ($runtime:expr, $call:expr) => {{
+    match $runtime.as_jsx($call) {
       Some((elem, props)) => (elem, props),
       None => {
         return;
@@ -407,9 +405,9 @@ macro_rules! jsx_or_return {
 
 #[macro_export]
 macro_rules! jsx_or_continue_visit {
-  ($visitor:ident, $factory:expr, $call:expr) => {{
+  ($visitor:ident, $runtime:expr, $call:expr) => {{
     use swc_core::ecma::visit::VisitWith as _;
-    match $factory.as_jsx($call) {
+    match $runtime.as_jsx($call) {
       Some((elem, props)) => (elem, props),
       None => {
         $call.visit_children_with($visitor);
@@ -417,9 +415,9 @@ macro_rules! jsx_or_continue_visit {
       }
     }
   }};
-  ($visitor:ident, $factory:expr, mut $call:expr) => {{
+  ($visitor:ident, $runtime:expr, mut $call:expr) => {{
     use swc_core::ecma::visit::VisitMutWith as _;
-    match $factory.as_jsx($call) {
+    match $runtime.as_jsx($call) {
       Some((elem, props)) => (elem, props),
       None => {
         $call.visit_mut_children_with($visitor);

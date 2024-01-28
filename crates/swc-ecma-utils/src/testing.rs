@@ -96,7 +96,7 @@ pub fn test_fixture<Config, Parse, Transform, Folder>(
 ) where
   Config: DeserializeOwned + Default,
   Parse: FnOnce(Lrc<SourceFile>) -> Module,
-  Transform: FnOnce(Lrc<JSXRuntime>, Config) -> Folder,
+  Transform: FnOnce(JSXRuntime, Config) -> Folder,
   Folder: Fold,
 {
   let config_path = source_path.clone().with_extension("json");
@@ -111,7 +111,7 @@ pub fn test_fixture<Config, Parse, Transform, Folder>(
     // default on file not found
     .unwrap_or_default();
 
-  let runtime = Lrc::new(JSXRuntime::default());
+  let jsx = JSXRuntime::default();
 
   let snapshot_path = get_snapshot_path(source_path.clone());
   let snapshot = std::fs::read_to_string(snapshot_path).unwrap();
@@ -123,7 +123,7 @@ pub fn test_fixture<Config, Parse, Transform, Folder>(
     std::fs::read_to_string(source_path.clone()).unwrap(),
   );
 
-  let mut transform = transform(runtime, config);
+  let mut transform = transform(jsx, config);
 
   let module = parse(source.clone());
 

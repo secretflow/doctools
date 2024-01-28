@@ -7,7 +7,7 @@ version = "0.0.0"
 
 [dependencies]
 anyhow = "1.0.79"
-serde = {version = "1.0.195", features = ["derive"]}
+serde = {version = "1", features = ["derive"]}
 swc-ecma-utils = {path = "../swc-ecma-utils"}
-swc_core = {version = "0.88.3", features = ["ecma_parser", "ecma_visit", "ecma_ast", "ecma_parser_typescript"]}
+swc_core = {version = "*", features = ["ecma_parser", "ecma_visit", "ecma_ast", "ecma_parser_typescript"]}
 url = "2.5.0"

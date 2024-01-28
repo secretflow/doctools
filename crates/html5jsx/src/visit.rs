@@ -134,10 +134,12 @@ impl Visit for DOMVisitor {
 
 impl DOMVisitor {
   pub fn new(runtime: JSXRuntime) -> Self {
-    if runtime
-      .get_names()
+    if vec![runtime.jsx(), runtime.jsxs(), runtime.fragment()]
       .iter()
-      .any(|name| name.contains("eval") || name.contains("Function"))
+      .any(|name| {
+        let name = &name.as_expr().unwrap().as_ident().unwrap().sym;
+        name.contains("eval") || name.contains("Function")
+      })
     {
       panic!("JSX factories cannot contain 'eval' or 'Function' in name");
     }

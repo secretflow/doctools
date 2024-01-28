@@ -1,22 +1,14 @@
 use serde_json::json;
-use swc_core::{
-  common::sync::Lazy,
-  ecma::transforms::{base::pass::noop, testing::test},
-};
+use swc_core::ecma::transforms::{base::pass::noop, testing::test};
 
 use swc_ecma_utils::{
   ast::json_to_expr,
-  jsx::{
-    builder::DocumentBuilder,
-    factory::{JSXRuntime, JSXTagName},
-  },
+  jsx::{builder::DocumentBuilder, factory::JSXTagName},
   testing::{document_as_module, print_one_unwrap},
 };
 
-static JSX_RUNTIME: Lazy<JSXRuntime> = Lazy::new(|| JSXRuntime::default());
-
 fn build_jsx(build: impl Fn(&mut DocumentBuilder)) -> String {
-  let mut builder = DocumentBuilder::new(JSX_RUNTIME.clone());
+  let mut builder = DocumentBuilder::new(Default::default());
   build(&mut builder);
   print_one_unwrap(&document_as_module(builder.declare()))
 }

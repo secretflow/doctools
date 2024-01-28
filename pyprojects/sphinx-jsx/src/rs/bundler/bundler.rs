@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use swc_core::{
   common::{
     chain,
-    errors::{DiagnosticBuilder, Handler, Level},
+    errors::{DiagnosticBuilder, DiagnosticId, Handler, Level},
     source_map::SourceMapGenConfig,
     sync::Lrc,
     FileName, MultiSpan, SourceMap,
@@ -87,9 +87,9 @@ impl SphinxBundler {
     let source_file = self.sources.new_source_file(filename.clone(), source);
 
     let factory = JSXRuntime::aliased(
-      &self.symbols.jsx,
-      &self.symbols.jsxs,
-      &self.symbols.fragment,
+      self.symbols.jsx.clone().into(),
+      self.symbols.jsxs.clone().into(),
+      self.symbols.fragment.clone().into(),
     );
 
     let document = SphinxDocument::new(factory, source_file.clone());
@@ -143,11 +143,11 @@ impl SphinxBundler {
       .context("failed to parse output path")
       .map_err(raise::<PyOSError, _>)?;
 
-    let runtime = Lrc::new(JSXRuntime::aliased(
-      &self.symbols.jsx,
-      &self.symbols.jsxs,
-      &self.symbols.fragment,
-    ));
+    let jsx = JSXRuntime::aliased(
+      self.symbols.jsx.clone().into(),
+      self.symbols.jsxs.clone().into(),
+      self.symbols.fragment.clone().into(),
+    );
 
     let undefined_bindings =
       LintUndefinedBindings::new(vec![include_str!("../../js/theme.d.ts").to_string()])
@@ -185,12 +185,12 @@ impl SphinxBundler {
       let mut links = Default::default();
 
       let module = module.fold_with(&mut chain!(
-        collect_links(runtime.clone(), &mut links),
-        drop_elements(runtime.clone(), |c| {
+        collect_links(jsx.clone(), &mut links),
+        drop_elements(jsx.clone(), |c| {
           c.delete(tag!(<comment>))
             .delete(tag!(<substitution_definition>))
         }),
-        sanitize_jsx(runtime.clone())
+        sanitize_jsx(jsx.clone())
       ));
 
       links.iter().for_each(|(link, span)| match link {
@@ -316,20 +316,16 @@ fn check_internal_links(
       return;
     }
 
-    let mut builder = DiagnosticBuilder::new(handler, Level::Error, "invalid link format");
-
+    let mut diagnostic =
+      handler.struct_span_err(span.primary_span().unwrap(), "invalid link format");
     span.span_labels().iter().for_each(|label| {
       if label.is_primary {
-        builder.set_span(label.span);
-      } else if label.label.is_some() {
-        let message = label.label.clone().unwrap();
-        builder.sub(Level::Error, message.as_str(), Some(label.span));
+        diagnostic.span_label(label.span, "link used here");
       } else {
-        unreachable!();
+        diagnostic.span_label(label.span, "link may be defined here");
       }
     });
-
-    builder.emit();
+    diagnostic.emit();
   });
   Ok(())
 }

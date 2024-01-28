@@ -16,23 +16,30 @@ use html5jsx::html_to_jsx;
 use swc_ecma_utils::jsx::factory::JSXRuntime;
 
 pub fn import_from(factory: &JSXRuntime, src: &str) -> ImportDecl {
-  let [jsx, jsxs, fragment] = factory.get_names();
   ImportDecl {
     specifiers: vec![
       ImportSpecifier::Named(ImportNamedSpecifier {
-        local: Ident::from(jsx),
+        local: Ident::from(&*factory.jsx().as_expr().unwrap().as_ident().unwrap().sym),
         imported: None,
         is_type_only: false,
         span: Default::default(),
       }),
       ImportSpecifier::Named(ImportNamedSpecifier {
-        local: Ident::from(jsxs),
+        local: Ident::from(&*factory.jsxs().as_expr().unwrap().as_ident().unwrap().sym),
         imported: None,
         is_type_only: false,
         span: Default::default(),
       }),
       ImportSpecifier::Named(ImportNamedSpecifier {
-        local: Ident::from(fragment),
+        local: Ident::from(
+          &*factory
+            .fragment()
+            .as_expr()
+            .unwrap()
+            .as_ident()
+            .unwrap()
+            .sym,
+        ),
         imported: None,
         is_type_only: false,
         span: Default::default(),

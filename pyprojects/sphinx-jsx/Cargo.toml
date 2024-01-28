@@ -28,7 +28,7 @@ swc-ecma-lint-sphinx-theme = {path = "../../crates/swc-ecma-lint-sphinx-theme"}
 swc-ecma-transform-i18n = {path = "../../crates/swc-ecma-transform-i18n"}
 swc-ecma-transform-sphinx = {path = "../../crates/swc-ecma-transform-sphinx"}
 swc-ecma-utils = {path = "../../crates/swc-ecma-utils"}
-swc_core = {version = "0.88", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen", "common_sourcemap"]}
+swc_core = {version = "*", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen", "common_sourcemap"]}
 swc_error_reporters = "0.17.13"
 url = "2.5.0"
 

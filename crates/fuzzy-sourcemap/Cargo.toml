@@ -1,0 +1,9 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "fuzzy-sourcemap"
+publish = false
+version = "0.0.0"
+
+[dependencies]
+swc_core = {version = "*", features = ["common_sourcemap"]}

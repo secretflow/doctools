@@ -1,5 +1,5 @@
 use swc_core::{
-  common::{chain, sync::Lrc, util::take::Take},
+  common::{chain, util::take::Take},
   ecma::{
     ast::{
       ArrayLit, CallExpr, Expr, ExprOrSpread, KeyValueProp, Lit, ObjectLit, Prop, PropOrSpread,
@@ -56,21 +56,21 @@ fn is_invalid(value: &Box<Expr>) -> bool {
 }
 
 struct FoldFragments {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
 }
 
 impl FoldFragments {
   fn should_remove_child(&self, elem: &Expr) -> bool {
     match elem {
       Expr::Call(call) => {
-        let jsx = self.runtime.as_jsx(call);
+        let jsx = self.jsx.as_jsx(call);
         match jsx {
           None => false,
           Some((tag, _)) => match tag {
             JSXTagName::Intrinsic(_) | JSXTagName::Ident(_) => false,
             JSXTagName::Fragment => {
-              let (_, props) = self.runtime.as_jsx(call).unwrap();
-              let children = self.runtime.get_prop(props, &["children"]).get();
+              let (_, props) = self.jsx.as_jsx(call).unwrap();
+              let children = self.jsx.get_prop(props, &["children"]).get();
               match children {
                 None => true,
                 Some(Expr::Array(ArrayLit { elems, .. })) => elems.iter().all(|i| match i {
@@ -94,10 +94,10 @@ impl VisitMut for FoldFragments {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    jsx_or_return!(self.runtime, elem);
+    jsx_or_return!(self.jsx, elem);
 
-    self.runtime.mut_prop(
-      self.runtime.as_mut_jsx_props(elem).unwrap(),
+    self.jsx.mut_prop(
+      self.jsx.as_mut_jsx_props(elem).unwrap(),
       &["children"],
       |children| match **children {
         Expr::Array(ref mut children) => {
@@ -118,11 +118,11 @@ impl VisitMut for FoldFragments {
       },
     );
 
-    let (tag, _) = self.runtime.as_jsx(elem).unwrap();
+    let (tag, _) = self.jsx.as_jsx(elem).unwrap();
 
     if tag == JSXTagName::Fragment {
-      let swap = self.runtime.mut_prop(
-        self.runtime.as_mut_jsx_props(elem).unwrap(),
+      let swap = self.jsx.mut_prop(
+        self.jsx.as_mut_jsx_props(elem).unwrap(),
         &["children"],
         |children| match **children {
           Expr::Array(ref mut children) => {
@@ -164,28 +164,28 @@ impl VisitMut for FoldFragments {
 }
 
 struct FixJSXFactory {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
 }
 
 impl VisitMut for FixJSXFactory {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (_, props) = jsx_or_return!(self.runtime, elem);
+    let (_, props) = jsx_or_return!(self.jsx, elem);
 
-    let children = self.runtime.get_prop(props, &["children"]).get();
+    let children = self.jsx.get_prop(props, &["children"]).get();
 
     match children {
       Some(Expr::Array(ArrayLit { elems, .. })) => {
         let len = elems.len();
         if len > 1 {
-          elem.callee = self.runtime.jsxs()
+          elem.callee = self.jsx.jsxs()
         } else {
-          elem.callee = self.runtime.jsx()
+          elem.callee = self.jsx.jsx()
         }
         if len == 1 {
-          self.runtime.mut_prop(
-            self.runtime.as_mut_jsx_props(elem).unwrap(),
+          self.jsx.mut_prop(
+            self.jsx.as_mut_jsx_props(elem).unwrap(),
             &["children"],
             |children| {
               let child = children.as_mut_array().unwrap().elems.first_mut().unwrap();
@@ -201,7 +201,7 @@ impl VisitMut for FixJSXFactory {
           );
         }
       }
-      _ => elem.callee = self.runtime.jsx(),
+      _ => elem.callee = self.jsx.jsx(),
     }
   }
 }
@@ -218,18 +218,18 @@ pub fn remove_invalid() -> impl Fold + VisitMut {
   as_folder(CleanUpTakenValues)
 }
 
-pub fn fold_fragments(runtime: Lrc<JSXRuntime>) -> impl Fold + VisitMut {
-  as_folder(FoldFragments { runtime })
+pub fn fold_fragments(jsx: JSXRuntime) -> impl Fold + VisitMut {
+  as_folder(FoldFragments { jsx })
 }
 
-pub fn fix_jsx_factories(runtime: Lrc<JSXRuntime>) -> impl Fold + VisitMut {
-  as_folder(FixJSXFactory { runtime })
+pub fn fix_jsx_factories(jsx: JSXRuntime) -> impl Fold + VisitMut {
+  as_folder(FixJSXFactory { jsx })
 }
 
-pub fn sanitize_jsx(runtime: Lrc<JSXRuntime>) -> impl Fold + VisitMut {
+pub fn sanitize_jsx(jsx: JSXRuntime) -> impl Fold + VisitMut {
   chain!(
-    fold_fragments(runtime.clone()),
+    fold_fragments(jsx.clone()),
     remove_invalid(),
-    fix_jsx_factories(runtime),
+    fix_jsx_factories(jsx),
   )
 }

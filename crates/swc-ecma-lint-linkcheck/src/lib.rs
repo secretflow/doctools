@@ -1,9 +1,8 @@
-/// TODO: use miette directly
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{sync::Lrc, util::take::Take, MultiSpan, Span},
+  common::{util::take::Take, MultiSpan, Span},
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
@@ -24,7 +23,7 @@ pub enum Link {
 }
 
 struct LinkCollector<'links> {
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   links: &'links mut Vec<(Link, MultiSpan)>,
   targets: HashMap<Link, MultiSpan>,
 }
@@ -91,9 +90,9 @@ impl VisitMut for LinkCollector<'_> {
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
     call.visit_mut_children_with(self);
 
-    let (name, props) = jsx_or_return!(self.runtime, call);
+    let (name, props) = jsx_or_return!(self.jsx, call);
 
-    let refuri = self.runtime.get_prop(props, &["refuri"]).as_string();
+    let refuri = self.jsx.get_prop(props, &["refuri"]).as_string();
 
     let url = match refuri {
       Some(refuri) => refuri,
@@ -120,11 +119,11 @@ impl VisitMut for LinkCollector<'_> {
 }
 
 pub fn collect_links(
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   links: &mut Vec<(Link, MultiSpan)>,
 ) -> impl Fold + VisitMut + '_ {
   as_folder(LinkCollector {
-    runtime,
+    jsx,
     links,
     targets: HashMap::new(),
   })

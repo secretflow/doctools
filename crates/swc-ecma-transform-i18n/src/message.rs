@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use swc_core::{
   atoms::Atom,
-  common::{sync::Lrc, util::take::Take as _, Span, Spanned as _},
+  common::{util::take::Take as _, Span, Spanned as _},
   ecma::ast::{
     CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, ObjectLit, Prop, PropName,
     PropOrSpread,
@@ -184,7 +184,7 @@ impl MessageProps {
       .any(|t| matches!(t, MessageToken::Text(_)))
   }
 
-  fn to_props(mut self, runtime: Lrc<JSXRuntime>) -> Props {
+  fn to_props(mut self, jsx: JSXRuntime) -> Props {
     let mut message = String::new();
     let mut plaintext = String::new();
 
@@ -260,34 +260,34 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.push(make_prop!("LF", runtime.create(&"br".into()).build()));
+      values.push(make_prop!("LF", jsx.create(&"br".into()).build()));
     }
 
     if has_less_than {
       values.push(make_prop!(
         "LT",
-        runtime.create(&tag!(<>)).children(vec!["<".into()]).build()
+        jsx.create(&tag!(<>)).children(vec!["<".into()]).build()
       ));
     }
 
     if has_greater_than {
       values.push(make_prop!(
         "GT",
-        runtime.create(&tag!(<>)).children(vec![">".into()]).build()
+        jsx.create(&tag!(<>)).children(vec![">".into()]).build()
       ));
     }
 
     if has_left_curly {
       values.push(make_prop!(
         "LC",
-        runtime.create(&tag!(<>)).children(vec!["{".into()]).build()
+        jsx.create(&tag!(<>)).children(vec!["{".into()]).build()
       ));
     }
 
     if has_right_curly {
       values.push(make_prop!(
         "RC",
-        runtime.create(&tag!(<>)).children(vec!["}".into()]).build()
+        jsx.create(&tag!(<>)).children(vec!["}".into()]).build()
       ));
     }
 
@@ -321,7 +321,7 @@ impl MessageProps {
   ///
   /// Since calling this function implies the end of a [swc_core::ecma::visit::VisitMut],
   /// mutating the tree only to result in an empty message is unexpected and likely a bug
-  pub fn make_trans(self, runtime: Lrc<JSXRuntime>, trans: Atom) -> (Message, Box<Expr>) {
+  pub fn make_trans(self, jsx: JSXRuntime, trans: Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -330,14 +330,14 @@ impl MessageProps {
       plaintext,
       components,
       values,
-    } = self.to_props(runtime.clone());
+    } = self.to_props(jsx.clone());
 
     if is_empty_or_whitespace(&message) {
       unreachable!("Message is empty")
     }
 
     let trans = with_span(Some(span))(
-      runtime
+      jsx
         .create(&tag!(=> &*trans))
         .prop("id", id.as_str().into(), None)
         .prop("message", message.as_str().into(), None)
@@ -357,7 +357,7 @@ impl MessageProps {
     )
   }
 
-  pub fn make_i18n(self, runtime: Lrc<JSXRuntime>, i18n: Atom) -> (Message, Box<Expr>) {
+  pub fn make_i18n(self, jsx: JSXRuntime, i18n: Atom) -> (Message, Box<Expr>) {
     let span = self.span;
 
     let Props {
@@ -366,7 +366,7 @@ impl MessageProps {
       plaintext,
       components: _,
       values,
-    } = self.to_props(runtime);
+    } = self.to_props(jsx);
 
     let call = Expr::Call(CallExpr {
       callee: Callee::Expr(Ident::from(&*i18n).into()),

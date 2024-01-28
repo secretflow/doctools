@@ -1,8 +1,5 @@
 use swc_core::{
-  common::{
-    chain,
-    sync::{Lazy, Lrc},
-  },
+  common::{chain, sync::Lazy},
   ecma::transforms::testing::test,
 };
 
@@ -12,8 +9,8 @@ use swc_ecma_utils::{
   tag,
 };
 
-static JSX_RUNTIME: Lazy<Lrc<JSXRuntime>> =
-  Lazy::new(|| Lrc::new(JSXRuntime::aliased("_jsx", "_jsxs", "_Fragment")));
+static JSX_RUNTIME: Lazy<JSXRuntime> =
+  Lazy::new(|| JSXRuntime::aliased("_jsx".into(), "_jsxs".into(), "_Fragment".into()));
 
 test!(
   Default::default(),

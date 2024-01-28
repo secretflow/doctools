@@ -3,7 +3,6 @@ use std::{collections::HashMap, fmt::Debug};
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
-  common::sync::Lrc,
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
@@ -246,24 +245,24 @@ impl Default for TranslatorOptions {
 }
 
 #[derive(Debug)]
-struct Translator<'messages> {
-  runtime: Lrc<JSXRuntime>,
+struct Translator<'result> {
+  jsx: JSXRuntime,
   options: TranslatorOptions,
   elements: HashMap<JSXTagName, Translatable>,
   pre: bool,
-  messages: &'messages mut Vec<Message>,
+  messages: &'result mut Vec<Message>,
 }
 
 impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let (element, _) = jsx_or_continue_visit!(self, self.runtime, mut elem);
+    let (element, _) = jsx_or_continue_visit!(self, self.jsx, mut elem);
 
     if matches!(element, tag!("*")) {
-      let props = self.runtime.as_mut_jsx_props(elem).unwrap();
+      let props = self.jsx.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
-        self.runtime.clone(),
+        self.jsx.clone(),
         self.options.sym_gettext.clone(),
         props,
         vec![
@@ -290,9 +289,9 @@ impl VisitMut for Translator<'_> {
         .iter()
         .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
         .collect::<Vec<_>>();
-      let props = self.runtime.as_mut_jsx_props(elem).unwrap();
+      let props = self.jsx.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
-        self.runtime.clone(),
+        self.jsx.clone(),
         self.options.sym_gettext.clone(),
         props,
         attrs,
@@ -305,7 +304,7 @@ impl VisitMut for Translator<'_> {
     match options.content {
       ContentModel::Flow => {
         self.messages.extend(translate_block(
-          self.runtime.clone(),
+          self.jsx.clone(),
           self.options.sym_trans.clone(),
           options.pre,
           elem,
@@ -313,7 +312,7 @@ impl VisitMut for Translator<'_> {
       }
       ContentModel::Phrasing => {
         if let Some(message) = translate_phrase(
-          self.runtime.clone(),
+          self.jsx.clone(),
           self.options.sym_trans.clone(),
           options.pre,
           elem,
@@ -487,7 +486,7 @@ impl<'messages> Translator<'messages> {
 }
 
 pub fn i18n(
-  runtime: Lrc<JSXRuntime>,
+  jsx: JSXRuntime,
   options: TranslatorOptions,
   output: &mut Vec<Message>,
 ) -> impl Fold + VisitMut + '_ {
@@ -499,7 +498,7 @@ pub fn i18n(
   });
 
   as_folder(Translator {
-    runtime,
+    jsx,
     options,
     elements,
     messages: output,

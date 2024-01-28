@@ -15,10 +15,10 @@ fn test_i18n(source_path: PathBuf) {
   test_fixture(
     source_path,
     |source| parse_one(&source.src, None, parse_file_as_module).unwrap(),
-    |runtime, config| {
+    |jsx, config| {
       chain!(
-        i18n(runtime.clone(), config, &mut messages),
-        sanitize_jsx(runtime.clone())
+        i18n(jsx.clone(), config, &mut messages),
+        sanitize_jsx(jsx.clone())
       )
     },
   );

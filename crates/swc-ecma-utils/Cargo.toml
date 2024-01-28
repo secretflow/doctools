@@ -23,7 +23,7 @@ features = [
   "testing",
   "testing_transform",
 ]
-version = "0.88"
+version = "*"
 
 [dev-dependencies]
 serde_json = {version = "1.0.111", features = ["preserve_order"]}

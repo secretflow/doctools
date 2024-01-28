@@ -1,0 +1,28 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "swc-ecma-transform-sphinx-math"
+version = "0.0.0"
+
+[lib]
+path = "src/rs/lib.rs"
+
+[dependencies]
+deno-lite = {path = "../deno-lite"}
+html5jsx = {path = "../html5jsx"}
+serde = {version = "1", features = ["derive"]}
+swc-ecma-utils = {path = "../swc-ecma-utils"}
+
+[dependencies.swc_core]
+features = [
+  "ecma_ast",
+  "ecma_utils",
+  "ecma_visit",
+]
+version = "*"
+
+[dev-dependencies.swc_core]
+features = [
+  "testing_transform",
+]
+version = "*"

@@ -1,7 +1,8 @@
 [workspace]
 members = [
-  "crates/deno-runtime-web-subset",
+  "crates/deno-lite",
   "crates/esm-serve",
+  "crates/fuzzy-sourcemap",
   "crates/html5jsx",
   "crates/html5jsx/bin",
   "crates/playground",
@@ -12,6 +13,7 @@ members = [
   "crates/swc-ecma-lint-linkcheck",
   "crates/swc-ecma-transform-i18n",
   "crates/swc-ecma-transform-sphinx",
+  "crates/swc-ecma-transform-sphinx-math",
   "crates/swc-ecma-utils",
   "packages/swc-plugin-esm-serve",
   "pyprojects/sphinx-jsx",
