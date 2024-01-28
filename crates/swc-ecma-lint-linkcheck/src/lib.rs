@@ -10,10 +10,7 @@ use swc_core::{
 };
 use url::Url;
 
-use swc_ecma_utils::{
-  jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_return,
-};
+use swc_ecma_utils::{jsx::factory::JSXRuntime, match_jsx};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Link {
@@ -87,12 +84,14 @@ fn maybe_mark_target(reference: &mut MultiSpan, targets: &MultiSpan) {
 impl VisitMut for LinkCollector<'_> {
   noop_visit_mut_type!();
 
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    call.visit_mut_children_with(self);
+  fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
+    elem.visit_mut_children_with(self);
 
-    let (name, props) = jsx_or_return!(self.jsx, call);
-
-    let refuri = self.jsx.get_prop(props, &["refuri"]).as_string();
+    let refuri = match_jsx!(
+      (self.jsx, elem),
+      Any(tag, props) >> { self.jsx.get_prop(props, &["refuri"]).as_string() },
+      _ >> { return },
+    );
 
     let url = match refuri {
       Some(refuri) => refuri,
@@ -104,17 +103,17 @@ impl VisitMut for LinkCollector<'_> {
       Err(_) => Link::Internal(url.to_string()), // TODO: differentiate errors
     };
 
-    match name {
-      JSXTagName::Ident(name) if &*name == "target" => {
-        self.add_target(link, call.span);
-        call.take();
-      }
-      JSXTagName::Ident(name) if &*name == "reference" => {
-        // TODO: allow third party nodes
-        self.add_reference(link, call.span);
-      }
-      _ => (),
-    }
+    match_jsx!(
+      (self.jsx, elem),
+      JSX(target) >> {
+        self.add_target(link, elem.span);
+        elem.take();
+      },
+      JSX(reference) >> {
+        self.add_reference(link, elem.span);
+      },
+      _ >> {},
+    );
   }
 }
 

@@ -10,9 +10,8 @@ use swc_core::{
 };
 
 use swc_ecma_utils::{
-  continue_visit,
   jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_return, tag,
+  match_jsx, tag,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -63,11 +62,14 @@ impl VisitMut for ElementDropper {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (name, _) = jsx_or_return!(self.jsx, elem);
+    let name = match_jsx!((self.jsx, elem), Any(name) >> { name }, _ >> { return },);
 
     let drop = match self.options.elements.get(&name) {
       Some(drop) => drop,
-      None => continue_visit!(self, mut elem),
+      None => {
+        elem.visit_mut_children_with(self);
+        return;
+      }
     };
 
     match drop {

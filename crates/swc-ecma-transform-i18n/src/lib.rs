@@ -11,7 +11,7 @@ use swc_core::{
 
 use swc_ecma_utils::{
   jsx::factory::{JSXRuntime, JSXTagName},
-  jsx_or_continue_visit, tag,
+  match_jsx, tag,
 };
 
 mod attribute;
@@ -257,9 +257,16 @@ impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let (element, _) = jsx_or_continue_visit!(self, self.jsx, mut elem);
+    let name = match_jsx!(
+      (self.jsx, elem),
+      Any(name) >> { name },
+      _ >> {
+        elem.visit_mut_children_with(self);
+        return;
+      },
+    );
 
-    if matches!(element, tag!("*")) {
+    if matches!(name, tag!("*")) {
       let props = self.jsx.as_mut_jsx_props(elem).unwrap();
       self.messages.extend(translate_attrs(
         self.jsx.clone(),
@@ -275,7 +282,7 @@ impl VisitMut for Translator<'_> {
       ));
     }
 
-    let options = match self.elements.get(&element) {
+    let options = match self.elements.get(&name) {
       Some(options) => options,
       None => {
         elem.visit_mut_children_with(self);

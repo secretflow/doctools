@@ -6,3 +6,6 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
+anyhow = "1.0.79"
+miette = {version = "5.10.0", features = ["fancy"]}
+thiserror = "1.0.56"

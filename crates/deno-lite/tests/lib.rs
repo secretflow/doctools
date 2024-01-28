@@ -1,4 +1,4 @@
-use deno_core::{anyhow, serde_json};
+use deno_core::anyhow;
 use deno_web::TimersPermission;
 
 use deno_lite::{export_function, DenoLite};
@@ -60,10 +60,10 @@ fn test_async_function() -> anyhow::Result<()> {
 
   let now = std::time::Instant::now();
 
-  let result: serde_json::Value = deno.call_function(module, Sleep { ms: 500_f64 })?;
+  let result: String = deno.call_function(module, Sleep { ms: 500_f64 })?;
 
   assert!(now.elapsed().as_millis() >= 500);
-  assert_eq!(result, serde_json::json!("done"));
+  assert_eq!(result, "done");
 
   Ok(())
 }
@@ -102,6 +102,33 @@ fn test_non_object_args() -> anyhow::Result<()> {
   let result: i32 = deno.call_function(module, Add(1, 2))?;
 
   assert_eq!(result, 3);
+
+  Ok(())
+}
+
+#[test]
+fn test_throw() -> anyhow::Result<()> {
+  let mut deno = DenoLite::new(None);
+
+  #[derive(Serialize)]
+  struct Add(i32, i32);
+
+  export_function!(add, Add);
+
+  let module = deno.load_module_once(
+    r#"
+    export function add([a, b]) {
+      throw new Error("oops");
+    }
+    "#,
+  )?;
+
+  let result: anyhow::Result<i32> = deno.call_function(module, Add(1, 2));
+
+  match result {
+    Ok(_) => panic!("expected an error"),
+    Err(err) => assert!(err.to_string().contains("Error: oops")),
+  }
 
   Ok(())
 }

@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
@@ -51,35 +53,16 @@ impl From<Ident> for JSXTagName {
   }
 }
 
-#[macro_export]
-macro_rules! tag {
-  (<>) => {
-    $crate::jsx::factory::JSXTagName::Fragment
-  };
-  ("*") => {
-    $crate::jsx::factory::JSXTagName::Intrinsic(_)
-  };
-  (let *) => {
-    $crate::jsx::factory::JSXTagName::Ident(_)
-  };
-  ($tag:literal) => {
-    $crate::jsx::factory::JSXTagName::Intrinsic($tag.into())
-  };
-  (<$tag:ident>) => {
-    $crate::jsx::factory::JSXTagName::Ident(stringify!($tag).into())
-  };
-  ("" $tag:expr) => {
-    $crate::jsx::factory::JSXTagName::Intrinsic(($tag).into())
-  };
-  (=> $tag:expr) => {
-    $crate::jsx::factory::JSXTagName::Ident(($tag).into())
-  };
-  ("*" $tag:ident) => {
-    $crate::jsx::factory::JSXTagName::Intrinsic($tag)
-  };
-  (let $tag:ident) => {
-    $crate::jsx::factory::JSXTagName::Ident($tag)
-  };
+impl Deref for JSXTagName {
+  type Target = str;
+
+  fn deref(&self) -> &Self::Target {
+    match self {
+      JSXTagName::Intrinsic(name) => name.as_ref(),
+      JSXTagName::Ident(name) => name.as_ref(),
+      JSXTagName::Fragment => unreachable!("Fragment does not have a name"),
+    }
+  }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -356,6 +339,37 @@ impl JSXBuilder<'_> {
 }
 
 #[macro_export]
+macro_rules! tag {
+  (<>) => {
+    $crate::jsx::factory::JSXTagName::Fragment
+  };
+  ("*") => {
+    $crate::jsx::factory::JSXTagName::Intrinsic(_)
+  };
+  (let *) => {
+    $crate::jsx::factory::JSXTagName::Ident(_)
+  };
+  ($tag:literal) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic($tag.into())
+  };
+  (<$tag:ident>) => {
+    $crate::jsx::factory::JSXTagName::Ident(stringify!($tag).into())
+  };
+  ("" $tag:expr) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic(($tag).into())
+  };
+  (=> $tag:expr) => {
+    $crate::jsx::factory::JSXTagName::Ident(($tag).into())
+  };
+  ("*" $tag:ident) => {
+    $crate::jsx::factory::JSXTagName::Intrinsic($tag)
+  };
+  (let $tag:ident) => {
+    $crate::jsx::factory::JSXTagName::Ident($tag)
+  };
+}
+
+#[macro_export]
 macro_rules! props {
   ( $($key:literal = $value:expr),* ) => {
     vec![
@@ -392,51 +406,45 @@ macro_rules! object_lit {
 }
 
 #[macro_export]
-macro_rules! jsx_or_return {
-  ($runtime:expr, $call:expr) => {{
-    match $runtime.as_jsx($call) {
-      Some((elem, props)) => (elem, props),
-      None => {
-        return;
-      }
+macro_rules! match_jsx {
+  (
+    ($jsx:expr, $elem:ident),
+    $(JSX($ident:ident $(, $ident_props:ident)?) >> $if_ident:block,)*
+    $(HTML($intrinsic:literal $(, $intrinsic_props:ident)?) >> $if_intrinsic:block,)*
+    $(Fragment($($children:ident)?) >> $if_fragment:block,)?
+    $(Any($any_tag:ident $(, $any_props:ident)?) >> $if_any:block,)?
+    $(_ >> $default:block,)?
+  ) => {{
+    match $jsx.as_jsx($elem) {
+      $(
+        Some(($crate::jsx::factory::JSXTagName::Ident($ident), _props))
+          if &*$ident == stringify!($ident) => {
+            $(let $ident_props = _props;)?
+            $if_ident
+          },
+      )*
+      $(
+        Some(($crate::jsx::factory::JSXTagName::Intrinsic(_name), _props))
+          if &*_name == $intrinsic => {
+            $(let $intrinsic_props = _props;)?
+            $if_intrinsic
+          },
+      )*
+      $(
+        Some(($crate::jsx::factory::JSXTagName::Fragment, _props)) => {
+          $(let $children = $jsx.get_prop(props, &["children"]);)?
+          $if_fragment
+        },
+      )?
+      $(
+        Some((_tag, _props)) => {
+          #[allow(unused_variables)]
+          let $any_tag = _tag;
+          $(let $any_props = _props;)?
+          $if_any
+        },
+      )?
+      $(_ => $default,)?
     }
-  }};
-}
-
-#[macro_export]
-macro_rules! jsx_or_continue_visit {
-  ($visitor:ident, $runtime:expr, $call:expr) => {{
-    use swc_core::ecma::visit::VisitWith as _;
-    match $runtime.as_jsx($call) {
-      Some((elem, props)) => (elem, props),
-      None => {
-        $call.visit_children_with($visitor);
-        return;
-      }
-    }
-  }};
-  ($visitor:ident, $runtime:expr, mut $call:expr) => {{
-    use swc_core::ecma::visit::VisitMutWith as _;
-    match $runtime.as_jsx($call) {
-      Some((elem, props)) => (elem, props),
-      None => {
-        $call.visit_mut_children_with($visitor);
-        return;
-      }
-    }
-  }};
-}
-
-#[macro_export]
-macro_rules! continue_visit {
-  ($visitor:ident, $call:expr) => {{
-    use swc_core::ecma::visit::VisitWith as _;
-    $call.visit_children_with($visitor);
-    return;
-  }};
-  ($visitor:ident, mut $call:expr) => {{
-    use swc_core::ecma::visit::VisitMutWith as _;
-    $call.visit_mut_children_with($visitor);
-    return;
   }};
 }

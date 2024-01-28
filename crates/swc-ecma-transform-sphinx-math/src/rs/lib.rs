@@ -3,18 +3,15 @@ use swc_core::{
   common::{FileName, SourceMap},
   ecma::{
     ast::CallExpr,
-    visit::{as_folder, Fold, VisitMut, VisitMutWith},
+    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
   },
 };
 
 use deno_lite::{anyhow, export_function, DenoLite, ESModule};
 use html5jsx::html_to_jsx;
 use swc_ecma_utils::{
-  jsx::{
-    builder::JSXDocument,
-    factory::{JSXRuntime, JSXTagName},
-  },
-  jsx_or_return,
+  jsx::{builder::JSXDocument, factory::JSXRuntime},
+  match_jsx,
 };
 
 static ESM: &str = include_str!("../../dist/index.js");
@@ -51,19 +48,23 @@ impl MathRenderer {
 }
 
 impl VisitMut for MathRenderer {
+  noop_visit_mut_type!();
+
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (name, props) = jsx_or_return!(self.jsx, elem);
-
-    // TODO: match macro
-    let inline = match name {
-      JSXTagName::Ident(name) if &*name == "math" => true,
-      JSXTagName::Ident(name) if &*name == "math_block" => false,
-      _ => return,
-    };
-
-    let code = self.jsx.get_prop(props, &["children"]).as_string();
+    let (inline, code) = match_jsx!(
+      (self.jsx, elem),
+      JSX(math, props) >> {
+        let code = self.jsx.get_prop(props, &["children"]).as_string();
+        (true, code)
+      },
+      JSX(math_block, props) >> {
+        let code = self.jsx.get_prop(props, &["children"]).as_string();
+        (false, code)
+      },
+      _ >> { return },
+    );
 
     let code = match code {
       Some(code) => code,

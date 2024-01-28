@@ -8,7 +8,7 @@ use swc_core::{
   },
 };
 
-use crate::jsx_or_return;
+use crate::match_jsx;
 
 use super::factory::{JSXRuntime, JSXTagName};
 
@@ -94,7 +94,7 @@ impl VisitMut for FoldFragments {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    jsx_or_return!(self.jsx, elem);
+    match_jsx!((self.jsx, elem), Any(tag) >> {}, _ >> { return },);
 
     self.jsx.mut_prop(
       self.jsx.as_mut_jsx_props(elem).unwrap(),
@@ -171,9 +171,11 @@ impl VisitMut for FixJSXFactory {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (_, props) = jsx_or_return!(self.jsx, elem);
-
-    let children = self.jsx.get_prop(props, &["children"]).get();
+    let children = match_jsx!(
+      (self.jsx, elem),
+      Any(tag, props) >> { self.jsx.get_prop(props, &["children"]).get() },
+      _ >> { return },
+    );
 
     match children {
       Some(Expr::Array(ArrayLit { elems, .. })) => {
