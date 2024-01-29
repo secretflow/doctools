@@ -1,5 +1,11 @@
 # @secretflow/dumi-plugin-search
 
+## 0.5.1
+
+### Patch Changes
+
+- fix: fix import
+
 ## 0.5.0
 
 ### Minor Changes

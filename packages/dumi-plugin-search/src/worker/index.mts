@@ -12,8 +12,8 @@ import type {
   SearchResult,
 } from './messages.mjs';
 
+import $interconnection$secretpad$spec$trustedflow$psi$other from '?dumi-plugin-search/runtime/interconnection~secretpad~spec~trustedflow~psi~OTHER_PROJECTS';
 import $scql$kuscia from '?dumi-plugin-search/runtime/scql~kuscia';
-import $interconnection$secretpad$spec$trustedflow$psi$other from '?dumi-plugin-search/runtime/scql~kuscia';
 import $secretflow from '?dumi-plugin-search/runtime/secretflow';
 import $spu$heu from '?dumi-plugin-search/runtime/spu~heu';
 
