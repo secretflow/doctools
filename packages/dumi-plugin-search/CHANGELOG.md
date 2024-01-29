@@ -1,5 +1,11 @@
 # @secretflow/dumi-plugin-search
 
+## 0.4.1
+
+### Patch Changes
+
+- fix: avoid early exit when path doesn't match standard docs
+
 ## 0.4.0
 
 ### Minor Changes

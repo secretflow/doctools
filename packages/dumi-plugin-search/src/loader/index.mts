@@ -52,7 +52,7 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
 
         const pathMatch = RE_STANDARD_PROJECT_PATH.exec(absPath);
 
-        if (!file || !extension || !pathMatch) {
+        if (!file || !extension) {
           return;
         }
 
@@ -72,9 +72,9 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
             url,
             title: longTitle,
             content,
-            project: pathMatch.groups?.['project'] || '',
-            version: pathMatch.groups?.['version'],
-            lang: pathMatch.groups?.['lang'],
+            project: pathMatch?.groups?.['project'] || '',
+            version: pathMatch?.groups?.['version'],
+            lang: pathMatch?.groups?.['lang'],
             type: id ? 'fragment' : 'page',
           });
         });
