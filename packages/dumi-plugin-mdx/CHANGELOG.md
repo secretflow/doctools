@@ -1,5 +1,37 @@
 # @secretflow/dumi-plugin-mdx
 
+## 0.3.0
+
+### Minor Changes
+
+- feat: finalize search provider
+- cd10fa5: add transitional openapi features
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [cd10fa5]
+- Updated dependencies [6c952c1]
+  - @secretflow/unified-toolkit@0.4.0
+
+## 0.3.0-alpha.1.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.4.0-alpha.1.2
+
+## 0.3.0-alpha.1.0
+
+### Minor Changes
+
+- add transitional openapi features
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.4.0-alpha.1.0
+
 ## 0.2.0
 
 ### Minor Changes

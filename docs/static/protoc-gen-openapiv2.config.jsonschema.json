@@ -14,9 +14,7 @@
     },
     "google.protobuf.NullValue": {
       "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
+      "enum": ["NULL_VALUE"],
       "default": "NULL_VALUE",
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
@@ -248,13 +246,7 @@
     },
     "grpc.gateway.protoc_gen_openapiv2.options.HeaderParameter.Type": {
       "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "STRING",
-        "NUMBER",
-        "INTEGER",
-        "BOOLEAN"
-      ],
+      "enum": ["UNKNOWN", "STRING", "NUMBER", "INTEGER", "BOOLEAN"],
       "default": "UNKNOWN",
       "description": "`Type` is a a supported HTTP header type.\nSee https://swagger.io/specification/v2/#parameterType."
     },
@@ -626,13 +618,7 @@
     },
     "grpc.gateway.protoc_gen_openapiv2.options.Scheme": {
       "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "HTTP",
-        "HTTPS",
-        "WS",
-        "WSS"
-      ],
+      "enum": ["UNKNOWN", "HTTP", "HTTPS", "WS", "WSS"],
       "default": "UNKNOWN",
       "description": "Scheme describes the schemes supported by the OpenAPI Swagger\nand Operation objects."
     },
@@ -749,22 +735,13 @@
     },
     "grpc.gateway.protoc_gen_openapiv2.options.SecurityScheme.In": {
       "type": "string",
-      "enum": [
-        "IN_INVALID",
-        "IN_QUERY",
-        "IN_HEADER"
-      ],
+      "enum": ["IN_INVALID", "IN_QUERY", "IN_HEADER"],
       "default": "IN_INVALID",
       "description": "The location of the API key. Valid values are \"query\" or \"header\"."
     },
     "grpc.gateway.protoc_gen_openapiv2.options.SecurityScheme.Type": {
       "type": "string",
-      "enum": [
-        "TYPE_INVALID",
-        "TYPE_BASIC",
-        "TYPE_API_KEY",
-        "TYPE_OAUTH2"
-      ],
+      "enum": ["TYPE_INVALID", "TYPE_BASIC", "TYPE_API_KEY", "TYPE_OAUTH2"],
       "default": "TYPE_INVALID",
       "description": "The type of the security scheme. Valid values are \"basic\",\n\"apiKey\" or \"oauth2\"."
     },
@@ -884,10 +861,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": [
-                  "summary",
-                  "parameters"
-                ],
+                "required": ["summary", "parameters"],
                 "additionalProperties": false,
                 "properties": {
                   "summary": {
@@ -930,10 +904,7 @@
               "description": "Examples values for this message or field.",
               "items": {
                 "type": "object",
-                "required": [
-                  "summary",
-                  "value"
-                ],
+                "required": ["summary", "value"],
                 "additionalProperties": false,
                 "properties": {
                   "summary": {

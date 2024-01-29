@@ -4,6 +4,9 @@ import type { SearchBackendModule, SearchableContent } from '../shared/typing.mj
 
 import type { LoaderConfig } from './typing.d.js';
 
+const RE_STANDARD_PROJECT_PATH =
+  /^\/docs\/(?<project>[^/]+)\/(?<version>[^/]+)\/(?<lang>[^/]+)/i;
+
 function* chunked<T>(items: Iterable<T>, size: number): Generator<T[], void, void> {
   const iterator = items[Symbol.iterator]();
   let result = iterator.next();
@@ -47,7 +50,9 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
       chunk.map(async ({ absPath, file }) => {
         const extension = file?.split('.').pop();
 
-        if (!file || !extension) {
+        const pathMatch = RE_STANDARD_PROJECT_PATH.exec(absPath);
+
+        if (!file || !extension || !pathMatch) {
           return;
         }
 
@@ -67,7 +72,10 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
             url,
             title: longTitle,
             content,
-            type: 'prose',
+            project: pathMatch.groups?.['project'] || '',
+            version: pathMatch.groups?.['version'],
+            lang: pathMatch.groups?.['lang'],
+            type: id ? 'fragment' : 'page',
           });
         });
 

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["ESNext"],
-    "outDir": "../../build/shared"
+    "outDir": "../../build/shared",
+    "exactOptionalPropertyTypes": false
   },
   "include": ["./**/*.mts"]
 }

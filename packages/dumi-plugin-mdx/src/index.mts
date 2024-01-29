@@ -23,6 +23,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import YAML from 'yaml';
 
+import { remarkSwagger } from './swagger.mjs';
+
 const DEFAULT_ASSETS = /\.(png|jpe?g|gif|tiff|svg|mp4|m4v|mov|webp|pdf)$/;
 
 // Extract the zod builder interface from Umi
@@ -134,6 +136,7 @@ export function plugin(api: DumiAPI) {
         [remarkAttrs],
         // validation
         [remarkValidDOMNesting],
+        [remarkSwagger],
         // routing
         [rehypeReactRouter, { routes: api.appData['routes'] }],
         // bundling
@@ -173,6 +176,7 @@ export function plugin(api: DumiAPI) {
         [remarkMath],
         [remarkAdmonitions],
         [remarkAttrs],
+        [remarkSwagger],
       ],
       rehypePlugins: [
         // outline extraction

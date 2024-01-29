@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import type { SearchResultList } from '../shared/typing.mjs';
+import type { SearchQuery, SearchResultList } from '../shared/typing.mjs';
 import { startSearching } from '../worker/messages.mjs';
 import type { OutgoingMessages } from '../worker/messages.mjs';
 
@@ -15,7 +15,7 @@ const worker = new Worker(
 worker.addEventListener('message', ({ data }: MessageEvent<OutgoingMessages>) => {
   switch (data.type) {
     case 'error':
-      console.error(data.data);
+      console.error('Error in worker', data.data);
       break;
     case 'ready':
       databaseReady = true;
@@ -25,10 +25,19 @@ worker.addEventListener('message', ({ data }: MessageEvent<OutgoingMessages>) =>
   }
 });
 
-export function useFullTextSearch(query = '') {
+export function useFullTextSearch({
+  project,
+  version,
+  lang,
+  query,
+  offset,
+}: SearchQuery) {
   const [ready, setReady] = useState(databaseReady);
 
   const [results, setResults] = useState<SearchResultList | undefined>(undefined);
+
+  const currentOffset = useRef(offset);
+  currentOffset.current = offset;
 
   useEffect(() => {
     const listener = ({ data }: MessageEvent<OutgoingMessages>) => {
@@ -38,7 +47,19 @@ export function useFullTextSearch(query = '') {
           setReady(true);
           break;
         case 'result':
-          setResults(data.data);
+          if (currentOffset.current !== 0) {
+            setResults((prev) => {
+              if (prev === undefined) {
+                return prev;
+              }
+              return {
+                ...prev,
+                items: [...prev.items, ...data.data.items],
+              };
+            });
+          } else {
+            setResults(data.data);
+          }
           break;
         default:
           break;
@@ -49,12 +70,12 @@ export function useFullTextSearch(query = '') {
   }, []);
 
   useEffect(() => {
-    setResults(undefined);
+    // setResults(undefined);
     if (!query) {
       return;
     }
-    worker.postMessage(startSearching(query));
-  }, [query]);
+    worker.postMessage(startSearching({ project, query, version, lang, offset }));
+  }, [project, query, offset, version, lang]);
 
   return { ready, results, searching: results === undefined };
 }

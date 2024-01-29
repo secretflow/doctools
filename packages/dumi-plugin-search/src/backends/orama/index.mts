@@ -1,10 +1,12 @@
 import * as orama from '@orama/orama';
+import type { WhereCondition } from '@orama/orama';
 
 import type {
   SearchBackendModule,
   SearchableContent,
   SearchResult,
   SearchResultList,
+  SearchQuery,
 } from '../../shared/typing.mjs';
 
 type DataType<T> = T extends string
@@ -26,7 +28,8 @@ const schema: DataType<SearchableContent> = {
   title: 'string',
   content: 'string',
   type: 'string',
-  topic: 'string',
+  project: 'string',
+  version: 'string',
   lang: 'string',
   symbol: {
     domain: 'string',
@@ -71,9 +74,32 @@ export const createProvider: SearchBackendModule['createProvider'] = async funct
     await orama.insertMultiple(db, content);
   }
 
-  async function search(query: string): Promise<SearchResultList> {
+  async function search({
+    project,
+    query,
+    version,
+    lang,
+    limit = 10,
+    offset = 0,
+  }: SearchQuery): Promise<SearchResultList> {
+    // TODO: upstream typing issues
+    const where: WhereCondition<
+      Partial<{ project: 'string'; version: 'string'; lang: 'string' }>
+    > = {};
+    if (project) {
+      where.project = project;
+    }
+    if (version) {
+      where.version = version;
+    }
+    if (lang) {
+      where.lang = lang;
+    }
     const result = await orama.search(db, {
       term: query,
+      limit,
+      offset,
+      where,
     });
     return {
       totalCount: result.count,
