@@ -1,6 +1,7 @@
 import type { Plugin } from 'unified';
 
 import type { SearchBackendModule, SearchableContent } from '../shared/typing.mjs';
+import { OTHER_PROJECTS } from '../shared/utils/constants.mjs';
 
 import type { LoaderConfig } from './typing.d.js';
 
@@ -20,7 +21,10 @@ function* chunked<T>(items: Iterable<T>, size: number): Generator<T[], void, voi
   }
 }
 
-export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) {
+export async function loader(
+  query: string,
+  { backend, pipelines = {}, routes }: LoaderConfig,
+) {
   const unistCompilerNoOp: Plugin = function () {
     this.Compiler = (_tree, file) => file;
   };
@@ -31,11 +35,13 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
   );
 
   const PROCESSORS = Object.fromEntries(
-    Object.entries(pipelines).map(([extension, factory]) => {
-      let processor = factory(unified());
-      processor = processor.use(rehypeArticleOutline).use(unistCompilerNoOp);
-      return [extension, processor.freeze()];
-    }),
+    Object.entries(pipelines).map(
+      ([extension, { preprocessor, processor: factory }]) => {
+        let processor = factory(unified());
+        processor = processor.use(rehypeArticleOutline).use(unistCompilerNoOp);
+        return [extension, { preprocessor, processor: processor.freeze() }];
+      },
+    ),
   );
 
   const { read } = await import('to-vfile');
@@ -44,6 +50,8 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
   const database = await createProvider();
 
   const endpoints = routes ?? {};
+
+  const shards = query.split('/').pop()?.split('~') ?? [];
 
   for (const chunk of chunked(Object.values(endpoints), 64)) {
     await Promise.all(
@@ -56,13 +64,28 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
           return;
         }
 
-        const processor = PROCESSORS[extension];
+        const { preprocessor, processor } = PROCESSORS[extension] || {};
 
         if (!processor) {
           return;
         }
 
+        if (
+          pathMatch &&
+          !shards.includes(pathMatch.groups?.['project'] ?? OTHER_PROJECTS)
+        ) {
+          return;
+        }
+
         const source = await read(file);
+
+        if (preprocessor) {
+          source.value = Buffer.from(
+            preprocessor(source.value.toString('utf-8')),
+            'utf-8',
+          );
+        }
+
         const result = await processor.process(source);
         const targets: SearchableContent[] = [];
 
@@ -72,7 +95,7 @@ export async function loader({ backend, pipelines = {}, routes }: LoaderConfig) 
             url,
             title: longTitle,
             content,
-            project: pathMatch?.groups?.['project'] || '',
+            project: pathMatch?.groups?.['project'] || OTHER_PROJECTS,
             version: pathMatch?.groups?.['version'],
             lang: pathMatch?.groups?.['lang'],
             type: id ? 'fragment' : 'page',

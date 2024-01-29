@@ -1,5 +1,17 @@
 # @secretflow/dumi-plugin-search
 
+## 0.5.0
+
+### Minor Changes
+
+- feat: load search index more lazily
+
+## 0.4.2
+
+### Patch Changes
+
+- fix: fix incorrect html parsing
+
 ## 0.4.1
 
 ### Patch Changes

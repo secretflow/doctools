@@ -6,7 +6,22 @@ declare module 'dumi-plugin-search/runtime/backend' {
   export = exports;
 }
 
-declare module '?dumi-plugin-search/runtime/index' {
-  const data: unknown;
-  export = data;
+declare module '?dumi-plugin-search/runtime/secretflow' {
+  const url: string;
+  export = url;
+}
+
+declare module '?dumi-plugin-search/runtime/spu~heu' {
+  const url: string;
+  export = url;
+}
+
+declare module '?dumi-plugin-search/runtime/scql~kuscia' {
+  const url: string;
+  export = url;
+}
+
+declare module '?dumi-plugin-search/runtime/interconnection~secretpad~spec~trustedflow~psi~OTHER_PROJECTS' {
+  const url: string;
+  export = url;
 }
