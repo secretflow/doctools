@@ -1,3 +1,4 @@
+import { gzipSync } from 'fflate';
 import type { Plugin } from 'unified';
 
 import type { SearchBackendModule, SearchableContent } from '../shared/typing.mjs';
@@ -108,5 +109,9 @@ export async function loader(
   }
 
   const serialized = await database.dump();
-  return JSON.stringify(serialized);
+  const data = JSON.stringify(serialized);
+  const array = new TextEncoder().encode(data);
+  const compressed = gzipSync(array, { level: 9 });
+
+  return Buffer.from(compressed);
 }

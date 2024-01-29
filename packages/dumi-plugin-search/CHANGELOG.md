@@ -1,5 +1,11 @@
 # @secretflow/dumi-plugin-search
 
+## 0.6.0
+
+### Minor Changes
+
+- feat: enable compression
+
 ## 0.5.1
 
 ### Patch Changes

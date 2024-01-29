@@ -91,7 +91,7 @@ export async function plugin(api: DumiAPI) {
       .test(/^$/)
       .resourceQuery(/dumi-plugin-search\/runtime\/.*/)
       .type('asset/resource')
-      .generator({ filename: 'static/search-index.[hash].json' })
+      .generator({ filename: 'static/search-index.[hash].gz' })
       .use('dumi-plugin-search/runtime/index')
       .loader(loader)
       .options({
