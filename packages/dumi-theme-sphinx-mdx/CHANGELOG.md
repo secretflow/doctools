@@ -1,5 +1,20 @@
 # @secretflow/dumi-theme-sphinx-mdx
 
+## 0.6.0
+
+### Minor Changes
+
+- feat: finalize search provider
+- cd10fa5: add transitional openapi features
+
+### Patch Changes
+
+- 6c952c1: fix misc issues
+- Updated dependencies
+- Updated dependencies [cd10fa5]
+  - @secretflow/dumi-plugin-search@0.4.0
+  - @secretflow/dumi-plugin-mdx@0.3.0
+
 ## 0.6.0-alpha.1.2
 
 ### Patch Changes

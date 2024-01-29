@@ -1,5 +1,15 @@
 # dumi-scaffolding
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [cd10fa5]
+- Updated dependencies [6c952c1]
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.0
+  - @secretflow/dumi-plugin-search@0.4.0
+
 ## 0.2.1
 
 ### Patch Changes

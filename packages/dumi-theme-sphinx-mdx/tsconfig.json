@@ -11,7 +11,8 @@
     "baseUrl": "./",
     "paths": {
       "~/*": ["src/*"]
-    }
+    },
+    "exactOptionalPropertyTypes": false
   },
   "include": [
     "src/**/*.ts",

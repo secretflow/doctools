@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/unified-toolkit",
   "license": "MIT",
-  "version": "0.4.0-alpha.1.2",
+  "version": "0.4.0",
   "description": "Suite of unified plugins and tools for processing Markdown documents using Dumi.",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/unified-toolkit",

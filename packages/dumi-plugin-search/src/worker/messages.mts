@@ -1,4 +1,4 @@
-import type { SearchResultList } from '../shared/typing.mjs';
+import type { SearchQuery, SearchResultList } from '../shared/typing.mjs';
 
 export type DatabaseReady = {
   type: 'ready';
@@ -6,7 +6,7 @@ export type DatabaseReady = {
 
 export type SearchRequested = {
   type: 'search';
-  data: string;
+  data: SearchQuery;
 };
 
 export type SearchResult = {
@@ -23,6 +23,6 @@ export type IncomingMessages = SearchRequested;
 
 export type OutgoingMessages = DatabaseReady | SearchResult | WorkerError;
 
-export function startSearching(query: string): SearchRequested {
+export function startSearching(query: SearchQuery): SearchRequested {
   return { type: 'search', data: query };
 }
