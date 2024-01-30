@@ -1,5 +1,11 @@
 # @secretflow/dumi-plugin-search
 
+## 0.6.1
+
+### Patch Changes
+
+- fix: avoid spawning worker in worker (it's safari)
+
 ## 0.6.0
 
 ### Minor Changes
