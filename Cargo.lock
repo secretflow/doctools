@@ -1625,16 +1625,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "html5jsx-bin"
-version = "0.0.0"
-dependencies = [
- "base64 0.21.7",
- "html5jsx",
- "swc-ecma-utils",
- "swc_core",
-]
-
-[[package]]
 name = "idna"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3264,14 +3254,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde-jsx"
-version = "0.0.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "serde_bytes"
 version = "0.11.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3502,8 +3484,8 @@ dependencies = [
  "relative-path",
  "serde",
  "serde_json",
+ "swc-ecma-lint-bindings",
  "swc-ecma-lint-linkcheck",
- "swc-ecma-lint-sphinx-theme",
  "swc-ecma-transform-i18n",
  "swc-ecma-transform-sphinx",
  "swc-ecma-utils",
@@ -3656,6 +3638,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "swc-ecma-lint-bindings"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "swc-ecma-utils",
+ "swc_core",
+]
+
+[[package]]
 name = "swc-ecma-lint-linkcheck"
 version = "0.0.0"
 dependencies = [
@@ -3664,15 +3655,6 @@ dependencies = [
  "swc-ecma-utils",
  "swc_core",
  "url",
-]
-
-[[package]]
-name = "swc-ecma-lint-sphinx-theme"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "swc-ecma-utils",
- "swc_core",
 ]
 
 [[package]]

@@ -406,14 +406,14 @@ macro_rules! object_lit {
 }
 
 #[macro_export]
-macro_rules! match_jsx {
+macro_rules! match_tag {
   (
-    ($jsx:expr, $elem:ident),
-    $(JSX($ident:ident $(, $ident_props:ident)?) >> $if_ident:block,)*
-    $(HTML($intrinsic:literal $(, $intrinsic_props:ident)?) >> $if_intrinsic:block,)*
-    $(Fragment($($children:ident)?) >> $if_fragment:block,)?
-    $(Any($any_tag:ident $(, $any_props:ident)?) >> $if_any:block,)?
-    $(_ >> $default:block,)?
+    ( $jsx:expr, $elem:ident ),
+    $( JSX($ident:ident $(, $ident_props:ident)?) >> $if_ident:block, )*
+    $( HTML($intrinsic:literal $(, $intrinsic_props:ident)?) >> $if_intrinsic:block, )*
+    $( Fragment($($children:ident)?) >> $if_fragment:block, )?
+    $( Any($any_tag:ident $(, $any_props:ident)?) >> $if_any:block, )?
+    $( _ >> $default:block, )?
   ) => {{
     match $jsx.as_jsx($elem) {
       $(

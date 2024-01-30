@@ -11,7 +11,7 @@ use deno_lite::{anyhow, export_function, DenoLite, ESModule};
 use html5jsx::html_to_jsx;
 use swc_ecma_utils::{
   jsx::{builder::JSXDocument, factory::JSXRuntime},
-  match_jsx,
+  match_tag,
 };
 
 static ESM: &str = include_str!("../../dist/index.js");
@@ -53,7 +53,7 @@ impl VisitMut for MathRenderer {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let (inline, code) = match_jsx!(
+    let (inline, Some(code)) = match_tag!(
       (self.jsx, elem),
       JSX(math, props) >> {
         let code = self.jsx.get_prop(props, &["children"]).as_string();
@@ -64,11 +64,8 @@ impl VisitMut for MathRenderer {
         (false, code)
       },
       _ >> { return },
-    );
-
-    let code = match code {
-      Some(code) => code,
-      None => return,
+    ) else {
+      return;
     };
 
     let document = self.render_math(code, inline);

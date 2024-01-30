@@ -11,7 +11,7 @@ use swc_core::{
 
 use swc_ecma_utils::{
   jsx::factory::{JSXRuntime, JSXTagName},
-  match_jsx, tag,
+  match_tag, tag,
 };
 
 mod attribute;
@@ -257,7 +257,7 @@ impl VisitMut for Translator<'_> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let name = match_jsx!(
+    let name = match_tag!(
       (self.jsx, elem),
       Any(name) >> { name },
       _ >> {

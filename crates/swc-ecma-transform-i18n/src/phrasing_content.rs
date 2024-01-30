@@ -9,7 +9,7 @@ use swc_core::{
   },
 };
 
-use swc_ecma_utils::{jsx::factory::JSXRuntime, match_jsx, span::with_span, tag};
+use swc_ecma_utils::{jsx::factory::JSXRuntime, match_tag, span::with_span, tag};
 
 use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 
@@ -43,7 +43,7 @@ impl Visit for PhrasingContentPreflight {
       return;
     }
 
-    let children = match_jsx!(
+    let children = match_tag!(
       (self.jsx, call),
       Any(tag, props) >> { self.jsx.get_prop(props, &["children"]).get() },
       _ >> {
@@ -92,7 +92,7 @@ impl VisitMut for PhrasingContentCollector {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    match_jsx!(
+    match_tag!(
       (self.jsx, elem),
       Any(tag) >> {},
       _ >> {

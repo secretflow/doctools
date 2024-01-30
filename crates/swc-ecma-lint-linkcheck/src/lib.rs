@@ -10,7 +10,7 @@ use swc_core::{
 };
 use url::Url;
 
-use swc_ecma_utils::{jsx::factory::JSXRuntime, match_jsx};
+use swc_ecma_utils::{jsx::factory::JSXRuntime, match_tag};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Link {
@@ -87,7 +87,7 @@ impl VisitMut for LinkCollector<'_> {
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
     elem.visit_mut_children_with(self);
 
-    let refuri = match_jsx!(
+    let refuri = match_tag!(
       (self.jsx, elem),
       Any(tag, props) >> { self.jsx.get_prop(props, &["refuri"]).as_string() },
       _ >> { return },
@@ -103,7 +103,7 @@ impl VisitMut for LinkCollector<'_> {
       Err(_) => Link::Internal(url.to_string()), // TODO: differentiate errors
     };
 
-    match_jsx!(
+    match_tag!(
       (self.jsx, elem),
       JSX(target) >> {
         self.add_target(link, elem.span);

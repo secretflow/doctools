@@ -1,20 +1,6 @@
 [workspace]
 members = [
-  "crates/deno-lite",
-  "crates/esm-serve",
-  "crates/fuzzy-sourcemap",
-  "crates/html5jsx",
-  "crates/html5jsx/bin",
-  "crates/playground",
-  "crates/playground/serde-jsx",
-  "crates/pyo3-build-utils",
-  "crates/pyo3-utils",
-  "crates/swc-ecma-lint-sphinx-theme",
-  "crates/swc-ecma-lint-linkcheck",
-  "crates/swc-ecma-transform-i18n",
-  "crates/swc-ecma-transform-sphinx",
-  "crates/swc-ecma-transform-sphinx-math",
-  "crates/swc-ecma-utils",
+  "crates/*",
   "packages/swc-plugin-esm-serve",
   "pyprojects/sphinx-jsx",
 ]

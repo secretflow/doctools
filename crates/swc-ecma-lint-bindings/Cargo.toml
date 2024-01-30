@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 license.workspace = true
-name = "swc-ecma-lint-sphinx-theme"
+name = "swc-ecma-lint-bindings"
 publish = false
 version = "0.0.0"
 
