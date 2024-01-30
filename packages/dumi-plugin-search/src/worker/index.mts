@@ -1,5 +1,5 @@
 import { createProvider } from 'dumi-plugin-search/runtime/backend';
-import { gunzip } from 'fflate';
+import { gunzipSync } from 'fflate';
 
 import type { SearchProvider } from '../shared/typing.mjs';
 import { OTHER_PROJECTS } from '../shared/utils/constants.mjs';
@@ -83,19 +83,8 @@ async function loadIndex(url: string, projects: string[]): Promise<SearchProvide
   }
   const compressed = new Uint8Array(await new Blob(chunks).arrayBuffer());
   try {
-    const data = await new Promise((resolve, reject) => {
-      gunzip(compressed, { consume: true }, (err, decompressed) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        try {
-          resolve(JSON.parse(new TextDecoder().decode(decompressed)));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    const decompressed = gunzipSync(compressed);
+    const data = JSON.parse(new TextDecoder().decode(decompressed));
     const provider = await createProvider();
     await provider.load(data);
     projects.forEach((project) => {
