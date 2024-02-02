@@ -1,0 +1,8 @@
+---
+source: crates/fuzzy-sourcemap/tests/paragraph.rs
+expression: "test_case(\"markdown.md\", 31).unwrap()"
+---
+What distinguishes Markdown from many other lightweight markup
+syntaxes, which are often easier to write, is its readability.
+As Gruber writes:
+

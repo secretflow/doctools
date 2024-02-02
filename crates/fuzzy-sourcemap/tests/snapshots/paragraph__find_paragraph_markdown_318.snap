@@ -1,0 +1,7 @@
+---
+source: crates/fuzzy-sourcemap/tests/paragraph.rs
+expression: "test_case(\"markdown.md\", 318).unwrap()"
+---
+1.  A paragraph
+    with two lines.
+

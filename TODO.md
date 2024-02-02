@@ -5,6 +5,7 @@
   - [ ] JSX-in-HTML
   - [ ] Sourcemap
     - [ ] Correctness & debug_assertion
+    - [ ] jupytext, py:percent
 - [ ] ESM
   - [ ] SWC + PyO3
 - [ ] Python symbols
@@ -148,3 +149,18 @@
 - [ ] graphviz
 - [ ] nbsphinx
 - [ ] sphinx-design
+
+1. lookahead: start of current span => end of current _paragraph_
+2. current span
+
+caching
+
+**dedented matching** per line matching
+
+1. if line_no then determine current paragraph (respecting indentation)
+2. else keep current paragraph
+3. lookahead until end of paragraph (end of file? worst case?)
+
+   1. find first line
+   2. determine indentation
+   3. find remaining lines

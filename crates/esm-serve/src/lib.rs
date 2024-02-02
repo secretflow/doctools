@@ -101,15 +101,7 @@ impl<'options> ModuleSpecifierRewriter<'options> {
 
     match jinja.add_template("import_source", &packages.import_source) {
       Ok(_) => (),
-      Err(err) => HANDLER.with(|handler| {
-        handler
-          .struct_err(&format!(
-            "[esm-serve] cannot parse import source: {:#?}",
-            err
-          ))
-          .emit();
-        panic!()
-      }),
+      Err(err) => panic!("[esm-serve] cannot parse import source: {:#?}", err),
     };
 
     Self { packages, jinja }

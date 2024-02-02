@@ -1,0 +1,7 @@
+---
+source: crates/fuzzy-sourcemap/tests/paragraph.rs
+expression: "test_case(\"markdown.md\", 54).unwrap()"
+---
+    a simple
+      indented code block
+

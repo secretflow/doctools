@@ -1,22 +1,42 @@
-use swc_core::common::{sync::Lrc, FileName, SourceMap, Span};
+use swc_core::common::{sync::Lrc, FileName, SourceFile, SourceMap, Span};
+
+pub mod paragraph;
+mod whitespace;
+
+#[macro_export]
+macro_rules! one_indexed {
+  ($x:expr) => {{
+    if $x <= 0 {
+      panic!("Index must be greater than 0")
+    } else {
+      $x - 1
+    }
+  }};
+}
 
 pub trait SourceLoader {
-  fn load_source(&mut self, current_file: FileName, last_file: Option<FileName>) -> Option<&str>;
+  fn load_source(
+    &mut self,
+    current_file: &FileName,
+    last_file: &Option<FileName>,
+  ) -> Option<String>;
 }
 
 pub struct SourceFinder {
   sources: Lrc<SourceMap>,
   loader: Box<dyn SourceLoader>,
-  current_file: Option<FileName>,
-  current_span: Option<Span>,
+
+  this_file: Option<FileName>,
+  this_para: Option<Span>,
+  this_span: Option<Span>,
 }
 
 impl SourceFinder {
   pub fn next_span(
     &mut self,
-    current_file: FileName,
+    file_name: FileName,
     line_number: Option<usize>,
-    raw_source: Option<&str>,
+    snippet: Option<&str>,
   ) -> Option<Span> {
     todo!()
   }

@@ -20,11 +20,11 @@ impl VisitMut for SetSpan {
 pub fn with_span<T: VisitMutWith<SetSpan>>(span: Option<Span>) -> impl Fn(T) -> T {
   move |mut node| {
     match span {
-      Some(span) => {
+      Some(span) if !span.is_dummy() => {
         let mut v = SetSpan { span };
         node.visit_mut_with(&mut v);
       }
-      None => {}
+      _ => {}
     }
     node
   }

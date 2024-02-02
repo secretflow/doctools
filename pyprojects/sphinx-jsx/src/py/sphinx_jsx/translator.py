@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
 
@@ -68,6 +69,26 @@ class SphinxJSXTranslator(SphinxTranslator):
         return None
 
     def visit_Element(self, node: nodes.Element):
+        if node.source:
+            file = Path(node.source).name
+        else:
+            file = None
+
+        line = node.line
+        rawsource = node.rawsource
+        name = type(node).__name__
+
+        print(
+            json.dumps(
+                {
+                    "name": name,
+                    "file": file,
+                    "line": line,
+                    "rawsource": str(rawsource),
+                }
+            )
+        )
+
         try:
             if node.line and node.line != self.range:
                 self.range = Range(
@@ -88,7 +109,6 @@ class SphinxJSXTranslator(SphinxTranslator):
         except IndexError:
             position = self.range
 
-        name = type(node).__name__
         props = dump_props(node.attributes)
         self.ast.element(name, props, position=position)
         self.ast.enter()

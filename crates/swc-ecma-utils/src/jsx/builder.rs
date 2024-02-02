@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::Span,
+  common::{Span, Spanned},
   ecma::ast::{ArrayLit, Expr},
 };
 
@@ -109,6 +109,8 @@ impl DocumentBuilder {
     self
       .runtime
       .mut_or_set_prop(props, &prop.as_strs()[..], |expr| *expr = children);
+
+    let parent = with_span(Some(parent.span()))(parent);
 
     self.push(parent);
     self

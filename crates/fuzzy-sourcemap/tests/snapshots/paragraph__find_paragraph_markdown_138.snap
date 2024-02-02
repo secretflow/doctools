@@ -1,0 +1,6 @@
+---
+source: crates/fuzzy-sourcemap/tests/paragraph.rs
+expression: "test_case(\"markdown.md\", 138).unwrap()"
+---
+    println!("Hello, world!");
+
