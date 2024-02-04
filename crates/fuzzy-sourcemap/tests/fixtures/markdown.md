@@ -38,9 +38,9 @@ As Gruber writes:
 
 ## 4.4 Indented code blocks
 
-An [indented code block](@) is composed of one or more
+An indented code block is composed of one or more
 [indented chunks] separated by blank lines.
-An [indented chunk](@) is a sequence of non-blank lines,
+An indented chunk is a sequence of non-blank lines,
 each preceded by four or more spaces of indentation. The contents of the code
 block are the literal contents of the lines, including trailing
 [line endings], minus four spaces of indentation.
@@ -127,10 +127,10 @@ Heading
 
 ## 4.5 Fenced code blocks
 
-A [code fence](@) is a sequence
+A code fence is a sequence
 of at least three consecutive backtick characters (`` ` ``) or
 tildes (`~`). (Tildes and backticks cannot be mixed.)
-A [fenced code block](@)
+A fenced code block
 begins with a code fence, preceded by up to three spaces of indentation.
 
 ```rust
@@ -236,7 +236,7 @@ The following rules define [block quotes]:
     more lines in which the next character other than a space or tab after the
     [block quote marker] is [paragraph continuation
     text] is a block quote with _Bs_ as its content.
-    [Paragraph continuation text](@) is text
+    Paragraph continuation text is text
     that will be parsed as part of the content of a paragraph, but does
     not occur at the beginning of the paragraph.
 
@@ -245,26 +245,26 @@ The following rules define [block quotes]:
 
 <!-- prettier-ignore-start -->
 
-> # Foo
+> ### Foo
 > bar
 > baz
 
 The space or tab after the `>` characters can be omitted:
 
-># Foo
+>### Bar
 >bar
 > baz
 
 The `>` characters can be preceded by up to three spaces of indentation:
 
-   > # Foo
+   > ### Baz
    > bar
  > baz
 
 The Laziness clause allows us to omit the `>` before
 [paragraph continuation text]:
 
-> # Foo
+> ### Quux
 > bar
 baz
 
@@ -279,13 +279,13 @@ baz
 
 ## 5.2 List items
 
-A [list marker](@) is a
+A list marker is a
 [bullet list marker] or an [ordered list marker].
 
-A [bullet list marker](@)
+A bullet list marker
 is a `-`, `+`, or `*` character.
 
-An [ordered list marker](@)
+An ordered list marker
 is a sequence of 1--9 arabic digits (`0-9`), followed by either a
 `.` character or a `)` character. (The reason for the length
 limit is that with 10 digits we start seeing integer overflows

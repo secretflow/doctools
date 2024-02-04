@@ -9,6 +9,13 @@ version = "0.0.0"
 swc_core = {version = "*", features = ["common_sourcemap"]}
 
 [dev-dependencies]
+anyhow = "1.0.79"
 glob = "0.3.1"
-insta = {version = "1.34.0"}
+insta = {version = "1.34.0", features = ["yaml"]}
+miette = {version = "5.10.0", features = ["fancy"]}
 once_cell = "1.19.0"
+relative-path = "1.9.2"
+serde = {version = "1.0.196", features = ["derive"]}
+serde_yaml = "0.9.31"
+swc_core = {version = "*", features = ["testing"]}
+thiserror = "1.0.56"

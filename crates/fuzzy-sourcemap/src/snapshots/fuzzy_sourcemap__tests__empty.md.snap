@@ -1,0 +1,10 @@
+---
+source: crates/fuzzy-sourcemap/src/lib.rs
+expression: "&results"
+---
+- NotFound:
+    file_name: ~
+    line_number: ~
+    raw_source: ""
+    node_name: document
+

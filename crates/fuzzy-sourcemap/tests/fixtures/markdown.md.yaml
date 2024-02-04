@@ -1,0 +1,1249 @@
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: document
+- file_name: markdown.md
+  line_number: 1
+  raw_source: |
+    <!--
+
+    Adapted from https://spec.commonmark.org/0.31.2/. John MacFarlane. CC BY-SA 4.0. Source at https://github.com/commonmark/commonmark-spec/blob/9103e341a973013013bb1a80e13567007c5cef6f/spec.txt
+
+    Adapted from https://github.com/rust-lang/book. The Rust Project Developers. MIT or Apache-2.0.
+
+    -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 9
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 9
+  raw_source: "[CommonMark]"
+  node_name: title
+- file_name: markdown.md
+  line_number: 9
+  raw_source: CommonMark
+  node_name: reference
+- file_name: markdown.md
+  line_number: 13
+  raw_source: |-
+    Markdown is a plain text format for writing structured documents,
+    based on conventions for indicating formatting in email
+    and usenet posts. It was developed by John Gruber (with
+    help from Aaron Swartz) and released in 2004 in the form of a
+    [syntax description](https://daringfireball.net/projects/markdown/syntax)
+    and a Perl script (`Markdown.pl`) for converting Markdown to
+    HTML. In the next decade, dozens of implementations were
+    developed in many languages. Some extended the original
+    Markdown syntax with conventions for footnotes, tables, and
+    other document elements. Some allowed Markdown documents to be
+    rendered in formats other than HTML. Websites like Reddit,
+    StackOverflow, and GitHub had millions of people using Markdown.
+    And Markdown started to be used beyond the web, to author books,
+    articles, slide shows, letters, and lecture notes.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 13
+  raw_source: syntax description
+  node_name: reference
+- file_name: markdown.md
+  line_number: 13
+  raw_source: Markdown.pl
+  node_name: literal
+- file_name: markdown.md
+  line_number: 28
+  raw_source: |-
+    What distinguishes Markdown from many other lightweight markup
+    syntaxes, which are often easier to write, is its readability.
+    As Gruber writes:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 32
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 32
+  raw_source: |-
+    The overriding design goal for Markdown's formatting syntax is
+    to make it as readable as possible. The idea is that a
+    Markdown-formatted document should be publishable as-is, as
+    plain text, without looking like it's been marked up with tags
+    or formatting instructions.
+    (<https://daringfireball.net/projects/markdown/>)
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 32
+  raw_source: https://daringfireball.net/projects/markdown/
+  node_name: reference
+- file_name: markdown.md
+  line_number: 39
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 39
+  raw_source: 4.4 Indented code blocks
+  node_name: title
+- file_name: markdown.md
+  line_number: 41
+  raw_source: |-
+    An indented code block is composed of one or more
+    [indented chunks] separated by blank lines.
+    An indented chunk is a sequence of non-blank lines,
+    each preceded by four or more spaces of indentation. The contents of the code
+    block are the literal contents of the lines, including trailing
+    [line endings], minus four spaces of indentation.
+    An indented code block has no [info string].
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 49
+  raw_source: |-
+    An indented code block cannot interrupt a paragraph, so there must be
+    a blank line between a paragraph and a following indented code block.
+    (A blank line is not needed, however, between a code block and a following
+    paragraph.)
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 54
+  raw_source: |
+    a simple
+      indented code block
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 57
+  raw_source: |-
+    If there is any ambiguity between an interpretation of indentation
+    as a code block and as indicating that material belongs to a [list
+    item][list items], the list item interpretation takes precedence:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 61
+  raw_source: ""
+  node_name: bullet_list
+- file_name: markdown.md
+  line_number: 61
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 61
+  raw_source: foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 63
+  raw_source: bar
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 65
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 65
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 65
+  raw_source: foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 67
+  raw_source: ""
+  node_name: bullet_list
+- file_name: markdown.md
+  line_number: 67
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 67
+  raw_source: bar
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 69
+  raw_source: |-
+    The contents of a code block are literal text, and do not get parsed
+    as Markdown:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 72
+  raw_source: |
+    <a/>
+    *hi*
+
+    - one
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 77
+  raw_source: "Here we have three chunks separated by blank lines:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 79
+  raw_source: |
+    chunk1
+
+    chunk2
+
+
+
+    chunk3
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 87
+  raw_source: |-
+    Any initial spaces or tabs beyond four spaces of indentation will be included in
+    the content, even in interior blank lines:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 90
+  raw_source: |
+    chunk1
+
+      chunk2
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 94
+  raw_source: |-
+    An indented code block cannot interrupt a paragraph. (This
+    allows hanging indents and the like.)
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 97
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 99
+  raw_source: |-
+    Foo
+        bar
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 102
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 104
+  raw_source: |-
+    However, any non-blank line with fewer than four spaces of indentation ends
+    the code block immediately. So a paragraph may occur immediately
+    after indented code:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 108
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 110
+  raw_source: |
+    foo
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 111
+  raw_source: bar
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 113
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 115
+  raw_source:
+    "And indented code can occur immediately before and after other kinds of blocks:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 117
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 119
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 119
+  raw_source: Heading
+  node_name: title
+- file_name: markdown.md
+  line_number: 120
+  raw_source: |
+    foo
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 121
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 121
+  raw_source: Heading
+  node_name: title
+- file_name: markdown.md
+  line_number: 123
+  raw_source: |
+    foo
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 124
+  raw_source: ""
+  node_name: transition
+- file_name: markdown.md
+  line_number: 126
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 128
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 128
+  raw_source: 4.5 Fenced code blocks
+  node_name: title
+- file_name: markdown.md
+  line_number: 130
+  raw_source: |-
+    A code fence is a sequence
+    of at least three consecutive backtick characters (`` ` ``) or
+    tildes (`~`). (Tildes and backticks cannot be mixed.)
+    A fenced code block
+    begins with a code fence, preceded by up to three spaces of indentation.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 130
+  raw_source: "`"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 130
+  raw_source: "~"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 136
+  raw_source: |
+    fn main() {
+        println!("Hello, world!");
+    }
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 142
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 142
+  raw_source: What is Ownership?
+  node_name: title
+- file_name: markdown.md
+  line_number: 144
+  raw_source: |-
+    The variable `s` refers to a string literal, where the value of the string is
+    hardcoded into the text of our program. The variable is valid from the point at
+    which it’s declared until the end of the current _scope_. Listing 4-1 shows a
+    program with comments annotating where the variable `s` would be valid.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 144
+  raw_source: s
+  node_name: literal
+- file_name: markdown.md
+  line_number: 144
+  raw_source: scope
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 144
+  raw_source: s
+  node_name: literal
+- file_name: markdown.md
+  line_number: 149
+  raw_source: |2
+        {                      // s is not valid here, it’s not yet declared
+            let s = "hello";   // s is valid from this point forward
+
+            // do stuff with s
+        }                      // this scope is now over, and s is no longer valid
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 157
+  raw_source: |-
+    The double colon `::` operator allows us to namespace this particular `from`
+    function under the `String` type rather than using some sort of name like
+    `string_from`. We’ll discuss this syntax more in the [“Method
+    Syntax”][method-syntax]<!-- ignore --> section of Chapter 5, and when we talk
+    about namespacing with modules in [“Paths for Referring to an Item in the
+    Module Tree”][paths-module-tree]<!-- ignore --> in Chapter 7.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 157
+  raw_source: "::"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 157
+  raw_source: from
+  node_name: literal
+- file_name: markdown.md
+  line_number: 157
+  raw_source: String
+  node_name: literal
+- file_name: markdown.md
+  line_number: 157
+  raw_source: string_from
+  node_name: literal
+- file_name: markdown.md
+  line_number: 157
+  raw_source: <!-- ignore -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 157
+  raw_source: <!-- ignore -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 164
+  raw_source: "This kind of string _can_ be mutated:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 164
+  raw_source: can
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 166
+  raw_source: |2
+        let mut s = String::from("hello");
+
+        s.push_str(", world!"); // push_str() appends a literal to a String
+
+        println!("{}", s); // This will print `hello, world!`
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 174
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 174
+  raw_source: The `match` Control Flow Construct
+  node_name: title
+- file_name: markdown.md
+  line_number: 174
+  raw_source: match
+  node_name: literal
+- file_name: markdown.md
+  line_number: 176
+  raw_source: |-
+    Speaking of coins, let’s use them as an example using `match`! We can write a
+    function that takes an unknown US coin and, in a similar way as the counting
+    machine, determines which coin it is and returns its value in cents, as shown
+    in Listing 6-3.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 176
+  raw_source: match
+  node_name: literal
+- file_name: markdown.md
+  line_number: 181
+  raw_source: |
+    enum Coin {
+        Penny,
+        Nickel,
+        Dime,
+        Quarter,
+    }
+
+    fn value_in_cents(coin: Coin) -> u8 {
+        match coin {
+            Coin::Penny => 1,
+            Coin::Nickel => 5,
+            Coin::Dime => 10,
+            Coin::Quarter => 25,
+        }
+    }
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 199
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 199
+  raw_source: 4.6 HTML blocks
+  node_name: title
+- file_name: markdown.md
+  line_number: 201
+  raw_source: |-
+    HTML blocks continue until they are closed by their appropriate
+    [end condition], or the last line of the document or other [container
+    block](#container-blocks). This means any HTML **within an HTML
+    block** that might otherwise be recognised as a start condition will
+    be ignored by the parser and passed through as-is, without changing
+    the parser's state.
+  node_name: paragraph
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: reference
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: inline
+- file_name: markdown.md
+  line_number: 201
+  raw_source: |-
+    within an HTML
+    block
+  node_name: strong
+- file_name: markdown.md
+  line_number: 208
+  raw_source: |-
+    For instance, `<pre>` within an HTML block started by `<table>` will not affect
+    the parser state; as the HTML block was started in by start condition 6, it
+    will end at any blank line. This can be surprising:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 208
+  raw_source: <pre>
+  node_name: literal
+- file_name: markdown.md
+  line_number: 208
+  raw_source: <table>
+  node_name: literal
+- file_name: markdown.md
+  line_number: 212
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 214
+  raw_source: |
+    <table><tr><td>
+    <pre>
+    **Hello**,
+  node_name: raw
+- file_name: markdown.md
+  line_number: 218
+  raw_source: |-
+    _world_.
+    </pre>
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 218
+  raw_source: world
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 218
+  raw_source: </pre>
+  node_name: raw
+- file_name: markdown.md
+  line_number: 220
+  raw_source: |
+    </td></tr></table>
+  node_name: raw
+- file_name: markdown.md
+  line_number: 222
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 224
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 224
+  raw_source: 5.1 Block quotes
+  node_name: title
+- file_name: markdown.md
+  line_number: 226
+  raw_source: "The following rules define [block quotes]:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 228
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 228
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 228
+  raw_source: |-
+    **Basic case.** If a string of lines _Ls_ constitute a sequence
+    of blocks _Bs_, then the result of prepending a [block quote
+    marker] to the beginning of each line in _Ls_
+    is a [block quote](#block-quotes) containing _Bs_.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 228
+  raw_source: Basic case.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 228
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 228
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 228
+  raw_source: Ls
+  node_name: emphasis
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: reference
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: inline
+- file_name: markdown.md
+  line_number: 228
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 233
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 233
+  raw_source: |-
+    **Laziness.** If a string of lines _Ls_ constitute a [block
+    quote](#block-quotes) with contents _Bs_, then the result of deleting
+    the initial [block quote marker] from one or
+    more lines in which the next character other than a space or tab after the
+    [block quote marker] is [paragraph continuation
+    text] is a block quote with _Bs_ as its content.
+    Paragraph continuation text is text
+    that will be parsed as part of the content of a paragraph, but does
+    not occur at the beginning of the paragraph.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 233
+  raw_source: Laziness.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 233
+  raw_source: Ls
+  node_name: emphasis
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: reference
+- file_name:
+  line_number:
+  raw_source: ""
+  node_name: inline
+- file_name: markdown.md
+  line_number: 233
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 233
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 243
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 243
+  raw_source: |-
+    **Consecutiveness.** A document cannot contain two [block
+    quotes] in a row unless there is a [blank line] between them.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 243
+  raw_source: Consecutiveness.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 246
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 248
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 248
+  raw_source: Foo
+  node_name: rubric
+- file_name: markdown.md
+  line_number: 249
+  raw_source: |-
+    bar
+    baz
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 252
+  raw_source: "The space or tab after the `>` characters can be omitted:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 252
+  raw_source: ">"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 254
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 254
+  raw_source: Bar
+  node_name: rubric
+- file_name: markdown.md
+  line_number: 255
+  raw_source: |-
+    bar
+    baz
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 258
+  raw_source: "The `>` characters can be preceded by up to three spaces of indentation:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 258
+  raw_source: ">"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 260
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 260
+  raw_source: Baz
+  node_name: rubric
+- file_name: markdown.md
+  line_number: 261
+  raw_source: |-
+    bar
+    baz
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 264
+  raw_source: |-
+    The Laziness clause allows us to omit the `>` before
+    [paragraph continuation text]:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 264
+  raw_source: ">"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 267
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 267
+  raw_source: Quux
+  node_name: rubric
+- file_name: markdown.md
+  line_number: 268
+  raw_source: |-
+    bar
+    baz
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 271
+  raw_source: |-
+    A block quote can contain some lazy and some non-lazy
+    continuation lines:
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 274
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 274
+  raw_source: |-
+    bar
+    baz
+    foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 278
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 280
+  raw_source: ""
+  node_name: section
+- file_name: markdown.md
+  line_number: 280
+  raw_source: 5.2 List items
+  node_name: title
+- file_name: markdown.md
+  line_number: 282
+  raw_source: |-
+    A list marker is a
+    [bullet list marker] or an [ordered list marker].
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 285
+  raw_source: |-
+    A bullet list marker
+    is a `-`, `+`, or `*` character.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 285
+  raw_source: "-"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 285
+  raw_source: +
+  node_name: literal
+- file_name: markdown.md
+  line_number: 285
+  raw_source: "*"
+  node_name: literal
+- file_name: markdown.md
+  line_number: 288
+  raw_source: |-
+    An ordered list marker
+    is a sequence of 1--9 arabic digits (`0-9`), followed by either a
+    `.` character or a `)` character. (The reason for the length
+    limit is that with 10 digits we start seeing integer overflows
+    in some browsers.)
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 288
+  raw_source: 0-9
+  node_name: literal
+- file_name: markdown.md
+  line_number: 288
+  raw_source: .
+  node_name: literal
+- file_name: markdown.md
+  line_number: 288
+  raw_source: )
+  node_name: literal
+- file_name: markdown.md
+  line_number: 294
+  raw_source: "The following rules define [list items]:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 296
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 296
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 296
+  raw_source: |-
+    **Basic case.** If a sequence of lines _Ls_ constitute a sequence of
+    blocks _Bs_ starting with a character other than a space or tab, and _M_ is
+    a list marker of width _W_ followed by 1 ≤ _N_ ≤ 4 spaces of indentation,
+    then the result of prepending _M_ and the following spaces to the first line
+    of _Ls_, and indenting subsequent lines of _Ls_ by _W + N_ spaces, is a
+    list item with _Bs_ as its contents. The type of the list item
+    (bullet or ordered) is determined by the type of its list marker.
+    If the list item is ordered, then it is also assigned a start
+    number, based on the ordered list marker.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Basic case.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: M
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: W
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: N
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: M
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: W + N
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 296
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 306
+  raw_source: "Exceptions:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 308
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 308
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 308
+  raw_source: |-
+    When the first list item in a [list] interrupts
+    a paragraph---that is, when it starts on a line that would
+    otherwise count as [paragraph continuation text]---then (a)
+    the lines _Ls_ must not begin with a blank line, and (b) if
+    the list item is ordered, the start number must be 1.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 308
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 313
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 313
+  raw_source: |-
+    If any line is a [thematic break][thematic breaks] then
+    that line is not a list item.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 316
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 318
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 318
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 318
+  raw_source: |-
+    A paragraph
+    with two lines.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 321
+  raw_source: |
+    indented code
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 323
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 323
+  raw_source: A block quote.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 325
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 325
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 325
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 325
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 325
+  raw_source: one
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 327
+  raw_source: two
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 329
+  raw_source: |-
+    A list item may contain blocks that are separated by more than
+    one blank line.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 332
+  raw_source: ""
+  node_name: bullet_list
+- file_name: markdown.md
+  line_number: 332
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 332
+  raw_source: foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 335
+  raw_source: bar
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 337
+  raw_source: "A list item may contain any kind of block:"
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 339
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 339
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 339
+  raw_source: foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 341
+  raw_source: |
+    bar
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 345
+  raw_source: baz
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 347
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 347
+  raw_source: bam
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 349
+  raw_source: |-
+    A list item that contains an indented code block will preserve
+    empty lines within the code block verbatim.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 352
+  raw_source: ""
+  node_name: bullet_list
+- file_name: markdown.md
+  line_number: 352
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 352
+  raw_source: Foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 354
+  raw_source: |
+    bar
+
+
+    baz
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 359
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 361
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 361
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 361
+  raw_source: |-
+    **Item starting with a blank line.** If a sequence of lines _Ls_
+    starting with a single [blank line] constitute a (possibly empty)
+    sequence of blocks _Bs_, and _M_ is a list marker of width _W_,
+    then the result of prepending _M_ to the first line of _Ls_, and
+    preceding subsequent lines of _Ls_ by _W + 1_ spaces of indentation, is a
+    list item with _Bs_ as its contents.
+    If a line is empty, then it need not be indented. The type of the
+    list item (bullet or ordered) is determined by the type of its list
+    marker. If the list item is ordered, then it is also assigned a
+    start number, based on the ordered list marker.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Item starting with a blank line.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: M
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: W
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: M
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: W + 1
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 361
+  raw_source: Bs
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 372
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 374
+  raw_source: ""
+  node_name: bullet_list
+- file_name: markdown.md
+  line_number: 374
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 375
+  raw_source: foo
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 376
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 377
+  raw_source: |
+    bar
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 380
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 381
+  raw_source: |
+    baz
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 383
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 385
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 385
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 385
+  raw_source: |-
+    **Indentation.** If a sequence of lines _Ls_ constitutes a list item
+    according to rule #1, #2, or #3, then the result of preceding each line
+    of _Ls_ by up to three spaces of indentation (the same for each line) also
+    constitutes a list item with the same contents and attributes. If a line is
+    empty, then it need not be indented.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 385
+  raw_source: Indentation.
+  node_name: strong
+- file_name: markdown.md
+  line_number: 385
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 385
+  raw_source: Ls
+  node_name: emphasis
+- file_name: markdown.md
+  line_number: 391
+  raw_source: |
+    <!-- prettier-ignore-start -->
+  node_name: raw
+- file_name: markdown.md
+  line_number: 393
+  raw_source: ""
+  node_name: enumerated_list
+- file_name: markdown.md
+  line_number: 393
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 393
+  raw_source: |-
+    A paragraph
+    with two lines.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 396
+  raw_source: |
+    indented code
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 398
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 398
+  raw_source: A block quote.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 400
+  raw_source: ""
+  node_name: list_item
+- file_name: markdown.md
+  line_number: 400
+  raw_source: |-
+    A paragraph
+    with two lines.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 403
+  raw_source: |
+    indented code
+  node_name: literal_block
+- file_name: markdown.md
+  line_number: 405
+  raw_source: ""
+  node_name: block_quote
+- file_name: markdown.md
+  line_number: 405
+  raw_source: A block quote.
+  node_name: paragraph
+- file_name: markdown.md
+  line_number: 407
+  raw_source: |
+    <!-- prettier-ignore-end -->
+  node_name: raw
