@@ -167,6 +167,9 @@ importers:
       '@types/katex':
         specifier: ^0.16.7
         version: 0.16.7
+      '@types/react':
+        specifier: ^18.2.43
+        version: 18.2.45
       esbuild:
         specifier: ^0.19.11
         version: 0.19.11

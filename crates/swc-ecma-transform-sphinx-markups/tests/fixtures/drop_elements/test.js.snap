@@ -1,0 +1,13 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+_jsxs(_Fragment, {
+    "children": [
+        "Lorem ipsum",
+        "dolor sit amet"
+    ]
+});
+``````

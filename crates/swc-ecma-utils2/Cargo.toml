@@ -1,0 +1,26 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "swc-ecma-utils2"
+publish = false
+version = "0.0.0"
+
+[dependencies]
+serde = {version = "1.0.196", features = ["derive"]}
+serde_json = "1.0.113"
+thiserror = "1.0.56"
+
+[dependencies.swc_core]
+features = [
+  "ecma_ast",
+  "ecma_ast_serde",
+  "ecma_utils",
+  "ecma_visit",
+]
+version = "*"
+
+[dev-dependencies]
+anyhow = "1.0.79"
+serde_json = {version = "1.0.113", features = ["preserve_order"]}
+swc-ecma-testing2 = {path = "../swc-ecma-testing2"}
+swc_core = {version = "*", features = ["testing"]}

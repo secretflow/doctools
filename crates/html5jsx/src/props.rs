@@ -1,18 +1,5 @@
-use swc_core::{
-  atoms::Atom,
-  ecma::ast::{KeyValueProp, Lit, Prop, PropName},
-};
+use swc_core::{atoms::Atom, ecma::ast::Lit};
 use swc_html_ast::Attribute;
-
-fn create_attribute(key: &Atom, value: Lit) -> Option<Prop> {
-  Some(
-    Prop::from(KeyValueProp {
-      key: PropName::Str(key.as_str().into()),
-      value: value.into(),
-    })
-    .into(),
-  )
-}
 
 fn create_value<F>(atom: &Option<Atom>, from: F, default: Lit) -> Option<Lit>
 where
@@ -64,7 +51,7 @@ fn reject_unsafe_inline_javascript(atom: &Atom) -> Option<Lit> {
   }
 }
 
-pub fn convert_attribute(attr: &Attribute) -> Option<Prop> {
+pub fn convert_attribute(attr: &Attribute) -> Option<(Lit, Lit)> {
   if cfg!(feature = "unsafe-ignore") {
     if attr.name.to_lowercase() == "dangerouslysetinnerhtml" || attr.name.starts_with("on") {
       return None;
@@ -580,7 +567,7 @@ pub fn convert_attribute(attr: &Attribute) -> Option<Prop> {
       match $name {
         $( $prop => {
           match create_value(&attr.value, $convert, $default.into()) {
-            Some(value) => return create_attribute(&Atom::from($name), value),
+            Some(value) => return Some(($name.into(), value)),
             None => return None,
           }
         }, )*
@@ -736,7 +723,7 @@ pub fn convert_attribute(attr: &Attribute) -> Option<Prop> {
   );
 
   match create_value(&attr.value, as_string, true.into()) {
-    Some(value) => create_attribute(&Atom::from(name), value),
+    Some(value) => Some((name.into(), value)),
     None => None,
   }
 }

@@ -1,0 +1,14 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+export const head = [
+    jsx("link", {
+        "rel": "stylesheet",
+        "href": "style.css"
+    })
+], body = [
+    "\n"
+];
+``````

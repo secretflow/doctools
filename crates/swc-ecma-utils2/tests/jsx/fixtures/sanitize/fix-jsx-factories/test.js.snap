@@ -1,0 +1,18 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+_jsx("div", {
+    children: _jsxs("span", {
+        children: [
+            "The quick brown ",
+            _jsx("strong", {
+                children: "fox"
+            }),
+            " jumps over the lazy dog."
+        ]
+    })
+});
+``````

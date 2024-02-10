@@ -1,23 +1,23 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::{collections::HashMap, fmt::Debug, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
-use swc_core::{
-  atoms::Atom,
-  ecma::{
-    ast::CallExpr,
-    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
-  },
+use swc_core::ecma::{
+  ast::CallExpr,
+  visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
 };
 
-use swc_ecma_utils::{
-  jsx::factory::{JSXRuntime, JSXTagName},
-  match_tag, tag,
+use swc_ecma_utils2::{
+  jsx::{jsx, jsx_mut, tag::JSXTag, JSXElement, JSXElementMut, JSXRuntime},
+  jsx_tag,
 };
 
 mod attribute;
 mod flow_content;
 mod message;
 mod phrasing_content;
+mod symbols;
+
+pub use crate::symbols::I18nSymbols;
 
 use crate::attribute::translate_attrs;
 use crate::flow_content::translate_block;
@@ -26,7 +26,7 @@ use crate::phrasing_content::translate_phrase;
 
 /// Content model determines how the element is translated.
 ///
-/// https://html.spec.whatwg.org/#concept-element-content-model
+/// <https://html.spec.whatwg.org/#concept-element-content-model>
 ///
 /// [ContentModel::Flow] — The element is being treated like a container for
 /// [flow content]. Elements like `<section>` `<div>` belong to this.
@@ -137,7 +137,7 @@ impl Default for ContentModel {
 #[serde(rename_all = "camelCase")]
 pub struct Translatable {
   /// What element is this?
-  pub tag: JSXTagName,
+  pub tag: JSXTag,
   /// Is the element preformatted like `<pre>` (whitespace is significant)?
   /// If not, then whitespace is collapsed according to HTML's whitespace rules.
   /// Default is `false`.
@@ -153,7 +153,7 @@ pub struct Translatable {
 impl Default for Translatable {
   fn default() -> Self {
     Self {
-      tag: tag!(<>),
+      tag: jsx_tag!(<>),
       content: ContentModel::Flow,
       pre: false,
       props: vec![],
@@ -162,25 +162,25 @@ impl Default for Translatable {
 }
 
 impl Translatable {
-  pub fn flow<E: Into<JSXTagName>>(tag: E) -> Self {
+  pub fn flow(tag: JSXTag) -> Self {
     Self {
-      tag: tag.into(),
+      tag,
       content: ContentModel::Flow,
       pre: false,
       props: vec![],
     }
   }
 
-  pub fn phrasing<E: Into<JSXTagName>>(tag: E) -> Self {
+  pub fn phrasing(tag: JSXTag) -> Self {
     Self {
-      tag: tag.into(),
+      tag: tag,
       content: ContentModel::Phrasing,
       pre: false,
       props: vec![],
     }
   }
 
-  pub fn preformatted<E: Into<JSXTagName>>(tag: E, content: ContentModel) -> Self {
+  pub fn preformatted(tag: JSXTag, content: ContentModel) -> Self {
     Self {
       tag: tag.into(),
       content,
@@ -198,14 +198,6 @@ impl Translatable {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TranslatorOptions {
-  #[serde(rename = "Trans")]
-  #[serde(default = "TranslatorOptions::default_trans")]
-  sym_trans: Atom,
-
-  #[serde(rename = "_")]
-  #[serde(default = "TranslatorOptions::default_gettext")]
-  sym_gettext: Atom,
-
   #[serde(default)]
   elements: Vec<Translatable>,
 }
@@ -214,63 +206,45 @@ impl TranslatorOptions {
   pub fn new() -> Self {
     Self::default()
   }
-
-  pub fn trans(&mut self, sym: Atom) -> &mut Self {
-    self.sym_trans = sym;
-    self
-  }
-
-  pub fn gettext(&mut self, sym: Atom) -> &mut Self {
-    self.sym_gettext = sym;
-    self
-  }
-
-  fn default_trans() -> Atom {
-    "Trans".into()
-  }
-
-  fn default_gettext() -> Atom {
-    "i18n".into()
-  }
 }
 
 impl Default for TranslatorOptions {
   fn default() -> Self {
-    Self {
-      sym_trans: TranslatorOptions::default_trans(),
-      sym_gettext: TranslatorOptions::default_gettext(),
-      elements: vec![],
-    }
+    Self { elements: vec![] }
   }
 }
 
 #[derive(Debug)]
-struct Translator<'result> {
-  jsx: JSXRuntime,
-  options: TranslatorOptions,
-  elements: HashMap<JSXTagName, Translatable>,
+struct Translator<'m, R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
+  elements: HashMap<JSXTag, Translatable>,
   pre: bool,
-  messages: &'result mut Vec<Message>,
+  messages: &'m mut Vec<Message>,
+
+  jsx: PhantomData<R>,
+  i18n: PhantomData<S>,
 }
 
-impl VisitMut for Translator<'_> {
+impl<R: JSXRuntime, S: I18nSymbols> VisitMut for Translator<'_, R, S> {
   noop_visit_mut_type!();
 
-  fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let name = match_tag!(
-      (self.jsx, elem),
-      Any(name) >> { name },
-      _ >> {
-        elem.visit_mut_children_with(self);
-        return;
-      },
-    );
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    let name = {
+      match jsx::<R>(call).and_then(|e| e.get_tag()) {
+        Some(tag) => tag,
+        None => {
+          call.visit_mut_children_with(self);
+          return;
+        }
+      }
+    };
 
-    if matches!(name, tag!("*")) {
-      let props = self.jsx.as_mut_jsx_props(elem).unwrap();
-      self.messages.extend(translate_attrs(
-        self.jsx.clone(),
-        self.options.sym_gettext.clone(),
+    if matches!(name, JSXTag::Intrinsic(_)) {
+      let props = jsx_mut::<R>(call).and_then(|e| e.get_props_mut()).unwrap();
+      self.messages.extend(translate_attrs::<R, S>(
         props,
         vec![
           vec!["title"],
@@ -285,7 +259,7 @@ impl VisitMut for Translator<'_> {
     let options = match self.elements.get(&name) {
       Some(options) => options,
       None => {
-        elem.visit_mut_children_with(self);
+        call.visit_mut_children_with(self);
         return;
       }
     };
@@ -296,13 +270,8 @@ impl VisitMut for Translator<'_> {
         .iter()
         .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
         .collect::<Vec<_>>();
-      let props = self.jsx.as_mut_jsx_props(elem).unwrap();
-      self.messages.extend(translate_attrs(
-        self.jsx.clone(),
-        self.options.sym_gettext.clone(),
-        props,
-        attrs,
-      ))
+      let props = jsx_mut::<R>(call).and_then(|e| e.get_props_mut()).unwrap();
+      self.messages.extend(translate_attrs::<R, S>(props, attrs))
     };
 
     let pre_parent = self.pre;
@@ -310,35 +279,31 @@ impl VisitMut for Translator<'_> {
 
     match options.content {
       ContentModel::Flow => {
-        self.messages.extend(translate_block(
-          self.jsx.clone(),
-          self.options.sym_trans.clone(),
-          options.pre,
-          elem,
-        ));
+        self
+          .messages
+          .extend(translate_block::<R, S>(options.pre, call));
       }
       ContentModel::Phrasing => {
-        if let Some(message) = translate_phrase(
-          self.jsx.clone(),
-          self.options.sym_trans.clone(),
-          options.pre,
-          elem,
-        ) {
+        if let Some(message) = translate_phrase::<R, S>(options.pre, call) {
           self.messages.push(message);
         }
       }
     };
 
-    elem.visit_mut_children_with(self);
+    call.visit_mut_children_with(self);
 
     self.pre = pre_parent;
   }
 }
 
-impl<'messages> Translator<'messages> {
-  pub fn flow<E: Into<JSXTagName>>(mut self, tag: E) -> Self {
+impl<'m, R, S> Translator<'m, R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
+  pub fn flow(mut self, tag: JSXTag) -> Self {
     self.elements.insert(
-      tag.into(),
+      tag,
       Translatable {
         content: ContentModel::Flow,
         ..Default::default()
@@ -347,9 +312,9 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn phrasing<E: Into<JSXTagName>>(mut self, tag: E) -> Self {
+  pub fn phrasing(mut self, tag: JSXTag) -> Self {
     self.elements.insert(
-      tag.into(),
+      tag,
       Translatable {
         content: ContentModel::Phrasing,
         ..Default::default()
@@ -358,9 +323,9 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn preformatted<E: Into<JSXTagName>>(mut self, tag: E, content: ContentModel) -> Self {
+  pub fn preformatted(mut self, tag: JSXTag, content: ContentModel) -> Self {
     self.elements.insert(
-      tag.into(),
+      tag,
       Translatable {
         pre: true,
         content,
@@ -372,7 +337,7 @@ impl<'messages> Translator<'messages> {
 
   pub fn fragment(mut self) -> Self {
     self.elements.insert(
-      tag!(<>),
+      jsx_tag!(<>),
       Translatable {
         content: ContentModel::Flow,
         ..Default::default()
@@ -381,7 +346,7 @@ impl<'messages> Translator<'messages> {
     self
   }
 
-  pub fn prop<E: Into<JSXTagName> + Debug>(mut self, prop: &[&str], tags: Vec<E>) -> Self {
+  pub fn prop(mut self, prop: &[&str], tags: Vec<JSXTag>) -> Self {
     tags.into_iter().for_each(|name| {
       let tag = name.into();
       let translatable = self.elements.entry(tag).or_default();
@@ -395,120 +360,139 @@ impl<'messages> Translator<'messages> {
   pub fn inline(self) -> Self {
     // https://html.spec.whatwg.org/#phrasing-content
     self
-      .phrasing("a")
-      .phrasing("abbr")
-      .phrasing("b")
-      .phrasing("bdi")
-      .phrasing("bdo")
-      .phrasing("button")
-      .phrasing("cite")
-      .phrasing("code")
-      .phrasing("data")
-      .phrasing("del")
-      .phrasing("dfn")
-      .phrasing("em")
-      .phrasing("i")
-      .phrasing("img")
-      .phrasing("ins")
-      .phrasing("kbd")
-      .phrasing("label")
-      .phrasing("mark")
-      .phrasing("meter")
-      .phrasing("noscript")
-      .phrasing("output")
-      .phrasing("progress")
-      .phrasing("q")
-      .phrasing("rp")
-      .phrasing("rt")
-      .phrasing("ruby")
-      .phrasing("s")
-      .phrasing("samp")
-      .phrasing("small")
-      .phrasing("span")
-      .phrasing("strong")
-      .phrasing("sub")
-      .phrasing("sup")
-      .phrasing("time")
-      .phrasing("u")
-      .phrasing("var")
-      .prop(&["alt"], vec!["area", "img", "input"])
-      .prop(&["href"], vec!["a", "area", "link"])
-      .prop(&["label"], vec!["optgroup", "option", "track"])
-      .prop(&["placeholder"], vec!["input", "textarea"])
-      .prop(&["poster"], vec!["video"])
+      .phrasing(jsx_tag!("a"))
+      .phrasing(jsx_tag!("abbr"))
+      .phrasing(jsx_tag!("b"))
+      .phrasing(jsx_tag!("bdi"))
+      .phrasing(jsx_tag!("bdo"))
+      .phrasing(jsx_tag!("button"))
+      .phrasing(jsx_tag!("cite"))
+      .phrasing(jsx_tag!("code"))
+      .phrasing(jsx_tag!("data"))
+      .phrasing(jsx_tag!("del"))
+      .phrasing(jsx_tag!("dfn"))
+      .phrasing(jsx_tag!("em"))
+      .phrasing(jsx_tag!("i"))
+      .phrasing(jsx_tag!("img"))
+      .phrasing(jsx_tag!("ins"))
+      .phrasing(jsx_tag!("kbd"))
+      .phrasing(jsx_tag!("label"))
+      .phrasing(jsx_tag!("mark"))
+      .phrasing(jsx_tag!("meter"))
+      .phrasing(jsx_tag!("noscript"))
+      .phrasing(jsx_tag!("output"))
+      .phrasing(jsx_tag!("progress"))
+      .phrasing(jsx_tag!("q"))
+      .phrasing(jsx_tag!("rp"))
+      .phrasing(jsx_tag!("rt"))
+      .phrasing(jsx_tag!("ruby"))
+      .phrasing(jsx_tag!("s"))
+      .phrasing(jsx_tag!("samp"))
+      .phrasing(jsx_tag!("small"))
+      .phrasing(jsx_tag!("span"))
+      .phrasing(jsx_tag!("strong"))
+      .phrasing(jsx_tag!("sub"))
+      .phrasing(jsx_tag!("sup"))
+      .phrasing(jsx_tag!("time"))
+      .phrasing(jsx_tag!("u"))
+      .phrasing(jsx_tag!("var"))
+      .prop(
+        &["alt"],
+        vec![jsx_tag!("area"), jsx_tag!("img"), jsx_tag!("input")],
+      )
+      .prop(
+        &["href"],
+        vec![jsx_tag!("a"), jsx_tag!("area"), jsx_tag!("link")],
+      )
+      .prop(
+        &["label"],
+        vec![jsx_tag!("optgroup"), jsx_tag!("option"), jsx_tag!("track")],
+      )
+      .prop(
+        &["placeholder"],
+        vec![jsx_tag!("input"), jsx_tag!("textarea")],
+      )
+      .prop(&["poster"], vec![jsx_tag!("video")])
       .prop(
         &["src"],
         vec![
-          "audio", "embed", "iframe", "img", "input", "script", "source", "track", "video",
+          jsx_tag!("audio"),
+          jsx_tag!("embed"),
+          jsx_tag!("iframe"),
+          jsx_tag!("img"),
+          jsx_tag!("input"),
+          jsx_tag!("script"),
+          jsx_tag!("source"),
+          jsx_tag!("track"),
+          jsx_tag!("video"),
         ],
       )
   }
 
   pub fn paragraphs(self) -> Self {
     self
-      .phrasing("p")
-      .phrasing("h1")
-      .phrasing("h2")
-      .phrasing("h3")
-      .phrasing("h4")
-      .phrasing("h5")
-      .phrasing("h6")
-      .phrasing("dd")
-      .phrasing("dt")
-      .phrasing("figcaption")
-      .phrasing("li")
-      .phrasing("th")
-      .phrasing("td")
+      .phrasing(jsx_tag!("p"))
+      .phrasing(jsx_tag!("h1"))
+      .phrasing(jsx_tag!("h2"))
+      .phrasing(jsx_tag!("h3"))
+      .phrasing(jsx_tag!("h4"))
+      .phrasing(jsx_tag!("h5"))
+      .phrasing(jsx_tag!("h6"))
+      .phrasing(jsx_tag!("dd"))
+      .phrasing(jsx_tag!("dt"))
+      .phrasing(jsx_tag!("figcaption"))
+      .phrasing(jsx_tag!("li"))
+      .phrasing(jsx_tag!("th"))
+      .phrasing(jsx_tag!("td"))
   }
 
   pub fn sections(self) -> Self {
     self
-      .flow("div")
-      .flow("address")
-      .flow("article")
-      .flow("aside")
-      .flow("blockquote")
-      .flow("details")
-      .flow("dialog")
-      .flow("dl")
-      .flow("fieldset")
-      .flow("figure")
-      .flow("footer")
-      .flow("form")
-      .flow("header")
-      .flow("hgroup")
-      .flow("main")
-      .flow("nav")
-      .flow("ol")
-      .flow("section")
-      .flow("table")
-      .flow("tr")
-      .flow("ul")
-      .flow("video")
+      .flow(jsx_tag!("div"))
+      .flow(jsx_tag!("address"))
+      .flow(jsx_tag!("article"))
+      .flow(jsx_tag!("aside"))
+      .flow(jsx_tag!("blockquote"))
+      .flow(jsx_tag!("details"))
+      .flow(jsx_tag!("dialog"))
+      .flow(jsx_tag!("dl"))
+      .flow(jsx_tag!("fieldset"))
+      .flow(jsx_tag!("figure"))
+      .flow(jsx_tag!("footer"))
+      .flow(jsx_tag!("form"))
+      .flow(jsx_tag!("header"))
+      .flow(jsx_tag!("hgroup"))
+      .flow(jsx_tag!("main"))
+      .flow(jsx_tag!("nav"))
+      .flow(jsx_tag!("ol"))
+      .flow(jsx_tag!("section"))
+      .flow(jsx_tag!("table"))
+      .flow(jsx_tag!("tr"))
+      .flow(jsx_tag!("ul"))
+      .flow(jsx_tag!("video"))
   }
 
   pub fn pre(self) -> Self {
-    self.preformatted("pre", ContentModel::Phrasing)
+    self.preformatted(jsx_tag!("pre"), ContentModel::Phrasing)
   }
 }
 
-pub fn i18n(
-  jsx: JSXRuntime,
+pub fn i18n<'m, R: JSXRuntime + 'm, S: I18nSymbols + 'm>(
   options: TranslatorOptions,
-  output: &mut Vec<Message>,
-) -> impl Fold + VisitMut + '_ {
+  output: &'m mut Vec<Message>,
+) -> impl Fold + VisitMut + 'm {
   let mut options = options;
-  let mut elements: HashMap<JSXTagName, Translatable> = Default::default();
+  let mut elements: HashMap<JSXTag, Translatable> = Default::default();
 
   options.elements.drain(..).for_each(|elem| {
     elements.insert(elem.tag.clone(), elem);
   });
 
-  as_folder(Translator {
-    jsx,
-    options,
+  as_folder(Translator::<'m, R, S> {
     elements,
     messages: output,
     pre: false,
+    jsx: PhantomData,
+    i18n: PhantomData,
   })
 }

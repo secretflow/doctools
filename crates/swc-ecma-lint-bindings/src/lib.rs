@@ -2,15 +2,13 @@ use std::collections::{HashMap, HashSet};
 
 use swc_core::{
   atoms::Atom,
-  common::SyntaxContext,
+  common::{sync::Lrc, FileName, SourceMap, SyntaxContext},
   ecma::{
-    ast::{Decl, ExportDecl, Ident, MemberExpr, Pat, PropName, VarDeclarator},
+    ast::{Decl, EsVersion, ExportDecl, Ident, MemberExpr, Pat, PropName, VarDeclarator},
     parser::{parse_file_as_module, Syntax, TsConfig},
     visit::{noop_visit_type, Visit, VisitAll, VisitAllWith, VisitWith},
   },
 };
-
-use swc_ecma_utils::testing::parse_one;
 
 struct CollectExportDeclares {
   idents: HashSet<Atom>,
@@ -123,15 +121,22 @@ impl LintUndefinedBindings {
   pub fn new(dts: Vec<String>) -> anyhow::Result<Self> {
     let mut declared = CollectExportDeclares::new();
 
+    let sourcemap: Lrc<SourceMap> = Default::default();
+
     for src in dts {
-      let ts = parse_one(
-        &src.as_str(),
-        Some(Syntax::Typescript(TsConfig {
+      let src = sourcemap.new_source_file(FileName::Anon, src);
+      let mut err = vec![];
+      let ts = parse_file_as_module(
+        &src,
+        Syntax::Typescript(TsConfig {
           dts: true,
           ..Default::default()
-        })),
-        parse_file_as_module,
-      )?;
+        }),
+        EsVersion::latest(),
+        None,
+        &mut err,
+      )
+      .map_err(|_| anyhow::anyhow!("error parsing .d.ts"))?;
       ts.visit_all_children_with(&mut declared);
     }
 
@@ -201,6 +206,8 @@ impl LintUndefinedBindings {
 
 #[cfg(test)]
 mod tests {
+  use swc_ecma_testing2::parse_one;
+
   use super::*;
 
   #[test]

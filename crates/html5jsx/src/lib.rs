@@ -1,5 +1,5 @@
 use swc_core::common::SourceFile;
-use swc_ecma_utils::jsx::{builder::JSXDocument, factory::JSXRuntime};
+use swc_ecma_utils2::jsx::{JSXDocument, JSXRuntime};
 use swc_html_ast::{DocumentMode, Element, Namespace};
 use swc_html_parser::{error::Error, parse_file_as_document_fragment, parser::ParserConfig};
 use swc_html_visit::VisitWith as _;
@@ -9,7 +9,7 @@ mod visit;
 
 use crate::visit::DOMVisitor;
 
-pub fn html_to_jsx(html: &SourceFile, jsx: Option<JSXRuntime>) -> Result<JSXDocument, Error> {
+pub fn html_to_jsx<R: JSXRuntime>(html: &SourceFile) -> Result<JSXDocument, Error> {
   let parent = Element {
     namespace: Namespace::HTML,
     span: Default::default(),
@@ -35,9 +35,7 @@ pub fn html_to_jsx(html: &SourceFile, jsx: Option<JSXRuntime>) -> Result<JSXDocu
     &mut errors,
   )?;
 
-  let jsx = jsx.unwrap_or_default();
-
-  let mut visitor = DOMVisitor::new(jsx);
+  let mut visitor = <DOMVisitor<R>>::new();
 
   dom.visit_with(&mut visitor);
 

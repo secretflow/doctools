@@ -1,8 +1,7 @@
 [workspace]
 members = [
   "crates/*",
-  "packages/swc-plugin-esm-serve",
-  "pyprojects/sphinx-jsx",
+  "packages/swc-plugin-esm-serve", # "pyprojects/sphinx-jsx",
 ]
 resolver = "2"
 

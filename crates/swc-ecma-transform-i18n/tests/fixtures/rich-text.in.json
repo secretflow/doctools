@@ -1,13 +1,12 @@
 {
-  "Trans": "Trans",
   "elements": [
     {
       "content": "Phrasing",
       "pre": false,
       "props": [],
       "tag": {
-        "name": "p",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "p"
       }
     },
     {
@@ -15,8 +14,8 @@
       "pre": false,
       "props": [],
       "tag": {
-        "name": "em",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "em"
       }
     },
     {
@@ -24,8 +23,8 @@
       "pre": false,
       "props": [],
       "tag": {
-        "name": "strong",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "strong"
       }
     },
     {
@@ -33,8 +32,8 @@
       "pre": false,
       "props": [["href"]],
       "tag": {
-        "name": "a",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "a"
       }
     },
     {
@@ -42,10 +41,9 @@
       "pre": false,
       "props": [],
       "tag": {
-        "name": "span",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "span"
       }
     }
-  ],
-  "_": "i18n"
+  ]
 }

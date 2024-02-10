@@ -1,3 +1,0 @@
-jsx("div", {
-    "children": foo
-});

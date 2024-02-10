@@ -11,7 +11,7 @@ indexmap = "2.1.0"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = "1.0.111"
 sha2 = "0.10.8"
-swc-ecma-utils = {path = "../swc-ecma-utils"}
+swc-ecma-utils2 = {path = "../swc-ecma-utils2"}
 tracing = "0.1.40"
 
 [dependencies.swc_core]
@@ -21,6 +21,9 @@ features = [
   "ecma_visit",
 ]
 version = "*"
+
+[dev-dependencies]
+swc-ecma-testing2 = {path = "../swc-ecma-testing2"}
 
 [dev-dependencies.swc_core]
 features = ["testing"]

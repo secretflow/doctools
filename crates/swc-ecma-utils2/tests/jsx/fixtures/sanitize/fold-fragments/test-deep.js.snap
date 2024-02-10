@@ -1,0 +1,30 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+_jsxs("div", {
+    "children": [
+        "Lorem",
+        _jsx("span", {
+            "children": _jsxs(_Fragment, {
+                "children": [
+                    _jsx("span", {
+                        "children": "ipsum"
+                    }),
+                    _jsxs("strong", {
+                        "children": [
+                            "dolor",
+                            _jsx("span", {
+                                "children": "sit"
+                            }),
+                            "amet"
+                        ]
+                    })
+                ]
+            })
+        })
+    ]
+});
+``````

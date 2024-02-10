@@ -1,22 +1,26 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, marker::PhantomData};
 
 use sha2::{Digest, Sha256};
-use swc_core::{atoms::Atom, ecma::ast::Expr};
+use swc_core::{
+  atoms::Atom,
+  ecma::ast::{ArrayLit, Expr, Lit},
+};
 use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
-use swc_ecma_utils::{
-  jsx::{builder::JSXDocument, factory::JSXRuntime},
+use swc_ecma_utils2::{
+  collections::{MutableMapping, MutableSequence},
+  jsx::{create_element, jsx_mut, JSXDocument, JSXElementMut, JSXRuntime},
   span::with_span,
 };
 
 use crate::props::convert_attribute;
 
-pub struct DOMVisitor {
-  runtime: JSXRuntime,
-  head: Vec<Box<Expr>>,
-  ancestors: Vec<Vec<Box<Expr>>>,
+pub struct DOMVisitor<R: JSXRuntime> {
+  head: Vec<Expr>,
+  ancestors: Vec<Vec<Expr>>,
   styles: HashSet<Atom>,
+  jsx: PhantomData<R>,
 }
 
 fn style_hash(style: &str) -> String {
@@ -34,7 +38,7 @@ fn style_classname(style: &str) -> String {
   format!("jsx-styled-{}", style_hash(&style))
 }
 
-impl Visit for DOMVisitor {
+impl<R: JSXRuntime> Visit for DOMVisitor<R> {
   fn visit_element(&mut self, elem: &Element) {
     match elem.tag_name.as_str() {
       "script" | "base" => {
@@ -56,8 +60,9 @@ impl Visit for DOMVisitor {
 
     let children = self.ancestors.pop().expect("expected children");
 
-    let name = elem.tag_name.as_str().into();
-    let mut builder = self.runtime.create(&name);
+    let name = &*elem.tag_name;
+
+    let mut new = create_element::<R>(Lit::from(name).into());
 
     let mut classes = String::new();
     let mut styled: Option<String> = None;
@@ -82,8 +87,10 @@ impl Visit for DOMVisitor {
         }
         continue;
       }
-      if let Some(prop) = convert_attribute(&attr) {
-        builder.props.push(with_span(Some(attr.span))(prop.into()));
+      if let Some((key, value)) = convert_attribute(&attr) {
+        jsx_mut::<R>(&mut new)
+          .get_props_mut()
+          .set_item(key, with_span(Some(attr.span))(value.into()));
       }
     }
 
@@ -98,10 +105,16 @@ impl Visit for DOMVisitor {
     };
 
     if !classes.is_empty() {
-      builder = builder.prop("className", classes.into(), None);
+      jsx_mut::<R>(&mut new)
+        .get_props_mut()
+        .set_item("className", classes.into());
     }
 
-    let element = with_span(Some(elem.span))(builder.children(children).build());
+    jsx_mut::<R>(&mut new)
+      .get_props_mut()
+      .set_item("children", ArrayLit::from_iterable(children).into());
+
+    let element = with_span(Some(elem.span))(new);
 
     match elem.tag_name.as_str() {
       "base" | "link" | "meta" | "noscript" | "script" | "style" | "title"
@@ -132,19 +145,10 @@ impl Visit for DOMVisitor {
   }
 }
 
-impl DOMVisitor {
-  pub fn new(runtime: JSXRuntime) -> Self {
-    if vec![runtime.jsx(), runtime.jsxs(), runtime.fragment()]
-      .iter()
-      .any(|name| {
-        let name = &name.as_expr().unwrap().as_ident().unwrap().sym;
-        name.contains("eval") || name.contains("Function")
-      })
-    {
-      panic!("JSX factories cannot contain 'eval' or 'Function' in name");
-    }
+impl<R: JSXRuntime> DOMVisitor<R> {
+  pub fn new() -> Self {
     Self {
-      runtime,
+      jsx: PhantomData,
       ancestors: vec![],
       head: vec![],
       styles: HashSet::new(),
@@ -154,7 +158,7 @@ impl DOMVisitor {
   pub fn get(mut self) -> Result<JSXDocument, swc_html_parser::error::Error> {
     let mut head = vec![];
 
-    let mut stylesheet: Vec<Box<Expr>> = vec![];
+    let mut stylesheet: Vec<Expr> = vec![];
 
     Some(self.styles.iter().collect::<Vec<_>>())
       .and_then(|mut c| {
@@ -170,14 +174,13 @@ impl DOMVisitor {
       });
 
     if stylesheet.len() > 0 {
-      head.push(
-        self
-          .runtime
-          .create(&"style".into())
-          .children(stylesheet)
-          .build()
-          .into(),
-      );
+      let mut style = create_element::<R>("style".into());
+
+      jsx_mut::<R>(&mut style)
+        .get_props_mut()
+        .set_item("children", ArrayLit::from_iterable(stylesheet).into());
+
+      head.push(style.into());
     }
 
     head.append(&mut self.head);

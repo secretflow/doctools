@@ -1,0 +1,22 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+export const head = [], body = [
+    jsxs("div", {
+        "children": [
+            "\n  ",
+            jsx("h1", {
+                "children": "Hello, world!"
+            }),
+            "\n  ",
+            jsx("p", {
+                "children": "This is a paragraph."
+            }),
+            "\n"
+        ]
+    }),
+    "\n"
+];
+``````

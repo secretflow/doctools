@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use serde::Serialize;
 use swc_core::{
   common::{FileName, SourceMap},
@@ -9,12 +11,16 @@ use swc_core::{
 
 use deno_lite::{anyhow, export_function, DenoLite, ESModule};
 use html5jsx::html_to_jsx;
-use swc_ecma_utils::{
-  jsx::{builder::JSXDocument, factory::JSXRuntime},
-  match_tag,
+use swc_ecma_utils2::{
+  collections::Mapping,
+  ecma::itertools::as_string,
+  jsx::{jsx, tag::JSXTag, JSXDocument, JSXElement, JSXRuntime},
+  Object, JSX,
 };
 
-static ESM: &str = include_str!("../../dist/index.js");
+static SERVER: &str = include_str!("../../dist/server/index.js");
+
+static CLIENT_DTS: &str = include_str!("../js/client/index.d.ts");
 
 #[derive(Serialize)]
 struct RenderMath {
@@ -24,13 +30,13 @@ struct RenderMath {
 
 export_function!(render, RenderMath);
 
-struct MathRenderer {
+struct MathRenderer<R: JSXRuntime> {
   deno: DenoLite,
   module: ESModule,
-  jsx: JSXRuntime,
+  jsx: PhantomData<R>,
 }
 
-impl MathRenderer {
+impl<R: JSXRuntime> MathRenderer<R> {
   fn render_math(&mut self, code: &str, inline: bool) -> anyhow::Result<JSXDocument> {
     let html: String = self.deno.call_function(
       self.module,
@@ -41,44 +47,70 @@ impl MathRenderer {
     )?;
     let sources = SourceMap::default();
     let file = sources.new_source_file(FileName::Anon, html);
-    let document = html_to_jsx(&file, Some(self.jsx.clone()))
+    let document = html_to_jsx::<R>(&file)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }
 }
 
-impl VisitMut for MathRenderer {
+impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
   noop_visit_mut_type!();
 
-  fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    elem.visit_mut_children_with(self);
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    call.visit_mut_children_with(self);
 
-    let (inline, Some(code)) = match_tag!(
-      (self.jsx, elem),
-      JSX(math, props) >> {
-        let code = self.jsx.get_prop(props, &["children"]).as_string();
-        (true, code)
-      },
-      JSX(math_block, props) >> {
-        let code = self.jsx.get_prop(props, &["children"]).as_string();
-        (false, code)
-      },
-      _ >> { return },
-    ) else {
+    let Some(tag) = jsx::<R>(call).get_tag() else {
       return;
     };
 
-    let document = self.render_math(code, inline);
+    let inline = match tag.tuple() {
+      (JSXTag::Component(_), "math") => true,
+      (JSXTag::Component(_), "math_block") => false,
+      _ => return,
+    };
 
-    match document {
-      Ok(_) => todo!(),
-      Err(_) => todo!(),
-    }
+    let Some(tex) = jsx::<R>(call)
+      .and_then(|e| e.get_props())
+      .and_then(|e| e.get_item("children"))
+      .and_then(as_string)
+    else {
+      return;
+    };
+
+    let document = self.render_math(tex, inline);
+
+    *call = match document {
+      Ok(document) => {
+        let children = document.to_fragment::<R>();
+        JSX!(
+          [(Math), R],
+          Object!("tex" = tex, "inline" = inline, "children" = children)
+        )
+      }
+      Err(error) => {
+        JSX!(
+          [(Math), R],
+          Object!(
+            "tex" = tex,
+            "inline" = inline,
+            "error" = format!("{}", error)
+          )
+        )
+      }
+    };
   }
 }
 
-pub fn render_math(jsx: JSXRuntime, deno: DenoLite) -> impl Fold + VisitMut {
+pub fn render_math<R: JSXRuntime>(deno: DenoLite) -> impl Fold + VisitMut {
   let mut deno = deno;
-  let module = deno.load_module_once(ESM).unwrap();
-  as_folder(MathRenderer { jsx, deno, module })
+  let module = deno.load_module_once(SERVER).unwrap();
+  as_folder(MathRenderer::<R> {
+    deno,
+    module,
+    jsx: PhantomData,
+  })
+}
+
+pub fn dts() -> &'static str {
+  CLIENT_DTS
 }

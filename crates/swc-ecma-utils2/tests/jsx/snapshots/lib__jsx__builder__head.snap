@@ -1,0 +1,26 @@
+---
+source: crates/swc-ecma-utils2/tests/jsx/builder.rs
+expression: document
+---
+export const head = [
+    _jsx("style", {
+        "children": [
+            "p { background: #fff; }"
+        ]
+    }),
+    _jsx("link", {
+        "rel": "preconnect",
+        "href": "https://rsms.me/"
+    })
+], body = [
+    _jsx("section", {
+        "children": [
+            _jsx("p", {
+                "children": [
+                    "Lorem ipsum"
+                ]
+            })
+        ]
+    })
+];
+

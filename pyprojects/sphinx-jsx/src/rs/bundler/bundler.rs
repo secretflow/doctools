@@ -27,10 +27,9 @@ use url::Url;
 
 use pyo3_utils::raise;
 use swc_ecma_lint_bindings::LintUndefinedBindings;
-use swc_ecma_lint_linkcheck::{collect_links, Link};
-use swc_ecma_transform_sphinx::drop_elements::drop_elements;
-use swc_ecma_utils::{
-  jsx::{builder::JSXDocument, factory::JSXRuntime, sanitize::sanitize_jsx},
+use swc_ecma_transform_sphinx_markups::drop_elements::drop_elements;
+use swc_ecma_utils2::{
+  jsx::{builder::JSXDocument, runtime::JSXRuntime, sanitize::sanitize_jsx},
   tag,
   testing::document_as_module,
 };

@@ -1,17 +1,26 @@
+use std::marker::PhantomData;
+
 use swc_core::{
-  atoms::Atom,
-  common::{util::take::Take as _, Spanned as _},
+  common::Spanned as _,
   ecma::{
-    ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, Str},
+    ast::{ArrayLit, CallExpr, Expr, Lit, Str},
     visit::{
       noop_visit_mut_type, noop_visit_type, Visit, VisitMut, VisitMutWith as _, VisitWith as _,
     },
   },
 };
 
-use swc_ecma_utils::{jsx::factory::JSXRuntime, match_tag, span::with_span, tag};
+use swc_ecma_utils2::{
+  collections::{Mapping, MutableMapping, MutableSequence, Sequence as _},
+  ecma::itertools::array_into_iter,
+  jsx::{jsx, jsx_mut, tag::JSXTag, JSXElement, JSXElementMut, JSXRuntime},
+  span::with_span,
+};
 
-use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
+use crate::{
+  message::{is_empty_or_whitespace, Message, MessageProps, Palpable},
+  symbols::I18nSymbols,
+};
 
 /// For [phrasing][crate::ContentModel::Phrasing] content, transform is done in two phases.
 ///
@@ -30,12 +39,12 @@ use crate::message::{is_empty_or_whitespace, Message, MessageProps, Palpable};
 /// involve a lot of backtracking / conditionals / very fragile
 /// [AST node taking][swc_core::common::util::take::Take]. This is much less ergonomic and
 /// more error-prone than just visiting the tree twice.
-struct PhrasingContentPreflight {
-  jsx: JSXRuntime,
+struct PhrasingContentPreflight<R: JSXRuntime> {
   is_translatable: bool,
+  jsx: PhantomData<R>,
 }
 
-impl Visit for PhrasingContentPreflight {
+impl<R: JSXRuntime> Visit for PhrasingContentPreflight<R> {
   noop_visit_type!();
 
   fn visit_call_expr(&mut self, call: &CallExpr) {
@@ -43,24 +52,20 @@ impl Visit for PhrasingContentPreflight {
       return;
     }
 
-    let children = match_tag!(
-      (self.jsx, call),
-      Any(tag, props) >> { self.jsx.get_prop(props, &["children"]).get() },
-      _ >> {
-        call.visit_children_with(self);
-        return;
-      },
-    );
+    let Some(children) = jsx::<R>(call)
+      .and_then(|elem| elem.get_props())
+      .and_then(|props| props.get_item("children"))
+    else {
+      call.visit_children_with(self);
+      return;
+    };
 
     self.is_translatable = match &children {
-      Some(Expr::Array(ArrayLit { ref elems, .. })) => elems.iter().any(|expr| match expr {
-        Some(ExprOrSpread { expr, .. }) => match &**expr {
-          Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(&value),
-          _ => false,
-        },
-        None => false,
+      Expr::Array(array) => array.iter().any(|expr| match expr {
+        Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(&value),
+        _ => false,
       }),
-      Some(Expr::Lit(Lit::Str(text))) => !is_empty_or_whitespace(&text.value),
+      Expr::Lit(Lit::Str(text)) => !is_empty_or_whitespace(&text.value),
       _ => false,
     };
 
@@ -68,11 +73,11 @@ impl Visit for PhrasingContentPreflight {
   }
 }
 
-impl PhrasingContentPreflight {
-  pub fn new(jsx: JSXRuntime) -> Self {
+impl<R: JSXRuntime> PhrasingContentPreflight<R> {
+  pub fn new() -> Self {
     Self {
-      jsx,
       is_translatable: false,
+      jsx: PhantomData,
     }
   }
 
@@ -82,112 +87,85 @@ impl PhrasingContentPreflight {
 }
 
 #[derive(Debug)]
-pub struct PhrasingContentCollector {
-  jsx: JSXRuntime,
-  sym_trans: Atom,
+pub struct PhrasingContentCollector<R: JSXRuntime, S: I18nSymbols> {
   message: MessageProps,
+  jsx: PhantomData<R>,
+  i18n: PhantomData<S>,
 }
 
-impl VisitMut for PhrasingContentCollector {
+impl<R, S> VisitMut for PhrasingContentCollector<R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    match_tag!(
-      (self.jsx, elem),
-      Any(tag) >> {},
-      _ >> {
-        elem.visit_mut_children_with(self);
-        return;
-      },
-    );
-
-    let children = match self
-      .jsx
-      .take_prop(self.jsx.as_mut_jsx_props(elem).unwrap(), &["children"])
-    {
-      Some(children) => children,
-      None => return,
+    let Some(children) = jsx_mut::<R>(elem).get_props_mut().del_item("children") else {
+      elem.visit_mut_children_with(self);
+      return;
     };
 
     let children = match children {
-      Expr::Array(ArrayLit { mut elems, .. }) => elems
-        .iter_mut()
-        .filter_map(|expr| match expr {
-          None => None,
-          Some(ExprOrSpread { expr, .. }) => Some(expr.take()),
-        })
-        .collect::<Vec<_>>(),
-      expr => vec![Box::from(expr)],
+      Expr::Array(array) => array,
+      expr => ArrayLit::from_iterable(std::iter::once(expr)),
     };
 
-    children
-      .into_iter()
-      .for_each(|mut expr| match *expr.take() {
-        Expr::Lit(Lit::Str(lit)) => match self.message.text(&lit.value, lit.span()) {
-          Palpable(true) => (),
-          Palpable(false) => (),
-        },
-        Expr::Call(mut call) => match self.jsx.as_jsx(&call) {
-          Some((elem, _)) => {
-            let name = match elem {
-              tag!(<>) => None,
-              tag!("*" name) => Some(name),
-              tag!(let name) => Some(name),
-            };
-            let name = self.message.enter(name);
-            call.visit_mut_with(self);
-            self.message.exit(name, Box::from(call.take()));
-          }
-          None => {
-            self.message.interpolate(Box::from(call.take()));
-          }
-        },
-        expr => {
-          self.message.interpolate(Box::from(expr));
+    array_into_iter(children).for_each(|expr| match expr {
+      Expr::Lit(Lit::Str(lit)) => match self.message.text(&lit.value, lit.span()) {
+        Palpable(true) => (),
+        Palpable(false) => (),
+      },
+      Expr::Call(mut call) => match jsx::<R>(&call).get_tag() {
+        Some(tag) => {
+          let name = match tag {
+            JSXTag::Fragment => None,
+            JSXTag::Component(name) => Some(name.into()),
+            JSXTag::Intrinsic(name) => Some(name.into()),
+          };
+          let name = self.message.enter(name);
+          call.visit_mut_with(self);
+          self.message.exit(name, call.into());
         }
-      });
-
-    let props = self.jsx.as_mut_jsx_props(elem).unwrap();
-    props.props = props
-      .props
-      .drain(..)
-      .filter(|prop| {
-        prop
-          .as_prop()
-          .and_then(|p| p.as_key_value())
-          .and_then(|p| Some(!p.value.is_invalid()))
-          .unwrap_or(false)
-      })
-      .collect();
+        None => {
+          self.message.interpolate(call.into());
+        }
+      },
+      expr => {
+        self.message.interpolate(expr);
+      }
+    });
   }
 }
 
-impl PhrasingContentCollector {
-  pub fn new(jsx: JSXRuntime, sym_trans: Atom, pre: bool) -> Self {
+impl<R, S> PhrasingContentCollector<R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
+  pub fn new(pre: bool) -> Self {
     Self {
-      jsx,
-      sym_trans,
       message: MessageProps::new(pre),
+      jsx: PhantomData,
+      i18n: PhantomData,
     }
   }
 
-  pub fn result(self) -> (Message, Box<Expr>) {
-    self.message.make_trans(self.jsx, self.sym_trans)
+  pub fn result(self) -> (Message, Expr) {
+    self.message.make_trans::<R, S>()
   }
 }
 
-pub fn translate_phrase(
-  jsx: JSXRuntime,
-  sym_trans: Atom,
+pub fn translate_phrase<R: JSXRuntime, S: I18nSymbols>(
   pre: bool,
   elem: &mut CallExpr,
 ) -> Option<Message> {
-  let mut preflight = PhrasingContentPreflight::new(jsx.clone());
+  let mut preflight = <PhrasingContentPreflight<R>>::new();
 
   elem.visit_with(&mut preflight);
 
   if preflight.is_translatable() {
-    let mut collector = PhrasingContentCollector::new(jsx.clone(), sym_trans.clone(), pre);
+    let mut collector = <PhrasingContentCollector<R, S>>::new(pre);
 
     elem.visit_mut_with(&mut collector);
 
@@ -195,9 +173,9 @@ pub fn translate_phrase(
 
     let children = with_span(Some(elem.span()))(children);
 
-    jsx.mut_or_set_prop(jsx.as_mut_jsx_props(elem).unwrap(), &["children"], |expr| {
-      *expr = children
-    });
+    jsx_mut::<R>(elem)
+      .get_props_mut()
+      .set_item("children", children);
 
     Some(message)
   } else {

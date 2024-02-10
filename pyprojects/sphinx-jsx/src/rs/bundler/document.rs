@@ -6,11 +6,11 @@ use pyo3::{
 use pyo3_utils::raise;
 use swc_core::common::{sync::Lrc, FileName, SourceFile};
 
-use swc_ecma_utils::{
+use swc_ecma_utils2::{
   ast::json_to_expr,
   jsx::{
     builder::{DocumentBuilder, JSXDocument},
-    factory::{JSXRuntime, JSXTagName},
+    runtime::{JSXRuntime, JSXTagName},
   },
 };
 

@@ -35,7 +35,8 @@
     "requirements.lock": "pip-requirements",
     "tsconfig.*.json": "jsonc",
     "tsconfig.json": "jsonc",
-    "*.js.jinja": "jinja"
+    "*.js.jinja": "jinja",
+    "*.snap": "markdown"
   },
   "eslint.validate": [
     "javascript",

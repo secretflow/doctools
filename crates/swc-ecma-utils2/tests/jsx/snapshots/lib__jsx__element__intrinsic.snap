@@ -1,0 +1,7 @@
+---
+source: crates/swc-ecma-utils2/tests/jsx/element.rs
+expression: document
+---
+_jsx("div", {
+    "children": "foo"
+})

@@ -13,7 +13,7 @@ use swc_core::{
 };
 
 use html5jsx::html_to_jsx;
-use swc_ecma_utils::jsx::factory::JSXRuntime;
+use swc_ecma_utils2::jsx::factory::JSXRuntime;
 
 pub fn import_from(factory: &JSXRuntime, src: &str) -> ImportDecl {
   ImportDecl {

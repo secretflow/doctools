@@ -1,5 +1,6 @@
+use std::marker::PhantomData;
+
 use swc_core::{
-  atoms::Atom,
   common::{util::take::Take as _, Span, Spanned},
   ecma::{
     ast::{ArrayLit, CallExpr, Expr, ExprOrSpread, Lit, ObjectLit, Str},
@@ -7,12 +8,16 @@ use swc_core::{
   },
 };
 
-use swc_ecma_utils::{
-  jsx::factory::JSXRuntime,
+use swc_ecma_utils2::{
+  collections::MutableMapping,
+  jsx::{jsx, jsx_mut, JSXElementMut, JSXRuntime},
   span::{union_span, with_span},
 };
 
-use crate::message::{Message, MessageProps, Palpable};
+use crate::{
+  message::{Message, MessageProps, Palpable},
+  symbols::I18nSymbols,
+};
 
 #[derive(Debug)]
 enum Block {
@@ -21,11 +26,11 @@ enum Block {
 }
 
 #[derive(Debug)]
-struct FlowContentCollector {
-  jsx: JSXRuntime,
-  sym_trans: Atom,
+struct FlowContentCollector<R: JSXRuntime, S: I18nSymbols> {
   pre: bool,
   blocks: Vec<(Block, Span)>,
+  jsx: PhantomData<R>,
+  i18n: PhantomData<S>,
 }
 
 macro_rules! current_message {
@@ -48,7 +53,11 @@ macro_rules! current_message {
   }};
 }
 
-impl FlowContentCollector {
+impl<R, S> FlowContentCollector<R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
   fn text(&mut self, lit: Str) {
     let (message, span) = current_message!(self);
     match message.text(lit.value.as_str(), lit.span()) {
@@ -60,7 +69,7 @@ impl FlowContentCollector {
   fn interpolate(&mut self, expr: Expr) {
     let (message, span) = current_message!(self);
     *span = union_span(*span, expr.span());
-    message.interpolate(Box::from(expr));
+    message.interpolate(expr);
   }
 
   fn other(&mut self, expr: ExprOrSpread) {
@@ -69,13 +78,16 @@ impl FlowContentCollector {
   }
 }
 
-impl VisitMut for FlowContentCollector {
+impl<R, S> VisitMut for FlowContentCollector<R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
   noop_visit_mut_type!();
 
   fn visit_mut_object_lit(&mut self, props: &mut ObjectLit) {
-    let mut children = match self.jsx.take_prop(props, &["children"]) {
-      Some(children) => children,
-      None => return,
+    let Some(mut children) = props.del_item("children") else {
+      return;
     };
 
     match children {
@@ -89,7 +101,7 @@ impl VisitMut for FlowContentCollector {
             } else {
               match *expr.expr.take() {
                 Expr::Lit(Lit::Str(lit)) => self.text(lit),
-                Expr::Call(call) => match self.jsx.as_jsx(&call) {
+                Expr::Call(call) => match jsx::<R>(&call) {
                   Some(_) => {
                     self.other(ExprOrSpread {
                       expr: Box::from(call),
@@ -113,13 +125,17 @@ impl VisitMut for FlowContentCollector {
   }
 }
 
-impl FlowContentCollector {
-  pub fn new(jsx: JSXRuntime, sym_trans: Atom, pre: bool) -> Self {
+impl<R, S> FlowContentCollector<R, S>
+where
+  R: JSXRuntime,
+  S: I18nSymbols,
+{
+  pub fn new(pre: bool) -> Self {
     Self {
-      jsx,
-      sym_trans,
       pre,
       blocks: vec![],
+      jsx: PhantomData,
+      i18n: PhantomData,
     }
   }
 
@@ -131,7 +147,7 @@ impl FlowContentCollector {
         if message.is_empty() {
           return;
         }
-        let (message, elem) = message.make_trans(self.jsx.clone(), self.sym_trans.clone());
+        let (message, elem) = message.make_trans::<R, S>();
         messages.push(message);
         children.push(Some(with_span(Some(span))(elem).into()));
       }
@@ -145,23 +161,20 @@ impl FlowContentCollector {
   }
 }
 
-pub fn translate_block(
-  jsx: JSXRuntime,
-  sym_trans: Atom,
+pub fn translate_block<R: JSXRuntime, S: I18nSymbols>(
   pre: bool,
-  elem: &mut CallExpr,
+  call: &mut CallExpr,
 ) -> Vec<Message> {
-  let mut collector = FlowContentCollector::new(jsx.clone(), sym_trans, pre);
+  let mut collector = <FlowContentCollector<R, S>>::new(pre);
 
-  let props = jsx.as_mut_jsx_props(elem).unwrap();
+  let mut elem = jsx_mut::<R>(call);
+  let props = elem.get_props_mut().unwrap();
 
   props.visit_mut_with(&mut collector);
 
   let (messages, children) = collector.results();
 
-  jsx.mut_or_set_prop(jsx.as_mut_jsx_props(elem).unwrap(), &["children"], |expr| {
-    *expr = Box::new(Expr::Array(children))
-  });
+  props.set_item("children", children.into());
 
   messages
 }

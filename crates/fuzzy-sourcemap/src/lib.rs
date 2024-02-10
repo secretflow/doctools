@@ -129,11 +129,7 @@ fn find_span_with_snippet(
   paragraph: Span,
   snippet: &str,
 ) -> Option<Span> {
-  fn find_in_region<'src>(
-    sources: &'src SourceMap,
-    snippet: &'src str,
-    region: Span,
-  ) -> Option<Span> {
+  let find_in_region = |region| {
     sources
       .with_snippet_of_span(region, |text| {
         let start = text.find(snippet);
@@ -144,9 +140,9 @@ fn find_span_with_snippet(
       })
       .ok()
       .unwrap_or(None)
-  }
+  };
 
-  let subparagraph = prev_span.and_then(|span| {
+  let sub_paragraph = prev_span.and_then(|span| {
     Some((
       Span::from((span.hi(), paragraph.hi())),
       span,
@@ -154,18 +150,18 @@ fn find_span_with_snippet(
     ))
   });
 
-  let processed = Span::from((file.start_pos, paragraph.lo()));
-  let remaining = Span::from((paragraph.hi(), file.end_pos));
+  let processed_text = Span::from((file.start_pos, paragraph.lo()));
+  let remaining_text = Span::from((paragraph.hi(), file.end_pos));
 
-  let found: Option<Span> = subparagraph
-    .and_then(|(to_end, previous, from_start)| {
-      find_in_region(sources, snippet, to_end)
-        .or_else(|| find_in_region(sources, snippet, previous))
-        .or_else(|| find_in_region(sources, snippet, from_start))
+  let found = sub_paragraph
+    .and_then(|(tail, previous_span, head)| {
+      find_in_region(tail)
+        .or_else(|| find_in_region(previous_span))
+        .or_else(|| find_in_region(head))
     })
-    .or_else(|| find_in_region(sources, snippet, paragraph))
-    .or_else(|| find_in_region(sources, snippet, remaining))
-    .or_else(|| find_in_region(sources, snippet, processed));
+    .or_else(|| find_in_region(paragraph))
+    .or_else(|| find_in_region(remaining_text))
+    .or_else(|| find_in_region(processed_text));
 
   if let Some(found) = found {
     return Some(found);

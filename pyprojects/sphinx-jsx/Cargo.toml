@@ -24,10 +24,9 @@ relative-path = "1.9.2"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = {version = "1.0.111", features = ["preserve_order"]}
 swc-ecma-lint-bindings = {path = "../../crates/swc-ecma-lint-bindings"}
-swc-ecma-lint-linkcheck = {path = "../../crates/swc-ecma-lint-linkcheck"}
 swc-ecma-transform-i18n = {path = "../../crates/swc-ecma-transform-i18n"}
-swc-ecma-transform-sphinx = {path = "../../crates/swc-ecma-transform-sphinx"}
-swc-ecma-utils = {path = "../../crates/swc-ecma-utils"}
+swc-ecma-transform-sphinx-markups = {path = "../../crates/swc-ecma-transform-sphinx-markups"}
+swc-ecma-utils2 = {path = "../../crates/swc-ecma-utils2"}
 swc_core = {version = "*", features = ["ecma_ast", "ecma_ast_serde", "ecma_codegen", "common_sourcemap"]}
 swc_error_reporters = "0.17.13"
 url = "2.5.0"

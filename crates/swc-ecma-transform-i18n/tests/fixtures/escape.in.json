@@ -1,15 +1,13 @@
 {
-  "Trans": "Trans",
   "elements": [
     {
       "content": "Phrasing",
       "pre": true,
       "props": [],
       "tag": {
-        "name": "pre",
-        "type": "Intrinsic"
+        "kind": "Intrinsic",
+        "type": "pre"
       }
     }
-  ],
-  "_": "i18n"
+  ]
 }

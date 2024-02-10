@@ -5,18 +5,17 @@ use sha2::{Digest, Sha256};
 use swc_core::{
   atoms::Atom,
   common::{util::take::Take as _, Span, Spanned as _},
-  ecma::ast::{
-    CallExpr, Callee, Expr, ExprOrSpread, Ident, KeyValueProp, Lit, ObjectLit, Prop, PropName,
-    PropOrSpread,
-  },
+  ecma::ast::{Expr, Ident, Lit, ObjectLit},
 };
 
-use swc_ecma_utils::{
-  jsx::factory::JSXRuntime,
-  object_lit,
+use swc_ecma_utils2::{
+  collections::MutableMapping,
+  jsx::JSXRuntime,
   span::{union_span, with_span},
-  tag,
+  var, Array, Function, Object, JSX,
 };
+
+use crate::symbols::I18nSymbols;
 
 /// Represents a message to be translated
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -45,8 +44,8 @@ pub struct MessageProps {
   pre: bool,
 
   tokens: Vec<MessageToken>,
-  values: IndexMap<Atom, Box<Expr>>,
-  components: IndexMap<Atom, Option<Box<Expr>>>,
+  values: IndexMap<Atom, Expr>,
+  components: IndexMap<Atom, Option<Expr>>,
 
   span: Span,
 }
@@ -125,11 +124,11 @@ impl MessageProps {
     Palpable(true)
   }
 
-  pub fn interpolate(&mut self, expr: Box<Expr>) {
+  pub fn interpolate(&mut self, expr: Expr) {
     self.span = union_span(self.span, expr.span());
 
     let idx = self.values.len();
-    let name = match *expr {
+    let name = match expr {
       Expr::Ident(Ident { ref sym, .. }) => Atom::from(sym.as_str()),
       _ => Atom::from(idx.to_string().as_str()),
     };
@@ -163,17 +162,19 @@ impl MessageProps {
     self
       .tokens
       .push(MessageToken::OpeningTag(name.as_str().into()));
+
     self.components.insert(name.as_str().into(), None);
 
     name
   }
 
-  pub fn exit(&mut self, name: Atom, expr: Box<Expr>) {
+  pub fn exit(&mut self, name: Atom, expr: Expr) {
     self.span = union_span(self.span, expr.span());
 
     self
       .tokens
       .push(MessageToken::ClosingTag(name.as_str().into()));
+
     self.components.get_mut(&name).unwrap().replace(expr);
   }
 
@@ -184,21 +185,9 @@ impl MessageProps {
       .any(|t| matches!(t, MessageToken::Text(_)))
   }
 
-  fn to_props(mut self, jsx: JSXRuntime) -> Props {
+  fn to_props<R: JSXRuntime>(mut self) -> Props {
     let mut message = String::new();
     let mut plaintext = String::new();
-
-    macro_rules! make_prop {
-      ($name:expr, $expr:expr) => {
-        PropOrSpread::Prop(
-          Prop::from(KeyValueProp {
-            key: PropName::Str($name.into()),
-            value: $expr.into(),
-          })
-          .into(),
-        )
-      };
-    }
 
     let mut has_newline = false;
     let mut has_less_than = false;
@@ -248,61 +237,55 @@ impl MessageProps {
       }
     });
 
-    let mut components: Vec<PropOrSpread> = vec![];
-    let mut values: Vec<PropOrSpread> = vec![];
+    let mut components = ObjectLit::dummy();
+    let mut values = ObjectLit::dummy();
 
     self.components.drain(..).for_each(|(name, expr)| {
-      components.push(make_prop!(name, expr.unwrap().as_mut().take()));
+      components.set_item(name, expr.unwrap().take());
     });
 
     self.values.drain(..).for_each(|(name, mut expr)| {
-      values.push(make_prop!(name, expr.take()));
+      values.set_item(name, expr.take());
     });
 
     if has_newline {
-      values.push(make_prop!("LF", jsx.create(&"br".into()).build()));
+      values.set_item("LF", JSX!(["br", R], Object!()).into());
     }
 
     if has_less_than {
-      values.push(make_prop!(
+      values.set_item(
         "LT",
-        jsx.create(&tag!(<>)).children(vec!["<".into()]).build()
-      ));
+        JSX!([(), R], Object!("children" = Array!(">"))).into(),
+      );
     }
 
     if has_greater_than {
-      values.push(make_prop!(
+      values.set_item(
         "GT",
-        jsx.create(&tag!(<>)).children(vec![">".into()]).build()
-      ));
+        JSX!([(), R], Object!("children" = Array!(">"))).into(),
+      );
     }
 
     if has_left_curly {
-      values.push(make_prop!(
+      values.set_item(
         "LC",
-        jsx.create(&tag!(<>)).children(vec!["{".into()]).build()
-      ));
+        JSX!([(), R], Object!("children" = Array!("{"))).into(),
+      );
     }
 
     if has_right_curly {
-      values.push(make_prop!(
+      values.set_item(
         "RC",
-        jsx.create(&tag!(<>)).children(vec!["}".into()]).build()
-      ));
+        JSX!([(), R], Object!("children" = Array!("}"))).into(),
+      );
     }
 
     Props {
       id: self.generate_id(&message),
       message,
       plaintext,
-      components: ObjectLit {
-        props: components,
-        span: self.span,
-      },
-      values: ObjectLit {
-        props: values,
-        span: self.span,
-      },
+      components: with_span(Some(self.span))(components),
+      values: with_span(Some(self.span))(values),
     }
   }
 
@@ -321,7 +304,7 @@ impl MessageProps {
   ///
   /// Since calling this function implies the end of a [swc_core::ecma::visit::VisitMut],
   /// mutating the tree only to result in an empty message is unexpected and likely a bug
-  pub fn make_trans(self, jsx: JSXRuntime, trans: Atom) -> (Message, Box<Expr>) {
+  pub fn make_trans<R: JSXRuntime, S: I18nSymbols>(self) -> (Message, Expr) {
     let span = self.span;
 
     let Props {
@@ -330,21 +313,21 @@ impl MessageProps {
       plaintext,
       components,
       values,
-    } = self.to_props(jsx.clone());
+    } = self.to_props::<R>();
 
     if is_empty_or_whitespace(&message) {
       unreachable!("Message is empty")
     }
 
-    let trans = with_span(Some(span))(
-      jsx
-        .create(&tag!(=> &*trans))
-        .prop("id", id.as_str().into(), None)
-        .prop("message", message.as_str().into(), None)
-        .prop("components", components.into(), None)
-        .prop("values", values.into(), None)
-        .build(),
-    );
+    let trans = with_span(Some(span))(JSX!(
+      [var!(S::TRANS), R],
+      Object!(
+        "id" = &*id,
+        "message" = &*message,
+        "components" = components,
+        "values" = values
+      )
+    ));
 
     (
       Message {
@@ -357,7 +340,7 @@ impl MessageProps {
     )
   }
 
-  pub fn make_i18n(self, jsx: JSXRuntime, i18n: Atom) -> (Message, Box<Expr>) {
+  pub fn make_i18n<R: JSXRuntime, S: I18nSymbols>(self) -> (Message, Expr) {
     let span = self.span;
 
     let Props {
@@ -366,22 +349,16 @@ impl MessageProps {
       plaintext,
       components: _,
       values,
-    } = self.to_props(jsx);
+    } = self.to_props::<R>();
 
-    let call = Expr::Call(CallExpr {
-      callee: Callee::Expr(Ident::from(&*i18n).into()),
-      args: vec![ExprOrSpread {
-        expr: object_lit!(
-          "id" = id.as_str(),
-          "message" = with_span(Some(span))(Lit::from(message.as_str())),
-          "values" = values
-        )
-        .into(),
-        spread: None,
-      }],
-      type_args: None,
-      span,
-    });
+    let call = Function!(
+      var!(S::GETTEXT),
+      Object!(
+        "id" = id.as_str(),
+        "message" = with_span(Some(span))(Lit::from(message.as_str())),
+        "values" = values
+      )
+    );
 
     (
       Message {
