@@ -44,21 +44,13 @@ struct PhrasingContentPreflight<R: JSXRuntime> {
   jsx: PhantomData<R>,
 }
 
-impl<R: JSXRuntime> Visit for PhrasingContentPreflight<R> {
-  noop_visit_type!();
-
-  fn visit_call_expr(&mut self, call: &CallExpr) {
+impl<R: JSXRuntime> PhrasingContentPreflight<R> {
+  fn check_call_expr(&mut self, call: &CallExpr) -> Option<()> {
     if self.is_translatable {
-      return;
+      return Some(());
     }
 
-    let Some(children) = jsx::<R>(call)
-      .and_then(|elem| elem.get_props())
-      .and_then(|props| props.get_item("children"))
-    else {
-      call.visit_children_with(self);
-      return;
-    };
+    let children = jsx::<R>(call)?.get_props()?.get_item("children")?;
 
     self.is_translatable = match &children {
       Expr::Array(array) => array.iter().any(|expr| match expr {
@@ -69,6 +61,15 @@ impl<R: JSXRuntime> Visit for PhrasingContentPreflight<R> {
       _ => false,
     };
 
+    Some(())
+  }
+}
+
+impl<R: JSXRuntime> Visit for PhrasingContentPreflight<R> {
+  noop_visit_type!();
+
+  fn visit_call_expr(&mut self, call: &CallExpr) {
+    self.check_call_expr(call);
     call.visit_children_with(self);
   }
 }

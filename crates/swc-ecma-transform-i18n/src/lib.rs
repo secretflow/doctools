@@ -228,53 +228,42 @@ where
   i18n: PhantomData<S>,
 }
 
-impl<R: JSXRuntime, S: I18nSymbols> VisitMut for Translator<'_, R, S> {
-  noop_visit_mut_type!();
+impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
+  fn translate_generic_attrs(&mut self, call: &mut CallExpr) -> Option<()> {
+    let props = jsx_mut::<R>(call)?.get_props_mut()?;
 
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    let name = {
-      match jsx::<R>(call).and_then(|e| e.get_tag()) {
-        Some(tag) => tag,
-        None => {
-          call.visit_mut_children_with(self);
-          return;
-        }
-      }
-    };
+    self.messages.extend(translate_attrs::<R, S>(
+      props,
+      vec![
+        vec!["title"],
+        vec!["aria-label"],
+        vec!["aria-placeholder"],
+        vec!["aria-roledescription"],
+        vec!["aria-valuetext"],
+      ],
+    ));
+
+    Some(())
+  }
+
+  fn translate_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
+    let name = jsx::<R>(call)?.get_tag()?;
 
     if matches!(name, JSXTag::Intrinsic(_)) {
-      let props = jsx_mut::<R>(call).and_then(|e| e.get_props_mut()).unwrap();
-      self.messages.extend(translate_attrs::<R, S>(
-        props,
-        vec![
-          vec!["title"],
-          vec!["aria-label"],
-          vec!["aria-placeholder"],
-          vec!["aria-roledescription"],
-          vec!["aria-valuetext"],
-        ],
-      ));
+      self.translate_generic_attrs(call);
     }
 
-    let options = match self.elements.get(&name) {
-      Some(options) => options,
-      None => {
-        call.visit_mut_children_with(self);
-        return;
-      }
-    };
+    let options = self.elements.get(&name)?;
 
-    {
-      let attrs = options
-        .props
-        .iter()
-        .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
-        .collect::<Vec<_>>();
-      let props = jsx_mut::<R>(call).and_then(|e| e.get_props_mut()).unwrap();
-      self.messages.extend(translate_attrs::<R, S>(props, attrs))
-    };
+    let attrs = options
+      .props
+      .iter()
+      .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
+      .collect::<Vec<_>>();
 
-    let pre_parent = self.pre;
+    let props = jsx_mut::<R>(call)?.get_props_mut()?;
+    self.messages.extend(translate_attrs::<R, S>(props, attrs));
+
     self.pre = self.pre || options.pre;
 
     match options.content {
@@ -290,8 +279,17 @@ impl<R: JSXRuntime, S: I18nSymbols> VisitMut for Translator<'_, R, S> {
       }
     };
 
-    call.visit_mut_children_with(self);
+    Some(())
+  }
+}
 
+impl<R: JSXRuntime, S: I18nSymbols> VisitMut for Translator<'_, R, S> {
+  noop_visit_mut_type!();
+
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    let pre_parent = self.pre;
+    self.translate_call_expr(call);
+    call.visit_mut_children_with(self);
     self.pre = pre_parent;
   }
 }

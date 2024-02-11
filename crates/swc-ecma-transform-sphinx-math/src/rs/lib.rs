@@ -51,31 +51,18 @@ impl<R: JSXRuntime> MathRenderer<R> {
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }
-}
 
-impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
-  noop_visit_mut_type!();
+  fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
+    let inline = match jsx::<R>(call)?.get_tag()?.tuple() {
+      (JSXTag::Component(_), "math") => Some(true),
+      (JSXTag::Component(_), "math_block") => Some(false),
+      _ => None,
+    }?;
 
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    call.visit_mut_children_with(self);
-
-    let Some(tag) = jsx::<R>(call).get_tag() else {
-      return;
-    };
-
-    let inline = match tag.tuple() {
-      (JSXTag::Component(_), "math") => true,
-      (JSXTag::Component(_), "math_block") => false,
-      _ => return,
-    };
-
-    let Some(tex) = jsx::<R>(call)
-      .and_then(|e| e.get_props())
-      .and_then(|e| e.get_item("children"))
-      .and_then(as_string)
-    else {
-      return;
-    };
+    let tex = jsx::<R>(call)?
+      .get_props()?
+      .get_item("children")
+      .and_then(as_string)?;
 
     let document = self.render_math(tex, inline);
 
@@ -98,6 +85,17 @@ impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
         )
       }
     };
+
+    Some(())
+  }
+}
+
+impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
+  noop_visit_mut_type!();
+
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    call.visit_mut_children_with(self);
+    self.process_call_expr(call);
   }
 }
 

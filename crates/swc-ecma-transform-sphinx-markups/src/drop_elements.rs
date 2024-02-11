@@ -56,40 +56,41 @@ struct ElementDropper<R: JSXRuntime> {
   jsx: PhantomData<R>,
 }
 
-impl<R: JSXRuntime> VisitMut for ElementDropper<R> {
-  noop_visit_mut_type!();
-
-  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
-    call.visit_mut_children_with(self);
-
-    let Some(tag) = jsx::<R>(call).get_tag() else {
-      return;
-    };
-
-    let drop = match self.options.elements.get(&tag) {
-      Some(drop) => drop,
+impl<R: JSXRuntime> ElementDropper<R> {
+  fn unwrap_elem(&mut self, call: &mut CallExpr) -> Option<()> {
+    let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
+    match children {
+      Some(children) => {
+        *call = JSX!([(), R], Object!("children" = children));
+      }
       None => {
-        call.visit_mut_children_with(self);
-        return;
+        call.take();
       }
     };
+    Some(())
+  }
 
+  fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
+    let tag = jsx::<R>(call)?.get_tag()?;
+    let drop = self.options.elements.get(&tag)?;
     match drop {
       Drop::Unwrap => {
-        let children = jsx_mut::<R>(call)
-          .and_then(|e| e.get_props_mut())
-          .and_then(|e| e.del_item("children"));
-        match children {
-          Some(children) => *call = JSX!([(), R], Object!("children" = children)),
-          None => {
-            call.take();
-          }
-        }
+        self.unwrap_elem(call);
       }
       Drop::Delete => {
         call.take();
       }
     };
+    Some(())
+  }
+}
+
+impl<R: JSXRuntime> VisitMut for ElementDropper<R> {
+  noop_visit_mut_type!();
+
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    call.visit_mut_children_with(self);
+    self.process_call_expr(call);
   }
 }
 
