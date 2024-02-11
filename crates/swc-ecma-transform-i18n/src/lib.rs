@@ -7,7 +7,11 @@ use swc_core::ecma::{
 };
 
 use swc_ecma_utils2::{
-  jsx::{jsx, jsx_mut, tag::JSXTag, JSXElement, JSXElementMut, JSXRuntime},
+  jsx::{
+    jsx, jsx_mut,
+    tag::{JSXTag, JSXTagType},
+    JSXElement, JSXElementMut, JSXRuntime,
+  },
   jsx_tag,
 };
 
@@ -247,13 +251,13 @@ impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
   }
 
   fn translate_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let name = jsx::<R>(call)?.get_tag()?;
+    let tag = jsx::<R>(call)?.get_tag()?;
 
-    if matches!(name, JSXTag::Intrinsic(_)) {
+    if matches!(tag.tag_type(), JSXTagType::Intrinsic(_)) {
       self.translate_generic_attrs(call);
     }
 
-    let options = self.elements.get(&name)?;
+    let options = self.elements.get(&tag)?;
 
     let attrs = options
       .props

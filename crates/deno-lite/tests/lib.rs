@@ -1,7 +1,7 @@
 use deno_core::anyhow;
 use deno_web::TimersPermission;
 
-use deno_lite::{export_function, DenoLite};
+use deno_lite::{define_deno_export, DenoLite};
 use serde::Serialize;
 
 struct Permissions;
@@ -22,7 +22,7 @@ fn test_function() -> anyhow::Result<()> {
     b: i32,
   }
 
-  export_function!(add, Add);
+  define_deno_export!(add, Add);
 
   let module = deno.load_module_once(
     r#"
@@ -48,7 +48,7 @@ fn test_async_function() -> anyhow::Result<()> {
     ms: f64,
   }
 
-  export_function!(sleep, Sleep);
+  define_deno_export!(sleep, Sleep);
 
   let module = deno.load_module_once(
     r#"
@@ -95,7 +95,7 @@ fn test_non_object_args() -> anyhow::Result<()> {
   #[derive(Serialize)]
   struct Add(i32, i32);
 
-  export_function!(add, Add);
+  define_deno_export!(add, Add);
 
   let module = deno.load_module_once(r#"export const add = ([a, b]) => a + b"#)?;
 
@@ -113,7 +113,7 @@ fn test_throw() -> anyhow::Result<()> {
   #[derive(Serialize)]
   struct Add(i32, i32);
 
-  export_function!(add, Add);
+  define_deno_export!(add, Add);
 
   let module = deno.load_module_once(
     r#"

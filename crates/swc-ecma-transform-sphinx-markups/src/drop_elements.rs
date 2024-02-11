@@ -61,7 +61,7 @@ impl<R: JSXRuntime> ElementDropper<R> {
     let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
     match children {
       Some(children) => {
-        *call = JSX!([(), R], Object!("children" = children));
+        *call = JSX!([(), R], Object![["children" = children]]);
       }
       None => {
         call.take();

@@ -11,12 +11,12 @@ use crate::{
   serde::passthru::{to_serde_data, visit_serde_data},
 };
 
-struct DestructExpr<'ast> {
+struct DestructureExpr<'ast> {
   value: Option<Expr>,
   marker: PhantomData<&'ast Expr>,
 }
 
-impl<'ast> DestructExpr<'ast> {
+impl<'ast> DestructureExpr<'ast> {
   fn from_expr(value: Expr) -> Self {
     Self {
       value: Some(value),
@@ -24,17 +24,17 @@ impl<'ast> DestructExpr<'ast> {
     }
   }
 
-  fn take(&mut self) -> Result<Expr, DestructError> {
+  fn take(&mut self) -> Result<Expr, DestructureError> {
     self
       .value
       .take()
-      .ok_or(DestructError::custom("unexpected None"))
+      .ok_or(DestructureError::custom("unexpected None"))
   }
 
-  fn number(value: Expr) -> Result<f64, DestructError> {
+  fn number(value: Expr) -> Result<f64, DestructureError> {
     match value {
       Expr::Lit(Lit::Num(Number { value, .. })) => Ok(value),
-      _ => Err(DestructError::invalid_type(
+      _ => Err(DestructureError::invalid_type(
         serde::de::Unexpected::Other("arbitrary expression"),
         &"a numeric literal",
       )),
@@ -48,14 +48,14 @@ macro_rules! integer {
     where
       V: serde::de::Visitor<'de>,
     {
-      let number = self.take().and_then(DestructExpr::number)?;
+      let number = self.take().and_then(DestructureExpr::number)?;
       if number < <$t>::MIN as f64 || number > <$t>::MAX as f64 {
-        Err(DestructError::invalid_value(
+        Err(DestructureError::invalid_value(
           serde::de::Unexpected::Float(number),
           &stringify!($t),
         ))
       } else if number.fract() != 0.0 {
-        Err(DestructError::invalid_value(
+        Err(DestructureError::invalid_value(
           serde::de::Unexpected::Float(number),
           &stringify!($t),
         ))
@@ -66,8 +66,8 @@ macro_rules! integer {
   };
 }
 
-impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut DestructExpr<'de> {
-  type Error = DestructError;
+impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut DestructureExpr<'de> {
+  type Error = DestructureError;
 
   fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
@@ -83,23 +83,23 @@ impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut DestructExpr<'d
 
       Ok(Expr::Lit(Lit::BigInt(BigInt { value, .. }))) => Ok(
         visit_serde_data(visitor, to_serde_data(&value))
-          .map_err(<DestructError as serde::de::Error>::custom)?,
+          .map_err(<DestructureError as serde::de::Error>::custom)?,
       ),
       Ok(Expr::Lit(Lit::JSXText(JSXText { value, .. }))) => visitor.visit_str(&*value),
 
       Ok(Expr::Array(container)) => {
-        let de = DestructSequence::new(self, container);
+        let de = DestructureSequence::new(self, container);
         visitor.visit_seq(de)
       }
 
       Ok(Expr::Object(container)) => {
-        let de = DestructMapping::new(self, container);
+        let de = DestructureMapping::new(self, container);
         visitor.visit_map(de)
       }
 
       Ok(value) => Ok(
         visit_serde_data(visitor, to_serde_data(&value))
-          .map_err(<DestructError as serde::de::Error>::custom)?,
+          .map_err(<DestructureError as serde::de::Error>::custom)?,
       ),
     }
   }
@@ -143,9 +143,9 @@ impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut DestructExpr<'d
   where
     V: serde::de::Visitor<'de>,
   {
-    let number = self.take().and_then(DestructExpr::number)?;
+    let number = self.take().and_then(DestructureExpr::number)?;
     if number < f32::MIN as f64 || number > f32::MAX as f64 {
-      Err(DestructError::invalid_value(
+      Err(DestructureError::invalid_value(
         serde::de::Unexpected::Float(number),
         &"f32",
       ))
@@ -155,20 +155,20 @@ impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut DestructExpr<'d
   }
 }
 
-struct DestructSequence<'ast, 'de: 'ast, T>
+struct DestructureSequence<'ast, 'de: 'ast, T>
 where
   T: MutableSequence<Value = Expr> + 'ast,
 {
-  de: &'ast mut DestructExpr<'de>,
+  de: &'ast mut DestructureExpr<'de>,
   container: T,
   iter: Box<dyn Iterator<Item = usize> + 'ast>,
 }
 
-impl<'ast, 'de, T> DestructSequence<'ast, 'de, T>
+impl<'ast, 'de, T> DestructureSequence<'ast, 'de, T>
 where
   T: MutableSequence<Value = Expr> + 'ast,
 {
-  fn new(de: &'ast mut DestructExpr<'de>, container: T) -> Self {
+  fn new(de: &'ast mut DestructureExpr<'de>, container: T) -> Self {
     let iter = Box::new((0..container.len()).collect::<Vec<_>>().into_iter());
     Self {
       de,
@@ -178,11 +178,11 @@ where
   }
 }
 
-impl<'ast, 'de, T> serde::de::SeqAccess<'de> for DestructSequence<'ast, 'de, T>
+impl<'ast, 'de, T> serde::de::SeqAccess<'de> for DestructureSequence<'ast, 'de, T>
 where
   T: MutableSequence<Value = Expr> + 'ast,
 {
-  type Error = DestructError;
+  type Error = DestructureError;
 
   fn next_element_seed<U>(&mut self, seed: U) -> Result<Option<U::Value>, Self::Error>
   where
@@ -203,50 +203,49 @@ where
   }
 }
 
-struct DestructMapping<'ast, 'de: 'ast, T>
+struct DestructureMapping<'ast, 'de: 'ast, T>
 where
   T: MutableMapping<Value = Expr> + 'ast,
 {
-  de: &'ast mut DestructExpr<'de>,
+  de: &'ast mut DestructureExpr<'de>,
   container: T,
   iter: Box<dyn Iterator<Item = T::Key> + 'ast>,
-  key: Option<T::Key>,
+  value: Option<T::Value>,
 }
 
-impl<'ast, 'de, T> DestructMapping<'ast, 'de, T>
+impl<'ast, 'de, T> DestructureMapping<'ast, 'de, T>
 where
   T: MutableMapping<Value = Expr> + 'ast,
 {
-  fn new(de: &'ast mut DestructExpr<'de>, container: T) -> Self {
+  fn new(de: &'ast mut DestructureExpr<'de>, container: T) -> Self {
     let iter = Box::new(container.keys().collect::<Vec<_>>().into_iter());
     Self {
       de,
       container,
       iter,
-      key: None,
+      value: None,
     }
   }
 }
 
-impl<'ast, 'de, T> serde::de::MapAccess<'de> for DestructMapping<'ast, 'de, T>
+impl<'ast, 'de, T> serde::de::MapAccess<'de> for DestructureMapping<'ast, 'de, T>
 where
   T: MutableMapping<Value = Expr> + 'ast,
-  T::Key: TryInto<Expr>,
+  T::Key: Clone + TryInto<Expr>,
 {
-  type Error = DestructError;
+  type Error = DestructureError;
 
   fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
   where
     K: serde::de::DeserializeSeed<'de>,
   {
-    self.key = self.iter.next();
+    let Some(key) = self.iter.next() else {
+      return Ok(None);
+    };
 
-    let key = self.key.take();
-
-    let Some(key) = key else { return Ok(None) };
+    self.value = self.container.del_item(key.clone());
 
     self.de.value = key.try_into().ok();
-
     seed.deserialize(&mut *self.de).map(Some)
   }
 
@@ -254,31 +253,25 @@ where
   where
     V: serde::de::DeserializeSeed<'de>,
   {
-    let value = self
-      .container
-      .get_item_mut(self.key.take().expect("current key should be set"))
-      .and_then(|item| Some(item.take()));
-
-    self.de.value = value;
-
+    self.de.value = self.value.take();
     seed.deserialize(&mut *self.de)
   }
 }
 
 #[derive(Debug, thiserror::Error)]
 #[error("failed to deserialize AST: {0}")]
-pub struct DestructError(String);
+pub struct DestructureError(String);
 
-impl serde::de::Error for DestructError {
+impl serde::de::Error for DestructureError {
   fn custom<T: std::fmt::Display>(msg: T) -> Self {
-    DestructError(format!("{}", msg))
+    DestructureError(format!("{}", msg))
   }
 }
 
-pub fn destruct_expr<'ast, T>(expr: Expr) -> Result<T, DestructError>
+pub fn destructure_expr<'ast, T>(expr: Expr) -> Result<T, DestructureError>
 where
   T: serde::de::Deserialize<'ast>,
 {
-  let mut deserializer = DestructExpr::from_expr(expr);
+  let mut deserializer = DestructureExpr::from_expr(expr);
   Ok(T::deserialize(&mut deserializer)?)
 }

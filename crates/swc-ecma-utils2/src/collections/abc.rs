@@ -54,7 +54,7 @@ pub trait Mapping: MappingBase {
 pub trait MutableMappingBase: MappingBase {
   fn _get_mut(&mut self, key: &Self::Key) -> Option<&mut Self::Value>;
   fn _set(&mut self, key: &Self::Key, value: Self::Value);
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)>;
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value>;
   fn _pop(&mut self) -> Option<(Self::Key, Self::Value)>;
 }
 
@@ -69,7 +69,7 @@ pub trait MutableMapping: MutableMappingBase + Mapping {
   }
 
   fn del_item<K: Into<Self::Key>>(&mut self, key: K) -> Option<Self::Value> {
-    Some(self._del(&key.into())?.1)
+    self._del(&key.into())
   }
 
   fn mut_item<K, F>(&mut self, key: K, f: F) -> &mut Self
@@ -164,7 +164,7 @@ pub trait MutableMapping: MutableMappingBase + Mapping {
     }
   }
 
-  fn from_iterable<I, K>(iterable: I) -> Self
+  fn from_iter<I, K>(iterable: I) -> Self
   where
     Self: DefaultContainer,
     I: IntoIterator<Item = (K, Self::Value)>,
@@ -387,7 +387,7 @@ where
   fn _set(&mut self, key: &Self::Key, value: Self::Value) {
     T::_set(*self, key, value)
   }
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)> {
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     T::_del(*self, key)
   }
   fn _pop(&mut self) -> Option<(Self::Key, Self::Value)> {
@@ -417,7 +417,7 @@ where
     }
   }
 
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)> {
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     match self {
       Some(inner) => inner._del(key),
       None => None,

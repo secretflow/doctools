@@ -639,7 +639,7 @@ jsxs(Fragment, {
                 "values": {
                     "LF": jsx("br", {}),
                     "LT": jsx(Fragment, {
-                        "children": ">"
+                        "children": "<"
                     }),
                     "GT": jsx(Fragment, {
                         "children": ">"

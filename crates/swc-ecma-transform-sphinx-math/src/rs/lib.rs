@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use swc_core::{
   common::{FileName, SourceMap},
   ecma::{
@@ -9,13 +9,11 @@ use swc_core::{
   },
 };
 
-use deno_lite::{anyhow, export_function, DenoLite, ESModule};
+use deno_lite::{anyhow, define_deno_export, DenoLite, ESModule};
 use html5jsx::html_to_jsx;
 use swc_ecma_utils2::{
-  collections::Mapping,
-  ecma::itertools::as_string,
-  jsx::{jsx, tag::JSXTag, JSXDocument, JSXElement, JSXRuntime},
-  Object, JSX,
+  jsx::{JSXDocument, JSXRuntime},
+  jsx_tag, unpack_jsx, Object, JSX,
 };
 
 static SERVER: &str = include_str!("../../dist/server/index.js");
@@ -28,20 +26,43 @@ struct RenderMath {
   inline: bool,
 }
 
-export_function!(render, RenderMath);
+define_deno_export!(render, RenderMath);
+
+#[derive(Deserialize)]
+struct MathProps {
+  #[serde(default)]
+  ids: Vec<String>,
+  #[serde(default)]
+  backrefs: Vec<String>,
+  #[serde(default)]
+  names: Vec<String>,
+  #[serde(default)]
+  classes: Vec<String>,
+
+  label: Option<String>,
+  number: Option<f64>,
+
+  #[serde(rename = "children")]
+  tex: String,
+}
+
+enum Math {
+  Inline(MathProps),
+  Block(MathProps),
+}
 
 struct MathRenderer<R: JSXRuntime> {
-  deno: DenoLite,
   module: ESModule,
+  deno: DenoLite,
   jsx: PhantomData<R>,
 }
 
 impl<R: JSXRuntime> MathRenderer<R> {
-  fn render_math(&mut self, code: &str, inline: bool) -> anyhow::Result<JSXDocument> {
+  fn render_math(&mut self, tex: &str, inline: bool) -> anyhow::Result<JSXDocument> {
     let html: String = self.deno.call_function(
       self.module,
       RenderMath {
-        code: String::from(code),
+        code: tex.into(),
         inline,
       },
     )?;
@@ -53,35 +74,45 @@ impl<R: JSXRuntime> MathRenderer<R> {
   }
 
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let inline = match jsx::<R>(call)?.get_tag()?.tuple() {
-      (JSXTag::Component(_), "math") => Some(true),
-      (JSXTag::Component(_), "math_block") => Some(false),
-      _ => None,
-    }?;
+    let math = unpack_jsx!(
+      [call, Math, R],
+      jsx_tag!(math?) = [Math::Inline, MathProps],
+      jsx_tag!(math_block?) = [Math::Block, MathProps],
+    )?;
 
-    let tex = jsx::<R>(call)?
-      .get_props()?
-      .get_item("children")
-      .and_then(as_string)?;
+    let (inline, data) = match math {
+      Math::Inline(props) => (true, props),
+      Math::Block(props) => (false, props),
+    };
 
-    let document = self.render_math(tex, inline);
+    let MathProps {
+      tex,
+      label,
+      number,
+      ids,
+      backrefs,
+      classes,
+      ..
+    } = data;
+
+    let document = self.render_math(&tex, inline);
 
     *call = match document {
       Ok(document) => {
         let children = document.to_fragment::<R>();
         JSX!(
-          [(Math), R],
-          Object!("tex" = tex, "inline" = inline, "children" = children)
+          [Math, R],
+          Object![
+            [tex, inline, children],
+            ["label"? = label],
+            ["number"? = number]
+          ]
         )
       }
       Err(error) => {
         JSX!(
-          [(Math), R],
-          Object!(
-            "tex" = tex,
-            "inline" = inline,
-            "error" = format!("{}", error)
-          )
+          [Math, R],
+          Object![[tex, inline], ["error" = format!("{}", error)]]
         )
       }
     };
@@ -103,8 +134,8 @@ pub fn render_math<R: JSXRuntime>(deno: DenoLite) -> impl Fold + VisitMut {
   let mut deno = deno;
   let module = deno.load_module_once(SERVER).unwrap();
   as_folder(MathRenderer::<R> {
-    deno,
     module,
+    deno,
     jsx: PhantomData,
   })
 }

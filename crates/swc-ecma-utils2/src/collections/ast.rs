@@ -62,7 +62,7 @@ impl MutableMappingBase for ObjectLit {
     }
   }
 
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)> {
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     let found = self.props.iter_mut().enumerate().find_map(|(idx, prop)| {
       if test_object_key(prop, key) {
         Some((
@@ -76,15 +76,16 @@ impl MutableMappingBase for ObjectLit {
 
     if let Some((idx, found)) = found {
       self.props.swap_remove(idx);
-      Some((key.clone(), found))
+      Some(found)
     } else {
       None
     }
   }
 
   fn _pop(&mut self) -> Option<(Self::Key, Self::Value)> {
-    let last = self.props.iter().rev().find_map(prop_name_to_lit)?;
-    self._del(&last)
+    let key = self.props.iter().rev().find_map(prop_name_to_lit)?;
+    let value = self._del(&key)?;
+    Some((key, value))
   }
 }
 
@@ -267,23 +268,23 @@ impl MutableMappingBase for CallExpr {
     }
   }
 
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)> {
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     if *key == 0 {
       let found = self.callee.take();
       let expr = *found.expr()?;
-      Some((*key, expr))
+      Some(expr)
     } else if *key - 1 >= self.args.len() {
       None
     } else {
       let found = self.args.remove(*key - 1);
       let expr = *found.expr;
-      Some((*key, expr))
+      Some(expr)
     }
   }
 
   fn _pop(&mut self) -> Option<(Self::Key, Self::Value)> {
     let idx = self._len().saturating_sub(1);
-    self._del(&idx)
+    Some((idx, self._del(&idx)?))
   }
 }
 
@@ -363,16 +364,16 @@ impl MutableMappingBase for Expr {
     }
   }
 
-  fn _del(&mut self, key: &Self::Key) -> Option<(Self::Key, Self::Value)> {
+  fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     match self {
       Expr::Object(ref mut obj) => obj._del(key),
       Expr::Array(ref mut arr) => {
         let idx = lit_as_usize(key).unwrap_or(arr.len());
-        Some((key.clone(), arr._del(idx)?))
+        Some(arr._del(idx)?)
       }
       Expr::Call(ref mut call) => {
         let idx = lit_as_usize(key).unwrap_or(call._len());
-        Some((key.clone(), call._del(&idx)?.1))
+        Some(call._del(&idx)?)
       }
       _ => None,
     }

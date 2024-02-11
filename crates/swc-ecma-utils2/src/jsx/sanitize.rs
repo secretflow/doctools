@@ -13,7 +13,12 @@ use crate::{
   ecma::{itertools::is_invalid_call, itertools::is_nullish},
 };
 
-use super::{jsx, jsx_mut, runtime::JSXRuntime, tag::JSXTag, JSXElement, JSXElementMut};
+use super::{
+  jsx, jsx_mut,
+  runtime::JSXRuntime,
+  tag::{JSXTagMatch, JSXTagType},
+  JSXElement, JSXElementMut,
+};
 
 struct FoldFragments<R: JSXRuntime>(PhantomData<R>);
 
@@ -27,10 +32,10 @@ impl<R: JSXRuntime> FoldFragments<R> {
       return is_invalid_call(call);
     };
 
-    match elem.get_tag() {
+    match elem.get_tag().tag_type() {
       None => false,
-      Some(JSXTag::Intrinsic(_) | JSXTag::Component(_)) => false,
-      Some(JSXTag::Fragment) => match elem.get_props().get_item("children") {
+      Some(JSXTagType::Intrinsic(_) | JSXTagType::Component(_)) => false,
+      Some(JSXTagType::Fragment) => match elem.get_props().get_item("children") {
         None => true,
         Some(children) => match children.as_array() {
           Some(array) => array.iter().all(|item| is_nullish(item)),
@@ -95,8 +100,8 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
       elem.get_props_mut().set_item("children", children);
     }
 
-    let orphan = match elem.get_tag() {
-      Some(JSXTag::Fragment) => match elem.get_props_mut().get_item_mut("children") {
+    let orphan = match elem.get_tag().tag_type() {
+      Some(JSXTagType::Fragment) => match elem.get_props_mut().get_item_mut("children") {
         None => None,
         Some(children) => match children.as_mut_array() {
           None => Some(children.take()),

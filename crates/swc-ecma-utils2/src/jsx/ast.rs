@@ -38,14 +38,14 @@ impl<R: JSXRuntime> JSXCall<R> for CallExpr {
 
   fn as_tag(value: &Self::Value) -> Option<JSXTag> {
     match value {
-      Expr::Lit(Lit::Str(Str { value, .. })) => Some(JSXTag::Intrinsic((&**value).into())),
+      Expr::Lit(Lit::Str(Str { value, .. })) => Some(JSXTag::intrinsic((&**value).into())),
       Expr::Ident(Ident { sym, .. }) => {
         if is_nullish(value) {
           None
         } else if sym == R::FRAGMENT {
-          Some(JSXTag::Fragment)
+          Some(JSXTag::fragment())
         } else {
-          Some(JSXTag::Component((&**sym).into()))
+          Some(JSXTag::component((&**sym).into()))
         }
       }
       _ => None,

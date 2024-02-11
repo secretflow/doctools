@@ -7,15 +7,35 @@ pub use abc::{
 
 #[macro_export]
 macro_rules! Object {
-  ( $($key:literal = $value:expr ),* ) => {{
+  ( $([ $($assign:tt)+ ]),* ) => {{
     use swc_core::common::util::take::Take as _;
     use $crate::collections::MutableMapping as _;
     let mut object = swc_core::ecma::ast::ObjectLit::dummy();
     $(
-      object.set_item($key, $value.into());
+      $crate::_object_assign!(object, $($assign)+);
     )*
     object
   }};
+}
+
+#[macro_export]
+macro_rules! _object_assign {
+  ( $object:ident, $key:literal? = $value:expr $(,)? ) => {
+    $value.map(|value| $object.set_item($key, value.into()));
+  };
+  ( $object:ident, $key:literal = $value:expr $(,)? ) => {
+    $object.set_item($key, $value.into());
+  };
+  ( $object:ident, $($shorthand:ident?),* $(,)? ) => {
+    $(
+      $shorthand.map(|value| $object.set_item(stringify!($shorthand), value.into()));
+    )*
+  };
+  ( $object:ident, $($shorthand:ident),* $(,)? ) => {
+    $(
+      $object.set_item(stringify!($shorthand), $shorthand.into());
+    )*
+  };
 }
 
 #[macro_export]
@@ -29,6 +49,18 @@ macro_rules! Array {
     )*
     array
   }};
+  ( $( $value:expr ),* , $( ($optional:expr)? ),* ) => {{
+    use swc_core::common::util::take::Take as _;
+    use $crate::collections::MutableSequence as _;
+    let mut array = swc_core::ecma::ast::ArrayLit::dummy();
+    $(
+      array.append($value.into());
+    )*
+    $(
+      $optional.map(|value| array.append(value.into()));
+    )*
+    array
+  }};
 }
 
 #[macro_export]
@@ -38,21 +70,21 @@ macro_rules! Function {
     use $crate::collections::MutableMapping as _;
     let mut call = swc_core::ecma::ast::CallExpr::dummy();
     call.set_item(0usize, $name.into());
-    $crate::function_args!(call, $( $args ),*);
+    $crate::_function_args!(call, $( $args ),*);
     call
   }};
 }
 
 #[macro_export]
-macro_rules! function_args {
-  (@idx $call:ident, $idx:expr) => {};
+macro_rules! _function_args {
+  ($call:ident, $( $args:expr ),*) => {
+    $crate::_function_args!(@idx $call, 1usize $( ,$args )*);
+  };
   (@idx $call:ident, $idx:expr, $arg:expr $( ,$rest:expr ),*) => {
     $call.set_item($idx, $arg.into());
-    $crate::function_args!(@idx $call, $idx + 1usize $( ,$rest )*);
+    $crate::_function_args!(@idx $call, $idx + 1usize $( ,$rest )*);
   };
-  ($call:ident, $( $args:expr ),*) => {
-    $crate::function_args!(@idx $call, 1usize $( ,$args )*);
-  };
+  (@idx $call:ident, $idx:expr) => {};
 }
 
 #[cfg(test)]
@@ -64,14 +96,15 @@ mod tests {
   #[test]
   fn test_object_macro() {
     assert_eq_codegen!(
-      &Object!(
-        "null" = null!(),
-        "bool" = true,
-        "string" = "string",
-        "number" = 42,
-        "array" = Array!(null!(), true, "string", 42),
-        "object" = Object!("lorem" = "ipsum", "dolor" = "sit amet")
-      )
+      &Object![
+        ["null" = null!()],
+        ["bool" = true],
+        ["string" = "string"],
+        ["number" = 42],
+        ["array" = Array![null!(), true, "string", 42]],
+        ["object" = Object![["lorem" = "ipsum"], ["dolor" = "sit amet"]]],
+        ["maybe"? = Some("maybe")]
+      ]
       .into(),
       &json_expr!({
         "null": null,
@@ -83,6 +116,7 @@ mod tests {
           "lorem": "ipsum",
           "dolor": "sit amet",
         },
+        "maybe": "maybe",
       })
     );
   }

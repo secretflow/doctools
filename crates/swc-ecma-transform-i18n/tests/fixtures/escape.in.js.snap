@@ -19,7 +19,7 @@ jsx("pre", {
             "LF_": LF,
             "LF": jsx("br", {}),
             "LT": jsx(Fragment, {
-                "children": ">"
+                "children": "<"
             }),
             "GT": jsx(Fragment, {
                 "children": ">"

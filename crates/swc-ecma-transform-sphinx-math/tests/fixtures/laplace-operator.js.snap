@@ -2020,6 +2020,8 @@ export const App = ()=>_jsx(Math, {
                     ]
                 })
             ]
-        })
+        }),
+        "label": "This is a label",
+        "number": 1
     });
 ``````

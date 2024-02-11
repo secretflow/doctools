@@ -170,7 +170,7 @@ impl Default for DenoLite {
 }
 
 #[macro_export]
-macro_rules! export_function {
+macro_rules! define_deno_export {
   ($func_name:ident, $args:ident) => {
     impl $crate::Callable for $args {
       fn name() -> &'static str {
