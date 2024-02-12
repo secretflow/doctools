@@ -1,0 +1,30 @@
+---
+source: crates/swc-ecma-utils2/src/serde/repack.rs
+expression: "format!(\"``````js\\n{}\\n``````\", src)"
+---
+``````js
+{
+    "status": {
+        "PartialContent": {
+            "range": "bytes 0-1023/2048"
+        }
+    },
+    "headers": {
+        "Content-Type": "text/plain"
+    },
+    "body": new Uint8Array([
+        73,
+        39,
+        109,
+        32,
+        97,
+        32,
+        116,
+        101,
+        97,
+        112,
+        111,
+        116
+    ])
+}
+``````

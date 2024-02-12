@@ -46,7 +46,7 @@ impl Default for PassthruSerializer {
 }
 
 macro_rules! primitive {
-  ($f:ident, $type:tt) => {
+  ($f:ident, $type:ident) => {
     fn $f(self, v: $type) -> Result<Self::Ok, Self::Error> {
       self.data = SerdeData::$type(v);
       Ok(())
@@ -609,7 +609,11 @@ impl<'de, 'a> serde::de::VariantAccess<'de> for PassthruDeserializeEnum<'de, 'a>
   type Error = PassthruSerdeError;
 
   fn unit_variant(self) -> Result<(), Self::Error> {
-    unreachable!("should have been handled in deserialize_any")
+    use serde::de::Error;
+    Err(Self::Error::invalid_type(
+      serde::de::Unexpected::Unit,
+      &"unit variant",
+    ))
   }
 
   fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value, Self::Error>

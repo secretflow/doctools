@@ -13,7 +13,7 @@ use deno_lite::{anyhow, define_deno_export, DenoLite, ESModule};
 use html5jsx::html_to_jsx;
 use swc_ecma_utils2::{
   jsx::{JSXDocument, JSXRuntime},
-  jsx_tag, unpack_jsx, Object, JSX,
+  jsx_tag, unpack_jsx, JSX,
 };
 
 static SERVER: &str = include_str!("../../dist/server/index.js");
@@ -28,8 +28,14 @@ struct RenderMath {
 
 define_deno_export!(render, RenderMath);
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct MathProps {
+  #[serde(rename(deserialize = "children"))]
+  tex: String,
+
+  label: Option<String>,
+  number: Option<f64>,
+
   #[serde(default)]
   ids: Vec<String>,
   #[serde(default)]
@@ -38,17 +44,11 @@ struct MathProps {
   names: Vec<String>,
   #[serde(default)]
   classes: Vec<String>,
-
-  label: Option<String>,
-  number: Option<f64>,
-
-  #[serde(rename = "children")]
-  tex: String,
 }
 
 enum Math {
-  Inline(MathProps),
-  Block(MathProps),
+  Inline { props: MathProps },
+  Block { props: MathProps },
 }
 
 struct MathRenderer<R: JSXRuntime> {
@@ -75,47 +75,28 @@ impl<R: JSXRuntime> MathRenderer<R> {
 
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
     let math = unpack_jsx!(
-      [call, Math, R],
-      jsx_tag!(math?) = [Math::Inline, MathProps],
-      jsx_tag!(math_block?) = [Math::Block, MathProps],
+      [Math, R, call],
+      jsx_tag!(math?) = [Inline, props as MathProps],
+      jsx_tag!(math_block?) = [Block, props as MathProps],
     )?;
 
-    let (inline, data) = match math {
-      Math::Inline(props) => (true, props),
-      Math::Block(props) => (false, props),
+    let (inline, props) = match math {
+      Math::Inline { props } => (true, props),
+      Math::Block { props } => (false, props),
     };
 
-    let MathProps {
-      tex,
-      label,
-      number,
-      ids,
-      backrefs,
-      classes,
-      ..
-    } = data;
-
-    let document = self.render_math(&tex, inline);
+    let document = self.render_math(&props.tex, inline);
 
     *call = match document {
       Ok(document) => {
         let children = document.to_fragment::<R>();
-        JSX!(
-          [Math, R],
-          Object![
-            [tex, inline, children],
-            ["label"? = label],
-            ["number"? = number]
-          ]
-        )
+        JSX!([Math, R], props, [inline], [children])
       }
       Err(error) => {
-        JSX!(
-          [Math, R],
-          Object![[tex, inline], ["error" = format!("{}", error)]]
-        )
+        JSX!([Math, R], props, [inline], ["error" = format!("{}", error)])
       }
-    };
+    }
+    .ok()?;
 
     Some(())
   }

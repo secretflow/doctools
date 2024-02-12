@@ -6,6 +6,14 @@ expression: result
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 export const App = ()=>_jsx(Math, {
         "tex": "\\nabla^2 f =\n\\frac{1}{r^2} \\frac{\\partial}{\\partial r}\n\\left( r^2 \\frac{\\partial f}{\\partial r} \\right) +\n\\frac{1}{r^2 \\sin \\theta} \\frac{\\partial f}{\\partial \\theta}\n\\left( \\sin \\theta \\, \\frac{\\partial f}{\\partial \\theta} \\right) +\n\\frac{1}{r^2 \\sin^2\\theta} \\frac{\\partial^2 f}{\\partial \\phi^2}",
+        "label": "This is a label",
+        "number": 1,
+        "ids": [
+            "equation-this-is-a-label"
+        ],
+        "backrefs": [],
+        "names": [],
+        "classes": [],
         "inline": false,
         "children": _jsx(_Fragment, {
             "children": [
@@ -2020,8 +2028,6 @@ export const App = ()=>_jsx(Math, {
                     ]
                 })
             ]
-        }),
-        "label": "This is a label",
-        "number": 1
+        })
     });
 ``````

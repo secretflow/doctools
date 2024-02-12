@@ -249,35 +249,23 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.set_item("LF", JSX!(["br", R], Object![]).into());
+      values.set_item("LF", JSX!(["br", R]).into());
     }
 
     if has_less_than {
-      values.set_item(
-        "LT",
-        JSX!([(), R], Object![["children" = Array!["<"]]]).into(),
-      );
+      values.set_item("LT", JSX!([(), R], ["children" = Array!["<"]]).into());
     }
 
     if has_greater_than {
-      values.set_item(
-        "GT",
-        JSX!([(), R], Object![["children" = Array![">"]]]).into(),
-      );
+      values.set_item("GT", JSX!([(), R], ["children" = Array![">"]]).into());
     }
 
     if has_left_curly {
-      values.set_item(
-        "LC",
-        JSX!([(), R], Object![["children" = Array!["{"]]]).into(),
-      );
+      values.set_item("LC", JSX!([(), R], ["children" = Array!["{"]]).into());
     }
 
     if has_right_curly {
-      values.set_item(
-        "RC",
-        JSX!([(), R], Object![["children" = Array!["}"]]]).into(),
-      );
+      values.set_item("RC", JSX!([(), R], ["children" = Array!["}"]]).into());
     }
 
     Props {
@@ -321,12 +309,10 @@ impl MessageProps {
 
     let trans = with_span(Some(span))(JSX!(
       [(var!(S::TRANS)), R],
-      Object![
-        ["id" = &*id],
-        ["message" = &*message],
-        ["components" = components],
-        ["values" = values]
-      ]
+      ["id" = &*id],
+      ["message" = &*message],
+      ["components" = components],
+      ["values" = values]
     ));
 
     (

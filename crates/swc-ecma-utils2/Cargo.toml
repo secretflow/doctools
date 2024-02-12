@@ -21,6 +21,7 @@ version = "*"
 
 [dev-dependencies]
 anyhow = "1.0.79"
+serde_bytes = "0.11.14"
 serde_json = {version = "1.0.113", features = ["preserve_order"]}
 swc-ecma-testing2 = {path = "../swc-ecma-testing2"}
 swc_core = {version = "*", features = ["testing"]}

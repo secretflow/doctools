@@ -68,42 +68,12 @@ macro_rules! jsx_tag {
 }
 
 #[macro_export]
-macro_rules! JSX {
-  ([(), $runtime:ty], $props:expr) => {{
-    use $crate::collections::MutableMapping as _;
-    let mut call = $crate::jsx::create_fragment::<$runtime>();
-    call.set_item(2usize, $props.into());
-    call
-  }};
-  ([($name:expr), $runtime:ty], $props:expr) => {{
-    use $crate::collections::MutableMapping as _;
-    let mut call = $crate::jsx::create_element::<$runtime>($name.into());
-    call.set_item(2usize, $props.into());
-    call
-  }};
-  ([$name:ident, $runtime:ty], $props:expr) => {{
-    use $crate::collections::MutableMapping as _;
-    let name = swc_core::ecma::ast::Ident::from(stringify!($name));
-    let mut call = $crate::jsx::create_element::<$runtime>(name.into());
-    call.set_item(2usize, $props.into());
-    call
-  }};
-  ([$name:literal, $runtime:ty], $props:expr) => {{
-    use $crate::collections::MutableMapping as _;
-    let name = swc_core::ecma::ast::Str::from($name);
-    let mut call = $crate::jsx::create_element::<$runtime>(name.into());
-    call.set_item(2usize, $props.into());
-    call
-  }};
-}
-
-#[macro_export]
 macro_rules! unpack_jsx {
   (
-    [ $call:ident, $rtype:ty, $runtime:ty ],
+    [ $rtype:ident, $runtime:ty, $call:ident ],
     $(
       $tag_type:pat =
-      [ $result_variant:path, $deserialize:ty $( ,$binding:ident )* ],
+      [ $variant:ident, $props:ident as $typed:ty $( ,$binding:ident )* ],
     )* ) => {{
       use $crate::collections::MutableMapping as _;
       use $crate::jsx::JSXElement;
@@ -111,17 +81,69 @@ macro_rules! unpack_jsx {
       fn unpack<R: $crate::jsx::JSXRuntime>(call: &mut swc_core::ecma::ast::CallExpr) -> Option<$rtype> {
         match $crate::jsx::jsx::<R>(call)?.get_tag()?.tag_type() {
           $($tag_type => {
-            let props = call.del_item(2usize)?;
+            let mut props = call.del_item(2usize)?;
             $(
-              let (_, $binding) = props.del_item(stringify!($binding))?;
+              let $binding = props.del_item(stringify!($binding))?;
             )*
-            let rest: $deserialize = $crate::serde::destructure_expr(props).ok()?;
-            Some($result_variant(rest, $($binding),*))
+            let $props: $typed = $crate::serde::unpack_expr(props).ok()?;
+            {
+              Some($rtype::$variant { $props $(, $binding)* })
+            }
           })*
           _ => None,
         }
       }
 
       unpack::<$runtime>($call)
+  }};
+}
+
+#[macro_export]
+macro_rules! JSX {
+  ([ $($create:tt)+ ] $(, [ $($assign:tt)+ ])*) => {{
+    use swc_core::ecma::ast::ObjectLit;
+    use $crate::collections::MutableMapping as _;
+    let mut call = $crate::_jsx_create!($($create)+);
+    let mut __props__ = ObjectLit::dummy();
+    $(
+      $crate::object_assign!(__props__, $($assign)+);
+    )*
+    call.set_item(2usize, __props__.into());
+    call
+  }};
+  ([ $($create:tt)+ ], $props:expr, $([ $($assign:tt)+ ]),*) => {{
+    use swc_core::ecma::ast::CallExpr;
+    use $crate::collections::MutableMapping as _;
+
+    let repack = || -> Result<CallExpr, $crate::serde::RepackError> {
+      let mut call = $crate::_jsx_create!($($create)+);
+      let mut __props__ = $crate::serde::repack_expr(&$props)?;
+      $(
+        $crate::object_assign!(__props__, $($assign)+);
+      )*
+      call.set_item(2usize, __props__.into());
+      Ok(call.into())
+    };
+
+    repack()
+  }};
+}
+
+#[macro_export]
+macro_rules! _jsx_create {
+  ((), $runtime:ty) => {
+    $crate::jsx::create_fragment::<$runtime>()
+  };
+  (($name:expr), $runtime:ty) => {
+    $crate::jsx::create_element::<$runtime>($name.into())
+  };
+  ($name:ident, $runtime:ty) => {{
+    let name = swc_core::ecma::ast::Ident::from(stringify!($name));
+    $crate::jsx::create_element::<$runtime>(name.into())
+  }};
+  ($name:literal, $runtime:ty) => {{
+    let name = swc_core::ecma::ast::Str::from($name);
+    let call = $crate::jsx::create_element::<$runtime>(name.into());
+    call
   }};
 }
