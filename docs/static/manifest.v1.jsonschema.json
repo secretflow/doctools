@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Manifest",
   "type": "object",
   "properties": {
@@ -8,7 +7,15 @@
       "title": "Sidebar",
       "type": "array",
       "items": {
-        "anyOf": [
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "doc": "#/definitions/SidebarItemDoc",
+            "link": "#/definitions/SidebarItemLink",
+            "category": "#/definitions/SidebarItemCategory"
+          }
+        },
+        "oneOf": [
           { "$ref": "#/definitions/SidebarItemDoc" },
           { "$ref": "#/definitions/SidebarItemLink" },
           { "$ref": "#/definitions/SidebarItemCategory" }
