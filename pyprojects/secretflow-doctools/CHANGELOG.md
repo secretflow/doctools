@@ -1,5 +1,11 @@
 # doctools
 
+## 0.7.0
+
+### Minor Changes
+
+- feature: support myst-nb output
+
 ## 0.6.2
 
 ### Patch Changes

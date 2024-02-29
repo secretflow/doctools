@@ -9,6 +9,7 @@ Upstreams:
 
 Note: Currently this doesn't include any of @types/estree.
 """
+
 from __future__ import annotations
 
 import json
