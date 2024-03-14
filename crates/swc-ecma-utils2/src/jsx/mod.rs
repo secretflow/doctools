@@ -131,19 +131,26 @@ macro_rules! JSX {
 
 #[macro_export]
 macro_rules! _jsx_create {
-  ((), $runtime:ty) => {
-    $crate::jsx::create_fragment::<$runtime>()
-  };
-  (($name:expr), $runtime:ty) => {
-    $crate::jsx::create_element::<$runtime>($name.into())
-  };
-  ($name:ident, $runtime:ty) => {{
-    let name = swc_core::ecma::ast::Ident::from(stringify!($name));
-    $crate::jsx::create_element::<$runtime>(name.into())
+  (Fragment, $runtime:ty, $span:expr) => {{
+    let mut elem = $crate::jsx::create_fragment::<$runtime>();
+    elem.span = $span;
+    elem
   }};
-  ($name:literal, $runtime:ty) => {{
+  (($name:expr), $runtime:ty, $span:expr) => {{
+    let mut elem = $crate::jsx::create_element::<$runtime>($name.into());
+    elem.span = $span;
+    elem
+  }};
+  ($name:ident, $runtime:ty, $span:expr) => {{
+    let name = swc_core::ecma::ast::Ident::from(stringify!($name));
+    let mut elem = $crate::jsx::create_element::<$runtime>(name.into());
+    elem.span = $span;
+    elem
+  }};
+  ($name:literal, $runtime:ty, $span:expr) => {{
     let name = swc_core::ecma::ast::Str::from($name);
-    let call = $crate::jsx::create_element::<$runtime>(name.into());
-    call
+    let mut elem = $crate::jsx::create_element::<$runtime>(name.into());
+    elem.span = $span;
+    elem
   }};
 }

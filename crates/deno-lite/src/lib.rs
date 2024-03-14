@@ -4,29 +4,21 @@ use std::{
   sync::{Arc, Mutex},
 };
 
-pub use deno_core::anyhow;
+pub use deno_core::{anyhow, serde_v8, v8};
 use deno_core::{
-  anyhow::Context, serde, serde_v8, v8, FastString, JsRuntime, ModuleId, ModuleSpecifier,
-  RuntimeOptions,
+  anyhow::Context as _, serde, FastString, JsRuntime, ModuleId, ModuleSpecifier, RuntimeOptions,
 };
 use deno_web::TimersPermission;
 
 mod global_this;
 pub mod utils;
 
-#[derive(Debug, Clone, Copy)]
-pub struct ESModule(ModuleId);
-
-pub trait Callable: serde::Serialize {
-  fn name() -> &'static str;
-}
-
-struct Permissions;
-
-impl TimersPermission for Permissions {
-  fn allow_hrtime(&mut self) -> bool {
-    true
-  }
+pub trait ESFunction: serde::Serialize {
+  fn export_name() -> &'static str;
+  fn to_args<'a>(
+    &'a self,
+    scope: &mut v8::HandleScope<'a>,
+  ) -> serde_v8::Result<Vec<v8::Local<'a, v8::Value>>>;
 }
 
 #[derive(Clone)]
@@ -68,7 +60,11 @@ impl DenoLite {
     }
   }
 
-  pub fn load_module_once(&mut self, code: &'static str) -> anyhow::Result<ESModule> {
+  pub fn load_module_once(
+    &mut self,
+    name: &'static str,
+    code: &'static str,
+  ) -> anyhow::Result<ESModule> {
     if let Some(module_id) = self.modules.lock().unwrap().get(code) {
       return Ok(ESModule(*module_id));
     }
@@ -77,7 +73,7 @@ impl DenoLite {
       let map = self.modules.lock().unwrap();
       let hasher = map.hasher();
       let hash = hasher.hash_one(code);
-      ModuleSpecifier::parse(format!("deno-lite://{:x}.js", hash).as_str()).unwrap()
+      ModuleSpecifier::parse(format!("deno-lite://{}.{:x}.js", name, hash).as_str()).unwrap()
     };
 
     let module_id = self.driver.block_on(
@@ -107,13 +103,13 @@ impl DenoLite {
 
   pub fn call_function<F, R>(&mut self, module: ESModule, callable: F) -> anyhow::Result<R>
   where
-    F: Callable,
+    F: ESFunction,
     R: serde::de::DeserializeOwned,
   {
     let global = self.deno.lock().unwrap().get_module_namespace(module.0)?;
 
     let func = {
-      let export = F::name();
+      let export = F::export_name();
 
       let deno = &mut self.deno.lock().unwrap();
       let scope = &mut deno.handle_scope();
@@ -137,15 +133,18 @@ impl DenoLite {
       v8::Global::<v8::Function>::new(scope, func)
     };
 
-    let arg1 = {
+    let args = {
       let deno = &mut self.deno.lock().unwrap();
       let scope = &mut deno.handle_scope();
-      let arg1 = serde_v8::to_v8(scope, callable)?;
-      v8::Global::<v8::Value>::new(scope, arg1)
+      callable
+        .to_args(scope)?
+        .iter()
+        .map(|arg| v8::Global::<v8::Value>::new(scope, arg))
+        .collect::<Vec<_>>()
     };
 
     self.driver.block_on(async {
-      let future = self.deno.lock().unwrap().call_with_args(&func, &[arg1]);
+      let future = self.deno.lock().unwrap().call_with_args(&func, &args[..]);
 
       let result = self
         .deno
@@ -169,13 +168,36 @@ impl Default for DenoLite {
   }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct ESModule(ModuleId);
+
+#[derive(Debug, Clone, Copy)]
+pub struct ESModuleSource(&'static str, &'static str);
+
+impl ESModuleSource {
+  pub const fn new(name: &'static str, source: &'static str) -> Self {
+    Self(name, source)
+  }
+
+  pub fn load_into(self, deno: &mut DenoLite) -> anyhow::Result<ESModule> {
+    deno.load_module_once(self.0, self.1)
+  }
+}
+
+struct Permissions;
+
+impl TimersPermission for Permissions {
+  fn allow_hrtime(&mut self) -> bool {
+    true
+  }
+}
+
 #[macro_export]
-macro_rules! define_deno_export {
-  ($func_name:ident, $args:ident) => {
-    impl $crate::Callable for $args {
-      fn name() -> &'static str {
-        stringify!($func_name)
-      }
-    }
+macro_rules! esm_source {
+  ($static:ident, $name:literal, $path:literal) => {
+    static $static: deno_lite::ESModuleSource =
+      deno_lite::ESModuleSource::new($name, include_str!($path));
   };
 }
+
+pub use deno_lite_macros::ESFunction;

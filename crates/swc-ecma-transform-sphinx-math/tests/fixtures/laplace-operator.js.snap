@@ -11,9 +11,9 @@ export const App = ()=>_jsx(Math, {
         "ids": [
             "equation-this-is-a-label"
         ],
-        "backrefs": [],
-        "names": [],
         "classes": [],
+        "names": [],
+        "dupnames": [],
         "inline": false,
         "children": _jsx(_Fragment, {
             "children": [

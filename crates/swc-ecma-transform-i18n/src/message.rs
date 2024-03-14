@@ -249,23 +249,35 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.set_item("LF", JSX!(["br", R]).into());
+      values.set_item("LF", JSX!(["br", R, Span::dummy()]).into());
     }
 
     if has_less_than {
-      values.set_item("LT", JSX!([(), R], ["children" = Array!["<"]]).into());
+      values.set_item(
+        "LT",
+        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["<"]]).into(),
+      );
     }
 
     if has_greater_than {
-      values.set_item("GT", JSX!([(), R], ["children" = Array![">"]]).into());
+      values.set_item(
+        "GT",
+        JSX!([Fragment, R, Span::dummy()], ["children" = Array![">"]]).into(),
+      );
     }
 
     if has_left_curly {
-      values.set_item("LC", JSX!([(), R], ["children" = Array!["{"]]).into());
+      values.set_item(
+        "LC",
+        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["{"]]).into(),
+      );
     }
 
     if has_right_curly {
-      values.set_item("RC", JSX!([(), R], ["children" = Array!["}"]]).into());
+      values.set_item(
+        "RC",
+        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["}"]]).into(),
+      );
     }
 
     Props {
@@ -308,7 +320,7 @@ impl MessageProps {
     }
 
     let trans = with_span(Some(span))(JSX!(
-      [(var!(S::TRANS)), R],
+      [(var!(S::TRANS)), R, span],
       ["id" = &*id],
       ["message" = &*message],
       ["components" = components],

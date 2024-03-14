@@ -10,7 +10,7 @@ struct CargoManifest {
   workspace_root: String,
 }
 
-/// <https://github.com/mitsuhiko/insta/blob/b113499249584cb650150d2d01ed96ee66db6b30/src/runtime.rs#L67-L88>
+// https://github.com/mitsuhiko/insta/blob/b113499249584cb650150d2d01ed96ee66db6b30/src/runtime.rs#L67-L88
 pub fn get_cargo_workspace(manifest_dir: &str) -> anyhow::Result<PathBuf> {
   let output = std::process::Command::new(env!("CARGO"))
     .arg("metadata")

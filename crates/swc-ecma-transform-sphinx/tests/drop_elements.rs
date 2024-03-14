@@ -7,7 +7,7 @@ use swc_core::{
 };
 
 use swc_ecma_testing2::{parse_one, test_fixture};
-use swc_ecma_transform_sphinx_markups::drop_elements::drop_elements;
+use swc_ecma_transform_sphinx::drop_elements::drop_elements;
 use swc_ecma_utils2::{
   ecma::sanitize::remove_invalid,
   jsx::{
@@ -24,9 +24,10 @@ fn test(path: PathBuf) {
     |src| parse_one(&src.src, None, parse_file_as_module).unwrap(),
     |_: ()| {
       chain!(
-        drop_elements::<JSXRuntimeDefault>(|options| options
+        drop_elements()
           .delete(jsx_tag!("comment"))
-          .unwrap(jsx_tag!("div"))),
+          .unwrap(jsx_tag!("div"))
+          .runtime::<JSXRuntimeDefault>(),
         fold_fragments::<JSXRuntimeDefault>(),
         fix_jsx_factories::<JSXRuntimeDefault>(),
         remove_invalid(),

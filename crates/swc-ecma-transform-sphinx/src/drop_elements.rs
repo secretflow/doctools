@@ -40,14 +40,21 @@ impl DropElements {
     }
   }
 
-  pub fn unwrap(&mut self, tag: JSXTag) -> &mut Self {
+  pub fn unwrap(mut self, tag: JSXTag) -> Self {
     self.elements.insert(tag, Drop::Unwrap);
     self
   }
 
-  pub fn delete(&mut self, tag: JSXTag) -> &mut Self {
+  pub fn delete(mut self, tag: JSXTag) -> Self {
     self.elements.insert(tag, Drop::Delete);
     self
+  }
+
+  pub fn runtime<R: JSXRuntime>(self) -> impl Fold + VisitMut {
+    as_folder(ElementDropper::<R> {
+      options: self,
+      jsx: PhantomData,
+    })
   }
 }
 
@@ -61,7 +68,7 @@ impl<R: JSXRuntime> ElementDropper<R> {
     let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
     match children {
       Some(children) => {
-        *call = JSX!([(), R], ["children" = children]);
+        *call = JSX!([Fragment, R, call.span], [children]);
       }
       None => {
         call.take();
@@ -94,13 +101,6 @@ impl<R: JSXRuntime> VisitMut for ElementDropper<R> {
   }
 }
 
-pub fn drop_elements<R: JSXRuntime>(
-  configurer: impl Fn(&mut DropElements) -> &mut DropElements,
-) -> impl Fold + VisitMut {
-  let mut options = DropElements::new();
-  configurer(&mut options);
-  as_folder(ElementDropper::<R> {
-    options,
-    jsx: PhantomData,
-  })
+pub fn drop_elements() -> DropElements {
+  DropElements::new()
 }

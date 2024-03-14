@@ -9,41 +9,29 @@ use swc_core::{
   },
 };
 
-use deno_lite::{anyhow, define_deno_export, DenoLite, ESModule};
+use deno_lite::{anyhow, esm_source, DenoLite, ESFunction, ESModule};
 use html5jsx::html_to_jsx;
+use sphinx_jsx_macros::basic_attributes;
 use swc_ecma_utils2::{
   jsx::{JSXDocument, JSXRuntime},
   jsx_tag, unpack_jsx, JSX,
 };
 
-static SERVER: &str = include_str!("../../dist/server/index.js");
+esm_source!(SERVER, "render-math", "../../dist/server/index.js");
 
-static CLIENT_DTS: &str = include_str!("../js/client/index.d.ts");
-
-#[derive(Serialize)]
+#[derive(Serialize, ESFunction)]
 struct RenderMath {
-  code: String,
+  tex: String,
   inline: bool,
 }
 
-define_deno_export!(render, RenderMath);
-
+#[basic_attributes]
 #[derive(Serialize, Deserialize)]
 struct MathProps {
-  #[serde(rename(deserialize = "children"))]
+  #[serde(alias = "children")]
   tex: String,
-
   label: Option<String>,
-  number: Option<f64>,
-
-  #[serde(default)]
-  ids: Vec<String>,
-  #[serde(default)]
-  backrefs: Vec<String>,
-  #[serde(default)]
-  names: Vec<String>,
-  #[serde(default)]
-  classes: Vec<String>,
+  number: Option<u32>,
 }
 
 enum Math {
@@ -62,7 +50,7 @@ impl<R: JSXRuntime> MathRenderer<R> {
     let html: String = self.deno.call_function(
       self.module,
       RenderMath {
-        code: tex.into(),
+        tex: tex.into(),
         inline,
       },
     )?;
@@ -90,10 +78,11 @@ impl<R: JSXRuntime> MathRenderer<R> {
     *call = match document {
       Ok(document) => {
         let children = document.to_fragment::<R>();
-        JSX!([Math, R], props, [inline], [children])
+        JSX!([Math, R, call.span], props, [inline, children])
       }
       Err(error) => {
-        JSX!([Math, R], props, [inline], ["error" = format!("{}", error)])
+        let error = format!("{}", error);
+        JSX!([Math, R, call.span], props, [inline, error])
       }
     }
     .ok()?;
@@ -113,14 +102,10 @@ impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
 
 pub fn render_math<R: JSXRuntime>(deno: DenoLite) -> impl Fold + VisitMut {
   let mut deno = deno;
-  let module = deno.load_module_once(SERVER).unwrap();
+  let module = SERVER.load_into(&mut deno).unwrap();
   as_folder(MathRenderer::<R> {
     module,
     deno,
     jsx: PhantomData,
   })
-}
-
-pub fn dts() -> &'static str {
-  CLIENT_DTS
 }

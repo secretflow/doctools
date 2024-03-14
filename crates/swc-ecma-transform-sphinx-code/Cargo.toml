@@ -1,0 +1,12 @@
+[package]
+edition = "2021"
+license.workspace = true
+name = "swc-ecma-transform-sphinx-code"
+version = "0.0.0"
+
+[lib]
+path = "src/rs/lib.rs"
+
+[dependencies]
+deno-lite = {path = "../deno-lite"}
+serde = {version = "1.0.196", features = ["derive"]}
