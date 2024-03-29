@@ -105,11 +105,11 @@
   - [ ] line_block
   - [ ] list_item
   - [ ] literal
-  - [ ] literal_block
+  - [x] literal_block
   - [ ] literal_emphasis
   - [ ] literal_strong
-  - [ ] math
-  - [ ] math_block
+  - [x] math
+  - [x] math_block
   - [ ] meta
   - [ ] note
   - [ ] option

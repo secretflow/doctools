@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use serde::de::{Error, IntoDeserializer};
 use swc_core::{
   common::util::take::Take,
-  ecma::ast::{ArrayLit, BigInt, Bool, Expr, Ident, JSXText, Lit, NewExpr, Number, Str},
+  ecma::ast::{ArrayLit, BigInt, Bool, Expr, Ident, JSXText, Lit, NewExpr, Number, Str, Tpl},
 };
 
 use crate::{
@@ -85,6 +85,21 @@ impl<'de: 'ast, 'ast> serde::de::Deserializer<'de> for &'ast mut UnpackExpr<'de>
           .map_err(<UnpackError as serde::de::Error>::custom)
       }
       Expr::Lit(Lit::JSXText(JSXText { value, .. })) => visitor.visit_str(&*value),
+
+      Expr::Tpl(Tpl { quasis, exprs, .. }) => {
+        if exprs.len() > 0 {
+          Err(UnpackError::custom(
+            "template literals with expressions cannot be deserialized",
+          ))
+        } else {
+          let text = quasis
+            .iter()
+            .map(|tpl| tpl.raw.to_string())
+            .collect::<Vec<_>>()
+            .join("");
+          visitor.visit_str(&text)
+        }
+      }
 
       Expr::Array(container) => {
         let de = UnpackSequence::new(self, container);

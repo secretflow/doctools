@@ -14,7 +14,7 @@
   "configurations": [
     {
       "name": "sphinx-jsx: pytest",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": ["-vv", "-s", "-k", "${input:pytestFilter}"],
@@ -23,7 +23,7 @@
     },
     {
       "name": "build sphinx-rtd docs",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "python": "${workspaceFolder}/extern/readthedocs/sphinx_rtd_theme/.venv/bin/python",
       "module": "sphinx",

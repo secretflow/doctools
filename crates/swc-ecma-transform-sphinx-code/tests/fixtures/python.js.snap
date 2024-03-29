@@ -1,0 +1,1774 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+export const App = ()=>_jsx(CodeBlock, {
+        "code": "from torch import nn\nimport torch.nn.functional as F\n\nclass Net(nn.Module):\n    def __init__(self):\n        super(Net, self).__init__()\n        self.conv1 = nn.Conv2d(1, 6, 3)\n        self.conv2 = nn.Conv2d(6, 16, 3)\n        self.fc1 = nn.Linear(16 * 6 * 6, 120)\n        self.fc2 = nn.Linear(120, 84)\n        self.fc3 = nn.Linear(84, 10)\n\n    def forward(self, x):\n        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))\n        x = F.max_pool2d(F.relu(self.conv2(x)), 2)\n        x = x.view(-1, self.num_flat_features(x))\n        x = F.relu(self.fc1(x))\n        x = F.relu(self.fc2(x))\n        x = self.fc3(x)\n        return x\n\n    def num_flat_features(self, x):\n        size = x.size()[1:]\n        num_features = 1\n        for s in size:\n            num_features *= s\n        return num_features\n\nnet = Net()\nprint(net)\n\nparams = list(net.parameters())\nprint(len(params))\n\nfor name, param in net.named_parameters():\n    print(name, param.size())\n    ",
+        "lang": "python",
+        "start_line": 1,
+        "show_line_numbers": false,
+        "ids": [],
+        "classes": [],
+        "names": [],
+        "dupnames": [],
+        "children": _jsx(_Fragment, {
+            "children": [
+                _jsx("style", {
+                    "children": [
+                        ".jsx-styled-cac628e{",
+                        "--shiki-light:#005CC5;--shiki-dark:#39BAE6",
+                        "}",
+                        ".jsx-styled-fef199d{",
+                        "--shiki-light:#005CC5;--shiki-dark:#39BAE6;--shiki-light-font-style:inherit;--shiki-dark-font-style:italic",
+                        "}",
+                        ".jsx-styled-cf41fc7{",
+                        "--shiki-light:#005CC5;--shiki-dark:#D2A6FF",
+                        "}",
+                        ".jsx-styled-3970089{",
+                        "--shiki-light:#005CC5;--shiki-dark:#F07178",
+                        "}",
+                        ".jsx-styled-2a87d63{",
+                        "--shiki-light:#24292E;--shiki-dark:#BFBDB6",
+                        "}",
+                        ".jsx-styled-0270d98{",
+                        "--shiki-light:#24292E;--shiki-dark:#BFBDB6B3",
+                        "}",
+                        ".jsx-styled-d3000dd{",
+                        "--shiki-light:#24292E;--shiki-dark:#D2A6FF",
+                        "}",
+                        ".jsx-styled-3029e43{",
+                        "--shiki-light:#24292E;--shiki-dark:#FFB454",
+                        "}",
+                        ".jsx-styled-295832c{",
+                        "--shiki-light:#24292e;--shiki-dark:#bfbdb6;--shiki-light-bg:#fff;--shiki-dark-bg:#0b0e14",
+                        "}",
+                        ".jsx-styled-e4d2ca7{",
+                        "--shiki-light:#6F42C1;--shiki-dark:#39BAE6",
+                        "}",
+                        ".jsx-styled-3d897f9{",
+                        "--shiki-light:#6F42C1;--shiki-dark:#59C2FF",
+                        "}",
+                        ".jsx-styled-eac8179{",
+                        "--shiki-light:#6F42C1;--shiki-dark:#FFB454",
+                        "}",
+                        ".jsx-styled-8bf5276{",
+                        "--shiki-light:#D73A49;--shiki-dark:#F29668",
+                        "}",
+                        ".jsx-styled-80705eb{",
+                        "--shiki-light:#D73A49;--shiki-dark:#FF8F40",
+                        "}"
+                    ]
+                }),
+                _jsx("pre", {
+                    "tabIndex": "0",
+                    "className": "shiki shiki-themes github-light ayu-dark jsx-styled-295832c",
+                    "children": [
+                        _jsx("code", {
+                            "children": [
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "from"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " torch "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "import"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "import"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " torch"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "functional "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "as"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " F"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "class"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3d897f9",
+                                            "children": [
+                                                " Net"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-e4d2ca7",
+                                            "children": [
+                                                "nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-e4d2ca7",
+                                            "children": [
+                                                "Module"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "):"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "    def"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                " __init__"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-d3000dd",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "):"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cac628e",
+                                            "children": [
+                                                "        super"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(Net"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                " self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                "__init__"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "()"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "        self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "conv1 "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "Conv2d"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "1"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 6"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 3"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "        self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "conv2 "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "Conv2d"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "6"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 16"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 3"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "        self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "fc1 "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "Linear"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "16"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                " *"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 6"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                " *"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 6"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 120"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "        self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "fc2 "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "Linear"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "120"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 84"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "        self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "fc3 "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " nn"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "Linear"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "84"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 10"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "    def"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-eac8179",
+                                            "children": [
+                                                " forward"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-d3000dd",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-d3000dd",
+                                            "children": [
+                                                " x"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "):"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "max_pool2d"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "relu"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "conv1"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x))"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " ("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "2"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 2"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "))"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "max_pool2d"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "relu"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "conv2"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x))"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 2"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                ")"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " x"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "view"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "-"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "1"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                " self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "num_flat_features"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x))"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "relu"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "fc1"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x))"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " F"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "relu"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "fc2"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x))"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        x "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-fef199d",
+                                            "children": [
+                                                " self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "fc3"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(x)"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "        return"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " x"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "    def"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-eac8179",
+                                            "children": [
+                                                " num_flat_features"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-d3000dd",
+                                            "children": [
+                                                "self"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-d3000dd",
+                                            "children": [
+                                                " x"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "):"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        size "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " x"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "size"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "()["
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                "1"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ":"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "]"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "        num_features "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cf41fc7",
+                                            "children": [
+                                                " 1"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "        for"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " s "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "in"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " size"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ":"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "            num_features "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "*="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " s"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "        return"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " num_features"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "net "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                " Net"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "()"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                "print"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(net)"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "params "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-8bf5276",
+                                            "children": [
+                                                "="
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-cac628e",
+                                            "children": [
+                                                " list"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(net"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "parameters"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "())"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                "print"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "("
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                "len"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(params))"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": []
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "for"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " name"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " param "
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-80705eb",
+                                            "children": [
+                                                "in"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " net"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "named_parameters"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "()"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ":"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3970089",
+                                            "children": [
+                                                "    print"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "(name"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                ","
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                " param"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-0270d98",
+                                            "children": [
+                                                "."
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-3029e43",
+                                            "children": [
+                                                "size"
+                                            ]
+                                        }),
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "())"
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                "\n",
+                                _jsx("span", {
+                                    "className": "line",
+                                    "children": [
+                                        _jsx("span", {
+                                            "className": "jsx-styled-2a87d63",
+                                            "children": [
+                                                "    "
+                                            ]
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                })
+            ]
+        })
+    });
+``````

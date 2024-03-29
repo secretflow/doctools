@@ -2639,7 +2639,12 @@ name = "swc-ecma-transform-sphinx-code"
 version = "0.0.0"
 dependencies = [
  "deno-lite",
+ "html5jsx",
  "serde",
+ "sphinx-jsx-macros",
+ "swc-ecma-testing2",
+ "swc-ecma-utils2",
+ "swc_core",
 ]
 
 [[package]]

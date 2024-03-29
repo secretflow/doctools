@@ -1,4 +1,19 @@
-import { codeToHtml } from "shiki";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-undef */
+
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+
+export const App = () =>
+  /*#__PURE__*/ _jsx(literal_block, {
+    ids: [],
+    classes: [],
+    names: [],
+    dupnames: [],
+    language: "typescript",
+    highlight_args: {
+      hl_lines: [15, 16, 17, 18, 19, 20],
+    },
+    children: `import { codeToHtml } from "shiki";
 
 type Options = {
   code: string;
@@ -23,4 +38,5 @@ export async function renderCode({ code, lang, highlightedLines }: Options) {
       properties: { class: "highlighted" },
     })),
   });
-}
+}`,
+  });

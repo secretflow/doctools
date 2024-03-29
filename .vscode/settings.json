@@ -107,5 +107,6 @@
     "vitest",
     "webp",
     "yuque"
-  ]
+  ],
+  "testing.openTesting": "neverOpen"
 }
