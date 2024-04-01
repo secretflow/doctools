@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 
 _jsxs(_Fragment, {
   children: [
-    _jsxs("div", {
+    _jsxs("section", {
       children: [
         "Lorem ipsum",
         _jsx(_Fragment, {

@@ -5,7 +5,7 @@ mod builder;
 mod element;
 mod runtime;
 
-pub mod sanitize;
+pub mod fixes;
 pub mod tag;
 
 use self::element::JSXCall;

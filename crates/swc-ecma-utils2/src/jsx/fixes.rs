@@ -1,5 +1,6 @@
-use std::marker::PhantomData;
+use std::{collections::HashMap, marker::PhantomData};
 
+use serde::{Deserialize, Serialize};
 use swc_core::{
   common::util::take::Take,
   ecma::{
@@ -8,16 +9,16 @@ use swc_core::{
   },
 };
 
-use crate::{
-  collections::{Mapping, MutableMapping, MutableSequence, Sequence},
-  ecma::{itertools::is_invalid_call, itertools::is_nullish},
-};
-
 use super::{
   jsx, jsx_mut,
   runtime::JSXRuntime,
-  tag::{JSXTagMatch, JSXTagType},
+  tag::{JSXTag, JSXTagMatch, JSXTagType},
   JSXElement, JSXElementMut,
+};
+use crate::{
+  collections::{Mapping, MutableMapping, MutableSequence, Sequence},
+  ecma::{itertools::is_invalid_call, itertools::is_nullish},
+  JSX,
 };
 
 struct FoldFragments<R: JSXRuntime>(PhantomData<R>);
@@ -157,10 +158,101 @@ impl<R: JSXRuntime> VisitMut for FixJSXFactory<R> {
   }
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum Drop {
+  /// Replace self with children, discarding all props
+  Unwrap,
+  /// Delete self and children completely
+  Delete,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DropElements {
+  elements: HashMap<JSXTag, Drop>,
+}
+
+impl Default for DropElements {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl DropElements {
+  pub fn new() -> Self {
+    Self {
+      elements: HashMap::new(),
+    }
+  }
+
+  pub fn unwrap(mut self, tag: JSXTag) -> Self {
+    self.elements.insert(tag, Drop::Unwrap);
+    self
+  }
+
+  pub fn delete(mut self, tag: JSXTag) -> Self {
+    self.elements.insert(tag, Drop::Delete);
+    self
+  }
+
+  pub fn build<R: JSXRuntime>(self) -> impl Fold + VisitMut {
+    as_folder(ElementDropper::<R> {
+      options: self,
+      jsx: PhantomData,
+    })
+  }
+}
+
+struct ElementDropper<R: JSXRuntime> {
+  options: DropElements,
+  jsx: PhantomData<R>,
+}
+
+impl<R: JSXRuntime> ElementDropper<R> {
+  fn unwrap_elem(&mut self, call: &mut CallExpr) -> Option<()> {
+    let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
+    match children {
+      Some(children) => {
+        *call = JSX!([Fragment, R, call.span], [children]);
+      }
+      None => {
+        call.take();
+      }
+    };
+    Some(())
+  }
+
+  fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
+    let tag = jsx::<R>(call)?.get_tag()?;
+    let drop = self.options.elements.get(&tag)?;
+    match drop {
+      Drop::Unwrap => {
+        self.unwrap_elem(call);
+      }
+      Drop::Delete => {
+        call.take();
+      }
+    };
+    Some(())
+  }
+}
+
+impl<R: JSXRuntime> VisitMut for ElementDropper<R> {
+  noop_visit_mut_type!();
+
+  fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
+    call.visit_mut_children_with(self);
+    self.process_call_expr(call);
+  }
+}
+
 pub fn fold_fragments<R: JSXRuntime>() -> impl Fold + VisitMut {
   as_folder(FoldFragments(PhantomData::<R>))
 }
 
 pub fn fix_jsx_factories<R: JSXRuntime>() -> impl Fold + VisitMut {
   as_folder(FixJSXFactory(PhantomData::<R>))
+}
+
+pub fn drop_elements() -> DropElements {
+  DropElements::new()
 }

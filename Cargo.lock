@@ -1225,15 +1225,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "616cde7c720bb2bb5824a224687d8f77bfd38922027f01d825cd7453be5099fb"
 
 [[package]]
-name = "itertools"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25db6b064527c5d482d0423354fcd07a89a2dfe07b67892e62411946db7f07b0"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2624,31 +2615,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "swc-ecma-transform-sphinx"
-version = "0.0.0"
-dependencies = [
- "itertools",
- "serde",
- "swc-ecma-testing2",
- "swc-ecma-utils2",
- "swc_core",
-]
-
-[[package]]
 name = "swc-ecma-transform-sphinx-code"
-version = "0.0.0"
-dependencies = [
- "deno-lite",
- "html5jsx",
- "serde",
- "sphinx-jsx-macros",
- "swc-ecma-testing2",
- "swc-ecma-utils2",
- "swc_core",
-]
-
-[[package]]
-name = "swc-ecma-transform-sphinx-math"
 version = "0.0.0"
 dependencies = [
  "deno-lite",

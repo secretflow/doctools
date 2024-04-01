@@ -1,10 +1,11 @@
 {
   "devDependencies": {
     "@types/katex": "^0.16.7",
-    "esbuild": "^0.19.11",
-    "katex": "^0.16.9"
+    "esbuild": "^0.20.2",
+    "katex": "^0.16.9",
+    "shiki": "^1.1.2"
   },
-  "name": "swc-ecma-transform-sphinx-math",
+  "name": "swc-ecma-transform-sphinx",
   "private": true,
   "scripts": {
     "prepare": "node ./scripts/build.js"

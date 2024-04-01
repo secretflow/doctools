@@ -60,19 +60,20 @@ impl DenoLite {
     }
   }
 
-  pub fn load_module_once(
-    &mut self,
-    name: &'static str,
-    code: &'static str,
-  ) -> anyhow::Result<ESModule> {
-    if let Some(module_id) = self.modules.lock().unwrap().get(code) {
-      return Ok(ESModule(*module_id));
+  pub fn create_module(&mut self, source: &ESModuleSource) -> anyhow::Result<ESModule> {
+    let ESModuleSource { name, source } = source;
+
+    if let Some(module_id) = self.modules.lock().unwrap().get(source) {
+      return Ok(ESModule {
+        id: *module_id,
+        deno: self.clone(),
+      });
     }
 
     let module_url = {
       let map = self.modules.lock().unwrap();
       let hasher = map.hasher();
-      let hash = hasher.hash_one(code);
+      let hash = hasher.hash_one(source);
       ModuleSpecifier::parse(format!("deno-lite://{}.{:x}.js", name, hash).as_str()).unwrap()
     };
 
@@ -81,13 +82,12 @@ impl DenoLite {
         .deno
         .lock()
         .unwrap()
-        .load_side_module(&module_url, Some(FastString::Static(code))),
+        .load_side_module(&module_url, Some(FastString::Static(&source))),
     )?;
 
     // run until complete, including top-level awaits
     self.driver.block_on(async {
       let module_eval = self.deno.lock().unwrap().mod_evaluate(module_id);
-
       self
         .deno
         .lock()
@@ -96,17 +96,20 @@ impl DenoLite {
         .await
     })?;
 
-    self.modules.lock().unwrap().insert(code, module_id);
+    self.modules.lock().unwrap().insert(&source, module_id);
 
-    Ok(ESModule(module_id))
+    Ok(ESModule {
+      id: module_id,
+      deno: self.clone(),
+    })
   }
 
-  pub fn call_function<F, R>(&mut self, module: ESModule, callable: F) -> anyhow::Result<R>
+  fn call_function<F, R>(&mut self, module: ModuleId, callable: F) -> anyhow::Result<R>
   where
     F: ESFunction,
     R: serde::de::DeserializeOwned,
   {
-    let global = self.deno.lock().unwrap().get_module_namespace(module.0)?;
+    let global = self.deno.lock().unwrap().get_module_namespace(module)?;
 
     let func = {
       let export = F::export_name();
@@ -168,19 +171,31 @@ impl Default for DenoLite {
   }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct ESModule(ModuleId);
+#[derive(Clone)]
+pub struct ESModule {
+  id: ModuleId,
+  deno: DenoLite,
+}
+
+impl ESModule {
+  pub fn call_function<F, R>(&mut self, callable: F) -> anyhow::Result<R>
+  where
+    F: ESFunction,
+    R: serde::de::DeserializeOwned,
+  {
+    self.deno.call_function(self.id, callable)
+  }
+}
 
 #[derive(Debug, Clone, Copy)]
-pub struct ESModuleSource(&'static str, &'static str);
+pub struct ESModuleSource {
+  name: &'static str,
+  source: &'static str,
+}
 
 impl ESModuleSource {
   pub const fn new(name: &'static str, source: &'static str) -> Self {
-    Self(name, source)
-  }
-
-  pub fn load_into(self, deno: &mut DenoLite) -> anyhow::Result<ESModule> {
-    deno.load_module_once(self.0, self.1)
+    Self { name, source }
   }
 }
 

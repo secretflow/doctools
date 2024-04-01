@@ -1,13 +1,17 @@
 [package]
 edition = "2021"
 license.workspace = true
-name = "swc-ecma-transform-sphinx"
-publish = false
+name = "swc-ecma-transform-sphinx-code"
 version = "0.0.0"
 
+[lib]
+path = "src/rs/lib.rs"
+
 [dependencies]
-itertools = "0.12.0"
-serde = {version = "1.0.195", features = ["derive"]}
+deno-lite = {path = "../deno-lite"}
+html5jsx = {path = "../html5jsx"}
+serde = {version = "1.0.196", features = ["derive"]}
+sphinx-jsx-macros = {path = "../sphinx-jsx-macros"}
 swc-ecma-utils2 = {path = "../swc-ecma-utils2"}
 
 [dependencies.swc_core]
@@ -20,4 +24,9 @@ version = "*"
 
 [dev-dependencies]
 swc-ecma-testing2 = {path = "../swc-ecma-testing2"}
-swc_core = {version = "*", features = ["testing_transform"]}
+
+[dev-dependencies.swc_core]
+features = [
+  "testing_transform",
+]
+version = "*"

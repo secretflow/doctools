@@ -5,7 +5,7 @@ use swc_core::{common::chain, testing::fixture};
 
 use swc_ecma_testing2::test_fixture;
 use swc_ecma_utils2::jsx::{
-  sanitize::{fix_jsx_factories, fold_fragments},
+  fixes::{fix_jsx_factories, fold_fragments},
   JSXRuntime,
 };
 

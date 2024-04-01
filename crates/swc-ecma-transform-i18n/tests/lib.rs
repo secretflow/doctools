@@ -5,7 +5,7 @@ use swc_core::{common::chain, ecma::parser::parse_file_as_module, testing::fixtu
 use swc_ecma_testing2::{parse_one, test_fixture};
 use swc_ecma_transform_i18n::{i18n, I18nSymbols};
 use swc_ecma_utils2::jsx::{
-  sanitize::{fix_jsx_factories, fold_fragments},
+  fixes::{fix_jsx_factories, fold_fragments},
   JSXRuntime,
 };
 

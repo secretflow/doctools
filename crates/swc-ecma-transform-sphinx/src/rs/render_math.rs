@@ -9,15 +9,13 @@ use swc_core::{
   },
 };
 
-use deno_lite::{anyhow, esm_source, DenoLite, ESFunction, ESModule};
+use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_to_jsx;
 use sphinx_jsx_macros::basic_attributes;
 use swc_ecma_utils2::{
   jsx::{JSXDocument, JSXRuntime},
   jsx_tag, unpack_jsx, JSX,
 };
-
-esm_source!(SERVER, "render-math", "../../dist/server/index.js");
 
 #[derive(Serialize, ESFunction)]
 struct RenderMath {
@@ -39,21 +37,17 @@ enum Math {
   Block { props: MathProps },
 }
 
-struct MathRenderer<R: JSXRuntime> {
+pub struct MathRenderer<R: JSXRuntime> {
   module: ESModule,
-  deno: DenoLite,
   jsx: PhantomData<R>,
 }
 
 impl<R: JSXRuntime> MathRenderer<R> {
   fn render_math(&mut self, tex: &str, inline: bool) -> anyhow::Result<JSXDocument> {
-    let html: String = self.deno.call_function(
-      self.module,
-      RenderMath {
-        tex: tex.into(),
-        inline,
-      },
-    )?;
+    let html: String = self.module.call_function(RenderMath {
+      tex: tex.into(),
+      inline,
+    })?;
     let sources = SourceMap::default();
     let file = sources.new_source_file(FileName::Anon, html);
     let document = html_to_jsx::<R>(&file)
@@ -100,12 +94,9 @@ impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
   }
 }
 
-pub fn render_math<R: JSXRuntime>(deno: DenoLite) -> impl Fold + VisitMut {
-  let mut deno = deno;
-  let module = SERVER.load_into(&mut deno).unwrap();
-  as_folder(MathRenderer::<R> {
-    module,
-    deno,
-    jsx: PhantomData,
+pub fn render_math<R: JSXRuntime>(esm: &ESModule) -> impl Fold + VisitMut {
+  as_folder(MathRenderer {
+    module: esm.clone(),
+    jsx: PhantomData::<R>,
   })
 }

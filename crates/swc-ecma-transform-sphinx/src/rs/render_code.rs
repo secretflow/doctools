@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use deno_lite::{anyhow, esm_source, DenoLite, ESFunction, ESModule};
+use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_to_jsx;
 use serde::{Deserialize, Serialize};
 use sphinx_jsx_macros::basic_attributes;
@@ -15,8 +15,6 @@ use swc_ecma_utils2::{
   jsx::{JSXDocument, JSXRuntime},
   jsx_tag, unpack_jsx, JSX,
 };
-
-esm_source!(SERVER, "render-code", "../../dist/server/index.js");
 
 #[derive(Serialize, Deserialize)]
 struct LineHighlight {
@@ -57,25 +55,7 @@ struct CodeBlock {
 
 struct CodeBlockRenderer<R: JSXRuntime> {
   module: ESModule,
-  deno: DenoLite,
   jsx: PhantomData<R>,
-}
-
-fn match_language(lang: &String) -> Option<&'static str> {
-  match &*lang.to_lowercase() {
-    "python" | "py" | "python3" | "ipython" | "ipython3" => Some("python"),
-    "javascript" | "js" => Some("javascript"),
-    "typescript" | "ts" => Some("typescript"),
-    "jsx" | "javascriptreact" => Some("jsx"),
-    "tsx" | "typescriptreact" => Some("tsx"),
-    "rust" | "rs" => Some("rust"),
-    "sql" | "mysql" | "sqlite" | "postgresql" => Some("sql"),
-    "proto" | "protobuf" | "proto3" => Some("proto"),
-    "go" | "golang" => Some("go"),
-    "markdown" | "md" => Some("markdown"),
-    "cpp" | "c++" => Some("cpp"),
-    _ => None,
-  }
 }
 
 impl<R: JSXRuntime> CodeBlockRenderer<R> {
@@ -85,14 +65,11 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     lang: String,
     highlighted_lines: Option<Vec<usize>>,
   ) -> anyhow::Result<JSXDocument> {
-    let html: String = self.deno.call_function(
-      self.module,
-      RenderCode {
-        code,
-        lang,
-        highlighted_lines,
-      },
-    )?;
+    let html: String = self.module.call_function(RenderCode {
+      code,
+      lang,
+      highlighted_lines,
+    })?;
     let sources = SourceMap::default();
     let file = sources.new_source_file(FileName::Anon, html);
     let document = html_to_jsx::<R>(&file)
@@ -172,12 +149,26 @@ impl<R: JSXRuntime> VisitMut for CodeBlockRenderer<R> {
   }
 }
 
-pub fn render_code<R: JSXRuntime>(deno: DenoLite) -> impl Fold + VisitMut {
-  let mut deno = deno;
-  let module = SERVER.load_into(&mut deno).unwrap();
-  as_folder(CodeBlockRenderer::<R> {
-    module,
-    deno,
-    jsx: PhantomData,
+pub fn render_code<R: JSXRuntime>(esm: &ESModule) -> impl Fold + VisitMut {
+  as_folder(CodeBlockRenderer {
+    module: esm.clone(),
+    jsx: PhantomData::<R>,
   })
+}
+
+fn match_language(lang: &String) -> Option<&'static str> {
+  match &*lang.to_lowercase() {
+    "python" | "py" | "python3" | "ipython" | "ipython3" => Some("python"),
+    "javascript" | "js" => Some("javascript"),
+    "typescript" | "ts" => Some("typescript"),
+    "jsx" | "javascriptreact" => Some("jsx"),
+    "tsx" | "typescriptreact" => Some("tsx"),
+    "rust" | "rs" => Some("rust"),
+    "sql" | "mysql" | "sqlite" | "postgresql" => Some("sql"),
+    "proto" | "protobuf" | "proto3" => Some("proto"),
+    "go" | "golang" => Some("go"),
+    "markdown" | "md" => Some("markdown"),
+    "cpp" | "c++" => Some("cpp"),
+    _ => None,
+  }
 }

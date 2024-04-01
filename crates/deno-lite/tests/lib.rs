@@ -1,8 +1,8 @@
 use deno_core::anyhow;
 use deno_web::TimersPermission;
-
-use deno_lite::{DenoLite, ESFunction};
 use serde::Serialize;
+
+use deno_lite::{DenoLite, ESFunction, ESModuleSource};
 
 struct Permissions;
 
@@ -22,16 +22,18 @@ fn test_function() -> anyhow::Result<()> {
     b: i32,
   }
 
-  let module = deno.load_module_once(
+  let source = ESModuleSource::new(
     "test",
     r#"
     export function addNumbers({ a, b }) {
       return a + b;
     }
     "#,
-  )?;
+  );
 
-  let result: i32 = deno.call_function(module, AddNumbers { a: 1, b: 2 })?;
+  let mut module = deno.create_module(&source)?;
+
+  let result: i32 = module.call_function(AddNumbers { a: 1, b: 2 })?;
 
   assert_eq!(result, 3);
 
@@ -47,18 +49,20 @@ fn test_async_function() -> anyhow::Result<()> {
     ms: f64,
   }
 
-  let module = deno.load_module_once(
+  let source = ESModuleSource::new(
     "test",
     r#"
     export function sleep({ ms }) {
       return new Promise(resolve => setTimeout(() => resolve("done"), ms));
     }
     "#,
-  )?;
+  );
+
+  let mut module = deno.create_module(&source)?;
 
   let now = std::time::Instant::now();
 
-  let result: String = deno.call_function(module, Sleep { ms: 500_f64 })?;
+  let result: String = module.call_function(Sleep { ms: 500_f64 })?;
 
   assert!(now.elapsed().as_millis() >= 500);
   assert_eq!(result, "done");
@@ -72,7 +76,7 @@ fn test_top_level_await() -> anyhow::Result<()> {
 
   let now = std::time::Instant::now();
 
-  deno.load_module_once(
+  let source = ESModuleSource::new(
     "test",
     r#"
     export function sleep({ ms }) {
@@ -80,7 +84,9 @@ fn test_top_level_await() -> anyhow::Result<()> {
     }
     await sleep({ ms: 500 });
     "#,
-  )?;
+  );
+
+  deno.create_module(&source)?;
 
   assert!(now.elapsed().as_millis() >= 500);
 
@@ -94,9 +100,11 @@ fn test_derive_multiple_args() -> anyhow::Result<()> {
   #[derive(Serialize, ESFunction)]
   struct Add(i32, i32);
 
-  let module = deno.load_module_once("test", r#"export const add = (a, b) => a + b"#)?;
+  let source = ESModuleSource::new("test", r#"export const add = (a, b) => a + b"#);
 
-  let result: i32 = deno.call_function(module, Add(1, 2))?;
+  let mut module = deno.create_module(&source)?;
+
+  let result: i32 = module.call_function(Add(1, 2))?;
 
   assert_eq!(result, 3);
 
@@ -111,16 +119,18 @@ fn test_throw() -> anyhow::Result<()> {
   #[deno(export = addNumbers)]
   struct Add(i32, i32);
 
-  let module = deno.load_module_once(
+  let source = ESModuleSource::new(
     "test",
     r#"
     export function addNumbers(a, b) {
       throw new Error("oops");
     }
     "#,
-  )?;
+  );
 
-  let result: anyhow::Result<i32> = deno.call_function(module, Add(1, 2));
+  let mut module = deno.create_module(&source)?;
+
+  let result: anyhow::Result<i32> = module.call_function(Add(1, 2));
 
   match result {
     Ok(_) => panic!("expected an error"),
