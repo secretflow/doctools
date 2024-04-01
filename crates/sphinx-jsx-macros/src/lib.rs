@@ -33,5 +33,8 @@ pub fn basic_attributes(
     }
   }
 
-  quote! { #ast }.into()
+  quote! {
+    #ast
+  }
+  .into()
 }

@@ -7,14 +7,21 @@ use sphinx_jsx_macros::basic_attributes;
 use swc_core::{
   common::{FileName, SourceMap},
   ecma::{
-    ast::CallExpr,
+    ast::{CallExpr, Expr},
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
   },
 };
 use swc_ecma_utils2::{
-  jsx::{JSXDocument, JSXRuntime},
+  collections::{MutableMapping, MutableSequence},
+  jsx::{
+    jsx, jsx_mut,
+    tag::{JSXTagMatch, JSXTagType},
+    JSXDocument, JSXElement, JSXElementMut, JSXRuntime,
+  },
   jsx_tag, unpack_jsx, JSX,
 };
+
+use crate::move_basic_attributes;
 
 #[derive(Serialize, Deserialize)]
 struct LineHighlight {
@@ -32,8 +39,36 @@ struct LiteralBlock {
   highlight_args: Option<LineHighlight>,
 }
 
-enum Literal {
-  Block { attrs: LiteralBlock },
+#[basic_attributes]
+#[derive(Serialize, Deserialize)]
+struct Container {
+  #[serde(deserialize_with = "Container::is_literal_block")]
+  literal_block: bool,
+}
+
+impl Container {
+  fn is_literal_block<'de, D>(de: D) -> Result<bool, D::Error>
+  where
+    D: serde::de::Deserializer<'de>,
+  {
+    let result = bool::deserialize(de)?;
+    if result == true {
+      Ok(result)
+    } else {
+      Err(serde::de::Error::custom("expected true"))
+    }
+  }
+}
+
+#[basic_attributes]
+#[derive(Serialize, Deserialize)]
+struct Caption {
+  children: Expr,
+}
+
+enum CodeBlockRoot {
+  Content { attrs: LiteralBlock },
+  Container { attrs: Container, children: Expr },
 }
 
 #[derive(Serialize, ESFunction)]
@@ -46,7 +81,7 @@ struct RenderCode {
 
 #[basic_attributes]
 #[derive(Serialize)]
-struct CodeBlock {
+struct CodeBlockProps {
   code: String,
   lang: String,
   start_line: usize,
@@ -77,25 +112,17 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     Ok(document)
   }
 
-  fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let elem = unpack_jsx!(
-      [Literal, R, call],
-      jsx_tag!(literal_block?) = [Block, attrs as LiteralBlock],
-    )?;
-
-    let Literal::Block {
-      attrs:
-        LiteralBlock {
-          code,
-          language,
-          linenos,
-          highlight_args,
-          ids,
-          classes,
-          names,
-          dupnames,
-        },
-    } = elem;
+  fn process_code_block(&mut self, call: &mut CallExpr, block: LiteralBlock) -> Option<()> {
+    let LiteralBlock {
+      code,
+      language,
+      linenos,
+      highlight_args,
+      ids,
+      classes,
+      names,
+      dupnames,
+    } = block;
 
     let lang = language.unwrap_or_else(|| "text".into());
     let lang = match_language(&lang).unwrap_or(&lang).to_lowercase();
@@ -113,7 +140,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       highlight_args.and_then(|f| f.hl_lines),
     );
 
-    let props = CodeBlock {
+    let props = CodeBlockProps {
       code,
       lang,
       show_line_numbers,
@@ -137,6 +164,61 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     .ok()?;
 
     Some(())
+  }
+
+  fn process_container(
+    &mut self,
+    call: &mut CallExpr,
+    container: Container,
+    mut children: Expr,
+  ) -> Option<()> {
+    let mut code_block: Option<CallExpr> = None;
+    let mut caption: Option<CallExpr> = None;
+
+    loop {
+      let Some((_, child)) = children.pop_item() else {
+        break;
+      };
+
+      let Expr::Call(child) = child else {
+        continue;
+      };
+
+      match jsx::<R>(&child).get_tag().tag_type() {
+        Some(JSXTagType::Component("CodeBlock")) => code_block = Some(child),
+        Some(JSXTagType::Component("caption")) => caption = Some(child),
+        _ => continue,
+      }
+    }
+
+    let Some(mut code_block) = code_block else {
+      return None;
+    };
+
+    if let Some(caption) = caption {
+      jsx_mut::<R>(&mut code_block)
+        .get_props_mut()
+        .set_item("caption", caption.into());
+    }
+
+    move_basic_attributes!(R, container, code_block);
+
+    *call = code_block;
+
+    Some(())
+  }
+
+  fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
+    let elem = unpack_jsx!(
+      [CodeBlockRoot, R, call],
+      jsx_tag!(literal_block?) = [Content, attrs as LiteralBlock],
+      jsx_tag!(container?) = [Container, attrs as Container, children],
+    )?;
+
+    match elem {
+      CodeBlockRoot::Content { attrs } => self.process_code_block(call, attrs),
+      CodeBlockRoot::Container { attrs, children } => self.process_container(call, attrs, children),
+    }
   }
 }
 

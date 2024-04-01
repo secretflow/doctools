@@ -25,16 +25,16 @@ struct RenderMath {
 
 #[basic_attributes]
 #[derive(Serialize, Deserialize)]
-struct MathProps {
+struct Math {
   #[serde(alias = "children")]
   tex: String,
   label: Option<String>,
   number: Option<u32>,
 }
 
-enum Math {
-  Inline { props: MathProps },
-  Block { props: MathProps },
+enum SphinxMath {
+  Inline { attrs: Math },
+  Block { attrs: Math },
 }
 
 pub struct MathRenderer<R: JSXRuntime> {
@@ -57,14 +57,14 @@ impl<R: JSXRuntime> MathRenderer<R> {
 
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
     let math = unpack_jsx!(
-      [Math, R, call],
-      jsx_tag!(math?) = [Inline, props as MathProps],
-      jsx_tag!(math_block?) = [Block, props as MathProps],
+      [SphinxMath, R, call],
+      jsx_tag!(math?) = [Inline, attrs as Math],
+      jsx_tag!(math_block?) = [Block, attrs as Math],
     )?;
 
     let (inline, props) = match math {
-      Math::Inline { props } => (true, props),
-      Math::Block { props } => (false, props),
+      SphinxMath::Inline { attrs: props } => (true, props),
+      SphinxMath::Block { attrs: props } => (false, props),
     };
 
     let document = self.render_math(&props.tex, inline);

@@ -1,13 +1,15 @@
 use deno_lite::{anyhow, esm_source, DenoLite, ESModule};
 
-esm_source!(SERVER, "render-code", "../../dist/server/index.js");
+esm_source!(SERVER, "server", "../../dist/server/index.js");
 
 pub fn init_esm(mut deno: DenoLite) -> anyhow::Result<ESModule> {
   deno.create_module(&SERVER)
 }
 
-mod render_code;
-mod render_math;
+mod code;
+mod html;
+mod math;
+mod utils;
 
-pub use render_code::render_code;
-pub use render_math::render_math;
+pub use code::render_code;
+pub use math::render_math;
