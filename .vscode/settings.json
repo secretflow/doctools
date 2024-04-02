@@ -36,7 +36,8 @@
     "tsconfig.*.json": "jsonc",
     "tsconfig.json": "jsonc",
     "*.js.jinja": "jinja",
-    "*.snap": "markdown"
+    "*.snap": "markdown",
+    "*.snap.new": "markdown"
   },
   "eslint.validate": [
     "javascript",

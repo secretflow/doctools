@@ -58,8 +58,8 @@ impl<R: JSXRuntime> MathRenderer<R> {
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
     let math = unpack_jsx!(
       [SphinxMath, R, call],
-      jsx_tag!(math?) = [Inline, attrs as Math],
-      jsx_tag!(math_block?) = [Block, attrs as Math],
+      [Inline, attrs as Math] = [jsx_tag!(math?)],
+      [Block, attrs as Math] = [jsx_tag!(math_block?)],
     )?;
 
     let (inline, props) = match math {

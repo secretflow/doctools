@@ -4,12 +4,12 @@ type Options = {
   code: string;
   lang: string | null;
   /** 1-indexed */
-  highlightedLines: number[] | null;
+  lineHighlight: number[] | null;
 };
 
-export async function renderCode({ code, lang, highlightedLines }: Options) {
-  const language = lang || "plaintext";
-  const highlighted = highlightedLines || [];
+export async function renderCode({ code, lang, lineHighlight }: Options) {
+  const language = lang || "text";
+  const highlighted = lineHighlight || [];
   return await codeToHtml(code, {
     lang: language,
     themes: {

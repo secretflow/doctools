@@ -8,6 +8,7 @@ pub enum JSXTagKind {
   Fragment,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum JSXTagType<'a> {
   Intrinsic(&'a str),
   Component(&'a str),
