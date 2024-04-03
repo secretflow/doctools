@@ -27,6 +27,7 @@ fn syn_es_function(item: syn::ItemStruct) -> syn::Result<proc_macro2::TokenStrea
   let to_args = syn_to_args(&item)?;
 
   let fn_body = quote! {
+    #[automatically_derived]
     impl deno_lite::ESFunction for #name {
       fn export_name() -> &'static str {
         #export_name

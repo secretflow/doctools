@@ -115,10 +115,10 @@ macro_rules! unpack_jsx {
     [ $rtype:ident, $runtime:ty, $call:ident ],
     $(
       [ $variant:ident $($tag_unpack:tt)+ ] =
-      [ $($tag_test:tt)+ ],
-    )*
+      [ $($tag_test:tt)+ ]
+    ),*
   ) => {{
-      use $crate::collections::MutableMapping as _;
+      use $crate::collections::Mapping as _;
       use $crate::jsx::JSXElement;
 
       fn unpack<R: $crate::jsx::JSXRuntime>(call: &mut swc_core::ecma::ast::CallExpr) -> Option<$rtype> {
@@ -190,15 +190,15 @@ macro_rules! unpack_jsx_test {
 #[macro_export]
 macro_rules! unpack_jsx_eval {
   ( $call:ident, $rtype:ident, $variant:ident, , $props:ident as $typed:ty $( ,$binding:ident )* ) => {{
-    let mut props = $call.del_item(2usize)?;
+    let props = $call.get_item(2usize)?;
     $(
-      let $binding = props.del_item(stringify!($binding))?;
+      let $binding = props.get_item(stringify!($binding))?;
     )*
     let $props: $typed = $crate::serde::unpack_expr(props).ok()?;
     Some($rtype::$variant { $props $(, $binding)* })
   }};
   ( $call:ident, $rtype:ident, $variant:ident, as $binding:ident ) => {{
-    Some($rtype::$variant { $binding: $call.take() })
+    Some($rtype::$variant { $binding: $call })
   }};
 }
 

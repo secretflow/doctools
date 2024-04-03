@@ -59,7 +59,7 @@ impl<R: JSXRuntime> MathRenderer<R> {
     let math = unpack_jsx!(
       [SphinxMath, R, call],
       [Inline, attrs as Math] = [jsx_tag!(math?)],
-      [Block, attrs as Math] = [jsx_tag!(math_block?)],
+      [Block, attrs as Math] = [jsx_tag!(math_block?)]
     )?;
 
     let (inline, props) = match math {

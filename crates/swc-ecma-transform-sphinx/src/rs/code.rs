@@ -39,7 +39,7 @@ impl<R: JSXRuntime> VisitMut for CodeBlockRenderer<R> {
         jsx_tag!(container?),
         literal_block = true,
         has(jsx_tag!(CodeBlock?)),
-      ],
+      ]
     );
 
     let Some(elem) = elem else {
@@ -126,20 +126,8 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     .map_err(|err| anyhow::anyhow!("{}", err))
   }
 
-  fn process_container(&mut self, mut elem: CallExpr) -> CallExpr {
-    let Some(mut code_block) = del_first_of_type::<R>(&mut elem, jsx_tag!(CodeBlock?)) else {
-      return elem;
-    };
-
-    if let Some(caption) = del_first_of_type::<R>(&mut elem, jsx_tag!(caption?)) {
-      jsx_mut::<R>(&mut code_block)
-        .get_props_mut()
-        .set_item("caption", caption.into());
-    }
-
-    move_basic_attributes!(R, Expr(elem), code_block);
-
-    code_block
+  fn process_container(&mut self, elem: &CallExpr) -> CallExpr {
+    todo!()
   }
 }
 
@@ -165,17 +153,13 @@ struct LiteralBlock {
 
 #[basic_attributes]
 #[derive(Serialize, Deserialize)]
-struct Container {}
-
-#[basic_attributes]
-#[derive(Serialize, Deserialize)]
 struct Caption {
   children: Expr,
 }
 
-enum LiteralBlockElement {
+enum LiteralBlockElement<'ast> {
   Content { attrs: LiteralBlock },
-  Container { elem: CallExpr },
+  Container { elem: &'ast CallExpr },
 }
 
 #[derive(Serialize, ESFunction)]

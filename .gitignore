@@ -314,3 +314,5 @@ dist
 
 # Personalization
 .vscode/launch.json
+
+*.snap.new

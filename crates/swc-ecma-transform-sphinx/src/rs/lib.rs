@@ -7,8 +7,8 @@ pub fn init_esm(mut deno: DenoLite) -> anyhow::Result<ESModule> {
 }
 
 mod code;
-mod html;
 mod math;
+mod raw;
 mod utils;
 
 pub use code::render_code;
