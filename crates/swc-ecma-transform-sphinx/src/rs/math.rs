@@ -13,8 +13,8 @@ use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_to_jsx;
 use sphinx_jsx_macros::basic_attributes;
 use swc_ecma_utils2::{
-  jsx::{JSXDocument, JSXRuntime},
-  jsx_tag, unpack_jsx, JSX,
+  jsx::{unpack::unpack_jsx, JSXDocument, JSXRuntime},
+  JSX,
 };
 
 #[derive(Serialize, ESFunction)]
@@ -32,9 +32,12 @@ struct Math {
   number: Option<u32>,
 }
 
+#[derive(Deserialize)]
 enum SphinxMath {
-  Inline { attrs: Math },
-  Block { attrs: Math },
+  #[serde(rename = "math")]
+  Inline(Math),
+  #[serde(rename = "math_block")]
+  Block(Math),
 }
 
 pub struct MathRenderer<R: JSXRuntime> {
@@ -56,15 +59,11 @@ impl<R: JSXRuntime> MathRenderer<R> {
   }
 
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let math = unpack_jsx!(
-      [SphinxMath, R, call],
-      [Inline, attrs as Math] = [jsx_tag!(math?)],
-      [Block, attrs as Math] = [jsx_tag!(math_block?)]
-    )?;
+    let math = unpack_jsx::<R, SphinxMath>(call).ok()?;
 
     let (inline, props) = match math {
-      SphinxMath::Inline { attrs: props } => (true, props),
-      SphinxMath::Block { attrs: props } => (false, props),
+      SphinxMath::Inline(props) => (true, props),
+      SphinxMath::Block(props) => (false, props),
     };
 
     let document = self.render_math(&props.tex, inline);

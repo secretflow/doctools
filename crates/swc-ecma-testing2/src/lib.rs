@@ -101,15 +101,10 @@ pub fn parse_expr_unchecked(source: &str) -> Expr {
   *parse_one(source, None, parse_file_as_expr).unwrap()
 }
 
-pub fn test_fixture<Config, Parse, Transform, Folder>(
-  source_path: PathBuf,
-  parse: Parse,
-  transform: Transform,
-) where
+pub fn test_fixture<Config, Test>(source_path: PathBuf, test: Test)
+where
   Config: DeserializeOwned + Default,
-  Parse: FnOnce(Lrc<SourceFile>) -> Module,
-  Transform: FnOnce(Config) -> Folder,
-  Folder: Fold,
+  Test: FnOnce(String, Config) -> String,
 {
   let config_path = source_path.clone().with_extension("json");
   let config: Config = std::fs::read_to_string(config_path)
@@ -123,30 +118,11 @@ pub fn test_fixture<Config, Parse, Transform, Folder>(
     // default on file not found
     .unwrap_or_default();
 
-  let sourcemap: Lrc<SourceMap> = Default::default();
-  let source = sourcemap.new_source_file(
-    FileName::Anon,
-    std::fs::read_to_string(source_path.clone()).unwrap(),
-  );
-
-  let mut transform = transform(config);
-
-  let module = parse(source.clone());
-
-  let module = module.fold_with(&mut transform);
-
-  let mut code = vec![];
-  let mut emitter = Emitter {
-    cfg: Default::default(),
-    cm: sourcemap.clone(),
-    comments: None,
-    wr: JsWriter::new(sourcemap.clone(), "\n", &mut code, None),
-  };
-  module.emit_with(&mut emitter).unwrap();
+  let source = std::fs::read_to_string(source_path.clone()).unwrap();
 
   let mut result = String::new();
   result.push_str("``````js\n");
-  result.push_str(&String::from_utf8_lossy(&code).trim());
+  result.push_str(&test(source, config));
   result.push_str("\n``````");
 
   let snapshot_path = source_path.parent().unwrap();
@@ -162,6 +138,38 @@ pub fn test_fixture<Config, Parse, Transform, Folder>(
     prepend_module_to_snapshot => false,
   }, {
     insta::assert_snapshot!(snapshot_name, result);
+  });
+}
+
+pub fn test_js_fixture<Config, Parse, Transform, Folder>(
+  source_path: PathBuf,
+  parse: Parse,
+  transform: Transform,
+) where
+  Config: DeserializeOwned + Default,
+  Parse: FnOnce(Lrc<SourceFile>) -> Module,
+  Transform: FnOnce(Config) -> Folder,
+  Folder: Fold,
+{
+  test_fixture(source_path, |source, config| {
+    let sourcemap: Lrc<SourceMap> = Default::default();
+    let source = sourcemap.new_source_file(FileName::Anon, source);
+
+    let mut transform = transform(config);
+
+    let module = parse(source.clone());
+    let module = module.fold_with(&mut transform);
+
+    let mut code = vec![];
+    let mut emitter = Emitter {
+      cfg: Default::default(),
+      cm: sourcemap.clone(),
+      comments: None,
+      wr: JsWriter::new(sourcemap.clone(), "\n", &mut code, None),
+    };
+    module.emit_with(&mut emitter).unwrap();
+
+    String::from_utf8_lossy(&code).trim().to_string()
   });
 }
 

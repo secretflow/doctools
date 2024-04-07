@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde_json::Value;
 use swc_core::{common::chain, ecma::parser::parse_file_as_module, testing::fixture};
 
-use swc_ecma_testing2::{parse_one, test_fixture};
+use swc_ecma_testing2::{parse_one, test_js_fixture};
 use swc_ecma_utils2::{
   ecma::sanitize::remove_invalid,
   jsx::{
@@ -15,7 +15,7 @@ use swc_ecma_utils2::{
 
 #[fixture("tests/jsx/fixtures/fixes/**/*.js")]
 fn test_fixes(path: PathBuf) {
-  test_fixture(
+  test_js_fixture(
     path,
     |src| parse_one(&src.src, None, parse_file_as_module).unwrap(),
     |_: Value| {

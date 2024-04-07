@@ -490,8 +490,9 @@ mod tests {
 
     let expr = repack_expr(&response).unwrap();
 
-    let src = print_one(&expr, None, None).unwrap();
+    let result = print_one(&expr, None, None).unwrap();
+    let result = format!("``````js\n{}\n``````", result);
 
-    assert_snapshot!(format!("``````js\n{}\n``````", src));
+    assert_snapshot!(result);
   }
 }

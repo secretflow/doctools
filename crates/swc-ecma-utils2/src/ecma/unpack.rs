@@ -9,7 +9,7 @@ use swc_core::ecma::ast::{
 
 use crate::{
   collections::{Mapping, Sequence},
-  serde::passthru::{to_serde_data, visit_serde_data},
+  serde::{to_serde_data, visit_serde_data},
 };
 
 macro_rules! deserialize_integer {
@@ -66,7 +66,7 @@ macro_rules! forward_to_lit {
   };
 }
 
-struct UnpackExpr<'ast> {
+pub struct UnpackExpr<'ast> {
   expr: &'ast Expr,
 }
 
@@ -222,6 +222,12 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   }
 }
 
+impl<'ast> UnpackExpr<'ast> {
+  pub fn new(expr: &'ast Expr) -> Self {
+    Self { expr }
+  }
+}
+
 struct UnpackArray<'ast> {
   array: &'ast ArrayLit,
   index: usize,
@@ -303,7 +309,7 @@ struct UnpackObjectEnum<'ast> {
 
 impl<'ast> serde::de::EnumAccess<'ast> for UnpackObjectEnum<'ast> {
   type Error = UnpackError;
-  type Variant = UnpackEnumVariant<'ast>;
+  type Variant = UnpackObjectVariant<'ast>;
 
   fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
   where
@@ -319,19 +325,19 @@ impl<'ast> serde::de::EnumAccess<'ast> for UnpackObjectEnum<'ast> {
     let key = seed.deserialize(UnpackPropName { prop })?;
     let value = &*prop_to_key_value(prop)?.value;
 
-    Ok((key, UnpackEnumVariant { value }))
+    Ok((key, UnpackObjectVariant { value }))
   }
 }
 
-struct UnpackEnumVariant<'ast> {
+struct UnpackObjectVariant<'ast> {
   value: &'ast Expr,
 }
 
-impl<'ast> serde::de::VariantAccess<'ast> for UnpackEnumVariant<'ast> {
+impl<'ast> serde::de::VariantAccess<'ast> for UnpackObjectVariant<'ast> {
   type Error = UnpackError;
 
   fn unit_variant(self) -> Result<(), Self::Error> {
-    Err(UnpackError::custom("a unit variant cannot appear here"))
+    Ok(())
   }
 
   fn newtype_variant_seed<T>(self, seed: T) -> Result<T::Value, Self::Error>
@@ -350,12 +356,13 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackEnumVariant<'ast> {
 
   fn struct_variant<V>(
     self,
-    _fields: &'static [&'static str],
+    fields: &'static [&'static str],
     visitor: V,
   ) -> Result<V::Value, Self::Error>
   where
     V: serde::de::Visitor<'ast>,
   {
+    let _ = fields;
     UnpackExpr { expr: &self.value }.deserialize_map(visitor)
   }
 }
@@ -406,6 +413,13 @@ impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
     visitor.visit_str(lit_to_str(self.lit)?)
   }
 
+  fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+  where
+    V: serde::de::Visitor<'de>,
+  {
+    visitor.visit_string(lit_to_str(self.lit)?.to_string())
+  }
+
   deserialize_char!(lit, lit_to_str, UnpackError::incorrect_lit_value);
 
   fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -423,7 +437,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
   }
 
   serde::forward_to_deserialize_any! {
-    bytes byte_buf string
+    bytes byte_buf
     option enum unit_struct
     map struct newtype_struct
     seq tuple tuple_struct
@@ -580,8 +594,12 @@ fn expr_to_byte_buf(expr: &Expr) -> Result<Vec<u8>, UnpackError> {
         },
         _ => None,
       };
-      let arr =
-        arr.ok_or_else(|| UnpackError::incorrect_expr_value(&expr, &"a Uint8Array constructor"))?;
+      let Some(arr) = arr else {
+        return Err(UnpackError::incorrect_expr_value(
+          &expr,
+          &"a Uint8Array constructor",
+        ));
+      };
       Ok(arr)
     }
     Expr::Array(ArrayLit { elems, .. }) => Ok(elems),
@@ -864,11 +882,12 @@ mod tests {
       ]),
     }
     "#;
+
     let expr = parse_one(src, None, parse_file_as_expr).unwrap();
 
     let request: Request = unpack_expr(&*expr).unwrap();
 
-    let body = request.body.unwrap();
+    let body = request.body.clone().unwrap();
     let body = String::from_utf8_lossy(&body);
 
     assert_eq!(body, "Never gonna give you up");

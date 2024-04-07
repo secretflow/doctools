@@ -42,6 +42,6 @@ pub fn json_to_expr(value: serde_json::Value) -> Expr {
 #[macro_export]
 macro_rules! json_expr {
   ($($tokens:tt)+) => {
-    $crate::serde::json_to_expr(serde_json::json!($($tokens)+))
+    $crate::ecma::json::json_to_expr(serde_json::json!($($tokens)+))
   };
 }

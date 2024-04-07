@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde_json::Value;
 use swc_core::{common::chain, testing::fixture};
 
-use swc_ecma_testing2::test_fixture;
+use swc_ecma_testing2::test_js_fixture;
 use swc_ecma_utils2::jsx::{
   fixes::{fix_jsx_factories, fold_fragments},
   JSXRuntime,
@@ -21,7 +21,7 @@ impl JSXRuntime for Runtime {
 
 #[fixture("tests/fixtures/*.html")]
 fn test_conversion(source_path: PathBuf) {
-  test_fixture(
+  test_js_fixture(
     source_path,
     |source| html_to_jsx::<Runtime>(&source).unwrap().to_module(),
     |_: Value| chain!(fold_fragments::<Runtime>(), fix_jsx_factories::<Runtime>()),

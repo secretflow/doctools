@@ -1,5 +1,14 @@
 pub mod itertools;
+pub mod json;
 pub mod sanitize;
+
+mod repack;
+mod unpack;
+
+pub use repack::{repack_expr, RepackError};
+pub use unpack::{unpack_expr, UnpackError};
+
+pub(crate) use unpack::UnpackExpr;
 
 #[macro_export]
 macro_rules! var {

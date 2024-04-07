@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use swc_core::{common::chain, ecma::parser::parse_file_as_module, testing::fixture};
 
-use swc_ecma_testing2::{parse_one, test_fixture};
+use swc_ecma_testing2::{parse_one, test_js_fixture};
 use swc_ecma_transform_i18n::{i18n, I18nSymbols};
 use swc_ecma_utils2::jsx::{
   fixes::{fix_jsx_factories, fold_fragments},
@@ -25,7 +25,7 @@ impl I18nSymbols for Runtime {
 #[fixture("tests/fixtures/*.in.js")]
 fn test_i18n(source_path: PathBuf) {
   let mut messages = vec![];
-  test_fixture(
+  test_js_fixture(
     source_path,
     |source| parse_one(&source.src, None, parse_file_as_module).unwrap(),
     |config| {

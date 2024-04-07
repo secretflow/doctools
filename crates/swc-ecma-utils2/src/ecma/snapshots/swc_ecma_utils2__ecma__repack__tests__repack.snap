@@ -1,6 +1,6 @@
 ---
-source: crates/swc-ecma-utils2/src/serde/repack.rs
-expression: "format!(\"``````js\\n{}\\n``````\", src)"
+source: crates/swc-ecma-utils2/src/ecma/repack.rs
+expression: result
 ---
 ``````js
 {
