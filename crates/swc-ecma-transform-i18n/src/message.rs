@@ -10,9 +10,9 @@ use swc_core::{
 
 use swc_ecma_utils2::{
   collections::MutableMapping,
-  jsx::JSXRuntime,
+  jsx::{create_element, create_fragment, JSXRuntime},
   span::{union_span, with_span},
-  var, Array, Function, Object, JSX,
+  tag, var, Function, Object,
 };
 
 use crate::symbols::I18nSymbols;
@@ -249,34 +249,34 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.set_item("LF", JSX!(["br", R, Span::dummy()]).into());
+      values.set_item("LF", create_element::<R>(tag!("br")).guarantee().into());
     }
 
     if has_less_than {
       values.set_item(
         "LT",
-        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["<"]]).into(),
+        create_fragment::<R>().child("<".into()).guarantee().into(),
       );
     }
 
     if has_greater_than {
       values.set_item(
         "GT",
-        JSX!([Fragment, R, Span::dummy()], ["children" = Array![">"]]).into(),
+        create_fragment::<R>().child(">".into()).guarantee().into(),
       );
     }
 
     if has_left_curly {
       values.set_item(
         "LC",
-        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["{"]]).into(),
+        create_fragment::<R>().child("{".into()).guarantee().into(),
       );
     }
 
     if has_right_curly {
       values.set_item(
         "RC",
-        JSX!([Fragment, R, Span::dummy()], ["children" = Array!["}"]]).into(),
+        create_fragment::<R>().child("}".into()).guarantee().into(),
       );
     }
 
@@ -319,13 +319,12 @@ impl MessageProps {
       unreachable!("Message is empty")
     }
 
-    let trans = with_span(Some(span))(JSX!(
-      [(var!(S::TRANS)), R, span],
-      ["id" = &*id],
-      ["message" = &*message],
-      ["components" = components],
-      ["values" = values]
-    ));
+    let trans = create_element::<R>(tag!(<> S::TRANS))
+      .prop("id", &id)
+      .prop("message", &message)
+      .prop2("components", components.into())
+      .prop2("values", values.into())
+      .guarantee();
 
     (
       Message {

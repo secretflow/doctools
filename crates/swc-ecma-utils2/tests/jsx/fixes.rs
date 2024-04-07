@@ -5,12 +5,12 @@ use swc_core::{common::chain, ecma::parser::parse_file_as_module, testing::fixtu
 
 use swc_ecma_testing2::{parse_one, test_js_fixture};
 use swc_ecma_utils2::{
-  ecma::sanitize::remove_invalid,
+  ecma::fixes::remove_invalid,
   jsx::{
     fixes::{drop_elements, fix_jsx_factories, fold_fragments},
     JSXRuntimeDefault,
   },
-  jsx_tag,
+  tag,
 };
 
 #[fixture("tests/jsx/fixtures/fixes/**/*.js")]
@@ -21,8 +21,8 @@ fn test_fixes(path: PathBuf) {
     |_: Value| {
       chain!(
         drop_elements()
-          .delete(jsx_tag!("comment"))
-          .unwrap(jsx_tag!("section"))
+          .delete(tag!("comment"))
+          .unwrap(tag!("section"))
           .build::<JSXRuntimeDefault>(),
         fold_fragments::<JSXRuntimeDefault>(),
         fix_jsx_factories::<JSXRuntimeDefault>(),

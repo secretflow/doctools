@@ -1,0 +1,63 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+export default function App() {
+    return _jsxs("section", {
+        children: [
+            _jsxs(paragraph, {
+                classes: [],
+                dupnames: [],
+                ids: [
+                    "para1"
+                ],
+                names: [],
+                children: [
+                    "Lorem ",
+                    _jsx("strong", {
+                        children: "ipsum"
+                    }),
+                    " ",
+                    _jsx(_Fragment, {
+                        "children": [
+                            _jsx("style", {
+                                "children": [
+                                    ".jsx-styled-6414e3e{",
+                                    "color: red;",
+                                    "}"
+                                ]
+                            }),
+                            _jsx("span", {
+                                "className": "jsx-styled-6414e3e",
+                                "children": [
+                                    _jsx("em", {
+                                        children: "dolor"
+                                    }),
+                                    " sit"
+                                ]
+                            }),
+                            " amet."
+                        ]
+                    })
+                ]
+            }),
+            _jsx(_Fragment, {
+                "children": [
+                    _jsx("hr", {})
+                ]
+            }),
+            _jsx(paragraph, {
+                classes: [],
+                dupnames: [],
+                ids: [
+                    "para2"
+                ],
+                names: [],
+                children: "Consectetur adipiscing elit."
+            })
+        ]
+    });
+}
+``````

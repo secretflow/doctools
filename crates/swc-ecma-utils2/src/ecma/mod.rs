@@ -1,6 +1,6 @@
+pub mod fixes;
 pub mod itertools;
 pub mod json;
-pub mod sanitize;
 
 mod repack;
 mod unpack;

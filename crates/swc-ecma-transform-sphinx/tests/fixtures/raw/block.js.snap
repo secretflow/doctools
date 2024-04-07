@@ -1,0 +1,46 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+export default function App() {
+    return _jsx(_Fragment, {
+        "children": [
+            "\n    ",
+            _jsx("video", {
+                "width": "620",
+                "controls": true,
+                "poster": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Elephants_Dream_s5_both.jpg",
+                "children": [
+                    "\n      ",
+                    _jsx("source", {
+                        "src": "https://archive.org/download/ElephantsDream/ed_hd.ogv",
+                        "type": "video/ogg"
+                    }),
+                    "\n      ",
+                    _jsx("source", {
+                        "src": "https://archive.org/download/ElephantsDream/ed_hd.avi",
+                        "type": "video/avi"
+                    }),
+                    "\n      ",
+                    _jsx("source", {
+                        "src": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
+                        "type": "video/mp4"
+                    }),
+                    "\n      Sorry, your browser doesn't support embedded videos, but don't worry, you can\n      ",
+                    _jsx("a", {
+                        "href": "https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4",
+                        "download": "ed_1024_512kb.mp4",
+                        "children": [
+                            "\n        download the MP4\n      "
+                        ]
+                    }),
+                    "\n      and watch it with your favorite video player!\n    "
+                ]
+            }),
+            "\n    "
+        ]
+    });
+}
+``````

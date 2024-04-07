@@ -13,8 +13,9 @@ use swc_core::{
 use swc_ecma_utils2::{
   collections::{Mapping, MutableMapping, MutableSequence, Sequence as _},
   ecma::itertools::array_into_iter,
-  jsx::{jsx, jsx_mut, tag::JSXTagType, JSXElement, JSXElementMut, JSXRuntime},
+  jsx::{jsx, jsx_mut, JSXElement, JSXElementMut, JSXRuntime},
   span::with_span,
+  tag,
 };
 
 use crate::{
@@ -120,9 +121,8 @@ where
       Expr::Call(mut call) => match jsx::<R>(&call).get_tag() {
         Some(tag) => {
           let name = match tag.tag_type() {
-            JSXTagType::Fragment => None,
-            JSXTagType::Component(name) => Some(name.into()),
-            JSXTagType::Intrinsic(name) => Some(name.into()),
+            tag!(<>?) => None,
+            tag!(* as name?) | tag!("*" as name?) => Some(name.into()),
           };
           let name = self.message.enter(name);
           call.visit_mut_with(self);

@@ -1,11 +1,11 @@
 use std::marker::PhantomData;
 
 use deno_lite::{anyhow, ESFunction, ESModule};
-use html5jsx::html_to_jsx;
+use html5jsx::html_str_to_jsx;
 use serde::{Deserialize, Serialize};
 use sphinx_jsx_macros::basic_attributes;
 use swc_core::{
-  common::{util::take::Take as _, FileName, SourceMap, Spanned},
+  common::{util::take::Take as _, Spanned},
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
@@ -13,9 +13,11 @@ use swc_core::{
 };
 use swc_ecma_utils2::{
   collections::MutableMapping,
-  jsx::{jsx_mut, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
-  JSX,
+  jsx::{create_element, jsx_mut, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
+  tag,
 };
+
+use crate::move_basic_attributes;
 
 #[derive(Deserialize)]
 enum SphinxCodeBlock {
@@ -73,20 +75,20 @@ struct CodeBlockProps {
 }
 
 enum State {
-  NotFound,
-  FoundContainer {
+  Empty,
+  Container {
     container: Container,
   },
-  FoundCaption {
+  Caption {
     container: Container,
     caption: CallExpr,
   },
-  FoundCodeBlock(CallExpr),
+  CodeBlock(CallExpr),
 }
 
 impl Default for State {
   fn default() -> Self {
-    State::NotFound
+    State::Empty
   }
 }
 
@@ -119,15 +121,15 @@ impl<R: JSXRuntime> VisitMut for CodeBlockRenderer<R> {
 
 impl<R: JSXRuntime> CodeBlockRenderer<R> {
   fn process_container(&mut self, call: &mut CallExpr, elem: Container) -> anyhow::Result<()> {
-    let State::NotFound = self.state else {
+    let State::Empty = self.state else {
       return Ok(());
     };
 
-    self.state = State::FoundContainer { container: elem };
+    self.state = State::Container { container: elem };
 
     call.visit_mut_children_with(self);
 
-    if let State::FoundCodeBlock(code_block) = std::mem::take(&mut self.state) {
+    if let State::CodeBlock(code_block) = std::mem::take(&mut self.state) {
       *call = code_block;
     }
 
@@ -135,13 +137,13 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
   }
 
   fn process_caption(&mut self, call: &mut CallExpr) -> anyhow::Result<()> {
-    let State::FoundContainer { container } = std::mem::take(&mut self.state) else {
+    let State::Container { container } = std::mem::take(&mut self.state) else {
       return Ok(());
     };
 
     call.visit_mut_children_with(self);
 
-    self.state = State::FoundCaption {
+    self.state = State::Caption {
       container,
       caption: call.take(),
     };
@@ -152,29 +154,26 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
   fn process_literal_block(
     &mut self,
     call: &mut CallExpr,
-    elem: LiteralBlock,
+    mut elem: LiteralBlock,
   ) -> anyhow::Result<()> {
+    if let State::Container { ref mut container }
+    | State::Caption {
+      ref mut container, ..
+    } = self.state
+    {
+      move_basic_attributes!(container, &mut elem);
+    }
+
     let LiteralBlock {
       code,
       language,
       show_line_numbers,
       line_options,
-      mut ids,
-      mut classes,
-      mut names,
-      mut dupnames,
+      ids,
+      classes,
+      names,
+      dupnames,
     } = elem;
-
-    if let State::FoundContainer { ref mut container }
-    | State::FoundCaption {
-      ref mut container, ..
-    } = self.state
-    {
-      ids.extend(container.ids.drain(..));
-      classes.extend(container.classes.drain(..));
-      names.extend(container.names.drain(..));
-      dupnames.extend(container.dupnames.drain(..));
-    };
 
     let lang = language.unwrap_or_else(|| "text".into());
     let lang = match_language(&lang).unwrap_or(&lang).to_lowercase();
@@ -205,30 +204,37 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
 
     let mut result = match document {
       Ok(document) => {
-        let children = document.to_fragment::<R>();
-        JSX!([CodeBlock, R, call.span()], props, [children])
+        let child = document.to_fragment::<R>();
+        create_element::<R>(tag!(CodeBlock))
+          .props(&props)
+          .child(child.into())
+          .span(call.span())
+          .build()?
       }
       Err(error) => {
         let error = format!("{}", error);
-        JSX!([CodeBlock, R, call.span()], props, [error])
+        create_element::<R>(tag!(CodeBlock))
+          .props(&props)
+          .child(error.into())
+          .span(call.span())
+          .build()?
       }
-    }
-    .map_err(|err| anyhow::anyhow!("{}", err))?;
+    };
 
     match std::mem::take(&mut self.state) {
-      State::NotFound => {
+      State::Empty => {
         *call = result;
       }
-      State::FoundContainer { .. } => {
-        self.state = State::FoundCodeBlock(result);
+      State::Container { .. } => {
+        self.state = State::CodeBlock(result);
       }
-      State::FoundCaption { caption, .. } => {
+      State::Caption { caption, .. } => {
         jsx_mut::<R>(&mut result)
           .get_props_mut()
           .set_item("caption", caption.into());
-        self.state = State::FoundCodeBlock(result);
+        self.state = State::CodeBlock(result);
       }
-      State::FoundCodeBlock { .. } => unreachable!(),
+      State::CodeBlock { .. } => unreachable!(),
     };
 
     Ok(())
@@ -245,9 +251,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       lang,
       line_highlight: highlighted_lines,
     })?;
-    let sources = SourceMap::default();
-    let file = sources.new_source_file(FileName::Anon, html);
-    let document = html_to_jsx::<R>(&file)
+    let document = html_str_to_jsx::<R>(&*html)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }

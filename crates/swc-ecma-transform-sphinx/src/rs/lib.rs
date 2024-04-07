@@ -13,3 +13,4 @@ mod utils;
 
 pub use code::render_code;
 pub use math::render_math;
+pub use raw::render_raw;

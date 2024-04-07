@@ -1,3 +1,5 @@
+use std::borrow::{Borrow, Cow};
+
 use serde::{
   de::{Error, IntoDeserializer},
   Deserializer,
@@ -109,17 +111,17 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_str(expr_to_string(&self.expr)?.as_str())
+    visitor.visit_str(expr_to_str(&self.expr)?.borrow())
   }
 
   fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_string(expr_to_string(&self.expr)?)
+    visitor.visit_string(expr_to_str(&self.expr)?.into_owned())
   }
 
-  deserialize_char!(expr, expr_to_string, UnpackError::incorrect_expr_value);
+  deserialize_char!(expr, expr_to_str, UnpackError::incorrect_expr_value);
 
   fn deserialize_byte_buf<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
@@ -554,9 +556,9 @@ fn lit_to_str(lit: &Lit) -> Result<&str, UnpackError> {
   }
 }
 
-fn expr_to_string(expr: &Expr) -> Result<String, UnpackError> {
+fn expr_to_str(expr: &Expr) -> Result<Cow<'_, str>, UnpackError> {
   match expr {
-    Expr::Lit(lit) => Ok(lit_to_str(lit)?.into()),
+    Expr::Lit(lit) => Ok(Cow::from(lit_to_str(lit)?)),
     Expr::Tpl(tpl) => {
       if tpl.exprs.len() > 0 {
         Err(UnpackError::invalid_value(
@@ -564,14 +566,14 @@ fn expr_to_string(expr: &Expr) -> Result<String, UnpackError> {
           &"a template literal without expressions",
         ))
       } else {
-        Ok(
+        Ok(Cow::from(
           tpl
             .quasis
             .iter()
             .map(|tpl| tpl.raw.to_string())
             .collect::<Vec<_>>()
             .join(""),
-        )
+        ))
       }
     }
     _ => Err(UnpackError::incorrect_expr_type(expr, "a string literal")),

@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{util::take::Take, Span, Spanned as _},
+  common::{util::take::Take, Span, Spanned},
   ecma::ast::{
     ArrayLit, CallExpr, Decl, ExportDecl, Expr, ExprOrSpread, Ident, Lit, Module, ModuleDecl,
     ModuleItem, ObjectLit, Str, VarDecl, VarDeclKind, VarDeclarator,
@@ -11,10 +11,189 @@ use swc_core::{
 
 use crate::{
   collections::{Mapping, MutableMapping, MutableSequence},
+  ecma::{repack_expr, RepackError},
   span::with_span,
+  Array,
 };
 
-use super::{create_element, create_fragment, jsx_mut, runtime::JSXRuntime, JSXElementMut};
+use super::{jsx_mut, runtime::JSXRuntime, tag::JSXTag, JSXElement, JSXElementMut};
+
+#[derive(Debug, thiserror::Error)]
+pub enum JSXBuilderError {
+  #[error("cannot serialize value as AST: {0}")]
+  RepackError(#[source] RepackError),
+  #[error("invalid props")]
+  InvalidProps,
+  #[error("invalid children")]
+  InvalidChildren,
+}
+
+pub struct JSXBuilder<R: JSXRuntime> {
+  call: CallExpr,
+  err: Option<JSXBuilderError>,
+  jsx: PhantomData<R>,
+}
+
+impl<R: JSXRuntime> JSXBuilder<R> {
+  pub fn tag(mut self, tag: JSXTag) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => {
+        jsx_mut::<R>(&mut self.call).set_type(tag.into_expr::<R>());
+        self
+      }
+    }
+  }
+
+  pub fn prop<T: Serialize>(mut self, name: &str, value: &T) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => match repack_expr(value) {
+        Err(err) => {
+          self.err = Some(JSXBuilderError::RepackError(err));
+          self
+        }
+        Ok(value) => {
+          match jsx_mut::<R>(&mut self.call).get_props_mut() {
+            None => {
+              self.err = Some(JSXBuilderError::InvalidProps);
+            }
+            Some(props) => {
+              props.set_item(name, value);
+            }
+          }
+          self
+        }
+      },
+    }
+  }
+
+  pub fn prop2(mut self, name: &str, value: Expr) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => {
+        match jsx_mut::<R>(&mut self.call).get_props_mut() {
+          None => {
+            self.err = Some(JSXBuilderError::InvalidProps);
+          }
+          Some(props) => {
+            props.set_item(name, value);
+          }
+        }
+        self
+      }
+    }
+  }
+
+  pub fn child(mut self, child: Expr) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => match jsx_mut::<R>(&mut self.call).get_props_mut() {
+        None => {
+          self.err = Some(JSXBuilderError::InvalidChildren);
+          self
+        }
+        Some(props) => match props.get_item_mut("children") {
+          None => {
+            props.set_item("children", child);
+            self
+          }
+          Some(children) => match children {
+            Expr::Array(children) => {
+              children.append(child);
+              self
+            }
+            children => {
+              *children = Array!(children.take(), child).into();
+              self
+            }
+          },
+        },
+      },
+    }
+  }
+
+  pub fn props<T: Serialize>(mut self, props: &T) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => match repack_expr(props) {
+        Err(err) => {
+          self.err = Some(JSXBuilderError::RepackError(err));
+          self
+        }
+        Ok(Expr::Object(props)) => {
+          match jsx_mut::<R>(&mut self.call).get_props_mut() {
+            None => {
+              self.err = Some(JSXBuilderError::InvalidProps);
+            }
+            Some(old) => {
+              *old = props;
+            }
+          }
+          self
+        }
+        Ok(_) => {
+          self.err = Some(JSXBuilderError::InvalidProps);
+          self
+        }
+      },
+    }
+  }
+
+  pub fn arg1(mut self, props: Expr) -> Self {
+    match self.err {
+      Some(_) => self,
+      None => {
+        match jsx_mut::<R>(&mut self.call).set_arg1(props) {
+          None => {
+            self.err = Some(JSXBuilderError::InvalidProps);
+          }
+          Some(_) => {}
+        };
+        self
+      }
+    }
+  }
+
+  pub fn span(mut self, span: Span) -> Self {
+    self.call.span = span;
+    self
+  }
+
+  pub fn build(self) -> Result<CallExpr, JSXBuilderError> {
+    match self.err {
+      Some(err) => Err(err),
+      None => Ok(self.call),
+    }
+  }
+
+  pub fn guarantee(self) -> CallExpr {
+    match self.build() {
+      Ok(call) => call,
+      Err(err) => unreachable!("{:?}", err),
+    }
+  }
+}
+
+pub fn jsx_builder2<R: JSXRuntime>(call: CallExpr) -> JSXBuilder<R> {
+  JSXBuilder {
+    call,
+    err: None,
+    jsx: PhantomData::<R>,
+  }
+}
+
+#[inline(always)]
+pub fn create_element<R: JSXRuntime>(tag: JSXTag) -> JSXBuilder<R> {
+  jsx_builder2(<CallExpr as JSXElement<R>>::create_element(
+    tag.into_expr::<R>(),
+  ))
+}
+
+#[inline(always)]
+pub fn create_fragment<R: JSXRuntime>() -> JSXBuilder<R> {
+  jsx_builder2(<CallExpr as JSXElement<R>>::create_fragment())
+}
 
 #[derive(Debug)]
 struct Context {
@@ -47,7 +226,7 @@ impl Default for JSXDocument {
 
 impl JSXDocument {
   pub fn to_fragment<R: JSXRuntime>(self) -> CallExpr {
-    let mut elem = create_fragment::<R>();
+    let mut elem = create_fragment::<R>().guarantee();
 
     let mut children = ArrayLit::dummy();
     children.extend(&mut self.head.into_iter());
@@ -75,14 +254,11 @@ pub struct DocumentBuilder<R: JSXRuntime> {
 impl<R: JSXRuntime> DocumentBuilder<R> {
   pub fn element(
     &mut self,
-    component: Option<Expr>,
+    tag: JSXTag,
     props: Option<ObjectLit>,
     span: Option<Span>,
   ) -> &mut Self {
-    let mut elem = match component {
-      Some(component) => create_element::<R>(component),
-      None => create_fragment::<R>(),
-    };
+    let mut elem = create_element::<R>(tag).guarantee();
 
     let mut props = props;
     let mut props = props.drain().collect::<Vec<_>>();

@@ -83,8 +83,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {
@@ -232,8 +231,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {
@@ -315,8 +313,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {
@@ -470,8 +467,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {

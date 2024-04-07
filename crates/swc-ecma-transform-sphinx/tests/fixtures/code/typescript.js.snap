@@ -110,8 +110,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {
@@ -295,8 +294,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                 }),
                                 "\n",
                                 _jsx("span", {
-                                    "className": "line",
-                                    "children": []
+                                    "className": "line"
                                 }),
                                 "\n",
                                 _jsx("span", {
@@ -591,8 +589,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line highlighted",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",
@@ -625,8 +622,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line highlighted",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",
@@ -659,8 +655,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line highlighted",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",
@@ -681,8 +676,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line highlighted",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",
@@ -715,8 +709,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line highlighted",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",
@@ -785,8 +778,7 @@ export const App = ()=>_jsx(CodeBlock, {
                                     "className": "line",
                                     "children": [
                                         _jsx("span", {
-                                            "className": "highlighted",
-                                            "children": []
+                                            "className": "highlighted"
                                         }),
                                         _jsx("span", {
                                             "className": "jsx-styled-2a87d63",

@@ -2,7 +2,6 @@
 source: crates/swc-ecma-utils2/tests/jsx/builder.rs
 expression: document
 ---
-_jsx("div", {
-    "className": "foo",
-    "id": "bar"
-})
+export const head = [], body = [
+    _jsx(_Fragment, {})
+];

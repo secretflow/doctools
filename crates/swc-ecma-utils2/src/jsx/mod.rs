@@ -1,4 +1,4 @@
-use swc_core::ecma::ast::{CallExpr, Expr};
+use swc_core::ecma::ast::CallExpr;
 
 mod ast;
 mod builder;
@@ -11,7 +11,7 @@ pub mod unpack;
 use self::ast::JSXCall;
 pub use self::{
   ast::{JSXElement, JSXElementMut},
-  builder::{DocumentBuilder, JSXDocument},
+  builder::{create_element, create_fragment, jsx_builder2, DocumentBuilder, JSXDocument},
   runtime::{JSXRuntime, JSXRuntimeDefault},
 };
 
@@ -29,93 +29,4 @@ pub fn jsx_mut<R: JSXRuntime>(call: &mut CallExpr) -> Option<&mut (impl JSXEleme
     Some(_) => Some(call),
     None => None,
   }
-}
-
-#[inline(always)]
-pub fn create_element<R: JSXRuntime>(component: Expr) -> CallExpr {
-  <CallExpr as JSXElement<R>>::create_element(component)
-}
-
-#[inline(always)]
-pub fn create_fragment<R: JSXRuntime>() -> CallExpr {
-  <CallExpr as JSXElement<R>>::create_fragment()
-}
-
-#[macro_export]
-macro_rules! jsx_tag {
-  (<>?) => {
-    $crate::jsx::tag::JSXTagType::Fragment
-  };
-  ($tag:literal?) => {
-    $crate::jsx::tag::JSXTagType::Intrinsic($tag)
-  };
-  ($tag:ident?) => {
-    $crate::jsx::tag::JSXTagType::Component(stringify!($tag))
-  };
-  (<>) => {
-    $crate::jsx::tag::JSXTag::fragment()
-  };
-  ($tag:literal) => {
-    $crate::jsx::tag::JSXTag::intrinsic($tag.into())
-  };
-  ($tag:ident) => {
-    $crate::jsx::tag::JSXTag::component(stringify!($tag).into())
-  };
-}
-
-#[macro_export]
-macro_rules! JSX {
-  ([ $($create:tt)+ ] $(, [ $($assign:tt)+ ])*) => {{
-    use swc_core::ecma::ast::ObjectLit;
-    use $crate::collections::MutableMapping as _;
-    let mut call = $crate::_jsx_create!($($create)+);
-    let mut __props__ = ObjectLit::dummy();
-    $(
-      $crate::object_assign!(__props__, $($assign)+);
-    )*
-    call.set_item(2usize, __props__.into());
-    call
-  }};
-  ([ $($create:tt)+ ], $props:expr, $([ $($assign:tt)+ ]),*) => {{
-    use swc_core::ecma::ast::CallExpr;
-    use $crate::collections::MutableMapping as _;
-
-    let repack = || -> Result<CallExpr, $crate::ecma::RepackError> {
-      let mut call = $crate::_jsx_create!($($create)+);
-      let mut __props__ = $crate::ecma::repack_expr(&$props)?;
-      $(
-        $crate::object_assign!(__props__, $($assign)+);
-      )*
-      call.set_item(2usize, __props__.into());
-      Ok(call.into())
-    };
-
-    repack()
-  }};
-}
-
-#[macro_export]
-macro_rules! _jsx_create {
-  (Fragment, $runtime:ty, $span:expr) => {{
-    let mut elem = $crate::jsx::create_fragment::<$runtime>();
-    elem.span = $span;
-    elem
-  }};
-  (($name:expr), $runtime:ty, $span:expr) => {{
-    let mut elem = $crate::jsx::create_element::<$runtime>($name.into());
-    elem.span = $span;
-    elem
-  }};
-  ($name:ident, $runtime:ty, $span:expr) => {{
-    let name = swc_core::ecma::ast::Ident::from(stringify!($name));
-    let mut elem = $crate::jsx::create_element::<$runtime>(name.into());
-    elem.span = $span;
-    elem
-  }};
-  ($name:literal, $runtime:ty, $span:expr) => {{
-    let name = swc_core::ecma::ast::Str::from($name);
-    let mut elem = $crate::jsx::create_element::<$runtime>(name.into());
-    elem.span = $span;
-    elem
-  }};
 }

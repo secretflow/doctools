@@ -1,4 +1,4 @@
-use swc_core::common::SourceFile;
+use swc_core::common::{FileName, SourceFile, SourceMap};
 use swc_ecma_utils2::jsx::{JSXDocument, JSXRuntime};
 use swc_html_ast::{DocumentMode, Element, Namespace};
 use swc_html_parser::{error::Error, parse_file_as_document_fragment, parser::ParserConfig};
@@ -40,4 +40,10 @@ pub fn html_to_jsx<R: JSXRuntime>(html: &SourceFile) -> Result<JSXDocument, Erro
   dom.visit_with(&mut visitor);
 
   visitor.get()
+}
+
+pub fn html_str_to_jsx<R: JSXRuntime>(html: &str) -> Result<JSXDocument, Error> {
+  let sources = SourceMap::default();
+  let file = sources.new_source_file(FileName::Anon, html.into());
+  html_to_jsx::<R>(&file)
 }

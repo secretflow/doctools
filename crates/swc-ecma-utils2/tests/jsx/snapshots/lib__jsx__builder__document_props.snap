@@ -1,0 +1,13 @@
+---
+source: crates/swc-ecma-utils2/tests/jsx/builder.rs
+expression: document
+---
+export const head = [], body = [
+    _jsx("a", {
+        "href": "https://example.com",
+        "title": "Example",
+        "children": [
+            "Example"
+        ]
+    })
+];

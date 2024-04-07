@@ -12,13 +12,14 @@ use swc_core::{
 use super::{
   jsx, jsx_mut,
   runtime::JSXRuntime,
-  tag::{JSXTag, JSXTagMatch, JSXTagType},
+  tag::{JSXTag, JSXTagMatch},
   JSXElement, JSXElementMut,
 };
 use crate::{
   collections::{Mapping, MutableMapping, MutableSequence, Sequence},
-  ecma::{itertools::is_invalid_call, itertools::is_nullish},
-  JSX,
+  ecma::itertools::{is_invalid_call, is_nullish},
+  jsx::create_fragment,
+  tag, Object,
 };
 
 struct FoldFragments<R: JSXRuntime>(PhantomData<R>);
@@ -35,8 +36,8 @@ impl<R: JSXRuntime> FoldFragments<R> {
 
     match elem.get_tag().tag_type() {
       None => false,
-      Some(JSXTagType::Intrinsic(_) | JSXTagType::Component(_)) => false,
-      Some(JSXTagType::Fragment) => match elem.get_props().get_item("children") {
+      Some(tag!(*?) | tag!("*"?)) => false,
+      Some(tag!(<>?)) => match elem.get_props().get_item("children") {
         None => true,
         Some(children) => match children.as_array() {
           Some(array) => array.iter().all(|item| is_nullish(item)),
@@ -102,7 +103,7 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
     }
 
     let orphan = match elem.get_tag().tag_type() {
-      Some(JSXTagType::Fragment) => match elem.get_props_mut().get_item_mut("children") {
+      Some(tag!(<>?)) => match elem.get_props_mut().get_item_mut("children") {
         None => None,
         Some(children) => match children.as_mut_array() {
           None => Some(children.take()),
@@ -142,19 +143,26 @@ impl<R: JSXRuntime> VisitMut for FixJSXFactory<R> {
 
     let props = elem.get_props();
 
-    if let Some(children) = props.get_item("children") {
+    let num_children = if let Some(children) = props.get_item("children") {
       match children.as_array() {
         Some(array) => {
           let len = array.len();
           elem.set_factory(len);
+          len
         }
         None => {
           elem.set_factory(1);
+          1
         }
       }
     } else {
       elem.set_factory(1);
+      0
     };
+
+    if num_children == 0 {
+      elem.get_props_mut().del_item("children");
+    }
   }
 }
 
@@ -212,7 +220,10 @@ impl<R: JSXRuntime> ElementDropper<R> {
     let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
     match children {
       Some(children) => {
-        *call = JSX!([Fragment, R, call.span], [children]);
+        *call = create_fragment::<R>()
+          .arg1(Object!([children]).into())
+          .span(call.span)
+          .guarantee();
       }
       None => {
         call.take();

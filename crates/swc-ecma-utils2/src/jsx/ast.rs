@@ -39,6 +39,7 @@ pub trait JSXCall<R: JSXRuntime>: Mapping {
 
 pub trait JSXCallMut<R: JSXRuntime>: JSXCall<R> + MutableMapping {
   fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr>;
+  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr>;
   fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit>;
 }
 
@@ -85,12 +86,22 @@ pub trait JSXElementMut<R: JSXRuntime>: JSXCallMut<R> {
     Self::as_type_mut(self.get_item_mut(Self::KEY_TYPE)?)
   }
 
+  fn get_arg1_mut(&mut self) -> Option<&mut Expr> {
+    Self::as_arg1_mut(self.get_item_mut(Self::KEY_PROPS)?)
+  }
+
   fn get_props_mut(&mut self) -> Option<&mut ObjectLit> {
     Self::as_props_mut(self.get_item_mut(Self::KEY_PROPS)?)
   }
 
   fn set_type(&mut self, value: Expr) -> Option<&mut Self> {
     let current = self.get_type_mut()?;
+    *current = value;
+    Some(self)
+  }
+
+  fn set_arg1(&mut self, value: Expr) -> Option<&mut Self> {
+    let current = self.get_arg1_mut()?;
     *current = value;
     Some(self)
   }
@@ -182,6 +193,9 @@ where
   fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
     T::as_type_mut(value)
   }
+  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
+    T::as_arg1_mut(value)
+  }
   fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit> {
     T::as_props_mut(value)
   }
@@ -228,6 +242,9 @@ where
 {
   fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
     T::as_type_mut(value)
+  }
+  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
+    T::as_arg1_mut(value)
   }
   fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit> {
     T::as_props_mut(value)
@@ -293,6 +310,10 @@ impl<R: JSXRuntime> JSXCall<R> for CallExpr {
 }
 
 impl<R: JSXRuntime> JSXCallMut<R> for CallExpr {
+  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
+    Some(value)
+  }
+
   fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
     match value {
       Expr::Ident(_) => Some(value),

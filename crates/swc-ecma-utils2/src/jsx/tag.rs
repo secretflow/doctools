@@ -1,5 +1,10 @@
 use serde::{Deserialize, Serialize};
-use swc_core::atoms::Atom;
+use swc_core::{
+  atoms::Atom,
+  ecma::ast::{Expr, Ident},
+};
+
+use super::JSXRuntime;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum JSXTagKind {
@@ -53,6 +58,22 @@ impl JSXTag {
       JSXTagKind::Fragment => JSXTagType::Fragment,
     }
   }
+
+  pub fn into_expr<R: JSXRuntime>(self) -> Expr {
+    match self.kind {
+      JSXTagKind::Intrinsic => Expr::Lit(self.name.into()),
+      JSXTagKind::Component => Expr::Ident(Ident {
+        sym: self.name,
+        span: Default::default(),
+        optional: false,
+      }),
+      JSXTagKind::Fragment => Expr::Ident(Ident {
+        sym: R::FRAGMENT.into(),
+        span: Default::default(),
+        optional: false,
+      }),
+    }
+  }
 }
 
 pub trait JSXTagMatch {
@@ -66,4 +87,44 @@ impl JSXTagMatch for Option<JSXTag> {
       None => None,
     }
   }
+}
+
+#[macro_export]
+macro_rules! tag {
+  (<>?) => {
+    $crate::jsx::tag::JSXTagType::Fragment
+  };
+  ("*"?) => {
+    $crate::jsx::tag::JSXTagType::Intrinsic(_)
+  };
+  (*?) => {
+    $crate::jsx::tag::JSXTagType::Component(_)
+  };
+  ("*" as $name:ident?) => {
+    $crate::jsx::tag::JSXTagType::Intrinsic($name)
+  };
+  (* as $name:ident?) => {
+    $crate::jsx::tag::JSXTagType::Component($name)
+  };
+  ($tag:literal?) => {
+    $crate::jsx::tag::JSXTagType::Intrinsic($tag)
+  };
+  ($tag:ident?) => {
+    $crate::jsx::tag::JSXTagType::Component(stringify!($tag))
+  };
+  (<>) => {
+    $crate::jsx::tag::JSXTag::fragment()
+  };
+  ($tag:literal) => {
+    $crate::jsx::tag::JSXTag::intrinsic($tag.into())
+  };
+  ($tag:ident) => {
+    $crate::jsx::tag::JSXTag::component(stringify!($tag).into())
+  };
+  ("" $tag:expr) => {
+    $crate::jsx::tag::JSXTag::intrinsic($tag)
+  };
+  (<> $tag:expr) => {
+    $crate::jsx::tag::JSXTag::component($tag)
+  };
 }
