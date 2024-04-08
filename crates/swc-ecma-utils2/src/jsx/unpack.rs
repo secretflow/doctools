@@ -16,7 +16,7 @@ struct UnpackJSX<'ast, R: JSXRuntime> {
 }
 
 impl<'de, R: JSXRuntime> serde::de::Deserializer<'de> for UnpackJSX<'de, R> {
-  type Error = UnpackError;
+  type Error = UnpackJSXError<'de>;
 
   fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
@@ -26,7 +26,7 @@ impl<'de, R: JSXRuntime> serde::de::Deserializer<'de> for UnpackJSX<'de, R> {
     if jsx::<R>(call).is_some() {
       visitor.visit_enum(UnpackJSXComponent { call, runtime })
     } else {
-      Err(UnpackError::custom("not a JSX element"))
+      Err(UnpackJSXError::custom("not a JSX element"))
     }
   }
 
@@ -56,7 +56,7 @@ struct UnpackJSXComponent<'ast, R: JSXRuntime> {
 }
 
 impl<'ast, R: JSXRuntime> serde::de::EnumAccess<'ast> for UnpackJSXComponent<'ast, R> {
-  type Error = UnpackError;
+  type Error = UnpackJSXError<'ast>;
   type Variant = UnpackJSXProps<'ast>;
 
   fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
@@ -67,14 +67,16 @@ impl<'ast, R: JSXRuntime> serde::de::EnumAccess<'ast> for UnpackJSXComponent<'as
 
     let component = elem
       .get_tag()
-      .ok_or_else(|| UnpackError::custom("could not get tag type"))?;
+      .ok_or_else(|| UnpackJSXError::custom("could not get tag type"))?;
 
-    let key = match component.tag_type() {
+    let key: Result<V::Value, UnpackJSXError<'ast>> = match component.tag_type() {
       JSXTagType::Component(name) | JSXTagType::Intrinsic(name) => {
-        seed.deserialize(name.into_deserializer())?
+        seed.deserialize(name.into_deserializer())
       }
-      JSXTagType::Fragment => seed.deserialize(R::FRAGMENT.into_deserializer())?,
+      JSXTagType::Fragment => seed.deserialize(R::FRAGMENT.into_deserializer()),
     };
+
+    let key = key?;
 
     let props = {
       let arg1 = self
@@ -84,7 +86,7 @@ impl<'ast, R: JSXRuntime> serde::de::EnumAccess<'ast> for UnpackJSXComponent<'as
         .ok_or_else(|| UnpackError::custom("could not get props"))?;
 
       if arg1.spread.is_some() {
-        return Err(UnpackError::custom("spread props are not supported"));
+        return Err(UnpackError::custom("spread props are not supported").into());
       }
 
       &arg1.expr
@@ -99,7 +101,7 @@ struct UnpackJSXProps<'ast> {
 }
 
 impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
-  type Error = UnpackError;
+  type Error = UnpackJSXError<'ast>;
 
   fn unit_variant(self) -> Result<(), Self::Error> {
     Ok(())
@@ -109,14 +111,18 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
   where
     T: serde::de::DeserializeSeed<'ast>,
   {
-    seed.deserialize(UnpackExpr::new(&self.props))
+    seed
+      .deserialize(UnpackExpr::new(&self.props))
+      .map_err(Into::into)
   }
 
   fn tuple_variant<V>(self, len: usize, visitor: V) -> Result<V::Value, Self::Error>
   where
     V: serde::de::Visitor<'ast>,
   {
-    UnpackExpr::new(&self.props).deserialize_tuple(len, visitor)
+    UnpackExpr::new(&self.props)
+      .deserialize_tuple(len, visitor)
+      .map_err(Into::into)
   }
 
   fn struct_variant<V>(
@@ -128,11 +134,45 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
     V: serde::de::Visitor<'ast>,
   {
     let _ = fields;
-    UnpackExpr::new(&self.props).deserialize_map(visitor)
+    UnpackExpr::new(&self.props)
+      .deserialize_map(visitor)
+      .map_err(Into::into)
   }
 }
 
-pub fn unpack_jsx<'ast, R, T>(call: &'ast CallExpr) -> Result<T, UnpackError>
+#[derive(Debug, thiserror::Error)]
+pub enum UnpackJSXError<'ast> {
+  #[error("unexpected component: {unexpected}, expected one of: {expected:?}")]
+  ComponentMismatch {
+    unexpected: String,
+    expected: &'static [&'static str],
+  },
+  #[error("invalid props: {0}")]
+  InvalidProps(UnpackError<'ast>),
+  #[error(transparent)]
+  UnpackError(UnpackError<'ast>),
+}
+
+impl serde::de::Error for UnpackJSXError<'_> {
+  fn custom<T: std::fmt::Display>(msg: T) -> Self {
+    UnpackJSXError::UnpackError(UnpackError::custom(msg))
+  }
+
+  fn unknown_variant(variant: &str, expected: &'static [&'static str]) -> Self {
+    UnpackJSXError::ComponentMismatch {
+      unexpected: variant.to_string(),
+      expected,
+    }
+  }
+}
+
+impl<'ast> From<UnpackError<'ast>> for UnpackJSXError<'ast> {
+  fn from(err: UnpackError<'ast>) -> Self {
+    UnpackJSXError::InvalidProps(err)
+  }
+}
+
+pub fn unpack_jsx<'ast, R, T>(call: &'ast CallExpr) -> Result<T, UnpackJSXError>
 where
   R: JSXRuntime,
   T: serde::de::Deserialize<'ast>,

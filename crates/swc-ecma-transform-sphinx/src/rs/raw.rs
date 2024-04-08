@@ -85,6 +85,65 @@ impl<R: JSXRuntime> VisitMut for RawRenderer<R> {
 }
 
 impl<R: JSXRuntime> RawRenderer<R> {
+  fn process_raw(&mut self, call: &mut CallExpr, raw: Raw) -> anyhow::Result<Option<State>> {
+    match self.state {
+      State::Empty => match &*raw.format {
+        "html" => {
+          let document = html_str_to_jsx::<R>(&raw.value)
+            .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
+          *call = with_span(Some(call.span()))(document.to_fragment::<R>());
+          Ok(None)
+        }
+
+        _ => {
+          let mut raw = raw;
+          let mut props = RawProps {
+            ids: vec![],
+            classes: vec![],
+            names: vec![],
+            dupnames: vec![],
+            formats: vec![],
+          };
+          move_basic_attributes!(raw, props);
+          props.formats.push(raw.into_tuple());
+          Ok(Some(State::NonHTML(props, call.span())))
+        }
+      },
+
+      State::NonHTML(ref mut sibling, ref mut span) => {
+        let mut raw = raw;
+        move_basic_attributes!(raw, sibling);
+        sibling.formats.push(raw.into_tuple());
+        *span = span.to(call.span());
+        Ok(None)
+      }
+    }
+  }
+
+  fn process_other_call(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<State>> {
+    match self.state {
+      State::NonHTML(ref mut props, ref mut span) => {
+        *call = create_fragment::<R>()
+          .child(
+            create_element::<R>(tag!(Raw))
+              .span(span.to(call.span()))
+              .props(props)
+              .build()?
+              .into(),
+          )
+          .child(call.take().into())
+          .build()?;
+
+        Ok(Some(State::Empty))
+      }
+
+      State::Empty => {
+        call.visit_mut_children_with(self);
+        Ok(None)
+      }
+    }
+  }
+
   fn process_paragraph(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<State>> {
     #[derive(Debug)]
     enum InlineHTML {
@@ -210,37 +269,6 @@ impl<R: JSXRuntime> RawRenderer<R> {
       }
     }
 
-    let mut visitor = FindInlineHTML {
-      state: State::Empty,
-      jsx: PhantomData::<R>,
-    };
-
-    call.visit_mut_children_with(&mut visitor);
-
-    let mut children = match visitor.state {
-      State::Found(children) => children,
-      State::Unsupported => return Err(anyhow::anyhow!("spread elements are not supported")),
-      _ => return Ok(None),
-    };
-
-    let mut attributes = Raw::default();
-
-    let html = children
-      .iter_mut()
-      .enumerate()
-      .map(|(idx, child)| match child {
-        InlineHTML::HTML(raw) => {
-          move_basic_attributes!(raw, attributes);
-          Cow::from(&*raw.value)
-        }
-        InlineHTML::Expr { .. } => {
-          Cow::from(format!("<swc-passthru id=\"{}\"></swc-passthru>", idx))
-        }
-        InlineHTML::Taken => unreachable!(),
-      })
-      .collect::<Vec<_>>()
-      .join("");
-
     struct RestoreExpr<R: JSXRuntime> {
       children: Vec<InlineHTML>,
       jsx: PhantomData<R>,
@@ -294,18 +322,49 @@ impl<R: JSXRuntime> RawRenderer<R> {
       }
     }
 
-    let mut document = html_str_to_jsx::<R>(&html)
-      .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?
-      .to_fragment::<R>();
+    let mut visitor = FindInlineHTML {
+      state: State::Empty,
+      jsx: PhantomData::<R>,
+    };
 
-    let mut restore = RestoreExpr {
+    call.visit_mut_children_with(&mut visitor);
+
+    let mut children = match visitor.state {
+      State::Found(children) => children,
+      State::Unsupported => return Err(anyhow::anyhow!("spread elements are not supported")),
+      _ => return Ok(None),
+    };
+
+    let mut attributes = Raw::default();
+
+    let html = children
+      .iter_mut()
+      .enumerate()
+      .map(|(idx, child)| match child {
+        InlineHTML::HTML(raw) => {
+          move_basic_attributes!(raw, attributes);
+          Cow::from(&*raw.value)
+        }
+        InlineHTML::Expr { .. } => {
+          Cow::from(format!("<swc-passthru id=\"{}\"></swc-passthru>", idx))
+        }
+        InlineHTML::Taken => unreachable!(),
+      })
+      .collect::<Vec<_>>()
+      .join("");
+
+    let mut document = html_str_to_jsx::<R>(&html)
+      .and_then(|document| Ok(document.to_fragment::<R>()))
+      .or_else(|err| Err(anyhow::anyhow!("failed to parse math as JSX: {:?}", err)))?;
+
+    let mut visitor = RestoreExpr {
       children,
       jsx: PhantomData::<R>,
     };
 
-    document.visit_mut_children_with(&mut restore);
+    document.visit_mut_children_with(&mut visitor);
 
-    restore
+    visitor
       .children
       .iter()
       .map(|c| match c {
@@ -320,65 +379,6 @@ impl<R: JSXRuntime> RawRenderer<R> {
       .build()?;
 
     Ok(None)
-  }
-
-  fn process_raw(&mut self, call: &mut CallExpr, raw: Raw) -> anyhow::Result<Option<State>> {
-    match self.state {
-      State::Empty => match &*raw.format {
-        "html" => {
-          let document = html_str_to_jsx::<R>(&raw.value)
-            .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
-          *call = with_span(Some(call.span()))(document.to_fragment::<R>());
-          Ok(None)
-        }
-
-        _ => {
-          let mut raw = raw;
-          let mut props = RawProps {
-            ids: vec![],
-            classes: vec![],
-            names: vec![],
-            dupnames: vec![],
-            formats: vec![],
-          };
-          move_basic_attributes!(raw, props);
-          props.formats.push(raw.into_tuple());
-          Ok(Some(State::NonHTML(props, call.span())))
-        }
-      },
-
-      State::NonHTML(ref mut sibling, ref mut span) => {
-        let mut raw = raw;
-        move_basic_attributes!(raw, sibling);
-        sibling.formats.push(raw.into_tuple());
-        *span = span.to(call.span());
-        Ok(None)
-      }
-    }
-  }
-
-  fn process_other_call(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<State>> {
-    match self.state {
-      State::NonHTML(ref mut props, ref mut span) => {
-        *call = create_fragment::<R>()
-          .child(
-            create_element::<R>(tag!(Raw))
-              .span(span.to(call.span()))
-              .props(props)
-              .build()?
-              .into(),
-          )
-          .child(call.take().into())
-          .build()?;
-
-        Ok(Some(State::Empty))
-      }
-
-      State::Empty => {
-        call.visit_mut_children_with(self);
-        Ok(None)
-      }
-    }
   }
 }
 

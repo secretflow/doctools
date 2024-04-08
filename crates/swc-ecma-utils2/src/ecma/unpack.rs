@@ -1,12 +1,15 @@
-use std::borrow::{Borrow, Cow};
+use std::borrow::Cow;
 
 use serde::{
   de::{Error, IntoDeserializer},
   Deserializer,
 };
-use swc_core::ecma::ast::{
-  ArrayLit, BigInt, Bool, ComputedPropName, Expr, Ident, JSXText, KeyValueProp, Lit, NewExpr,
-  Number, ObjectLit, Prop, PropName, PropOrSpread, Str,
+use swc_core::{
+  common::{Span, Spanned as _},
+  ecma::ast::{
+    ArrayLit, BigInt, Bool, ComputedPropName, Expr, Ident, JSXText, KeyValueProp, Lit, NewExpr,
+    Number, ObjectLit, Prop, PropName, PropOrSpread, Str,
+  },
 };
 
 use crate::{
@@ -73,7 +76,7 @@ pub struct UnpackExpr<'ast> {
 }
 
 impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
-  type Error = UnpackError;
+  type Error = UnpackError<'de>;
 
   forward_to_lit!(deserialize_bool, "boolean");
   forward_to_lit!(deserialize_i8, "number");
@@ -111,7 +114,10 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_str(expr_to_str(&self.expr)?.borrow())
+    match expr_to_str(&self.expr)? {
+      Cow::Owned(string) => visitor.visit_string(string),
+      Cow::Borrowed(string) => visitor.visit_borrowed_str(string),
+    }
   }
 
   fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -236,7 +242,7 @@ struct UnpackArray<'ast> {
 }
 
 impl<'ast> serde::de::SeqAccess<'ast> for UnpackArray<'ast> {
-  type Error = UnpackError;
+  type Error = UnpackError<'ast>;
 
   fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
   where
@@ -273,7 +279,7 @@ struct UnpackObject<'ast> {
 }
 
 impl<'ast> serde::de::MapAccess<'ast> for UnpackObject<'ast> {
-  type Error = UnpackError;
+  type Error = UnpackError<'ast>;
 
   fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error>
   where
@@ -310,7 +316,7 @@ struct UnpackObjectEnum<'ast> {
 }
 
 impl<'ast> serde::de::EnumAccess<'ast> for UnpackObjectEnum<'ast> {
-  type Error = UnpackError;
+  type Error = UnpackError<'ast>;
   type Variant = UnpackObjectVariant<'ast>;
 
   fn variant_seed<V>(self, seed: V) -> Result<(V::Value, Self::Variant), Self::Error>
@@ -336,7 +342,7 @@ struct UnpackObjectVariant<'ast> {
 }
 
 impl<'ast> serde::de::VariantAccess<'ast> for UnpackObjectVariant<'ast> {
-  type Error = UnpackError;
+  type Error = UnpackError<'ast>;
 
   fn unit_variant(self) -> Result<(), Self::Error> {
     Ok(())
@@ -374,7 +380,7 @@ struct UnpackLit<'ast> {
 }
 
 impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
-  type Error = UnpackError;
+  type Error = UnpackError<'de>;
 
   deserialize_integer!(lit, lit_to_f64, i8, deserialize_i8, visit_i8);
   deserialize_integer!(lit, lit_to_f64, i16, deserialize_i16, visit_i16);
@@ -412,7 +418,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_str(lit_to_str(self.lit)?)
+    visitor.visit_borrowed_str(lit_to_str(self.lit)?)
   }
 
   fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -452,7 +458,7 @@ struct UnpackPropName<'ast> {
 }
 
 impl<'de> serde::de::Deserializer<'de> for UnpackPropName<'de> {
-  type Error = UnpackError;
+  type Error = UnpackError<'de>;
 
   deserialize_integer!(prop, prop_name_to_f64, i8, deserialize_i8, visit_i8);
   deserialize_integer!(prop, prop_name_to_f64, i16, deserialize_i16, visit_i16);
@@ -482,7 +488,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackPropName<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_str(prop_name_to_str(self.prop)?)
+    visitor.visit_borrowed_str(prop_name_to_str(self.prop)?)
   }
 
   deserialize_char!(prop, prop_name_to_str, UnpackError::incorrect_prop_value);
@@ -513,7 +519,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackPropName<'de> {
 struct UnpackArrayHole;
 
 impl<'de> serde::de::Deserializer<'de> for UnpackArrayHole {
-  type Error = UnpackError;
+  type Error = UnpackError<'de>;
 
   fn deserialize_any<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
@@ -565,6 +571,8 @@ fn expr_to_str(expr: &Expr) -> Result<Cow<'_, str>, UnpackError> {
           serde::de::Unexpected::Other("template literal with expressions"),
           &"a template literal without expressions",
         ))
+      } else if tpl.quasis.len() == 1 {
+        Ok(Cow::from(&*tpl.quasis[0].raw))
       } else {
         Ok(Cow::from(
           tpl
@@ -706,7 +714,7 @@ bounded_number!(u64);
 bounded_number!(f32);
 bounded_number!(f64);
 
-fn bounded_float<T: BoundedNumber>(number: f64) -> Result<T, UnpackError> {
+fn bounded_float<T: BoundedNumber>(number: f64) -> Result<T, UnpackError<'static>> {
   if number < T::MIN || number > T::MAX {
     Err(UnpackError::invalid_value(
       serde::de::Unexpected::Float(number),
@@ -717,7 +725,7 @@ fn bounded_float<T: BoundedNumber>(number: f64) -> Result<T, UnpackError> {
   }
 }
 
-fn bounded_integer<T: BoundedNumber>(number: f64) -> Result<T, UnpackError> {
+fn bounded_integer<T: BoundedNumber>(number: f64) -> Result<T, UnpackError<'static>> {
   if number < T::MIN || number > T::MAX {
     Err(UnpackError::invalid_value(
       serde::de::Unexpected::Float(number),
@@ -733,17 +741,42 @@ fn bounded_integer<T: BoundedNumber>(number: f64) -> Result<T, UnpackError> {
   }
 }
 
-#[derive(Debug, thiserror::Error)]
-#[error("failed to deserialize AST: {0}")]
-pub struct UnpackError(String);
+#[derive(Debug)]
+pub struct UnpackErrorSource(Span);
 
-impl serde::de::Error for UnpackError {
-  fn custom<T: std::fmt::Display>(msg: T) -> Self {
-    UnpackError(format!("{}", msg))
+impl std::fmt::Display for UnpackErrorSource {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.write_fmt(format_args!("at {:?}", self.0))
   }
 }
 
-impl UnpackError {
+impl std::error::Error for UnpackErrorSource {}
+
+#[derive(Debug, thiserror::Error)]
+pub enum UnpackError<'ast> {
+  #[error("unexpected value of type {unexpected}, expected {expected}")]
+  TypeError {
+    unexpected: serde::de::Unexpected<'ast>,
+    expected: &'static str,
+    source: UnpackErrorSource,
+  },
+  #[error("unexpected value {unexpected}, expected {expected}")]
+  ValueError {
+    unexpected: serde::de::Unexpected<'ast>,
+    expected: &'static str,
+    source: UnpackErrorSource,
+  },
+  #[error("failed to deserialize AST: {0}")]
+  Other(String),
+}
+
+impl serde::de::Error for UnpackError<'_> {
+  fn custom<T: std::fmt::Display>(msg: T) -> Self {
+    UnpackError::Other(format!("{}", msg))
+  }
+}
+
+impl UnpackError<'_> {
   fn expr_type(expr: &Expr) -> serde::de::Unexpected {
     match expr {
       Expr::Lit(lit) => Self::lit_type(lit),
@@ -785,28 +818,52 @@ impl UnpackError {
     }
   }
 
-  fn incorrect_lit_type(lit: &Lit, expected: &str) -> UnpackError {
-    Self::invalid_type(Self::lit_type(lit), &expected)
+  fn incorrect_lit_type<'a>(lit: &'a Lit, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::TypeError {
+      unexpected: Self::lit_type(lit),
+      expected,
+      source: UnpackErrorSource(lit.span()),
+    }
   }
 
-  fn incorrect_lit_value(lit: &Lit, expected: &str) -> UnpackError {
-    Self::invalid_value(Self::lit_type(lit), &expected)
+  fn incorrect_lit_value<'a>(lit: &'a Lit, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::ValueError {
+      unexpected: Self::lit_type(lit),
+      expected,
+      source: UnpackErrorSource(lit.span()),
+    }
   }
 
-  fn incorrect_prop_type(prop: &PropOrSpread, expected: &str) -> UnpackError {
-    Self::invalid_type(Self::prop_type(prop), &expected)
+  fn incorrect_prop_type<'a>(prop: &'a PropOrSpread, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::TypeError {
+      unexpected: Self::prop_type(prop),
+      expected,
+      source: UnpackErrorSource(prop.span()),
+    }
   }
 
-  fn incorrect_prop_value(prop: &PropOrSpread, expected: &str) -> UnpackError {
-    Self::invalid_value(Self::prop_type(prop), &expected)
+  fn incorrect_prop_value<'a>(prop: &'a PropOrSpread, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::ValueError {
+      unexpected: Self::prop_type(prop),
+      expected,
+      source: UnpackErrorSource(prop.span()),
+    }
   }
 
-  fn incorrect_expr_type(expr: &Expr, expected: &str) -> UnpackError {
-    Self::invalid_type(Self::expr_type(expr), &expected)
+  fn incorrect_expr_type<'a>(expr: &'a Expr, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::TypeError {
+      unexpected: Self::expr_type(expr),
+      expected,
+      source: UnpackErrorSource(expr.span()),
+    }
   }
 
-  fn incorrect_expr_value(expr: &Expr, expected: &str) -> UnpackError {
-    Self::invalid_value(Self::expr_type(expr), &expected)
+  fn incorrect_expr_value<'a>(expr: &'a Expr, expected: &'static str) -> UnpackError<'a> {
+    UnpackError::ValueError {
+      unexpected: Self::expr_type(expr),
+      expected,
+      source: UnpackErrorSource(expr.span()),
+    }
   }
 }
 

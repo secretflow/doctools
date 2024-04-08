@@ -77,7 +77,7 @@
   - [ ] desc_signature
   - [ ] desc_signature_line
   - [ ] description
-  - [ ] doctest_block
+  - [x] doctest_block
   - [ ] document
   - [ ] download_reference
   - [ ] emphasis
@@ -120,6 +120,7 @@
   - [ ] option_string
   - [ ] paragraph
   - [ ] problematic
+  - [x] raw
   - [ ] reference
   - [ ] row
   - [ ] rubric
