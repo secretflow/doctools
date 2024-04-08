@@ -19,7 +19,7 @@ use crate::{
   collections::{Mapping, MutableMapping, MutableSequence, Sequence},
   ecma::itertools::{is_invalid_call, is_nullish},
   jsx::create_fragment,
-  tag, Object,
+  tag_test, Object,
 };
 
 struct FoldFragments<R: JSXRuntime>(PhantomData<R>);
@@ -36,8 +36,8 @@ impl<R: JSXRuntime> FoldFragments<R> {
 
     match elem.get_tag().tag_type() {
       None => false,
-      Some(tag!(*?) | tag!("*"?)) => false,
-      Some(tag!(<>?)) => match elem.get_props().get_item("children") {
+      Some(tag_test!(*?) | tag_test!("*"?)) => false,
+      Some(tag_test!(<>?)) => match elem.get_props().get_item("children") {
         None => true,
         Some(children) => match children.as_array() {
           Some(array) => array.iter().all(|item| is_nullish(item)),
@@ -103,7 +103,7 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
     }
 
     let orphan = match elem.get_tag().tag_type() {
-      Some(tag!(<>?)) => match elem.get_props_mut().get_item_mut("children") {
+      Some(tag_test!(<>?)) => match elem.get_props_mut().get_item_mut("children") {
         None => None,
         Some(children) => match children.as_mut_array() {
           None => Some(children.take()),

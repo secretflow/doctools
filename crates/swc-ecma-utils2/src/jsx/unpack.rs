@@ -8,7 +8,11 @@ use swc_core::ecma::ast::{CallExpr, Expr};
 
 use crate::ecma::{UnpackError, UnpackExpr};
 
-use super::{jsx, tag::JSXTagType, JSXElement, JSXRuntime};
+use super::{
+  jsx,
+  tag::{JSXTagDef as _, JSXTagType},
+  JSXElement, JSXRuntime,
+};
 
 struct UnpackJSX<'ast, R: JSXRuntime> {
   call: &'ast CallExpr,

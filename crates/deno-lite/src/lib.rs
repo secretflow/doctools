@@ -215,4 +215,4 @@ macro_rules! esm_source {
   };
 }
 
-pub use deno_lite_macros::ESFunction;
+pub use _deno_lite_macros::ESFunction;

@@ -16,7 +16,7 @@ use crate::{
   Array,
 };
 
-use super::{jsx_mut, runtime::JSXRuntime, tag::JSXTag, JSXElement, JSXElementMut};
+use super::{jsx_mut, runtime::JSXRuntime, tag::JSXTag, JSXElement, JSXElementMut, JSXTagDef};
 
 #[derive(Debug, thiserror::Error)]
 pub enum JSXBuilderError {
@@ -35,7 +35,7 @@ pub struct JSXBuilder<R: JSXRuntime> {
 }
 
 impl<R: JSXRuntime> JSXBuilder<R> {
-  pub fn tag(mut self, tag: JSXTag) -> Self {
+  pub fn tag(mut self, tag: impl JSXTagDef) -> Self {
     match self.err {
       Some(_) => self,
       None => {
@@ -184,10 +184,9 @@ pub fn jsx_builder2<R: JSXRuntime>(call: CallExpr) -> JSXBuilder<R> {
 }
 
 #[inline(always)]
-pub fn create_element<R: JSXRuntime>(tag: JSXTag) -> JSXBuilder<R> {
-  jsx_builder2(<CallExpr as JSXElement<R>>::create_element(
-    tag.into_expr::<R>(),
-  ))
+pub fn create_element<R: JSXRuntime>(tag: impl JSXTagDef) -> JSXBuilder<R> {
+  let component = tag.into_expr::<R>();
+  jsx_builder2(<CallExpr as JSXElement<R>>::create_element(component))
 }
 
 #[inline(always)]
@@ -240,7 +239,6 @@ impl JSXDocument {
   }
 }
 
-#[derive(Debug)]
 pub struct DocumentBuilder<R: JSXRuntime> {
   state: LastElement,
   context: Vec<Context>,
@@ -444,5 +442,122 @@ impl JSXDocument {
       }))],
       shebang: None,
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use swc_ecma_testing2::{insta, print_one_unchecked};
+
+  use crate::{ad_hoc_tag, json_expr, jsx::JSXRuntimeDefault};
+
+  use super::{create_element, create_fragment, DocumentBuilder};
+
+  #[test]
+  fn test_fragment() {
+    let document = print_one_unchecked(&create_fragment::<JSXRuntimeDefault>().guarantee());
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_intrinsic() {
+    let document = print_one_unchecked(&{
+      create_element::<JSXRuntimeDefault>(ad_hoc_tag!("div"))
+        .child("foo".into())
+        .guarantee()
+    });
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_component() {
+    let document =
+      print_one_unchecked(&create_element::<JSXRuntimeDefault>(ad_hoc_tag!(Foo)).guarantee());
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_props() {
+    let document = print_one_unchecked(&{
+      create_element::<JSXRuntimeDefault>(ad_hoc_tag!("div"))
+        .prop("className", &"foo")
+        .prop("id", &"bar")
+        .guarantee()
+    });
+    insta::assert_snapshot!(document);
+  }
+
+  fn document_builder(build: impl Fn(&mut DocumentBuilder<JSXRuntimeDefault>)) -> String {
+    let mut builder = DocumentBuilder::new();
+    build(&mut builder);
+    print_one_unchecked(&builder.to_document().to_module())
+  }
+
+  #[test]
+  fn test_document_fragment() {
+    let document = document_builder(|builder| {
+      builder.element(ad_hoc_tag!(<>), json_expr!({}).object(), None);
+    });
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_document_intrinsic() {
+    let document = document_builder(|builder| {
+      builder
+        .element(ad_hoc_tag!("div"), json_expr!({}).object(), None)
+        .enter(&["children"])
+        .value("foo".into())
+        .exit();
+    });
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_document_props() {
+    let document = document_builder(|builder| {
+      builder
+        .element(
+          ad_hoc_tag!("a"),
+          json_expr!({
+            "href": "https://example.com",
+            "title": "Example"
+          })
+          .object(),
+          None,
+        )
+        .enter(&["children"])
+        .value("Example".into())
+        .exit();
+    });
+    insta::assert_snapshot!(document);
+  }
+
+  #[test]
+  fn test_document_head() {
+    let document = document_builder(|builder| {
+      builder
+        .element(ad_hoc_tag!("section"), None, None)
+        .enter(&["children"])
+        .element(ad_hoc_tag!("style"), None, None)
+        .enter(&["children"])
+        .value("p { background: #fff; }".into())
+        .exit()
+        .element(
+          ad_hoc_tag!("link"),
+          json_expr!({
+            "rel": "preconnect",
+            "href": "https://rsms.me/"
+          })
+          .object(),
+          None,
+        )
+        .element(ad_hoc_tag!("p"), None, None)
+        .enter(&["children"])
+        .value("Lorem ipsum".into())
+        .exit()
+        .exit();
+    });
+    insta::assert_snapshot!(document);
   }
 }

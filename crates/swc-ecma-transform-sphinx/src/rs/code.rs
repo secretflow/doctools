@@ -3,7 +3,6 @@ use std::marker::PhantomData;
 use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_str_to_jsx;
 use serde::{Deserialize, Serialize};
-use sphinx_jsx_macros::basic_attributes;
 use swc_core::{
   common::{util::take::Take as _, Span, Spanned},
   ecma::{
@@ -14,10 +13,9 @@ use swc_core::{
 use swc_ecma_utils2::{
   collections::MutableMapping,
   jsx::{create_element, jsx_mut, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
-  tag,
 };
 
-use crate::move_basic_attributes;
+use crate::{components::Transformed, macros::basic_attributes, move_basic_attributes};
 
 #[derive(Deserialize)]
 enum SphinxCodeBlock<'ast> {
@@ -33,7 +31,7 @@ enum SphinxCodeBlock<'ast> {
   DoctestBlock(DoctestBlock<'ast>),
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Deserialize)]
 struct Container {
   #[allow(unused)]
@@ -41,7 +39,7 @@ struct Container {
   literal_block: bool,
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Deserialize, Debug)]
 struct LiteralBlock<'ast> {
   #[serde(alias = "children")]
@@ -53,7 +51,7 @@ struct LiteralBlock<'ast> {
   line_options: Option<LineOptions>,
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Deserialize)]
 struct DoctestBlock<'ast> {
   #[serde(alias = "children")]
@@ -91,7 +89,7 @@ struct RenderCode<'ast> {
   line_highlight: Option<Vec<usize>>,
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Serialize)]
 struct CodeBlockProps<'ast> {
   code: &'ast str,
@@ -238,7 +236,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     let result = match document {
       Ok(document) => {
         let child = document.to_fragment::<R>();
-        create_element::<R>(tag!(CodeBlock))
+        create_element::<R>(Transformed::CodeBlock)
           .props(&props)
           .child(child.into())
           .span(span)
@@ -246,7 +244,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       }
       Err(error) => {
         let error = format!("{}", error);
-        create_element::<R>(tag!(CodeBlock))
+        create_element::<R>(Transformed::CodeBlock)
           .props(&props)
           .child(error.into())
           .span(span)

@@ -9,10 +9,10 @@ use swc_html_ast::{Document, DocumentFragment, Element, Namespace, Text};
 use swc_html_visit::{Visit, VisitWith as _};
 
 use swc_ecma_utils2::{
+  ad_hoc_tag,
   collections::{MutableMapping, MutableSequence},
   jsx::{create_element, jsx_mut, JSXDocument, JSXElementMut, JSXRuntime},
   span::with_span,
-  tag,
 };
 
 use crate::props::convert_attribute;
@@ -63,7 +63,7 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
 
     let name = &*elem.tag_name;
 
-    let mut new = create_element::<R>(tag!("" name)).guarantee();
+    let mut new = create_element::<R>(ad_hoc_tag!("" name)).guarantee();
 
     let mut classes = String::new();
     let mut styled: Option<String> = None;
@@ -177,7 +177,7 @@ impl<R: JSXRuntime> DOMVisitor<R> {
       });
 
     if stylesheet.len() > 0 {
-      let mut style = create_element::<R>(tag!("style")).guarantee();
+      let mut style = create_element::<R>(ad_hoc_tag!("style")).guarantee();
 
       jsx_mut::<R>(&mut style)
         .get_props_mut()

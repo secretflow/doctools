@@ -6,7 +6,7 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-deno-lite-macros = {path = "../deno-lite-macros"}
+_deno-lite-macros = {path = "./macros"}
 deno_console = "0.135.0"
 deno_core = "0.254.0"
 deno_crypto = "0.149.0"

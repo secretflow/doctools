@@ -8,11 +8,12 @@ use swc_core::ecma::{
 
 use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_str_to_jsx;
-use sphinx_jsx_macros::basic_attributes;
 use swc_ecma_utils2::{
+  ad_hoc_tag,
   jsx::{create_element, unpack::unpack_jsx, JSXDocument, JSXRuntime},
-  tag,
 };
+
+use crate::macros::basic_attributes;
 
 #[derive(Serialize, ESFunction)]
 struct RenderMath {
@@ -20,7 +21,7 @@ struct RenderMath {
   inline: bool,
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Serialize, Deserialize)]
 struct Math {
   #[serde(alias = "children")]
@@ -66,13 +67,13 @@ impl<R: JSXRuntime> MathRenderer<R> {
     let document = self.render_math(&props.tex, inline);
 
     *call = match document {
-      Ok(document) => create_element::<R>(tag!(Math))
+      Ok(document) => create_element::<R>(ad_hoc_tag!(Math))
         .props(&props)
         .prop("inline", &inline)
         .child(document.to_fragment::<R>().into())
         .span(call.span)
         .build()?,
-      Err(error) => create_element::<R>(tag!(Math))
+      Err(error) => create_element::<R>(ad_hoc_tag!(Math))
         .props(&props)
         .prop("inline", &inline)
         .prop("error", &format!("{}", error))

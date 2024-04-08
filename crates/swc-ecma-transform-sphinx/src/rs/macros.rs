@@ -1,0 +1,1 @@
+pub use _swc_ecma_transform_sphinx_macros::basic_attributes;

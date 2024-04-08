@@ -7,7 +7,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 export default function App() {
     return _jsxs("section", {
         children: [
-            _jsxs(paragraph, {
+            _jsxs(Paragraph, {
                 classes: [],
                 dupnames: [],
                 ids: [
@@ -48,7 +48,7 @@ export default function App() {
                     _jsx("hr", {})
                 ]
             }),
-            _jsx(paragraph, {
+            _jsx(Paragraph, {
                 classes: [],
                 dupnames: [],
                 ids: [

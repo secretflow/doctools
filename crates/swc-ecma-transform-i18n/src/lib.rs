@@ -7,8 +7,9 @@ use swc_core::ecma::{
 };
 
 use swc_ecma_utils2::{
-  jsx::{jsx, jsx_mut, tag::JSXTag, JSXElement, JSXElementMut, JSXRuntime},
-  tag,
+  ad_hoc_tag,
+  jsx::{jsx, jsx_mut, JSXElement, JSXElementMut, JSXRuntime, JSXTag, JSXTagDef as _},
+  tag_test,
 };
 
 mod attribute;
@@ -153,7 +154,7 @@ pub struct Translatable {
 impl Default for Translatable {
   fn default() -> Self {
     Self {
-      tag: tag!(<>),
+      tag: ad_hoc_tag!(<>),
       content: ContentModel::Flow,
       pre: false,
       props: vec![],
@@ -249,7 +250,7 @@ impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
   fn translate_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
     let tag = jsx::<R>(call)?.get_tag()?;
 
-    if matches!(tag.tag_type(), tag!("*"?)) {
+    if matches!(tag.tag_type(), tag_test!("*"?)) {
       self.translate_generic_attrs(call);
     }
 

@@ -9,10 +9,11 @@ use swc_core::{
 };
 
 use swc_ecma_utils2::{
+  ad_hoc_tag,
   collections::MutableMapping,
   jsx::{create_element, create_fragment, JSXRuntime},
   span::{union_span, with_span},
-  tag, var, Function, Object,
+  var, Function, Object,
 };
 
 use crate::symbols::I18nSymbols;
@@ -249,7 +250,10 @@ impl MessageProps {
     });
 
     if has_newline {
-      values.set_item("LF", create_element::<R>(tag!("br")).guarantee().into());
+      values.set_item(
+        "LF",
+        create_element::<R>(ad_hoc_tag!("br")).guarantee().into(),
+      );
     }
 
     if has_less_than {
@@ -319,7 +323,7 @@ impl MessageProps {
       unreachable!("Message is empty")
     }
 
-    let trans = create_element::<R>(tag!(<> S::TRANS))
+    let trans = create_element::<R>(ad_hoc_tag!(<> S::TRANS))
       .prop("id", &id)
       .prop("message", &message)
       .prop2("components", components.into())

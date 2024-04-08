@@ -2,7 +2,6 @@ use std::{borrow::Cow, marker::PhantomData};
 
 use html5jsx::html_str_to_jsx;
 use serde::{Deserialize, Serialize};
-use sphinx_jsx_macros::basic_attributes;
 use swc_core::{
   common::{util::take::Take, Span, Spanned},
   ecma::{
@@ -14,10 +13,9 @@ use swc_ecma_utils2::{
   anyhow,
   jsx::{create_element, create_fragment, jsx_builder2, unpack::unpack_jsx, JSXRuntime},
   span::with_span,
-  tag,
 };
 
-use crate::move_basic_attributes;
+use crate::{components::Transformed, macros::basic_attributes, move_basic_attributes};
 
 #[derive(Deserialize)]
 enum SphinxRaw {
@@ -27,7 +25,7 @@ enum SphinxRaw {
   Raw(Raw),
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Deserialize, Debug, Default)]
 struct Raw {
   format: String,
@@ -35,7 +33,7 @@ struct Raw {
   value: String,
 }
 
-#[basic_attributes]
+#[basic_attributes(#[serde(default)])]
 #[derive(Serialize)]
 struct RawProps {
   formats: Vec<(String, String)>,
@@ -125,7 +123,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
       State::NonHTML(ref mut props, ref mut span) => {
         *call = create_fragment::<R>()
           .child(
-            create_element::<R>(tag!(Raw))
+            create_element::<R>(Transformed::Raw)
               .span(span.to(call.span()))
               .props(props)
               .build()?

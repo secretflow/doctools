@@ -8,10 +8,10 @@ version = "0.0.0"
 path = "src/rs/lib.rs"
 
 [dependencies]
+_swc-ecma-transform-sphinx-macros = {path = "./macros"}
 deno-lite = {path = "../deno-lite"}
 html5jsx = {path = "../html5jsx"}
 serde = {version = "1.0.196", features = ["derive"]}
-sphinx-jsx-macros = {path = "../sphinx-jsx-macros"}
 swc-ecma-utils2 = {path = "../swc-ecma-utils2"}
 
 [dependencies.swc_core]
