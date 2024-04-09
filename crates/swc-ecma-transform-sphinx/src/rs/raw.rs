@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 use std::{borrow::Cow, marker::PhantomData};
 
 use html5jsx::html_str_to_jsx;
@@ -11,7 +13,9 @@ use swc_core::{
 };
 use swc_ecma_utils2::{
   anyhow,
-  jsx::{create_element, create_fragment, jsx_builder2, unpack::unpack_jsx, JSXRuntime},
+  jsx::{
+    create_element, create_fragment, jsx_builder2, unpack::unpack_jsx, JSXDocument, JSXRuntime,
+  },
   span::with_span,
 };
 
@@ -50,15 +54,11 @@ impl Raw {
   }
 }
 
+#[derive(Default)]
 enum State {
+  #[default]
   Empty,
   NonHTML(RawProps, Span),
-}
-
-impl Default for State {
-  fn default() -> Self {
-    State::Empty
-  }
 }
 
 struct RawRenderer<R: JSXRuntime> {
@@ -143,17 +143,12 @@ impl<R: JSXRuntime> RawRenderer<R> {
   }
 
   fn process_paragraph(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<State>> {
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     enum InlineHTML {
       HTML(Raw),
       Expr(Expr),
+      #[default]
       Taken,
-    }
-
-    impl Default for InlineHTML {
-      fn default() -> Self {
-        InlineHTML::Taken
-      }
     }
 
     #[derive(Debug)]
@@ -186,16 +181,13 @@ impl<R: JSXRuntime> RawRenderer<R> {
       }
 
       fn visit_mut_prop_name(&mut self, name: &mut PropName) {
-        match self.state {
-          State::KeyValue => match name {
-            PropName::Str(Str { value, .. }) | PropName::Ident(Ident { sym: value, .. })
-              if value.as_str() == "children" =>
-            {
+        if let State::KeyValue = self.state {
+          if let PropName::Str(Str { value, .. }) | PropName::Ident(Ident { sym: value, .. }) = name
+          {
+            if value.as_str() == "children" {
               self.state = State::Children;
             }
-            _ => {}
-          },
-          _ => {}
+          }
         }
       }
 
@@ -246,23 +238,25 @@ impl<R: JSXRuntime> RawRenderer<R> {
                 _ => {}
               }
             }
-            _ => match self.state {
-              State::Found(ref mut found) => found.push(InlineHTML::Expr({
-                let mut expr = call.take();
+            _ => {
+              if let State::Found(ref mut found) = self.state {
+                found.push(InlineHTML::Expr({
+                  let mut expr = call.take();
+                  expr.visit_mut_with(&mut render_raw::<R>());
+                  expr.into()
+                }))
+              }
+            }
+          },
+          _ => {
+            if let State::Found(ref mut found) = self.state {
+              found.push(InlineHTML::Expr({
+                let mut expr = elem.take();
                 expr.visit_mut_with(&mut render_raw::<R>());
-                expr.into()
-              })),
-              _ => {}
-            },
-          },
-          _ => match self.state {
-            State::Found(ref mut found) => found.push(InlineHTML::Expr({
-              let mut expr = elem.take();
-              expr.visit_mut_with(&mut render_raw::<R>());
-              expr.into()
-            })),
-            _ => {}
-          },
+                expr
+              }))
+            }
+          }
         }
       }
     }
@@ -276,7 +270,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
       fn process_call(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<Expr>> {
         #[derive(Deserialize)]
         enum Placeholder {
-          #[serde(rename = "swc-passthru")]
+          #[serde(rename = r#""swc-passthru""#)]
           Passthru { id: String },
         }
 
@@ -352,8 +346,8 @@ impl<R: JSXRuntime> RawRenderer<R> {
       .join("");
 
     let mut document = html_str_to_jsx::<R>(&html)
-      .and_then(|document| Ok(document.to_fragment::<R>()))
-      .or_else(|err| Err(anyhow::anyhow!("failed to parse math as JSX: {:?}", err)))?;
+      .map(JSXDocument::to_fragment::<R>)
+      .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
 
     let mut visitor = RestoreExpr {
       children,
@@ -362,14 +356,10 @@ impl<R: JSXRuntime> RawRenderer<R> {
 
     document.visit_mut_children_with(&mut visitor);
 
-    visitor
-      .children
-      .iter()
-      .map(|c| match c {
-        InlineHTML::Expr { .. } => Err(anyhow::anyhow!("failed to match HTML result with source")),
-        _ => Ok(()),
-      })
-      .collect::<Result<(), _>>()?;
+    visitor.children.iter().try_for_each(|c| match c {
+      InlineHTML::Expr { .. } => Err(anyhow::anyhow!("failed to match HTML result with source")),
+      _ => Ok(()),
+    })?;
 
     *call = jsx_builder2::<R>(call.take())
       .child(document.into())

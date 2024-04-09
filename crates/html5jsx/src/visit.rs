@@ -10,8 +10,8 @@ use swc_html_visit::{Visit, VisitWith as _};
 
 use swc_ecma_utils2::{
   ad_hoc_tag,
-  collections::{MutableMapping, MutableSequence},
-  jsx::{create_element, jsx_mut, JSXDocument, JSXElementMut, JSXRuntime},
+  collections::{MutableMapping as _, MutableSequence},
+  jsx::{create_element, JSXDocument, JSXElementMut, JSXRuntime},
   span::with_span,
 };
 
@@ -32,11 +32,11 @@ fn style_hash(style: &str) -> String {
 }
 
 fn style_selector(style: &str) -> String {
-  format!(".jsx-styled-{}{{", style_hash(&style))
+  format!(".jsx-styled-{}{{", style_hash(style))
 }
 
 fn style_classname(style: &str) -> String {
-  format!("jsx-styled-{}", style_hash(&style))
+  format!("jsx-styled-{}", style_hash(style))
 }
 
 impl<R: JSXRuntime> Visit for DOMVisitor<R> {
@@ -45,8 +45,7 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
       "script" | "base" => {
         if cfg!(feature = "unsafe-ignore") {
           return;
-        } else if cfg!(feature = "unsafe-ignore") {
-          ();
+        } else if cfg!(feature = "unsafe-allow") {
         } else {
           panic!("refuse to parse {} tags", elem.tag_name);
         }
@@ -88,9 +87,9 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
         }
         continue;
       }
-      if let Some((key, value)) = convert_attribute(&attr) {
-        jsx_mut::<R>(&mut new)
-          .get_props_mut()
+      if let Some((key, value)) = convert_attribute(attr) {
+        new
+          .as_jsx_props_mut::<R>()
           .set_item(key, with_span(Some(attr.span))(value.into()));
       }
     }
@@ -106,14 +105,14 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
     };
 
     if !classes.is_empty() {
-      jsx_mut::<R>(&mut new)
-        .get_props_mut()
+      new
+        .as_jsx_props_mut::<R>()
         .set_item("className", classes.into());
     }
 
-    if children.len() > 0 {
-      jsx_mut::<R>(&mut new)
-        .get_props_mut()
+    if !children.is_empty() {
+      new
+        .as_jsx_props_mut::<R>()
         .set_item("children", ArrayLit::from_iterable(children).into());
     }
 
@@ -134,7 +133,7 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
 
   fn visit_text(&mut self, text: &Text) {
     let parent = self.ancestors.last_mut().expect("expected parent");
-    parent.push(with_span(Some(text.span))(Expr::from(text.data.as_str())).into());
+    parent.push(with_span(Some(text.span))(Expr::from(text.data.as_str())));
   }
 
   fn visit_document(&mut self, d: &Document) {
@@ -164,23 +163,23 @@ impl<R: JSXRuntime> DOMVisitor<R> {
     let mut stylesheet: Vec<Expr> = vec![];
 
     Some(self.styles.iter().collect::<Vec<_>>())
-      .and_then(|mut c| {
+      .map(|mut c| {
         c.sort_unstable();
-        Some(c)
+        c
       })
       .unwrap()
       .iter()
       .for_each(|style| {
-        stylesheet.push(style_selector(&style).into());
+        stylesheet.push(style_selector(style).into());
         stylesheet.push(style.as_str().into());
         stylesheet.push("}".into());
       });
 
-    if stylesheet.len() > 0 {
+    if !stylesheet.is_empty() {
       let mut style = create_element::<R>(ad_hoc_tag!("style")).guarantee();
 
-      jsx_mut::<R>(&mut style)
-        .get_props_mut()
+      style
+        .as_jsx_props_mut::<R>()
         .set_item("children", ArrayLit::from_iterable(stylesheet).into());
 
       head.push(style.into());
@@ -188,7 +187,7 @@ impl<R: JSXRuntime> DOMVisitor<R> {
 
     head.append(&mut self.head);
 
-    let children = self.ancestors.pop().unwrap_or(vec![]);
+    let children = self.ancestors.pop().unwrap_or_default();
 
     Ok(JSXDocument {
       head,

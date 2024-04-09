@@ -65,10 +65,7 @@ impl MutableMappingBase for ObjectLit {
   fn _del(&mut self, key: &Self::Key) -> Option<Self::Value> {
     let found = self.props.iter_mut().enumerate().find_map(|(idx, prop)| {
       if test_object_key(prop, key) {
-        Some((
-          idx,
-          (&mut *prop.as_mut_prop()?.as_mut_key_value()?.value).take(),
-        ))
+        Some((idx, (*prop.as_mut_prop()?.as_mut_key_value()?.value).take()))
       } else {
         None
       }
@@ -92,7 +89,7 @@ impl MutableMappingBase for ObjectLit {
 fn prop_name_to_lit(prop: &PropOrSpread) -> Option<Lit> {
   match prop {
     PropOrSpread::Prop(prop) => match &**prop {
-      Prop::KeyValue(KeyValueProp { key, .. }) => match &*key {
+      Prop::KeyValue(KeyValueProp { key, .. }) => match &key {
         PropName::Str(string) => Some(string.clone().into()),
         PropName::Num(number) => Some(number.clone().into()),
         PropName::Ident(ident) => Some(Str::from(&*ident.sym).into()),
@@ -273,7 +270,7 @@ impl MutableMappingBase for CallExpr {
       let found = self.callee.take();
       let expr = *found.expr()?;
       Some(expr)
-    } else if *key - 1 >= self.args.len() {
+    } else if *key > self.args.len() {
       None
     } else {
       let found = self.args.remove(*key - 1);
@@ -388,7 +385,7 @@ impl MutableMappingBase for Expr {
       }
       Expr::Call(ref mut call) => call
         ._pop()
-        .and_then(|(idx, expr)| Some((idx.to_string().into(), expr))),
+        .map(|(idx, expr)| (idx.to_string().into(), expr)),
       _ => None,
     }
   }
@@ -397,11 +394,7 @@ impl MutableMappingBase for Expr {
 fn lit_as_usize(lit: &Lit) -> Option<usize> {
   match lit {
     Lit::Num(num) => {
-      if num.value.fract() != 0.0 {
-        None
-      } else if num.value.is_sign_negative() {
-        None
-      } else if num.value > usize::MAX as f64 {
+      if num.value.fract() != 0.0 || num.value.is_sign_negative() || num.value > usize::MAX as f64 {
         None
       } else {
         Some(num.value as usize)

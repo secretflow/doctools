@@ -11,8 +11,8 @@ use swc_core::{
   },
 };
 use swc_ecma_utils2::{
-  collections::MutableMapping,
-  jsx::{create_element, jsx_mut, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
+  collections::MutableMapping as _,
+  jsx::{create_element, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
 };
 
 use crate::{components::Transformed, macros::basic_attributes, move_basic_attributes};
@@ -58,17 +58,17 @@ struct DoctestBlock<'ast> {
   code: &'ast str,
 }
 
-impl<'ast> Into<LiteralBlock<'ast>> for DoctestBlock<'ast> {
-  fn into(self) -> LiteralBlock<'ast> {
+impl<'ast> From<DoctestBlock<'ast>> for LiteralBlock<'ast> {
+  fn from(value: DoctestBlock<'ast>) -> Self {
     LiteralBlock {
-      code: self.code,
+      code: value.code,
       language: Some("python".into()),
       show_line_numbers: Some(false),
       line_options: None,
-      ids: self.ids,
-      classes: self.classes,
-      names: self.names,
-      dupnames: self.dupnames,
+      ids: value.ids,
+      classes: value.classes,
+      names: value.names,
+      dupnames: value.dupnames,
     }
   }
 }
@@ -98,7 +98,9 @@ struct CodeBlockProps<'ast> {
   show_line_numbers: bool,
 }
 
+#[derive(Default)]
 enum State {
+  #[default]
   Empty,
   Container {
     container: Container,
@@ -108,12 +110,6 @@ enum State {
     caption: CallExpr,
   },
   CodeBlock(CallExpr),
-}
-
-impl Default for State {
-  fn default() -> Self {
-    State::Empty
-  }
 }
 
 enum VisitResult {
@@ -260,8 +256,8 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       }
       State::Caption { caption, .. } => {
         let mut result = result;
-        jsx_mut::<R>(&mut result)
-          .get_props_mut()
+        result
+          .as_jsx_props_mut::<R>()
           .set_item("caption", caption.into());
         self.state = State::CodeBlock(result);
         Ok(VisitResult::Continue)
@@ -281,7 +277,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       lang,
       line_highlight: highlighted_lines,
     })?;
-    let document = html_str_to_jsx::<R>(&*html)
+    let document = html_str_to_jsx::<R>(&html)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }
@@ -295,7 +291,7 @@ pub fn render_code<R: JSXRuntime>(esm: &ESModule) -> impl Fold + VisitMut {
   })
 }
 
-fn match_language(lang: &String) -> Option<&'static str> {
+fn match_language(lang: &str) -> Option<&'static str> {
   match &*lang.to_lowercase() {
     "python" | "py" | "python3" | "ipython" | "ipython3" => Some("python"),
     "javascript" | "js" => Some("javascript"),

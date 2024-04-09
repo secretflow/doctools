@@ -16,12 +16,14 @@ use crate::{
   Array,
 };
 
-use super::{jsx_mut, runtime::JSXRuntime, tag::JSXTag, JSXElement, JSXElementMut, JSXTagDef};
+use super::{JSXElement, JSXElementMut, JSXRuntime, JSXTagDef};
 
 #[derive(Debug, thiserror::Error)]
 pub enum JSXBuilderError {
   #[error("cannot serialize value as AST: {0}")]
   RepackError(#[source] RepackError),
+  #[error("invalid tag")]
+  InvalidTag,
   #[error("invalid props")]
   InvalidProps,
   #[error("invalid children")]
@@ -37,118 +39,111 @@ pub struct JSXBuilder<R: JSXRuntime> {
 impl<R: JSXRuntime> JSXBuilder<R> {
   pub fn tag(mut self, tag: impl JSXTagDef) -> Self {
     match self.err {
-      Some(_) => self,
-      None => {
-        jsx_mut::<R>(&mut self.call).set_type(tag.into_expr::<R>());
-        self
-      }
+      Some(_) => {}
+      None => match self.call.as_arg0_mut::<R>() {
+        None => {
+          self.err = Some(JSXBuilderError::InvalidTag);
+        }
+        Some(arg0) => {
+          *arg0 = tag.to_expr::<R>();
+        }
+      },
     }
+    self
   }
 
   pub fn prop<T: Serialize>(mut self, name: &str, value: &T) -> Self {
     match self.err {
-      Some(_) => self,
+      Some(_) => {}
       None => match repack_expr(value) {
         Err(err) => {
           self.err = Some(JSXBuilderError::RepackError(err));
-          self
         }
-        Ok(value) => {
-          match jsx_mut::<R>(&mut self.call).get_props_mut() {
-            None => {
-              self.err = Some(JSXBuilderError::InvalidProps);
-            }
-            Some(props) => {
-              props.set_item(name, value);
-            }
-          }
-          self
-        }
-      },
-    }
-  }
-
-  pub fn prop2(mut self, name: &str, value: Expr) -> Self {
-    match self.err {
-      Some(_) => self,
-      None => {
-        match jsx_mut::<R>(&mut self.call).get_props_mut() {
+        Ok(value) => match self.call.as_jsx_props_mut::<R>() {
           None => {
             self.err = Some(JSXBuilderError::InvalidProps);
           }
           Some(props) => {
             props.set_item(name, value);
           }
-        }
-        self
-      }
+        },
+      },
     }
+    self
+  }
+
+  pub fn prop2(mut self, name: &str, value: Expr) -> Self {
+    match self.err {
+      Some(_) => {}
+      None => match self.call.as_jsx_props_mut::<R>() {
+        None => {
+          self.err = Some(JSXBuilderError::InvalidProps);
+        }
+        Some(props) => {
+          props.set_item(name, value);
+        }
+      },
+    }
+    self
   }
 
   pub fn child(mut self, child: Expr) -> Self {
     match self.err {
-      Some(_) => self,
-      None => match jsx_mut::<R>(&mut self.call).get_props_mut() {
+      Some(_) => {}
+      None => match self.call.as_jsx_props_mut::<R>() {
         None => {
           self.err = Some(JSXBuilderError::InvalidChildren);
-          self
         }
         Some(props) => match props.get_item_mut("children") {
           None => {
             props.set_item("children", child);
-            self
           }
           Some(children) => match children {
             Expr::Array(children) => {
               children.append(child);
-              self
             }
             children => {
               *children = Array!(children.take(), child).into();
-              self
             }
           },
         },
       },
     }
+    self
   }
 
   pub fn props<T: Serialize>(mut self, props: &T) -> Self {
     match self.err {
-      Some(_) => self,
+      Some(_) => {}
       None => match repack_expr(props) {
         Err(err) => {
           self.err = Some(JSXBuilderError::RepackError(err));
-          self
         }
-        Ok(Expr::Object(props)) => {
-          match jsx_mut::<R>(&mut self.call).get_props_mut() {
-            None => {
-              self.err = Some(JSXBuilderError::InvalidProps);
-            }
-            Some(old) => {
-              *old = props;
-            }
+        Ok(Expr::Object(props)) => match self.call.as_jsx_props_mut::<R>() {
+          None => {
+            self.err = Some(JSXBuilderError::InvalidProps);
           }
-          self
-        }
-        Ok(_) => {
-          self.err = Some(JSXBuilderError::InvalidProps);
-          self
-        }
+          Some(old) => {
+            *old = props.into();
+          }
+        },
+        Ok(_) => self.err = Some(JSXBuilderError::InvalidProps),
       },
     }
+    self
   }
 
   pub fn arg1(mut self, props: Expr) -> Self {
     match self.err {
       Some(_) => self,
       None => {
-        match jsx_mut::<R>(&mut self.call).set_arg1(props) {
+        match self.call.as_jsx_props_mut::<R>() {
           None => {
             self.err = Some(JSXBuilderError::InvalidProps);
           }
-          Some(_) => {}
+          Some(old) => {
+            *old = props;
+          }
         };
         self
       }
@@ -185,13 +180,12 @@ pub fn jsx_builder2<R: JSXRuntime>(call: CallExpr) -> JSXBuilder<R> {
 
 #[inline(always)]
 pub fn create_element<R: JSXRuntime>(tag: impl JSXTagDef) -> JSXBuilder<R> {
-  let component = tag.into_expr::<R>();
-  jsx_builder2(<CallExpr as JSXElement<R>>::create_element(component))
+  jsx_builder2(<CallExpr as JSXElement>::new_jsx_element::<R>(tag))
 }
 
 #[inline(always)]
 pub fn create_fragment<R: JSXRuntime>() -> JSXBuilder<R> {
-  jsx_builder2(<CallExpr as JSXElement<R>>::create_fragment())
+  jsx_builder2(<CallExpr as JSXElement>::new_jsx_fragment::<R>())
 }
 
 #[derive(Debug)]
@@ -201,26 +195,18 @@ struct Context {
   children: Vec<Expr>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 enum LastElement {
   Head,
+  #[default]
   Body,
   Context,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct JSXDocument {
   pub head: Vec<Expr>,
   pub body: Vec<Expr>,
-}
-
-impl Default for JSXDocument {
-  fn default() -> Self {
-    Self {
-      head: vec![],
-      body: vec![],
-    }
-  }
 }
 
 impl JSXDocument {
@@ -231,14 +217,15 @@ impl JSXDocument {
     children.extend(&mut self.head.into_iter());
     children.extend(&mut self.body.into_iter());
 
-    jsx_mut::<R>(&mut elem)
-      .get_props_mut()
+    elem
+      .as_jsx_props_mut::<R>()
       .set_item("children", children.into());
 
     elem
   }
 }
 
+#[derive(Default)]
 pub struct DocumentBuilder<R: JSXRuntime> {
   state: LastElement,
   context: Vec<Context>,
@@ -252,7 +239,7 @@ pub struct DocumentBuilder<R: JSXRuntime> {
 impl<R: JSXRuntime> DocumentBuilder<R> {
   pub fn element(
     &mut self,
-    tag: JSXTag,
+    tag: impl JSXTagDef,
     props: Option<ObjectLit>,
     span: Option<Span>,
   ) -> &mut Self {
@@ -263,8 +250,8 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
 
     props.reverse();
 
-    jsx_mut::<R>(&mut elem)
-      .get_props_mut()
+    elem
+      .as_jsx_props_mut::<R>()
       .update_from(&mut props.drain(..));
 
     self.push(with_span(span)(elem.into()));
@@ -302,9 +289,11 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
       array
     };
 
-    jsx_mut::<R>(&mut parent.as_mut_call().unwrap())
-      .get_props_mut()
-      .set_item_at_path(prop.into_iter(), children.into())
+    parent
+      .as_mut_call()
+      .unwrap()
+      .as_jsx_props_mut::<R>()
+      .set_item_at_path(prop, children.into())
       .unwrap();
 
     let parent = with_span(Some(parent.span()))(parent);
@@ -314,7 +303,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
   }
 
   pub fn flush(&mut self) {
-    while self.context.len() > 0 {
+    while !self.context.is_empty() {
       self.exit();
     }
   }
@@ -360,16 +349,6 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
           self.state = LastElement::Body;
         }
       }
-    }
-  }
-
-  pub fn new() -> Self {
-    Self {
-      jsx: PhantomData,
-      state: LastElement::Body,
-      context: vec![],
-      head: vec![],
-      body: vec![],
     }
   }
 
@@ -449,20 +428,20 @@ impl JSXDocument {
 mod tests {
   use swc_ecma_testing2::{insta, print_one_unchecked};
 
-  use crate::{ad_hoc_tag, json_expr, jsx::JSXRuntimeDefault};
+  use crate::{ad_hoc_tag, json_expr, jsx::JSXSymbols};
 
   use super::{create_element, create_fragment, DocumentBuilder};
 
   #[test]
   fn test_fragment() {
-    let document = print_one_unchecked(&create_fragment::<JSXRuntimeDefault>().guarantee());
+    let document = print_one_unchecked(&create_fragment::<JSXSymbols>().guarantee());
     insta::assert_snapshot!(document);
   }
 
   #[test]
   fn test_intrinsic() {
     let document = print_one_unchecked(&{
-      create_element::<JSXRuntimeDefault>(ad_hoc_tag!("div"))
+      create_element::<JSXSymbols>(ad_hoc_tag!("div"))
         .child("foo".into())
         .guarantee()
     });
@@ -471,15 +450,14 @@ mod tests {
 
   #[test]
   fn test_component() {
-    let document =
-      print_one_unchecked(&create_element::<JSXRuntimeDefault>(ad_hoc_tag!(Foo)).guarantee());
+    let document = print_one_unchecked(&create_element::<JSXSymbols>(ad_hoc_tag!(Foo)).guarantee());
     insta::assert_snapshot!(document);
   }
 
   #[test]
   fn test_props() {
     let document = print_one_unchecked(&{
-      create_element::<JSXRuntimeDefault>(ad_hoc_tag!("div"))
+      create_element::<JSXSymbols>(ad_hoc_tag!("div"))
         .prop("className", &"foo")
         .prop("id", &"bar")
         .guarantee()
@@ -487,8 +465,8 @@ mod tests {
     insta::assert_snapshot!(document);
   }
 
-  fn document_builder(build: impl Fn(&mut DocumentBuilder<JSXRuntimeDefault>)) -> String {
-    let mut builder = DocumentBuilder::new();
+  fn document_builder(build: impl Fn(&mut DocumentBuilder<JSXSymbols>)) -> String {
+    let mut builder = Default::default();
     build(&mut builder);
     print_one_unchecked(&builder.to_document().to_module())
   }

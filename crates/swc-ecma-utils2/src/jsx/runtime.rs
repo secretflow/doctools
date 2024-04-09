@@ -4,9 +4,10 @@ pub trait JSXRuntime {
   const FRAGMENT: &'static str;
 }
 
-pub struct JSXRuntimeDefault;
+#[derive(Default)]
+pub struct JSXSymbols;
 
-impl JSXRuntime for JSXRuntimeDefault {
+impl JSXRuntime for JSXSymbols {
   const JSX: &'static str = "_jsx";
   const JSXS: &'static str = "_jsxs";
   const FRAGMENT: &'static str = "_Fragment";

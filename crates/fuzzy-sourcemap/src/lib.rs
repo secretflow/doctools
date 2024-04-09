@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use swc_core::common::{sync::Lrc, BytePos, FileName, SourceFile, SourceMap, Span};
 
 #[macro_export]
@@ -11,53 +13,54 @@ macro_rules! one_indexed {
   }};
 }
 
-pub trait SourceLoader {
-  fn load_source(&self, current_file: &FileName, last_file: &Option<FileName>) -> Option<String>;
+pub trait PathResolver {
+  fn resolve(&self, path: Option<&str>, base: Option<PathBuf>) -> Option<PathBuf>;
+}
+
+impl Default for Box<dyn PathResolver + Send> {
+  fn default() -> Self {
+    Box::new(DefaultResolver)
+  }
+}
+
+struct DefaultResolver;
+
+impl PathResolver for DefaultResolver {
+  fn resolve(&self, path: Option<&str>, base: Option<PathBuf>) -> Option<PathBuf> {
+    match path {
+      Some(path) => Some(PathBuf::from(path)),
+      None => base,
+    }
+  }
 }
 
 pub struct FuzzySourceMap {
   sources: Lrc<SourceMap>,
-  loader: Option<Box<dyn SourceLoader>>,
-
-  this_file: Option<FileName>,
+  resolver: Box<dyn PathResolver + Send>,
+  this_file: Option<PathBuf>,
   this_para: Option<Span>,
   this_span: Option<Span>,
 }
 
 impl FuzzySourceMap {
-  pub fn next_span(
+  pub fn feed(
     &mut self,
-    file_name: Option<FileName>,
+    file_name: Option<&str>,
     line_number: Option<usize>,
     snippet: Option<&str>,
   ) -> Option<Span> {
-    match file_name {
-      Some(name) => {
-        self.this_file = Some(name);
-      }
-      None => {}
-    };
-
-    let Some(ref file_name) = self.this_file else {
+    let Some(file_name) = self.resolver.resolve(file_name, self.this_file.take()) else {
       self.this_para = None;
       self.this_span = None;
       return None;
     };
 
-    let source = self.sources.get_source_file(file_name);
-
-    let source = match source {
+    let source = match self
+      .sources
+      .get_source_file(&FileName::Real(file_name.clone()))
+    {
       Some(source) => Some(source),
-      None => match self.loader {
-        Some(ref loader) => {
-          let source = loader.load_source(file_name, &self.this_file);
-          match source {
-            Some(source) => Some(self.sources.new_source_file(file_name.clone(), source)),
-            None => None,
-          }
-        }
-        None => None,
-      },
+      None => self.sources.load_file(&file_name).ok(),
     };
 
     let Some(source) = source else {
@@ -66,13 +69,18 @@ impl FuzzySourceMap {
       return self.this_span;
     };
 
+    self.this_file = match source.name {
+      FileName::Real(ref path) => Some(path.clone()),
+      _ => None,
+    };
+
     let snippet = match snippet {
-      Some(s) if s == "" => None,
+      Some("") => None,
       _ => snippet,
     };
 
     let para = match line_number {
-      Some(line_number) => find_nearest_paragraph(&*source, line_number).or(self.this_para),
+      Some(line_number) => find_nearest_paragraph(&source, line_number).or(self.this_para),
       None => match snippet {
         Some(_) => self.this_para,
         None => None,
@@ -111,10 +119,10 @@ impl FuzzySourceMap {
 }
 
 impl FuzzySourceMap {
-  pub fn new(sources: Lrc<SourceMap>, loader: Option<Box<dyn SourceLoader>>) -> FuzzySourceMap {
+  pub fn new(sources: Lrc<SourceMap>, resolver: Box<dyn PathResolver + Send>) -> FuzzySourceMap {
     FuzzySourceMap {
       sources,
-      loader,
+      resolver,
       this_file: None,
       this_para: None,
       this_span: None,
@@ -132,22 +140,20 @@ fn find_span_with_snippet(
   let find_in_region = |region| {
     sources
       .with_snippet_of_span(region, |text| {
-        let start = text.find(snippet);
-        match start {
-          None => None,
-          Some(start) => Some(region.from_inner_byte_pos(start, start + snippet.len())),
-        }
+        text
+          .find(snippet)
+          .map(|start| region.from_inner_byte_pos(start, start + snippet.len()))
       })
       .ok()
       .unwrap_or(None)
   };
 
-  let sub_paragraph = prev_span.and_then(|span| {
-    Some((
+  let sub_paragraph = prev_span.map(|span| {
+    (
       Span::from((span.hi(), paragraph.hi())),
       span,
       Span::from((paragraph.lo(), span.lo())),
-    ))
+    )
   });
 
   let processed_text = Span::from((file.start_pos, paragraph.lo()));
@@ -218,7 +224,7 @@ fn find_nearest_paragraph(src: &SourceFile, line_number: usize) -> Option<Span> 
       let Some(text) = src.get_line(current_line) else {
         break;
       };
-      if !is_empty_or_whitespace(&*text) {
+      if !is_empty_or_whitespace(&text) {
         break;
       } else {
         let Some(next_line) = current_line.checked_sub(1) else {
@@ -234,7 +240,7 @@ fn find_nearest_paragraph(src: &SourceFile, line_number: usize) -> Option<Span> 
       let Some(next_line_text) = src.get_line(next_line) else {
         break;
       };
-      if is_empty_or_whitespace(&*next_line_text) {
+      if is_empty_or_whitespace(&next_line_text) {
         break;
       } else {
         current_line = next_line;
@@ -249,8 +255,8 @@ fn find_nearest_paragraph(src: &SourceFile, line_number: usize) -> Option<Span> 
       let Some(text) = src.get_line(current_line) else {
         break;
       };
-      let indent = indentation_of(&*text);
-      if indent == "" {
+      let indent = indentation_of(&text);
+      if indent.is_empty() {
         break;
       } else {
         let Some(next_line) = current_line.checked_sub(1) else {
@@ -266,7 +272,7 @@ fn find_nearest_paragraph(src: &SourceFile, line_number: usize) -> Option<Span> 
       let Some(next_line_text) = src.get_line(next_line) else {
         break;
       };
-      if is_empty_or_whitespace(&*next_line_text) {
+      if is_empty_or_whitespace(&next_line_text) {
         break;
       } else {
         current_line = next_line;
@@ -344,7 +350,7 @@ mod tests {
   struct SourceCodeReport {
     source: NamedSource,
     span: Vec<LabeledSpan>,
-    help: Box<String>,
+    help: String,
   }
 
   impl std::fmt::Display for SourceCodeReport {
@@ -418,7 +424,7 @@ mod tests {
   }
 
   fn fmt_fixture_name(name: &str) -> FileName {
-    FileName::Custom(name.to_string())
+    FileName::Real(PathBuf::from(name))
   }
 
   fn print_report(results: &Vec<SourceCodeResult>) {
@@ -447,10 +453,10 @@ mod tests {
               None => "line ?".to_string(),
             };
             match query.raw_source {
-              Some(ref source) if source.len() > 0 => {
-                Box::new(format!("{}, raw source:\n\n{}", line, source))
+              Some(ref source) if !source.is_empty() => {
+                format!("{}, raw source:\n\n{}", line, source)
               }
-              _ => Box::new(format!("{}, raw source: ?", line)),
+              _ => format!("{}, raw source: ?", line),
             }
           };
 
@@ -470,16 +476,13 @@ mod tests {
 
     let doc_path = query_path.clone().with_extension("");
 
-    let mut mapper = FuzzySourceMap::new(get_fixture(), None);
+    let mut mapper = FuzzySourceMap::new(get_fixture(), Default::default());
 
     let mut results: Vec<SourceCodeResult> = vec![];
 
     for query in queries {
-      let span = mapper.next_span(
-        query
-          .file_name
-          .clone()
-          .and_then(|f| Some(fmt_fixture_name(f.as_str()))),
+      let span = mapper.feed(
+        query.file_name.as_deref(),
         if query.line_number == Some(0) {
           None
         } else {

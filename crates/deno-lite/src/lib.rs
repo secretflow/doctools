@@ -1,7 +1,8 @@
 use std::{
   collections::HashMap,
   hash::BuildHasher as _,
-  sync::{Arc, Mutex},
+  rc::Rc,
+  sync::{Arc, Mutex, MutexGuard},
 };
 
 pub use deno_core::{anyhow, serde_v8, v8};
@@ -21,11 +22,12 @@ pub trait ESFunction: serde::Serialize {
   ) -> serde_v8::Result<Vec<v8::Local<'a, v8::Value>>>;
 }
 
+// NOTE: Rc for Clone
 #[derive(Clone)]
 pub struct DenoLite {
   driver: Arc<tokio::runtime::Runtime>,
-  deno: Arc<Mutex<JsRuntime>>,
-  modules: Arc<Mutex<HashMap<&'static str, usize>>>,
+  deno: Rc<tokio::sync::Mutex<JsRuntime>>,
+  modules: Rc<Mutex<HashMap<&'static str, usize>>>,
 }
 
 impl DenoLite {
@@ -37,7 +39,7 @@ impl DenoLite {
         .unwrap(),
     );
 
-    let deno = Arc::new(Mutex::new(JsRuntime::new(RuntimeOptions {
+    let deno = Rc::new(tokio::sync::Mutex::new(JsRuntime::new(RuntimeOptions {
       extensions: vec![
         deno_webidl::deno_webidl::init_ops_and_esm(),
         deno_console::deno_console::init_ops_and_esm(),
@@ -51,7 +53,7 @@ impl DenoLite {
       ..options.unwrap_or_default()
     })));
 
-    let modules = Arc::new(Mutex::new(HashMap::new()));
+    let modules = Rc::new(Mutex::new(HashMap::new()));
 
     Self {
       driver,
@@ -63,7 +65,7 @@ impl DenoLite {
   pub fn create_module(&mut self, source: &ESModuleSource) -> anyhow::Result<ESModule> {
     let ESModuleSource { name, source } = source;
 
-    if let Some(module_id) = self.modules.lock().unwrap().get(source) {
+    if let Some(module_id) = self.modules()?.get(source) {
       return Ok(ESModule {
         id: *module_id,
         deno: self.clone(),
@@ -71,32 +73,33 @@ impl DenoLite {
     }
 
     let module_url = {
-      let map = self.modules.lock().unwrap();
+      let map = self.modules()?;
       let hasher = map.hasher();
       let hash = hasher.hash_one(source);
       ModuleSpecifier::parse(format!("deno-lite://{}.{:x}.js", name, hash).as_str()).unwrap()
     };
 
-    let module_id = self.driver.block_on(
-      self
-        .deno
-        .lock()
-        .unwrap()
-        .load_side_module(&module_url, Some(FastString::Static(&source))),
-    )?;
+    let module_id = {
+      self.driver.block_on(async {
+        self
+          .deno
+          .lock()
+          .await
+          .load_side_module(&module_url, Some(FastString::Static(source)))
+          .await
+      })?
+    };
 
     // run until complete, including top-level awaits
     self.driver.block_on(async {
-      let module_eval = self.deno.lock().unwrap().mod_evaluate(module_id);
-      self
-        .deno
-        .lock()
-        .unwrap()
+      let deno = &mut self.deno.lock().await;
+      let module_eval = deno.mod_evaluate(module_id);
+      deno
         .with_event_loop_future(module_eval, Default::default())
         .await
     })?;
 
-    self.modules.lock().unwrap().insert(&source, module_id);
+    self.modules()?.insert(source, module_id);
 
     Ok(ESModule {
       id: module_id,
@@ -109,13 +112,13 @@ impl DenoLite {
     F: ESFunction,
     R: serde::de::DeserializeOwned,
   {
-    let global = self.deno.lock().unwrap().get_module_namespace(module)?;
-
     let func = {
-      let export = F::export_name();
+      let deno = &mut self.deno_sync();
 
-      let deno = &mut self.deno.lock().unwrap();
+      let global = deno.get_module_namespace(module)?;
       let scope = &mut deno.handle_scope();
+
+      let export = F::export_name();
 
       let func_name = v8::String::new(scope, export)
         .ok_or(anyhow::anyhow!("failed to instantiate function name"))?;
@@ -137,7 +140,7 @@ impl DenoLite {
     };
 
     let args = {
-      let deno = &mut self.deno.lock().unwrap();
+      let deno = &mut self.deno_sync();
       let scope = &mut deno.handle_scope();
       callable
         .to_args(scope)?
@@ -147,21 +150,30 @@ impl DenoLite {
     };
 
     self.driver.block_on(async {
-      let future = self.deno.lock().unwrap().call_with_args(&func, &args[..]);
+      let deno = &mut self.deno.lock().await;
 
-      let result = self
-        .deno
-        .lock()
-        .unwrap()
+      let future = deno.call_with_args(&func, &args[..]);
+
+      let result = deno
         .with_event_loop_future(future, Default::default())
         .await?;
 
-      let deno = &mut self.deno.lock().unwrap();
       let scope = &mut deno.handle_scope();
       let result = v8::Local::<v8::Value>::new(scope, result);
 
       Ok(serde_v8::from_v8(scope, result)?)
     })
+  }
+
+  fn deno_sync(&self) -> tokio::sync::MutexGuard<JsRuntime> {
+    self.driver.block_on(self.deno.lock())
+  }
+
+  fn modules(&self) -> anyhow::Result<MutexGuard<HashMap<&'static str, usize>>> {
+    self
+      .modules
+      .lock()
+      .map_err(|_| anyhow::anyhow!("failed to acquire module map"))
   }
 }
 

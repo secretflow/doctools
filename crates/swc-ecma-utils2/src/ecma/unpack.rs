@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 use std::borrow::Cow;
 
 use serde::{
@@ -95,7 +97,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
     match self.expr {
       Expr::Lit(lit) => UnpackLit { lit }.deserialize_f32(visitor),
       Expr::Ident(Ident { ref sym, .. }) if sym == "NaN" => visitor.visit_f32(f32::NAN),
-      _ => Err(UnpackError::incorrect_expr_type(&self.expr, "float")),
+      _ => Err(UnpackError::incorrect_expr_type(self.expr, "float")),
     }
   }
 
@@ -106,7 +108,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
     match self.expr {
       Expr::Lit(lit) => UnpackLit { lit }.deserialize_f64(visitor),
       Expr::Ident(Ident { ref sym, .. }) if sym == "NaN" => visitor.visit_f64(f64::NAN),
-      _ => Err(UnpackError::incorrect_expr_type(&self.expr, "float")),
+      _ => Err(UnpackError::incorrect_expr_type(self.expr, "float")),
     }
   }
 
@@ -114,7 +116,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    match expr_to_str(&self.expr)? {
+    match expr_to_str(self.expr)? {
       Cow::Owned(string) => visitor.visit_string(string),
       Cow::Borrowed(string) => visitor.visit_borrowed_str(string),
     }
@@ -124,7 +126,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_string(expr_to_str(&self.expr)?.into_owned())
+    visitor.visit_string(expr_to_str(self.expr)?.into_owned())
   }
 
   deserialize_char!(expr, expr_to_str, UnpackError::incorrect_expr_value);
@@ -133,14 +135,14 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_byte_buf(expr_to_byte_buf(&self.expr)?)
+    visitor.visit_byte_buf(expr_to_byte_buf(self.expr)?)
   }
 
   fn deserialize_bytes<V>(self, visitor: V) -> Result<V::Value, Self::Error>
   where
     V: serde::de::Visitor<'de>,
   {
-    visitor.visit_bytes(expr_to_byte_buf(&self.expr)?.as_slice())
+    visitor.visit_bytes(expr_to_byte_buf(self.expr)?.as_slice())
   }
 
   fn deserialize_option<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -162,7 +164,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
       Expr::Lit(lit) => UnpackLit { lit }.deserialize_unit(visitor),
       Expr::Ident(Ident { ref sym, .. }) if sym == "undefined" => visitor.visit_unit(),
       _ => Err(UnpackError::incorrect_expr_type(
-        &self.expr,
+        self.expr,
         "null or undefined",
       )),
     }
@@ -200,10 +202,10 @@ impl<'de> serde::de::Deserializer<'de> for UnpackExpr<'de> {
     V: serde::de::Visitor<'de>,
   {
     match self.expr {
-      Expr::Lit(Lit::Str(Str { value, .. })) => visitor.visit_enum((&*value).into_deserializer()),
+      Expr::Lit(Lit::Str(Str { value, .. })) => visitor.visit_enum(value.into_deserializer()),
       Expr::Object(object) => visitor.visit_enum(UnpackObjectEnum { object }),
       _ => Err(UnpackError::incorrect_expr_type(
-        &self.expr,
+        self.expr,
         "a discriminator or an externally-tagged union",
       )),
     }
@@ -265,7 +267,7 @@ impl<'ast> serde::de::SeqAccess<'ast> for UnpackArray<'ast> {
 
     self.index += 1;
 
-    seed.deserialize(UnpackExpr { expr: &*elem.expr }).map(Some)
+    seed.deserialize(UnpackExpr { expr: &elem.expr }).map(Some)
   }
 
   fn size_hint(&self) -> Option<usize> {
@@ -323,7 +325,7 @@ impl<'ast> serde::de::EnumAccess<'ast> for UnpackObjectEnum<'ast> {
   where
     V: serde::de::DeserializeSeed<'ast>,
   {
-    let Some(prop) = self.object.props.get(0) else {
+    let Some(prop) = self.object.props.first() else {
       return Err(UnpackError::invalid_length(
         0,
         &"an object with at least 1 key-value property",
@@ -352,14 +354,14 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackObjectVariant<'ast> {
   where
     T: serde::de::DeserializeSeed<'ast>,
   {
-    seed.deserialize(UnpackExpr { expr: &self.value })
+    seed.deserialize(UnpackExpr { expr: self.value })
   }
 
   fn tuple_variant<V>(self, len: usize, visitor: V) -> Result<V::Value, Self::Error>
   where
     V: serde::de::Visitor<'ast>,
   {
-    UnpackExpr { expr: &self.value }.deserialize_tuple(len, visitor)
+    UnpackExpr { expr: self.value }.deserialize_tuple(len, visitor)
   }
 
   fn struct_variant<V>(
@@ -371,7 +373,7 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackObjectVariant<'ast> {
     V: serde::de::Visitor<'ast>,
   {
     let _ = fields;
-    UnpackExpr { expr: &self.value }.deserialize_map(visitor)
+    UnpackExpr { expr: self.value }.deserialize_map(visitor)
   }
 }
 
@@ -400,7 +402,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
   {
     match self.lit {
       Lit::Null(_) => visitor.visit_unit(),
-      _ => Err(UnpackError::incorrect_lit_type(self.lit, &"null")),
+      _ => Err(UnpackError::incorrect_lit_type(self.lit, "null")),
     }
   }
 
@@ -410,7 +412,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackLit<'de> {
   {
     match self.lit {
       Lit::Bool(Bool { value, .. }) => visitor.visit_bool(*value),
-      _ => Err(UnpackError::incorrect_lit_type(self.lit, &"boolean")),
+      _ => Err(UnpackError::incorrect_lit_type(self.lit, "boolean")),
     }
   }
 
@@ -478,7 +480,7 @@ impl<'de> serde::de::Deserializer<'de> for UnpackPropName<'de> {
   {
     match prop_to_key_value(self.prop)?.key {
       PropName::Computed(ComputedPropName { ref expr, .. }) => {
-        UnpackExpr { expr: &*expr }.deserialize_bool(visitor)
+        UnpackExpr { expr }.deserialize_bool(visitor)
       }
       _ => Err(UnpackError::incorrect_prop_type(self.prop, "a boolean key")),
     }
@@ -551,13 +553,13 @@ impl<'de> serde::de::Deserializer<'de> for UnpackArrayHole {
 fn lit_to_f64(lit: &Lit) -> Result<f64, UnpackError> {
   match lit {
     Lit::Num(Number { value, .. }) => Ok(*value),
-    _ => Err(UnpackError::incorrect_lit_type(lit, &"a numeric literal")),
+    _ => Err(UnpackError::incorrect_lit_type(lit, "a numeric literal")),
   }
 }
 
 fn lit_to_str(lit: &Lit) -> Result<&str, UnpackError> {
   match lit {
-    Lit::Str(Str { value, .. }) | Lit::JSXText(JSXText { value, .. }) => Ok(&*value),
+    Lit::Str(Str { value, .. }) | Lit::JSXText(JSXText { value, .. }) => Ok(value),
     _ => Err(UnpackError::incorrect_lit_type(lit, "a string literal")),
   }
 }
@@ -566,7 +568,7 @@ fn expr_to_str(expr: &Expr) -> Result<Cow<'_, str>, UnpackError> {
   match expr {
     Expr::Lit(lit) => Ok(Cow::from(lit_to_str(lit)?)),
     Expr::Tpl(tpl) => {
-      if tpl.exprs.len() > 0 {
+      if !tpl.exprs.is_empty() {
         Err(UnpackError::invalid_value(
           serde::de::Unexpected::Other("template literal with expressions"),
           &"a template literal without expressions",
@@ -606,14 +608,14 @@ fn expr_to_byte_buf(expr: &Expr) -> Result<Vec<u8>, UnpackError> {
       };
       let Some(arr) = arr else {
         return Err(UnpackError::incorrect_expr_value(
-          &expr,
-          &"a Uint8Array constructor",
+          expr,
+          "a Uint8Array constructor",
         ));
       };
       Ok(arr)
     }
     Expr::Array(ArrayLit { elems, .. }) => Ok(elems),
-    _ => Err(UnpackError::incorrect_expr_type(&expr, "a Uint8Array")),
+    _ => Err(UnpackError::incorrect_expr_type(expr, "a Uint8Array")),
   }?;
 
   let mut array = vec![];
@@ -624,7 +626,7 @@ fn expr_to_byte_buf(expr: &Expr) -> Result<Vec<u8>, UnpackError> {
       None => Some(&*item.expr),
       Some(_) => None,
     }
-    .ok_or_else(|| UnpackError::incorrect_expr_value(expr, &"a non-spread array item"))?;
+    .ok_or_else(|| UnpackError::incorrect_expr_value(expr, "a non-spread array item"))?;
     array.push(item);
   }
 
@@ -632,7 +634,7 @@ fn expr_to_byte_buf(expr: &Expr) -> Result<Vec<u8>, UnpackError> {
 
   for item in array {
     use serde::Deserialize;
-    let de = UnpackExpr { expr: &item };
+    let de = UnpackExpr { expr: item };
     byte_array.push(u8::deserialize(de)?);
   }
 
@@ -649,7 +651,7 @@ fn prop_to_key_value(prop: &PropOrSpread) -> Result<&KeyValueProp, UnpackError> 
       "a key-value property",
     ));
   };
-  Ok(&kv)
+  Ok(kv)
 }
 
 fn prop_name_to_f64(prop: &PropOrSpread) -> Result<f64, UnpackError> {
@@ -665,8 +667,8 @@ fn prop_name_to_f64(prop: &PropOrSpread) -> Result<f64, UnpackError> {
 
 fn prop_name_to_str(prop: &PropOrSpread) -> Result<&str, UnpackError> {
   match prop_to_key_value(prop)?.key {
-    PropName::Ident(Ident { ref sym, .. }) => Ok(&sym),
-    PropName::Str(Str { ref value, .. }) => Ok(&value),
+    PropName::Ident(Ident { ref sym, .. }) => Ok(sym),
+    PropName::Str(Str { ref value, .. }) => Ok(value),
     PropName::Computed(ComputedPropName { ref expr, .. }) => match &**expr {
       Expr::Lit(lit) => lit_to_str(lit),
       _ => Err(UnpackError::incorrect_prop_type(prop, "a string key")),
@@ -726,12 +728,7 @@ fn bounded_float<T: BoundedNumber>(number: f64) -> Result<T, UnpackError<'static
 }
 
 fn bounded_integer<T: BoundedNumber>(number: f64) -> Result<T, UnpackError<'static>> {
-  if number < T::MIN || number > T::MAX {
-    Err(UnpackError::invalid_value(
-      serde::de::Unexpected::Float(number),
-      &T::NAME,
-    ))
-  } else if number.fract() != 0.0 {
+  if number < T::MIN || number > T::MAX || number.fract() != 0.0 {
     Err(UnpackError::invalid_value(
       serde::de::Unexpected::Float(number),
       &T::NAME,
@@ -791,8 +788,8 @@ impl UnpackError<'_> {
       Lit::Null(_) => serde::de::Unexpected::Unit,
       Lit::Bool(Bool { value, .. }) => serde::de::Unexpected::Bool(*value),
       Lit::Num(Number { value, .. }) => serde::de::Unexpected::Float(*value),
-      Lit::Str(Str { value, .. }) => serde::de::Unexpected::Str(&*value),
-      Lit::JSXText(JSXText { value, .. }) => serde::de::Unexpected::Str(&*value),
+      Lit::Str(Str { value, .. }) => serde::de::Unexpected::Str(value),
+      Lit::JSXText(JSXText { value, .. }) => serde::de::Unexpected::Str(value),
       Lit::BigInt(_) => serde::de::Unexpected::Other("bigint"),
       Lit::Regex(_) => serde::de::Unexpected::Other("regex"),
     }
@@ -808,8 +805,8 @@ impl UnpackError<'_> {
         Prop::Method(_) => serde::de::Unexpected::Other("method"),
         Prop::Shorthand(_) => serde::de::Unexpected::Other("object shorthand"),
         Prop::KeyValue(ref prop) => match prop.key {
-          PropName::Ident(Ident { ref sym, .. }) => serde::de::Unexpected::Str(&sym),
-          PropName::Str(Str { ref value, .. }) => serde::de::Unexpected::Str(&value),
+          PropName::Ident(Ident { ref sym, .. }) => serde::de::Unexpected::Str(sym),
+          PropName::Str(Str { ref value, .. }) => serde::de::Unexpected::Str(value),
           PropName::Num(Number { value, .. }) => serde::de::Unexpected::Float(value),
           PropName::BigInt(_) => serde::de::Unexpected::Other("bigint"),
           PropName::Computed(_) => serde::de::Unexpected::Other("computed property"),
@@ -944,7 +941,7 @@ mod tests {
 
     let expr = parse_one(src, None, parse_file_as_expr).unwrap();
 
-    let request: Request = unpack_expr(&*expr).unwrap();
+    let request: Request = unpack_expr(&expr).unwrap();
 
     let body = request.body.clone().unwrap();
     let body = String::from_utf8_lossy(&body);

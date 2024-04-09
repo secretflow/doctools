@@ -84,14 +84,14 @@ where
 
   try_with_handler(sourcemap.clone(), Default::default(), |reporter| {
     parse_fn(&source, syntax, target, None, &mut errors)
-      .and_then(|result| {
+      .map(|result| {
         for err in errors {
-          err.into_diagnostic(&reporter).emit();
+          err.into_diagnostic(reporter).emit();
         }
-        Ok(result)
+        result
       })
       .map_err(|err| {
-        err.into_diagnostic(&reporter).emit();
+        err.into_diagnostic(reporter).emit();
         anyhow::anyhow!("trying to parse string as valid ECMAScript")
       })
   })
@@ -107,16 +107,16 @@ where
   Test: FnOnce(String, Config) -> String,
 {
   let config_path = source_path.clone().with_extension("json");
-  let config: Config = std::fs::read_to_string(config_path)
-    // exits on deserialize error
-    .and_then(|s| match serde_json::from_str(&s) {
-      Ok(v) => Ok(v),
-      Err(e) => {
-        panic!("Error: {}", e);
-      }
-    })
-    // default on file not found
-    .unwrap_or_default();
+  let config: Config = match std::fs::read_to_string(config_path) {
+    Ok(s) => match serde_json::from_str(&s) {
+      Ok(v) => v,
+      Err(e) => panic!("Error while reading test config: {}", e),
+    },
+    Err(err) => match err.kind() {
+      std::io::ErrorKind::NotFound => Default::default(),
+      _ => panic!("Error while reading test config: {}", err),
+    },
+  };
 
   let source = std::fs::read_to_string(source_path.clone()).unwrap();
 

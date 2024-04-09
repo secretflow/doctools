@@ -6,7 +6,7 @@ classifiers = [
 dependencies = []
 name = "monorepo"
 readme = "README.md"
-requires-python = ">=3.8.15, <3.11"
+requires-python = ">=3.9, <3.13"
 version = "0.0.0"
 
 [build-system]
@@ -18,7 +18,7 @@ members = ["pyprojects/*"]
 
 [tool.rye]
 dev-dependencies = [
-  "black[jupyter]~=23.7",
+  "black[jupyter]>=24",
   "docutils-stubs>=0.0.22",
   "hatch~=1.8",
   "ipython~=8.12",

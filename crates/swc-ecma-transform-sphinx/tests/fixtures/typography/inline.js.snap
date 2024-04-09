@@ -1,0 +1,45 @@
+---
+source: crates/swc-ecma-testing2/src/lib.rs
+expression: result
+---
+``````js
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export default function App() {
+    return _jsxs(section, {
+        ids: [
+            "heading-level-3"
+        ],
+        names: [
+            "heading level 3"
+        ],
+        children: [
+            _jsx(title, {
+                children: "Heading Level 3"
+            }),
+            _jsx(Paragraph, {
+                classes: [
+                    "bg-primary"
+                ],
+                children: "Here is a paragraph with a class to control its formatting."
+            }),
+            _jsx(HorizontalRule, {}),
+            _jsxs(Paragraph, {
+                children: [
+                    _jsx(Strong, {
+                        children: "strong"
+                    }),
+                    ", ",
+                    _jsx(Emphasis, {
+                        children: "emphasis"
+                    }),
+                    ", ",
+                    _jsx(Code, {
+                        children: "literal text"
+                    }),
+                    ", *escaped symbols*"
+                ]
+            })
+        ]
+    });
+}
+``````

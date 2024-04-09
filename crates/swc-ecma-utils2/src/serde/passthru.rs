@@ -456,13 +456,13 @@ impl<'de: 'a, 'a> serde::de::Deserializer<'de> for &'a mut PassthruDeserializer<
       SerdeData::seq(ref mut items)
       | SerdeData::tuple(ref mut items)
       | SerdeData::tuple_struct(ref mut items) => {
-        let items = std::mem::replace(items, Vec::new());
+        let items = std::mem::take(items);
         let de = PassthruDeserializeList::new(self, items);
         visitor.visit_seq(de)
       }
 
       SerdeData::map(ref mut items) | SerdeData::struct_(ref mut items) => {
-        let items = std::mem::replace(items, Vec::new());
+        let items = std::mem::take(items);
         let de = PassthruDeserializeDict::new(self, items);
         visitor.visit_map(de)
       }
@@ -473,13 +473,13 @@ impl<'de: 'a, 'a> serde::de::Deserializer<'de> for &'a mut PassthruDeserializer<
         visitor.visit_enum(de)
       }
       SerdeData::tuple_variant(variant, ref mut items) => {
-        let items = std::mem::replace(items, Vec::new());
+        let items = std::mem::take(items);
         self.data = SerdeData::tuple(items);
         let de = PassthruDeserializeEnum::new(self, variant);
         visitor.visit_enum(de)
       }
       SerdeData::struct_variant(variant, ref mut items) => {
-        let items = std::mem::replace(items, Vec::new());
+        let items = std::mem::take(items);
         self.data = SerdeData::struct_(items);
         let de = PassthruDeserializeEnum::new(self, variant);
         visitor.visit_enum(de)
@@ -530,7 +530,7 @@ impl<'de, 'a> serde::de::SeqAccess<'de> for PassthruDeserializeList<'de, 'a> {
     T: serde::de::DeserializeSeed<'de>,
   {
     if self.index >= self.list.len() {
-      return Ok(None);
+      Ok(None)
     } else {
       let item = std::mem::replace(&mut self.list[self.index], SerdeData::unit);
       self.index += 1;
@@ -561,7 +561,7 @@ impl<'de, 'a> serde::de::MapAccess<'de> for PassthruDeserializeDict<'de, 'a> {
     K: serde::de::DeserializeSeed<'de>,
   {
     if self.index >= self.dict.len() {
-      return Ok(None);
+      Ok(None)
     } else {
       let key = std::mem::replace(&mut self.dict[self.index].0, SerdeData::unit);
       self.de.data = key;

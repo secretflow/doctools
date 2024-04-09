@@ -61,7 +61,6 @@ impl MessageProps {
     self.span = union_span(self.span, span);
   }
 
-  #[must_use]
   pub fn text(&mut self, text: &str, span: Span) -> Palpable {
     if is_empty_or_whitespace(text) {
       match self.tokens.last() {
@@ -186,7 +185,7 @@ impl MessageProps {
       .any(|t| matches!(t, MessageToken::Text(_)))
   }
 
-  fn to_props<R: JSXRuntime>(mut self) -> Props {
+  fn into_props<R: JSXRuntime>(mut self) -> Props {
     let mut message = String::new();
     let mut plaintext = String::new();
 
@@ -213,27 +212,27 @@ impl MessageProps {
       }
       MessageToken::LineFeed => {
         message.push_str("{LF}");
-        plaintext.push_str(" ");
+        plaintext.push(' ');
         has_newline = true;
       }
       MessageToken::LeftCurly => {
         message.push_str("{LC}");
-        plaintext.push_str("{");
+        plaintext.push('{');
         has_left_curly = true;
       }
       MessageToken::RightCurly => {
         message.push_str("{RC}");
-        plaintext.push_str("}");
+        plaintext.push('}');
         has_right_curly = true;
       }
       MessageToken::LessThan => {
         message.push_str("{LT}");
-        plaintext.push_str("<");
+        plaintext.push('<');
         has_less_than = true;
       }
       MessageToken::GreaterThan => {
         message.push_str("{GT}");
-        plaintext.push_str(">");
+        plaintext.push('>');
         has_greater_than = true;
       }
     });
@@ -317,7 +316,7 @@ impl MessageProps {
       plaintext,
       components,
       values,
-    } = self.to_props::<R>();
+    } = self.into_props::<R>();
 
     if is_empty_or_whitespace(&message) {
       unreachable!("Message is empty")
@@ -350,7 +349,7 @@ impl MessageProps {
       plaintext,
       components: _,
       values,
-    } = self.to_props::<R>();
+    } = self.into_props::<R>();
 
     let call = Function!(
       var!(S::GETTEXT),
@@ -404,7 +403,6 @@ pub fn collapse_ascii_whitespace(str: &str) -> String {
   str.chars().for_each(|c: char| {
     if c.is_ascii_whitespace() {
       if last_char.is_ascii_whitespace() {
-        ()
       } else {
         last_char = c;
         result.push(' ');

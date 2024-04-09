@@ -23,7 +23,7 @@ pub fn html_to_jsx<R: JSXRuntime>(html: &SourceFile) -> Result<JSXDocument, Erro
   let mut errors: Vec<Error> = vec![];
 
   let dom = parse_file_as_document_fragment(
-    &html,
+    html,
     &parent,
     DocumentMode::NoQuirks,
     None,

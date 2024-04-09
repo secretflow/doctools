@@ -9,7 +9,7 @@ use crate::{
   symbols::I18nSymbols,
 };
 
-fn translate_one<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Message> {
+fn translate_attr<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Message> {
   let expr = attr.take();
 
   match expr {
@@ -36,7 +36,7 @@ fn translate_one<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Messa
               Some(ref text) => text,
               None => "",
             };
-            message.raw(&text, chunk.span());
+            message.raw(text, chunk.span());
           }
           1 => {
             message.interpolate(*exprs[i / 2].take());
@@ -50,7 +50,7 @@ fn translate_one<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Messa
     }
 
     _ => {
-      *attr = expr.into();
+      *attr = expr;
       None
     }
   }
@@ -58,15 +58,13 @@ fn translate_one<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Messa
 
 pub fn translate_attrs<R: JSXRuntime, S: I18nSymbols>(
   props: &mut ObjectLit,
-  attrs: Vec<Vec<&str>>,
+  attrs: &[Vec<String>],
 ) -> Vec<Message> {
   attrs
     .iter()
     .filter_map(|path| {
-      let Some(value) = props.get_item_mut_at_path(path.iter().map(|s| *s)) else {
-        return None;
-      };
-      translate_one::<R, S>(value)
+      let value = props.get_item_mut_at_path(path.iter().map(String::as_str))?;
+      translate_attr::<R, S>(value)
     })
     .collect()
 }

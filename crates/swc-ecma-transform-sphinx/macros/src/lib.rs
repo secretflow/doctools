@@ -43,15 +43,13 @@ fn basic_attributes_for_enum(
 }
 
 fn update_fields(fields: &mut Fields, attrs: &proc_macro2::TokenStream) -> syn::Result<()> {
-  match fields {
-    syn::Fields::Unit => {
-      *fields = syn::Fields::Named(syn::FieldsNamed {
-        brace_token: Default::default(),
-        named: Default::default(),
-      });
-    }
-    _ => {}
+  if let syn::Fields::Unit = fields {
+    *fields = syn::Fields::Named(syn::FieldsNamed {
+      brace_token: Default::default(),
+      named: Default::default(),
+    });
   }
+
   match fields {
     syn::Fields::Named(ref mut fields) => {
       for attr in ["ids", "classes", "names", "dupnames"] {

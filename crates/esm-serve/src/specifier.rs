@@ -1,5 +1,3 @@
-use url;
-
 #[derive(Debug, PartialEq)]
 pub struct PackageImport<'a> {
   pub package: &'a str,
@@ -65,51 +63,50 @@ mod test_specifier {
 
   #[test]
   fn test_package_is_bare_specifier() {
-    assert_eq!(is_bare_specifier("foo"), true);
+    assert!(is_bare_specifier("foo"));
   }
 
   #[test]
   fn test_package_with_subpackage_is_bare_specifier() {
-    assert_eq!(is_bare_specifier("foo/bar"), true);
+    assert!(is_bare_specifier("foo/bar"));
   }
 
   #[test]
   fn test_http_url_is_not_bare_specifier() {
-    assert_eq!(is_bare_specifier("http://foo.com"), false);
+    assert!(!is_bare_specifier("http://foo.com"));
   }
 
   #[test]
   fn test_file_url_is_not_bare_specifier() {
-    assert_eq!(is_bare_specifier("file:///foo"), false);
+    assert!(!is_bare_specifier("file:///foo"));
   }
 
   #[test]
   fn test_relative_url_is_not_bare_specifier_1() {
-    assert_eq!(is_bare_specifier("/foo"), false);
+    assert!(!is_bare_specifier("/foo"));
   }
 
   #[test]
   fn test_relative_url_is_not_bare_specifier_2() {
-    assert_eq!(is_bare_specifier("./foo"), false);
+    assert!(!is_bare_specifier("./foo"));
   }
 
   #[test]
   fn test_relative_url_is_not_bare_specifier_3() {
-    assert_eq!(is_bare_specifier("../foo"), false);
+    assert!(!is_bare_specifier("../foo"));
   }
 
   #[test]
   fn test_valid_url_is_not_bare_specifier() {
-    assert_eq!(
-      is_bare_specifier("postgresql+psycopg2://scott:tiger@localhost/test"),
-      false
-    );
+    assert!(!is_bare_specifier(
+      "postgresql+psycopg2://scott:tiger@localhost/test"
+    ));
   }
 
   #[test]
   fn test_malformed_url_is_bare_specifier() {
     // Node considers this a bare specifier
-    assert_eq!(is_bare_specifier("  ://    /   "), true);
+    assert!(is_bare_specifier("  ://    /   "));
   }
 
   #[test]
@@ -119,7 +116,7 @@ mod test_specifier {
         assert_eq!(package, "react");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -130,7 +127,7 @@ mod test_specifier {
         assert_eq!(package, "example.com");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -141,7 +138,7 @@ mod test_specifier {
         assert_eq!(package, "under_score");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -152,7 +149,7 @@ mod test_specifier {
         assert_eq!(package, "@npm/thingy");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -163,7 +160,7 @@ mod test_specifier {
         assert_eq!(package, "@jane/foo.js");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -174,7 +171,7 @@ mod test_specifier {
         assert_eq!(package, "react-dom");
         assert_eq!(path, "/client");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -185,7 +182,7 @@ mod test_specifier {
         assert_eq!(package, "@mdx-js/mdx");
         assert_eq!(path, "/lib/compiler.js");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -196,7 +193,7 @@ mod test_specifier {
         assert_eq!(package, "lodash-es");
         assert_eq!(path, "/first.js");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -207,7 +204,7 @@ mod test_specifier {
         assert_eq!(package, "my-package");
         assert_eq!(path, "");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 
@@ -218,7 +215,7 @@ mod test_specifier {
         assert_eq!(package, "my-package");
         assert_eq!(path, "/path/to/file.js");
       }
-      None => assert!(false),
+      None => panic!(),
     }
   }
 

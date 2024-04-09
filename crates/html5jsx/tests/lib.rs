@@ -37,8 +37,7 @@ mod test_rejections {
 
   fn make_source(text: &str) -> Lrc<SourceFile> {
     let sourcemap: Lrc<SourceMap> = Default::default();
-    let file = sourcemap.new_source_file(FileName::Anon, text.into());
-    file
+    sourcemap.new_source_file(FileName::Anon, text.into())
   }
 
   #[test]

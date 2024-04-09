@@ -44,7 +44,7 @@ fn syn_es_function(item: syn::ItemStruct) -> syn::Result<proc_macro2::TokenStrea
     }
   };
 
-  Ok(fn_body.into())
+  Ok(fn_body)
 }
 
 fn syn_export_name(input: &ItemStruct) -> syn::Result<Option<proc_macro2::TokenStream>> {
@@ -53,18 +53,17 @@ fn syn_export_name(input: &ItemStruct) -> syn::Result<Option<proc_macro2::TokenS
       continue;
     }
     let expr: Expr = attr.parse_args()?;
-    match expr {
-      Expr::Assign(ExprAssign { left, right, .. }) => match *left {
-        Expr::Path(ExprPath { path: left, .. }) if left.is_ident("export") => match *right {
-          Expr::Path(ExprPath { path: right, .. }) => {
+    if let Expr::Assign(ExprAssign { left, right, .. }) = expr {
+      if let Expr::Path(ExprPath { path: left, .. }) = *left {
+        if left.is_ident("export") {
+          if let Expr::Path(ExprPath { path: right, .. }) = *right {
             let right = right.require_ident()?.to_string();
             return Ok(Some(quote! { #right }));
+          } else {
+            return Err(syn::Error::new(right.span(), "expected identifier"));
           }
-          _ => return Err(syn::Error::new(right.span(), "expected identifier")),
-        },
-        _ => {}
-      },
-      _ => {}
+        }
+      }
     }
   }
   Ok(None)
@@ -95,5 +94,5 @@ fn syn_to_args(input: &ItemStruct) -> syn::Result<proc_macro2::TokenStream> {
     std::result::Result::Ok(args)
   };
 
-  Ok(fn_body.into())
+  Ok(fn_body)
 }

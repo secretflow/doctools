@@ -1,328 +1,133 @@
 use swc_core::{
-  common::util::take::Take as _,
-  ecma::ast::{CallExpr, Expr, Ident, Lit, ObjectLit, Str},
+  common::{util::take::Take as _, Spanned},
+  ecma::ast::{CallExpr, Expr, Ident, ObjectLit},
 };
 
-use crate::collections::{DefaultContainer, Mapping, MutableMapping};
-use crate::ecma::itertools::is_nullish;
+use crate::{
+  collections::{Mapping, MutableMapping},
+  span::with_span,
+};
 
-use super::{tag::JSXTag, JSXRuntime};
+use super::{JSXRuntime, JSXTagDef, JSXTagType};
 
-pub trait JSXCall<R: JSXRuntime>: Mapping {
-  const KEY_FACTORY: Self::Key;
-  const KEY_TYPE: Self::Key;
-  const KEY_PROPS: Self::Key;
+pub trait JSXElement {
+  fn as_arg0<R: JSXRuntime>(&self) -> Option<&Expr>;
+  fn as_jsx_type<R: JSXRuntime>(&self) -> Option<JSXTagType<'_>>;
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr>;
+  fn new_jsx_element<R: JSXRuntime>(tag: impl JSXTagDef) -> Self;
+  fn new_jsx_fragment<R: JSXRuntime>() -> Self;
 
-  fn as_factory(value: &Self::Value) -> Option<&str>;
-  fn as_type(value: &Self::Value) -> Option<&Expr>;
-  fn as_props(value: &Self::Value) -> Option<&ObjectLit>;
-  fn as_tag(value: &Self::Value) -> Option<JSXTag>;
+  fn is_jsx<R: JSXRuntime>(&self) -> bool {
+    self.as_jsx_type::<R>().is_some()
+  }
+}
 
-  fn new() -> Self
-  where
-    Self: MutableMapping;
-  fn new_factory(factory: &str) -> Self::Value;
-  fn new_fragment(fragment: &str) -> Self::Value;
-  fn new_props() -> Self::Value;
+pub trait JSXElementMut {
+  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr>;
+  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr>;
+  fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize);
+}
 
-  fn is_jsx(&self) -> Option<()> {
-    let callee = Self::as_factory(self.get_item(Self::KEY_FACTORY)?)?;
+impl JSXElement for CallExpr {
+  fn as_arg0<R: JSXRuntime>(&self) -> Option<&Expr> {
+    let callee = &self.get_item(0usize)?.as_ident()?.sym;
     if callee == R::JSX || callee == R::JSXS {
-      let _ = Self::as_type(self.get_item(Self::KEY_TYPE)?)?;
-      let _ = Self::as_props(self.get_item(Self::KEY_PROPS)?)?;
-      Some(())
+      self.get_item(1usize)
     } else {
       None
     }
   }
-}
 
-pub trait JSXCallMut<R: JSXRuntime>: JSXCall<R> + MutableMapping {
-  fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr>;
-  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr>;
-  fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit>;
-}
-
-pub trait JSXElement<R: JSXRuntime>: JSXCall<R> {
-  fn get_tag(&self) -> Option<JSXTag> {
-    Self::as_tag(self.get_item(Self::KEY_TYPE)?)
+  fn as_jsx_type<R: JSXRuntime>(&self) -> Option<JSXTagType<'_>> {
+    JSXTagType::from_expr::<R>(self.as_arg0::<R>()?)
   }
 
-  fn get_type(&self) -> Option<&Expr> {
-    Self::as_type(self.get_item(Self::KEY_TYPE)?)
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr> {
+    self.as_arg0::<R>()?;
+    self.get_item(2usize)
   }
 
-  fn get_props(&self) -> Option<&ObjectLit> {
-    Self::as_props(self.get_item(Self::KEY_PROPS)?)
+  fn new_jsx_element<R: JSXRuntime>(tag: impl JSXTagDef) -> Self {
+    let mut call = CallExpr::dummy();
+    call.set_item(0usize, Ident::from(R::JSX).into());
+    call.set_item(1usize, tag.to_expr::<R>());
+    call.set_item(2usize, ObjectLit::dummy().into());
+    call
   }
 
-  fn create_element(component: Self::Value) -> Self
-  where
-    Self: Sized + MutableMapping,
-  {
-    let mut new = Self::new();
-    new
-      .set_item(Self::KEY_FACTORY, Self::new_factory(R::JSX))
-      .set_item(Self::KEY_TYPE, component)
-      .set_item(Self::KEY_PROPS, Self::new_props());
-    new
-  }
-
-  fn create_fragment() -> Self
-  where
-    Self: Sized + MutableMapping,
-  {
-    let mut new = Self::new();
-    new
-      .set_item(Self::KEY_FACTORY, Self::new_factory(R::JSX))
-      .set_item(Self::KEY_TYPE, Self::new_fragment(R::FRAGMENT))
-      .set_item(Self::KEY_PROPS, Self::new_props());
-    new
+  fn new_jsx_fragment<R: JSXRuntime>() -> Self {
+    Self::new_jsx_element::<R>(JSXTagType::Fragment)
   }
 }
 
-pub trait JSXElementMut<R: JSXRuntime>: JSXCallMut<R> {
-  fn get_type_mut(&mut self) -> Option<&mut Expr> {
-    Self::as_type_mut(self.get_item_mut(Self::KEY_TYPE)?)
-  }
-
-  fn get_arg1_mut(&mut self) -> Option<&mut Expr> {
-    Self::as_arg1_mut(self.get_item_mut(Self::KEY_PROPS)?)
-  }
-
-  fn get_props_mut(&mut self) -> Option<&mut ObjectLit> {
-    Self::as_props_mut(self.get_item_mut(Self::KEY_PROPS)?)
-  }
-
-  fn set_type(&mut self, value: Expr) -> Option<&mut Self> {
-    let current = self.get_type_mut()?;
-    *current = value;
-    Some(self)
-  }
-
-  fn set_arg1(&mut self, value: Expr) -> Option<&mut Self> {
-    let current = self.get_arg1_mut()?;
-    *current = value;
-    Some(self)
-  }
-
-  fn set_factory(&mut self, count: usize) -> &mut Self {
-    if count > 1 {
-      self.set_item(Self::KEY_FACTORY, Self::new_factory(R::JSXS));
+impl JSXElementMut for CallExpr {
+  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    let callee = &self.get_item(0usize)?.as_ident()?.sym;
+    if callee == R::JSX || callee == R::JSXS {
+      self.get_item_mut(1usize)
     } else {
-      self.set_item(Self::KEY_FACTORY, Self::new_factory(R::JSX));
-    }
-    self
-  }
-}
-
-impl<T, R: JSXRuntime> JSXCall<R> for &T
-where
-  T: JSXCall<R>,
-{
-  const KEY_FACTORY: Self::Key = T::KEY_FACTORY;
-  const KEY_TYPE: Self::Key = T::KEY_TYPE;
-  const KEY_PROPS: Self::Key = T::KEY_PROPS;
-
-  fn as_factory(value: &Self::Value) -> Option<&str> {
-    T::as_factory(value)
-  }
-  fn as_type(value: &Self::Value) -> Option<&Expr> {
-    T::as_type(value)
-  }
-  fn as_props(value: &Self::Value) -> Option<&ObjectLit> {
-    T::as_props(value)
-  }
-  fn as_tag(value: &Self::Value) -> Option<JSXTag> {
-    T::as_tag(value)
-  }
-
-  fn new() -> Self {
-    unreachable!()
-  }
-  fn new_factory(factory: &str) -> Self::Value {
-    T::new_factory(factory)
-  }
-  fn new_fragment(fragment: &str) -> Self::Value {
-    T::new_fragment(fragment)
-  }
-  fn new_props() -> Self::Value {
-    T::new_props()
-  }
-}
-
-impl<T, R: JSXRuntime> JSXCall<R> for &mut T
-where
-  T: JSXCall<R> + MutableMapping,
-{
-  const KEY_FACTORY: Self::Key = T::KEY_FACTORY;
-  const KEY_TYPE: Self::Key = T::KEY_TYPE;
-  const KEY_PROPS: Self::Key = T::KEY_PROPS;
-
-  fn as_factory(value: &Self::Value) -> Option<&str> {
-    T::as_factory(value)
-  }
-  fn as_type(value: &Self::Value) -> Option<&Expr> {
-    T::as_type(value)
-  }
-  fn as_props(value: &Self::Value) -> Option<&ObjectLit> {
-    T::as_props(value)
-  }
-  fn as_tag(value: &Self::Value) -> Option<JSXTag> {
-    T::as_tag(value)
-  }
-
-  fn new() -> Self {
-    unreachable!()
-  }
-  fn new_factory(factory: &str) -> Self::Value {
-    T::new_factory(factory)
-  }
-  fn new_fragment(fragment: &str) -> Self::Value {
-    T::new_fragment(fragment)
-  }
-  fn new_props() -> Self::Value {
-    T::new_props()
-  }
-}
-
-impl<T, R: JSXRuntime> JSXCallMut<R> for &mut T
-where
-  T: JSXCallMut<R>,
-{
-  fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    T::as_type_mut(value)
-  }
-  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    T::as_arg1_mut(value)
-  }
-  fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit> {
-    T::as_props_mut(value)
-  }
-}
-
-impl<T, R: JSXRuntime> JSXCall<R> for Option<T>
-where
-  T: JSXCall<R>,
-{
-  const KEY_FACTORY: Self::Key = T::KEY_FACTORY;
-  const KEY_TYPE: Self::Key = T::KEY_TYPE;
-  const KEY_PROPS: Self::Key = T::KEY_PROPS;
-
-  fn as_factory(value: &Self::Value) -> Option<&str> {
-    T::as_factory(value)
-  }
-  fn as_type(value: &Self::Value) -> Option<&Expr> {
-    T::as_type(value)
-  }
-  fn as_props(value: &Self::Value) -> Option<&ObjectLit> {
-    T::as_props(value)
-  }
-  fn as_tag(value: &Self::Value) -> Option<JSXTag> {
-    T::as_tag(value)
-  }
-
-  fn new() -> Self {
-    unreachable!()
-  }
-  fn new_factory(factory: &str) -> Self::Value {
-    T::new_factory(factory)
-  }
-  fn new_fragment(fragment: &str) -> Self::Value {
-    T::new_fragment(fragment)
-  }
-  fn new_props() -> Self::Value {
-    T::new_props()
-  }
-}
-
-impl<T, R: JSXRuntime> JSXCallMut<R> for Option<T>
-where
-  T: JSXCallMut<R> + DefaultContainer,
-{
-  fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    T::as_type_mut(value)
-  }
-  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    T::as_arg1_mut(value)
-  }
-  fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit> {
-    T::as_props_mut(value)
-  }
-}
-
-impl<T, R: JSXRuntime> JSXElement<R> for T where T: JSXCall<R> {}
-impl<T, R: JSXRuntime> JSXElementMut<R> for T where T: JSXCallMut<R> {}
-
-impl<R: JSXRuntime> JSXCall<R> for CallExpr {
-  const KEY_FACTORY: Self::Key = 0;
-  const KEY_TYPE: Self::Key = 1;
-  const KEY_PROPS: Self::Key = 2;
-
-  fn as_factory(value: &Self::Value) -> Option<&str> {
-    let ident = value.as_ident()?;
-    Some(&*ident.sym)
-  }
-
-  fn as_type(value: &Self::Value) -> Option<&Expr> {
-    match value {
-      Expr::Ident(_) => Some(value),
-      Expr::Lit(Lit::Str(_)) => Some(value),
-      _ => None,
+      None
     }
   }
 
-  fn as_props(value: &Self::Value) -> Option<&ObjectLit> {
-    value.as_object()
+  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    self.as_arg0_mut::<R>()?;
+    self.get_item_mut(2usize)
   }
 
-  fn as_tag(value: &Self::Value) -> Option<JSXTag> {
-    match value {
-      Expr::Lit(Lit::Str(Str { value, .. })) => Some(JSXTag::intrinsic((&**value).into())),
-      Expr::Ident(Ident { sym, .. }) => {
-        if is_nullish(value) {
-          None
-        } else if sym == R::FRAGMENT {
-          Some(JSXTag::fragment())
-        } else {
-          Some(JSXTag::component((&**sym).into()))
-        }
-      }
-      _ => None,
+  fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize) {
+    if !self.is_jsx::<R>() {
+      return;
     }
-  }
-
-  fn new() -> Self {
-    CallExpr::dummy()
-  }
-
-  fn new_factory(factory: &str) -> Self::Value {
-    Ident::from(factory).into()
-  }
-
-  fn new_fragment(fragment: &str) -> Self::Value {
-    Ident::from(fragment).into()
-  }
-
-  fn new_props() -> Self::Value {
-    ObjectLit::dummy().into()
+    let Some(callee) = self.get_item_mut(0usize) else {
+      return;
+    };
+    if num_children > 1 {
+      *callee = with_span(Some(callee.span()))(Ident::from(R::JSXS).into());
+    } else {
+      *callee = with_span(Some(callee.span()))(Ident::from(R::JSX).into());
+    }
   }
 }
 
-impl<R: JSXRuntime> JSXCallMut<R> for CallExpr {
-  fn as_arg1_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    Some(value)
+impl<T> JSXElement for &T
+where
+  T: JSXElement,
+{
+  fn as_arg0<R: JSXRuntime>(&self) -> Option<&Expr> {
+    (**self).as_arg0::<R>()
   }
 
-  fn as_type_mut(value: &mut Self::Value) -> Option<&mut Expr> {
-    match value {
-      Expr::Ident(_) => Some(value),
-      Expr::Lit(Lit::Str(_)) => Some(value),
-      _ => None,
-    }
+  fn as_jsx_type<R: JSXRuntime>(&self) -> Option<JSXTagType<'_>> {
+    (**self).as_jsx_type::<R>()
   }
 
-  fn as_props_mut(value: &mut Self::Value) -> Option<&mut ObjectLit> {
-    value.as_mut_object()
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr> {
+    (**self).as_jsx_props::<R>()
+  }
+
+  fn new_jsx_element<R: JSXRuntime>(_: impl JSXTagDef) -> Self {
+    unimplemented!("Cannot call `new_jsx_element` on a reference type")
+  }
+
+  fn new_jsx_fragment<R: JSXRuntime>() -> Self {
+    unimplemented!("Cannot call `new_jsx_fragment` on a reference type")
+  }
+}
+
+impl<T> JSXElementMut for &mut T
+where
+  T: JSXElementMut,
+{
+  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    (**self).as_arg0_mut::<R>()
+  }
+
+  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    (**self).as_jsx_props_mut::<R>()
+  }
+
+  fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize) {
+    (**self).set_jsx_factory::<R>(num_children)
   }
 }

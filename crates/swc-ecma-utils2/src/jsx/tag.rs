@@ -1,63 +1,29 @@
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
-  ecma::ast::{Expr, Ident},
+  ecma::ast::{Expr, Ident, Lit, Str},
 };
 
 use super::JSXRuntime;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum JSXTagKind {
-  Intrinsic,
-  Component,
-  Fragment,
+pub trait JSXTagDef {
+  fn to_expr<R: JSXRuntime>(&self) -> Expr;
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct JSXTag {
-  pub kind: JSXTagKind,
-  #[serde(rename = "type")]
-  pub name: Atom,
-}
-
-impl JSXTag {
-  pub fn intrinsic(value: &str) -> Self {
-    Self {
-      kind: JSXTagKind::Intrinsic,
-      name: value.into(),
-    }
-  }
-
-  pub fn component(value: &str) -> Self {
-    Self {
-      kind: JSXTagKind::Component,
-      name: value.into(),
-    }
-  }
-
-  pub fn fragment() -> Self {
-    Self {
-      kind: JSXTagKind::Fragment,
-      name: "".into(),
-    }
-  }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(tag = "kind", content = "type")]
 pub enum JSXTagType<'a> {
   Intrinsic(&'a str),
   Component(&'a str),
   Fragment,
 }
 
-pub trait JSXTagDef {
-  fn tag_type(&self) -> JSXTagType<'_>;
-
-  fn into_expr<R: JSXRuntime>(&self) -> Expr {
-    match self.tag_type() {
-      JSXTagType::Intrinsic(tag) => Expr::Lit(tag.into()),
-      JSXTagType::Component(tag) => Expr::Ident(Ident {
-        sym: tag.into(),
+impl JSXTagDef for JSXTagType<'_> {
+  fn to_expr<R: JSXRuntime>(&self) -> Expr {
+    match self {
+      JSXTagType::Intrinsic(name) => Expr::Lit(name.to_owned().into()),
+      JSXTagType::Component(name) => Expr::Ident(Ident {
+        sym: name.to_owned().into(),
         span: Default::default(),
         optional: false,
       }),
@@ -70,41 +36,46 @@ pub trait JSXTagDef {
   }
 }
 
-impl JSXTagDef for JSXTag {
-  fn tag_type(&self) -> JSXTagType<'_> {
-    match self.kind {
-      JSXTagKind::Intrinsic => JSXTagType::Intrinsic(&self.name),
-      JSXTagKind::Component => JSXTagType::Component(&self.name),
-      JSXTagKind::Fragment => JSXTagType::Fragment,
-    }
-  }
-
-  fn into_expr<R: JSXRuntime>(&self) -> Expr {
-    match self.kind {
-      JSXTagKind::Intrinsic => Expr::Lit((*self.name).into()),
-      JSXTagKind::Component => Expr::Ident(Ident {
-        sym: (&*self.name).into(),
-        span: Default::default(),
-        optional: false,
-      }),
-      JSXTagKind::Fragment => Expr::Ident(Ident {
-        sym: R::FRAGMENT.into(),
-        span: Default::default(),
-        optional: false,
-      }),
+impl<'a> JSXTagType<'a> {
+  pub fn from_expr<R: JSXRuntime>(expr: &'a Expr) -> Option<Self> {
+    match expr {
+      Expr::Lit(Lit::Str(Str { value, .. })) => Some(JSXTagType::Intrinsic(value)),
+      Expr::Ident(Ident { sym, .. }) => {
+        if sym == R::FRAGMENT {
+          Some(JSXTagType::Fragment)
+        } else {
+          Some(JSXTagType::Component(sym))
+        }
+      }
+      _ => None,
     }
   }
 }
 
-pub trait JSXTagMatch {
-  fn tag_type(&self) -> Option<JSXTagType<'_>>;
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(tag = "kind", content = "type")]
+pub enum JSXTagTypeOwned {
+  Intrinsic(Atom),
+  Component(Atom),
+  Fragment,
 }
 
-impl JSXTagMatch for Option<JSXTag> {
-  fn tag_type(&self) -> Option<JSXTagType<'_>> {
+impl JSXTagTypeOwned {
+  pub fn to_borrowed(&self) -> JSXTagType {
     match self {
-      Some(tag) => Some(tag.tag_type()),
-      None => None,
+      JSXTagTypeOwned::Intrinsic(name) => JSXTagType::Intrinsic(name.as_str()),
+      JSXTagTypeOwned::Component(name) => JSXTagType::Component(name.as_str()),
+      JSXTagTypeOwned::Fragment => JSXTagType::Fragment,
+    }
+  }
+}
+
+impl From<JSXTagType<'_>> for JSXTagTypeOwned {
+  fn from(tag: JSXTagType) -> Self {
+    match tag {
+      JSXTagType::Intrinsic(name) => JSXTagTypeOwned::Intrinsic(name.into()),
+      JSXTagType::Component(name) => JSXTagTypeOwned::Component(name.into()),
+      JSXTagType::Fragment => JSXTagTypeOwned::Fragment,
     }
   }
 }
@@ -135,21 +106,28 @@ macro_rules! tag_test {
 }
 
 #[macro_export]
+macro_rules! matches_tag {
+  ($arg:expr, $($tt:tt)+) => {
+    matches!($arg, $crate::tag_test!($($tt)+))
+  };
+}
+
+#[macro_export]
 macro_rules! ad_hoc_tag {
   (<>) => {
-    $crate::jsx::JSXTag::fragment()
+    $crate::jsx::JSXTagType::Fragment
   };
   ($tag:literal) => {
-    $crate::jsx::JSXTag::intrinsic($tag.into())
+    $crate::jsx::JSXTagType::Intrinsic($tag.into())
   };
   ($tag:ident) => {
-    $crate::jsx::JSXTag::component(stringify!($tag).into())
+    $crate::jsx::JSXTagType::Component(stringify!($tag).into())
   };
   ("" $tag:expr) => {
-    $crate::jsx::JSXTag::intrinsic($tag)
+    $crate::jsx::JSXTagType::Intrinsic($tag)
   };
   (<> $tag:expr) => {
-    $crate::jsx::JSXTag::component($tag)
+    $crate::jsx::JSXTagType::Component($tag)
   };
 }
 
@@ -159,9 +137,11 @@ macro_rules! tag_whitelist {
     $vis enum $name { $($tags),* }
 
     impl $crate::jsx::JSXTagDef for $name {
-      fn tag_type(&self) -> $crate::jsx::JSXTagType<'_> {
+      fn to_expr<R: $crate::jsx::JSXRuntime>(&self) -> swc_core::ecma::ast::Expr {
         match self {
-          $(Self::$tags => $crate::jsx::JSXTagType::Component(stringify!($tags)),)*
+          $(
+            $name::$tags => $crate::jsx::JSXTagType::Component(stringify!($tags)).to_expr::<R>()
+          ),*
         }
       }
     }

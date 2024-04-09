@@ -13,7 +13,7 @@ use swc_core::{
 use swc_ecma_utils2::{
   collections::{Mapping, MutableMapping, MutableSequence, Sequence as _},
   ecma::itertools::array_into_iter,
-  jsx::{jsx, jsx_mut, JSXElement, JSXElementMut, JSXRuntime, JSXTagDef as _},
+  jsx::{JSXElement, JSXElementMut, JSXRuntime},
   span::with_span,
   tag_test,
 };
@@ -51,11 +51,11 @@ impl<R: JSXRuntime> PhrasingContentPreflight<R> {
       return Some(());
     }
 
-    let children = jsx::<R>(call)?.get_props()?.get_item("children")?;
+    let children = call.as_jsx_props::<R>()?.get_item("children")?;
 
     self.is_translatable = match &children {
       Expr::Array(array) => array.iter().any(|expr| match expr {
-        Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(&value),
+        Expr::Lit(Lit::Str(Str { value, .. })) => !is_empty_or_whitespace(value),
         _ => false,
       }),
       Expr::Lit(Lit::Str(text)) => !is_empty_or_whitespace(&text.value),
@@ -103,7 +103,7 @@ where
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let Some(children) = jsx_mut::<R>(elem).get_props_mut().del_item("children") else {
+    let Some(children) = elem.as_jsx_props_mut::<R>().del_item("children") else {
       elem.visit_mut_children_with(self);
       return;
     };
@@ -118,9 +118,9 @@ where
         Palpable(true) => (),
         Palpable(false) => (),
       },
-      Expr::Call(mut call) => match jsx::<R>(&call).get_tag() {
+      Expr::Call(mut call) => match call.as_jsx_type::<R>() {
         Some(tag) => {
-          let name = match tag.tag_type() {
+          let name = match tag {
             tag_test!(<>?) => None,
             tag_test!(* as name?) | tag_test!("*" as name?) => Some(name.into()),
           };
@@ -174,9 +174,7 @@ pub fn translate_phrase<R: JSXRuntime, S: I18nSymbols>(
 
     let children = with_span(Some(elem.span()))(children);
 
-    jsx_mut::<R>(elem)
-      .get_props_mut()
-      .set_item("children", children);
+    elem.as_jsx_props_mut::<R>().set_item("children", children);
 
     Some(message)
   } else {

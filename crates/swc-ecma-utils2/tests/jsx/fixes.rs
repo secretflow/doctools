@@ -9,7 +9,7 @@ use swc_ecma_utils2::{
   ecma::fixes::remove_invalid,
   jsx::{
     fixes::{drop_elements, fix_jsx_factories, fold_fragments},
-    JSXRuntimeDefault,
+    JSXSymbols,
   },
 };
 
@@ -23,9 +23,9 @@ fn test_fixes(path: PathBuf) {
         drop_elements()
           .delete(ad_hoc_tag!("comment"))
           .unwrap(ad_hoc_tag!("section"))
-          .build::<JSXRuntimeDefault>(),
-        fold_fragments::<JSXRuntimeDefault>(),
-        fix_jsx_factories::<JSXRuntimeDefault>(),
+          .build::<JSXSymbols>(),
+        fold_fragments::<JSXSymbols>(),
+        fix_jsx_factories::<JSXSymbols>(),
         remove_invalid()
       )
     },

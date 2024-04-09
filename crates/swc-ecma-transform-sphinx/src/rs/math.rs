@@ -49,7 +49,7 @@ impl<R: JSXRuntime> MathRenderer<R> {
       tex: tex.into(),
       inline,
     })?;
-    let document = html_str_to_jsx::<R>(&*html)
+    let document = html_str_to_jsx::<R>(&html)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }

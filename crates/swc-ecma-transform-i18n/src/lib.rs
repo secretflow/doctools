@@ -1,15 +1,20 @@
-use std::{collections::HashMap, fmt::Debug, marker::PhantomData};
+use std::{collections::HashMap, marker::PhantomData};
 
+use attribute::translate_attrs;
 use serde::{Deserialize, Serialize};
-use swc_core::ecma::{
-  ast::CallExpr,
-  visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
+use swc_core::{
+  common::util::take::Take,
+  ecma::{
+    ast::CallExpr,
+    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
+  },
 };
 
 use swc_ecma_utils2::{
   ad_hoc_tag,
-  jsx::{jsx, jsx_mut, JSXElement, JSXElementMut, JSXRuntime, JSXTag, JSXTagDef as _},
-  tag_test,
+  collections::MutableMapping as _,
+  jsx::{JSXElement, JSXElementMut, JSXRuntime, JSXTagTypeOwned},
+  matches_tag,
 };
 
 mod attribute;
@@ -20,7 +25,6 @@ mod symbols;
 
 pub use crate::symbols::I18nSymbols;
 
-use crate::attribute::translate_attrs;
 use crate::flow_content::translate_block;
 use crate::message::Message;
 use crate::phrasing_content::translate_phrase;
@@ -136,9 +140,7 @@ impl Default for ContentModel {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Translatable {
-  /// What element is this?
-  pub tag: JSXTag,
+struct TranslatableOptions {
   /// Is the element preformatted like `<pre>` (whitespace is significant)?
   /// If not, then whitespace is collapsed according to HTML's whitespace rules.
   /// Default is `false`.
@@ -151,68 +153,76 @@ pub struct Translatable {
   pub props: Vec<Vec<String>>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Translatable {
+  /// What element is this?
+  pub tag: JSXTagTypeOwned,
+  #[serde(flatten)]
+  options: TranslatableOptions,
+}
+
 impl Default for Translatable {
   fn default() -> Self {
     Self {
-      tag: ad_hoc_tag!(<>),
-      content: ContentModel::Flow,
-      pre: false,
-      props: vec![],
+      tag: ad_hoc_tag!(<>).into(),
+      options: TranslatableOptions {
+        pre: false,
+        content: ContentModel::Flow,
+        props: vec![],
+      },
     }
   }
 }
 
 impl Translatable {
-  pub fn flow(tag: JSXTag) -> Self {
+  pub fn flow(tag: JSXTagTypeOwned) -> Self {
     Self {
       tag,
-      content: ContentModel::Flow,
-      pre: false,
-      props: vec![],
+      options: TranslatableOptions {
+        content: ContentModel::Flow,
+        pre: false,
+        props: vec![],
+      },
     }
   }
 
-  pub fn phrasing(tag: JSXTag) -> Self {
+  pub fn phrasing(tag: JSXTagTypeOwned) -> Self {
     Self {
-      tag: tag,
-      content: ContentModel::Phrasing,
-      pre: false,
-      props: vec![],
+      tag,
+      options: TranslatableOptions {
+        content: ContentModel::Phrasing,
+        pre: false,
+        props: vec![],
+      },
     }
   }
 
-  pub fn preformatted(tag: JSXTag, content: ContentModel) -> Self {
+  pub fn preformatted(tag: JSXTagTypeOwned, content: ContentModel) -> Self {
     Self {
-      tag: tag.into(),
-      content,
-      pre: true,
-      props: vec![],
+      tag,
+      options: TranslatableOptions {
+        content,
+        pre: true,
+        props: vec![],
+      },
     }
   }
 
   pub fn prop(mut self, prop: &[&str]) -> Self {
-    self.props.push(prop.iter().map(|s| (*s).into()).collect());
+    self
+      .options
+      .props
+      .push(prop.iter().map(|s| (*s).into()).collect());
     self
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TranslatorOptions {
   #[serde(default)]
   elements: Vec<Translatable>,
-}
-
-impl TranslatorOptions {
-  pub fn new() -> Self {
-    Self::default()
-  }
-}
-
-impl Default for TranslatorOptions {
-  fn default() -> Self {
-    Self { elements: vec![] }
-  }
 }
 
 #[derive(Debug)]
@@ -221,7 +231,7 @@ where
   R: JSXRuntime,
   S: I18nSymbols,
 {
-  elements: HashMap<JSXTag, Translatable>,
+  elements: HashMap<JSXTagTypeOwned, TranslatableOptions>,
   pre: bool,
   messages: &'m mut Vec<Message>,
 
@@ -230,51 +240,61 @@ where
 }
 
 impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
-  fn translate_generic_attrs(&mut self, call: &mut CallExpr) -> Option<()> {
-    let props = jsx_mut::<R>(call)?.get_props_mut()?;
+  fn translate_attrs(&mut self, call: &mut CallExpr) -> Option<()> {
+    {
+      let tag = call.as_jsx_type::<R>()?;
+      if matches_tag!(tag, "*"?) {
+        let props = call.as_jsx_props_mut::<R>()?.as_mut_object()?;
+        let messages = translate_attrs::<R, S>(
+          props,
+          &[
+            vec!["title".to_string()],
+            vec!["aria-label".to_string()],
+            vec!["aria-placeholder".to_string()],
+            vec!["aria-roledescription".to_string()],
+            vec!["aria-valuetext".to_string()],
+          ],
+        );
+        self.messages.extend(messages);
+      }
+    }
 
-    self.messages.extend(translate_attrs::<R, S>(
-      props,
-      vec![
-        vec!["title"],
-        vec!["aria-label"],
-        vec!["aria-placeholder"],
-        vec!["aria-roledescription"],
-        vec!["aria-valuetext"],
-      ],
-    ));
+    {
+      let mut props = call.as_jsx_props_mut::<R>()?.as_mut_object()?.take();
+      let Some(tag) = call.as_jsx_type::<R>() else {
+        call.set_item(2usize, props.into());
+        return None;
+      };
+      let Some(options) = self.elements.get(&tag.into()) else {
+        call.set_item(2usize, props.into());
+        return None;
+      };
+      let attrs = &options.props;
+      let messages = translate_attrs::<R, S>(&mut props, attrs);
+      self.messages.extend(messages);
+      call.set_item(2usize, props.into());
+    }
 
     Some(())
   }
 
   fn translate_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let tag = jsx::<R>(call)?.get_tag()?;
+    self.translate_attrs(call);
 
-    if matches!(tag.tag_type(), tag_test!("*"?)) {
-      self.translate_generic_attrs(call);
-    }
+    let (pre, content) = {
+      let tag = call.as_jsx_type::<R>()?.clone();
+      let options = self.elements.get(&tag.into())?;
+      (options.pre, options.content)
+    };
 
-    let options = self.elements.get(&tag)?;
+    self.pre = self.pre || pre;
 
-    let attrs = options
-      .props
-      .iter()
-      .map(|ss| ss.iter().map(|s| s.as_str()).collect::<Vec<_>>())
-      .collect::<Vec<_>>();
-
-    let props = jsx_mut::<R>(call)?.get_props_mut()?;
-    self.messages.extend(translate_attrs::<R, S>(props, attrs));
-
-    self.pre = self.pre || options.pre;
-
-    match options.content {
+    match content {
       ContentModel::Flow => {
-        self
-          .messages
-          .extend(translate_block::<R, S>(options.pre, call));
+        self.messages.extend(translate_block::<R, S>(pre, call));
       }
       ContentModel::Phrasing => {
-        if let Some(message) = translate_phrase::<R, S>(options.pre, call) {
+        if let Some(message) = translate_phrase::<R, S>(pre, call) {
           self.messages.push(message);
         }
       }
@@ -300,10 +320,10 @@ pub fn i18n<'m, R: JSXRuntime + 'm, S: I18nSymbols + 'm>(
   output: &'m mut Vec<Message>,
 ) -> impl Fold + VisitMut + 'm {
   let mut options = options;
-  let mut elements: HashMap<JSXTag, Translatable> = Default::default();
+  let mut elements: HashMap<JSXTagTypeOwned, TranslatableOptions> = Default::default();
 
   options.elements.drain(..).for_each(|elem| {
-    elements.insert(elem.tag.clone(), elem);
+    elements.insert(elem.tag, elem.options);
   });
 
   as_folder(Translator::<'m, R, S> {

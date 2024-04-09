@@ -1,0 +1,5 @@
+---
+source: crates/swc-ecma-utils2/src/jsx/builder.rs
+expression: document
+---
+_jsx(_Fragment, {})

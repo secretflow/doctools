@@ -12,6 +12,10 @@ pub trait Mapping: MappingBase {
     self._len()
   }
 
+  fn is_empty(&self) -> bool {
+    self._len() == 0
+  }
+
   fn get_item<K: Into<Self::Key>>(&self, key: K) -> Option<&Self::Value> {
     self._get(&key.into())
   }
@@ -188,6 +192,10 @@ pub trait Sequence: SequenceBase {
     self._len()
   }
 
+  fn is_empty(&self) -> bool {
+    self._len() == 0
+  }
+
   fn get_item(&self, idx: usize) -> Option<&Self::Value> {
     self._get(idx)
   }
@@ -287,11 +295,7 @@ pub trait MutableSequence: MutableSequenceBase + Sequence {
   where
     Self::Value: PartialEq,
   {
-    if let Some(idx) = self.index_of(value) {
-      Some(self._del(idx).unwrap())
-    } else {
-      None
-    }
+    self.index_of(value).map(|idx| self._del(idx).unwrap())
   }
 
   fn reverse(&mut self) {

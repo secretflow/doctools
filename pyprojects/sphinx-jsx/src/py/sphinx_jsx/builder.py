@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import timeit
 from pathlib import Path
 from typing import Iterator, Optional, Set
 
@@ -8,14 +7,11 @@ from docutils import nodes
 from loguru import logger
 from sphinx.application import Sphinx
 from sphinx.builders import Builder
-from sphinx.builders.html import INVENTORY_FILENAME, BuildInfo
+from sphinx.builders.html import BuildInfo
 from sphinx.environment import BuildEnvironment
-from sphinx.locale import __
-from sphinx.util.display import progress_message
-from sphinx.util.inventory import InventoryFile
 
 from ._lib import SphinxBundler
-from .options import BuildOptions, WellKnownSymbols
+from .options import SphinxOptions
 from .translator import SphinxJSXTranslator
 
 
@@ -37,7 +33,13 @@ class SphinxJSXBuilder(Builder):
     def __init__(self, app: Sphinx, env: BuildEnvironment) -> None:
         super().__init__(app, env)
         self.build_info: BuildInfo
-        self.bundler = SphinxBundler(WellKnownSymbols())
+        self.bundler = SphinxBundler(
+            SphinxOptions(
+                srcdir=Path(self.srcdir),
+                confdir=Path(self.confdir),
+                outdir=Path(self.outdir),
+            )
+        )
 
     @property
     def source_root(self) -> Path:
@@ -56,6 +58,7 @@ class SphinxJSXBuilder(Builder):
 
     def init(self) -> None:
         self.build_info = self.create_build_info()
+        self.bundler.init()
 
     def create_build_info(self) -> BuildInfo:
         return BuildInfo(self.config, self.tags, ["jsx"])
@@ -74,32 +77,6 @@ class SphinxJSXBuilder(Builder):
             raise TypeError("translator must be a SphinxJSXTranslator")
 
         doctree.walkabout(translator)
-        self.bundler.seal_document(translator.ast)
 
     def finish(self):
-        options = BuildOptions(
-            srcdir=Path(self.srcdir),
-            outdir=Path(self.outdir),
-        )
-
-        try:
-            logger.info("Checking link validity...")
-            print(timeit.Timer(lambda: self.bundler.build(options)).timeit(1))
-        except RuntimeError as e:
-            logger.exception("Failed to build")
-            print(e)
-            exit(1)
-
-        with progress_message(__("dumping object inventory")):
-            InventoryFile.dump(
-                str(self.output_root / INVENTORY_FILENAME),
-                self.env,
-                self,
-            )
-
-        with progress_message(__("emitting build info")):
-            try:
-                with open(self.build_info_path, "w", encoding="utf-8") as fp:
-                    self.build_info.dump(fp)
-            except OSError as exc:
-                logger.warning(__("Failed to write build info file: %r"), exc)
+        pass

@@ -2,8 +2,6 @@ use std::{env, error, fmt, fs::File, io::Read, path::PathBuf};
 
 use anyhow::Context;
 use serde::Deserialize;
-use serde_json;
-use toml;
 
 #[derive(Deserialize)]
 struct CargoManifest {

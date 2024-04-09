@@ -11,9 +11,8 @@ pub fn json_to_expr(value: serde_json::Value) -> Expr {
     String(value) => value.into(),
     Number(number) => number
       .as_f64()
-      .and_then(|f| Some(Expr::from(f)))
-      .unwrap_or_else(|| Expr::from(Ident::from("NaN")))
-      .into(),
+      .map(Expr::from)
+      .unwrap_or_else(|| Expr::from(Ident::from("NaN"))),
     Array(elems) => ArrayLit {
       elems: elems
         .into_iter()

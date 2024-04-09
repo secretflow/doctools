@@ -41,7 +41,7 @@ fn reject_unsafe_inline_javascript(atom: &Atom) -> Option<Lit> {
   if atom.as_str().contains("javascript:") {
     if cfg!(feature = "unsafe-ignore") {
       None
-    } else if cfg!(feature = "unsafe-ignore") {
+    } else if cfg!(feature = "unsafe-allow") {
       as_string(atom)
     } else {
       panic!("refuse to convert `javascript:` URLs")
@@ -57,7 +57,6 @@ pub fn convert_attribute(attr: &Attribute) -> Option<(Lit, Lit)> {
       return None;
     }
   } else if cfg!(feature = "unsafe-allow") {
-    ();
   } else {
     if attr.name.to_lowercase() == "dangerouslysetinnerhtml" {
       panic!("refuse to convert dangerouslySetInnerHTML")
@@ -722,8 +721,5 @@ pub fn convert_attribute(attr: &Attribute) -> Option<(Lit, Lit)> {
     "xmlSpace" << [as_string, ""]
   );
 
-  match create_value(&attr.value, as_string, true.into()) {
-    Some(value) => Some((name.into(), value)),
-    None => None,
-  }
+  create_value(&attr.value, as_string, true.into()).map(|value| (name.into(), value))
 }

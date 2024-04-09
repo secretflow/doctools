@@ -8,7 +8,7 @@ use swc_ecma_testing2::{parse_one, test_js_fixture};
 use swc_ecma_transform_sphinx_code::{
   init_esm, render_code, render_math, render_raw, render_typograph,
 };
-use swc_ecma_utils2::{ecma::fixes::remove_invalid, jsx::JSXRuntimeDefault};
+use swc_ecma_utils2::{ecma::fixes::remove_invalid, jsx::JSXSymbols};
 
 #[fixture("tests/fixtures/**/*.js")]
 fn test_transforms(path: PathBuf) {
@@ -19,10 +19,10 @@ fn test_transforms(path: PathBuf) {
     |src| parse_one(&src.src, None, parse_file_as_module).unwrap(),
     |_: ()| {
       chain!(
-        render_code::<JSXRuntimeDefault>(&esm),
-        render_math::<JSXRuntimeDefault>(&esm),
-        render_raw::<JSXRuntimeDefault>(),
-        render_typograph::<JSXRuntimeDefault>(),
+        render_code::<JSXSymbols>(&esm),
+        render_math::<JSXSymbols>(&esm),
+        render_raw::<JSXSymbols>(),
+        render_typograph::<JSXSymbols>(),
         remove_invalid(),
       )
     },

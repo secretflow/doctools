@@ -10,7 +10,7 @@ use swc_core::{
 
 use swc_ecma_utils2::{
   collections::MutableMapping,
-  jsx::{jsx, jsx_mut, JSXElementMut, JSXRuntime},
+  jsx::{JSXElement, JSXElementMut, JSXRuntime},
   span::{union_span, with_span},
 };
 
@@ -101,17 +101,16 @@ where
             } else {
               match *expr.expr.take() {
                 Expr::Lit(Lit::Str(lit)) => self.text(lit),
-                Expr::Call(call) => match jsx::<R>(&call) {
-                  Some(_) => {
+                Expr::Call(call) => {
+                  if call.is_jsx::<R>() {
                     self.other(ExprOrSpread {
                       expr: Box::from(call),
                       spread: None,
                     });
-                  }
-                  None => {
+                  } else {
                     self.interpolate(Expr::Call(call));
                   }
-                },
+                }
                 expr => {
                   self.interpolate(expr);
                 }
@@ -167,8 +166,9 @@ pub fn translate_block<R: JSXRuntime, S: I18nSymbols>(
 ) -> Vec<Message> {
   let mut collector = <FlowContentCollector<R, S>>::new(pre);
 
-  let mut elem = jsx_mut::<R>(call);
-  let props = elem.get_props_mut().unwrap();
+  let Some(props) = call.as_jsx_props_mut::<R>() else {
+    return vec![];
+  };
 
   props.visit_mut_with(&mut collector);
 

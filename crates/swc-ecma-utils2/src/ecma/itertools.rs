@@ -7,10 +7,10 @@ use swc_core::{
 };
 
 pub fn array_into_iter(array: ArrayLit) -> impl Iterator<Item = Expr> {
-  array.elems.into_iter().filter_map(|item| match item {
-    Some(ExprOrSpread { expr, .. }) => Some(*expr),
-    None => None,
-  })
+  array
+    .elems
+    .into_iter()
+    .filter_map(|item| item.map(|ExprOrSpread { expr, .. }| *expr))
 }
 
 pub fn object_into_iter(object: ObjectLit) -> impl Iterator<Item = (Lit, Expr)> {
@@ -47,10 +47,7 @@ pub fn is_nullish(expr: &Expr) -> bool {
       op: UnaryOp::Void,
       arg,
       ..
-    }) => match &**arg {
-      Expr::Lit(Lit::Num(num)) if num.value == 0.0 => true,
-      _ => false,
-    },
+    }) => matches!(&**arg, Expr::Lit(Lit::Num(num)) if num.value == 0.0),
     _ => false,
   }
 }

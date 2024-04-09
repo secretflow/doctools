@@ -23,11 +23,10 @@ impl VisitAll for CollectExportDeclares {
         if !declare.declare {
           return;
         }
-        declare.decls.iter().for_each(|d| match d.name {
-          Pat::Ident(ref ident) => {
+        declare.decls.iter().for_each(|d| {
+          if let Pat::Ident(ref ident) = d.name {
             self.idents.insert((&*ident.id.sym).into());
           }
-          _ => {}
         })
       }
       Decl::Class(ref declare) => {
@@ -42,7 +41,7 @@ impl VisitAll for CollectExportDeclares {
         }
         self.idents.insert((&*declare.ident.sym).into());
       }
-      _ => return,
+      _ => {}
     }
   }
 }
@@ -227,7 +226,7 @@ mod tests {
     let {a, b} = [1, 2, c], d;
     "#;
 
-    let expr = parse_one(&src, None, parse_file_as_module).unwrap();
+    let expr = parse_one(src, None, parse_file_as_module).unwrap();
 
     let found = lint.lint(&expr);
 

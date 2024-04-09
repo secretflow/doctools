@@ -6,13 +6,12 @@ use serde::{
 };
 use swc_core::ecma::ast::{CallExpr, Expr};
 
-use crate::ecma::{UnpackError, UnpackExpr};
-
-use super::{
-  jsx,
-  tag::{JSXTagDef as _, JSXTagType},
-  JSXElement, JSXRuntime,
+use crate::{
+  ecma::{UnpackError, UnpackExpr},
+  tag_test,
 };
+
+use super::{JSXElement, JSXRuntime};
 
 struct UnpackJSX<'ast, R: JSXRuntime> {
   call: &'ast CallExpr,
@@ -27,7 +26,7 @@ impl<'de, R: JSXRuntime> serde::de::Deserializer<'de> for UnpackJSX<'de, R> {
     V: serde::de::Visitor<'de>,
   {
     let Self { call, runtime } = self;
-    if jsx::<R>(call).is_some() {
+    if call.is_jsx::<R>() {
       visitor.visit_enum(UnpackJSXComponent { call, runtime })
     } else {
       Err(UnpackJSXError::custom("not a JSX element"))
@@ -67,17 +66,15 @@ impl<'ast, R: JSXRuntime> serde::de::EnumAccess<'ast> for UnpackJSXComponent<'as
   where
     V: serde::de::DeserializeSeed<'ast>,
   {
-    let elem = jsx::<R>(&self.call);
-
-    let component = elem
-      .get_tag()
+    let component = self
+      .call
+      .as_jsx_type::<R>()
       .ok_or_else(|| UnpackJSXError::custom("could not get tag type"))?;
 
-    let key: Result<V::Value, UnpackJSXError<'ast>> = match component.tag_type() {
-      JSXTagType::Component(name) | JSXTagType::Intrinsic(name) => {
-        seed.deserialize(name.into_deserializer())
-      }
-      JSXTagType::Fragment => seed.deserialize(R::FRAGMENT.into_deserializer()),
+    let key: Result<V::Value, UnpackJSXError<'ast>> = match component {
+      tag_test!(* as name?) => seed.deserialize(name.into_deserializer()),
+      tag_test!(<>?) => seed.deserialize(R::FRAGMENT.into_deserializer()),
+      tag_test!("*" as name?) => seed.deserialize(format!(r#""{}""#, name).into_deserializer()),
     };
 
     let key = key?;
@@ -116,7 +113,7 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
     T: serde::de::DeserializeSeed<'ast>,
   {
     seed
-      .deserialize(UnpackExpr::new(&self.props))
+      .deserialize(UnpackExpr::new(self.props))
       .map_err(Into::into)
   }
 
@@ -124,7 +121,7 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
   where
     V: serde::de::Visitor<'ast>,
   {
-    UnpackExpr::new(&self.props)
+    UnpackExpr::new(self.props)
       .deserialize_tuple(len, visitor)
       .map_err(Into::into)
   }
@@ -138,7 +135,7 @@ impl<'ast> serde::de::VariantAccess<'ast> for UnpackJSXProps<'ast> {
     V: serde::de::Visitor<'ast>,
   {
     let _ = fields;
-    UnpackExpr::new(&self.props)
+    UnpackExpr::new(self.props)
       .deserialize_map(visitor)
       .map_err(Into::into)
   }
@@ -205,12 +202,12 @@ mod tests {
   }
 
   #[test]
-  fn test_unpack_jsx_1() {
+  fn test_unpack_jsx_intrinsic() {
     #[derive(Debug, PartialEq, Deserialize)]
     enum SectionElement {
-      #[serde(rename = "article")]
+      #[serde(rename = r#""article""#)]
       Article,
-      #[serde(rename = "section")]
+      #[serde(rename = r#""section""#)]
       Section,
     }
 

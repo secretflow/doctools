@@ -2,7 +2,8 @@
 members = [
   "crates/*",
   "crates/*/macros",
-  "packages/swc-plugin-esm-serve", # "pyprojects/sphinx-jsx",
+  "packages/swc-plugin-esm-serve",
+  "pyprojects/sphinx-jsx",
 ]
 resolver = "2"
 

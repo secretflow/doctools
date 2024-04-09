@@ -9,14 +9,9 @@ use swc_core::{
   },
 };
 
-use super::{
-  jsx, jsx_mut,
-  runtime::JSXRuntime,
-  tag::{JSXTag, JSXTagMatch},
-  JSXElement, JSXElementMut,
-};
+use super::{JSXElement as _, JSXElementMut, JSXRuntime, JSXTagType};
 use crate::{
-  collections::{Mapping, MutableMapping, MutableSequence, Sequence},
+  collections::{Mapping as _, MutableMapping as _, MutableSequence, Sequence as _},
   ecma::itertools::{is_invalid_call, is_nullish},
   jsx::create_fragment,
   tag_test, Object,
@@ -30,17 +25,16 @@ impl<R: JSXRuntime> FoldFragments<R> {
       return is_nullish(elem);
     };
 
-    let Some(elem) = jsx::<R>(call) else {
+    let Some(elem) = call.as_jsx_type::<R>() else {
       return is_invalid_call(call);
     };
 
-    match elem.get_tag().tag_type() {
-      None => false,
-      Some(tag_test!(*?) | tag_test!("*"?)) => false,
-      Some(tag_test!(<>?)) => match elem.get_props().get_item("children") {
+    match elem {
+      tag_test!(*?) | tag_test!("*"?) => false,
+      tag_test!(<>?) => match call.as_jsx_props::<R>().get_item("children") {
         None => true,
         Some(children) => match children.as_array() {
-          Some(array) => array.iter().all(|item| is_nullish(item)),
+          Some(array) => array.iter().all(is_nullish),
           None => is_nullish(children),
         },
       },
@@ -54,12 +48,14 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
     call.visit_mut_children_with(self);
 
-    let Some(elem) = jsx_mut::<R>(call) else {
-      return;
-    };
-
-    let Some(children) = elem.get_props_mut().del_item("children") else {
-      return;
+    let children = {
+      let Some(props) = call.as_jsx_props_mut::<R>().and_then(Expr::as_mut_object) else {
+        return;
+      };
+      let Some(children) = props.del_item("children") else {
+        return;
+      };
+      children
     };
 
     let children = match children {
@@ -99,11 +95,11 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
     };
 
     if let Some(children) = children {
-      elem.get_props_mut().set_item("children", children);
+      call.as_jsx_props_mut::<R>().set_item("children", children);
     }
 
-    let orphan = match elem.get_tag().tag_type() {
-      Some(tag_test!(<>?)) => match elem.get_props_mut().get_item_mut("children") {
+    let orphan = match call.as_jsx_type::<R>() {
+      Some(tag_test!(<>?)) => match call.as_jsx_props_mut::<R>().get_item_mut("children") {
         None => None,
         Some(children) => match children.as_mut_array() {
           None => Some(children.take()),
@@ -125,7 +121,7 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
         *call = orphan;
       }
       Some(expr) => {
-        elem.get_props_mut().set_item("children", expr);
+        call.as_jsx_props_mut::<R>().set_item("children", expr);
       }
     }
   }
@@ -137,31 +133,19 @@ impl<R: JSXRuntime> VisitMut for FixJSXFactory<R> {
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
     call.visit_mut_children_with(self);
 
-    let Some(elem) = jsx_mut::<R>(call) else {
-      return;
-    };
-
-    let props = elem.get_props();
-
-    let num_children = if let Some(children) = props.get_item("children") {
+    let num_children = if let Some(children) = call.as_jsx_props::<R>().get_item("children") {
       match children.as_array() {
-        Some(array) => {
-          let len = array.len();
-          elem.set_factory(len);
-          len
-        }
-        None => {
-          elem.set_factory(1);
-          1
-        }
+        Some(array) => array.len(),
+        None => 1,
       }
     } else {
-      elem.set_factory(1);
       0
     };
 
+    call.set_jsx_factory::<R>(num_children);
+
     if num_children == 0 {
-      elem.get_props_mut().del_item("children");
+      call.as_jsx_props_mut::<R>().del_item("children");
     }
   }
 }
@@ -175,34 +159,35 @@ pub enum Drop {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DropElements {
-  elements: HashMap<JSXTag, Drop>,
+pub struct DropElements<'a> {
+  #[serde(borrow)]
+  elements: HashMap<JSXTagType<'a>, Drop>,
 }
 
-impl Default for DropElements {
+impl Default for DropElements<'_> {
   fn default() -> Self {
     Self::new()
   }
 }
 
-impl DropElements {
+impl<'a> DropElements<'a> {
   pub fn new() -> Self {
     Self {
       elements: HashMap::new(),
     }
   }
 
-  pub fn unwrap(mut self, tag: JSXTag) -> Self {
+  pub fn unwrap(mut self, tag: JSXTagType<'a>) -> Self {
     self.elements.insert(tag, Drop::Unwrap);
     self
   }
 
-  pub fn delete(mut self, tag: JSXTag) -> Self {
+  pub fn delete(mut self, tag: JSXTagType<'a>) -> Self {
     self.elements.insert(tag, Drop::Delete);
     self
   }
 
-  pub fn build<R: JSXRuntime>(self) -> impl Fold + VisitMut {
+  pub fn build<R: JSXRuntime + 'a>(self) -> impl Fold + VisitMut + 'a {
     as_folder(ElementDropper::<R> {
       options: self,
       jsx: PhantomData,
@@ -210,14 +195,14 @@ impl DropElements {
   }
 }
 
-struct ElementDropper<R: JSXRuntime> {
-  options: DropElements,
+struct ElementDropper<'a, R: JSXRuntime> {
+  options: DropElements<'a>,
   jsx: PhantomData<R>,
 }
 
-impl<R: JSXRuntime> ElementDropper<R> {
+impl<R: JSXRuntime> ElementDropper<'_, R> {
   fn unwrap_elem(&mut self, call: &mut CallExpr) -> Option<()> {
-    let children = jsx_mut::<R>(call)?.get_props_mut().del_item("children");
+    let children = call.as_jsx_props_mut::<R>()?.del_item("children");
     match children {
       Some(children) => {
         *call = create_fragment::<R>()
@@ -233,7 +218,7 @@ impl<R: JSXRuntime> ElementDropper<R> {
   }
 
   fn process_call_expr(&mut self, call: &mut CallExpr) -> Option<()> {
-    let tag = jsx::<R>(call)?.get_tag()?;
+    let tag = call.as_jsx_type::<R>()?;
     let drop = self.options.elements.get(&tag)?;
     match drop {
       Drop::Unwrap => {
@@ -247,7 +232,7 @@ impl<R: JSXRuntime> ElementDropper<R> {
   }
 }
 
-impl<R: JSXRuntime> VisitMut for ElementDropper<R> {
+impl<R: JSXRuntime> VisitMut for ElementDropper<'_, R> {
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
@@ -264,6 +249,6 @@ pub fn fix_jsx_factories<R: JSXRuntime>() -> impl Fold + VisitMut {
   as_folder(FixJSXFactory(PhantomData::<R>))
 }
 
-pub fn drop_elements() -> DropElements {
+pub fn drop_elements() -> DropElements<'static> {
   DropElements::new()
 }
