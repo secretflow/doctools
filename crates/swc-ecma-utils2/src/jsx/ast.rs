@@ -1,5 +1,5 @@
 use swc_core::{
-  common::{util::take::Take as _, Spanned},
+  common::{util::take::Take as _, Span, Spanned},
   ecma::ast::{CallExpr, Expr, Ident, ObjectLit},
 };
 
@@ -12,19 +12,32 @@ use super::{JSXRuntime, JSXTagDef, JSXTagType};
 
 pub trait JSXElement {
   fn as_arg0<R: JSXRuntime>(&self) -> Option<&Expr>;
+
   fn as_jsx_type<R: JSXRuntime>(&self) -> Option<JSXTagType<'_>>;
-  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr>;
-  fn new_jsx_element<R: JSXRuntime>(tag: impl JSXTagDef) -> Self;
-  fn new_jsx_fragment<R: JSXRuntime>() -> Self;
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&ObjectLit>;
+
+  fn new_element<R: JSXRuntime>(span: Span, tag: impl JSXTagDef) -> Self;
+  fn new_fragment<R: JSXRuntime>(span: Span) -> Self;
 
   fn is_jsx<R: JSXRuntime>(&self) -> bool {
     self.as_jsx_type::<R>().is_some()
   }
+
+  fn as_arg0_span<R: JSXRuntime>(&self) -> Span {
+    self.as_arg0::<R>().map(Spanned::span).unwrap_or_default()
+  }
+  fn as_arg1_span<R: JSXRuntime>(&self) -> Span {
+    self
+      .as_jsx_props::<R>()
+      .map(Spanned::span)
+      .unwrap_or_default()
+  }
 }
 
 pub trait JSXElementMut {
-  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr>;
-  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr>;
+  fn as_mut_arg0<R: JSXRuntime>(&mut self) -> Option<&mut Expr>;
+  fn as_mut_jsx_props<R: JSXRuntime>(&mut self) -> Option<&mut ObjectLit>;
+
   fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize);
 }
 
@@ -42,26 +55,26 @@ impl JSXElement for CallExpr {
     JSXTagType::from_expr::<R>(self.as_arg0::<R>()?)
   }
 
-  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr> {
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&ObjectLit> {
     self.as_arg0::<R>()?;
-    self.get_item(2usize)
+    self.get_item(2usize).and_then(Expr::as_object)
   }
 
-  fn new_jsx_element<R: JSXRuntime>(tag: impl JSXTagDef) -> Self {
+  fn new_element<R: JSXRuntime>(span: Span, tag: impl JSXTagDef) -> Self {
     let mut call = CallExpr::dummy();
     call.set_item(0usize, Ident::from(R::JSX).into());
-    call.set_item(1usize, tag.to_expr::<R>());
+    call.set_item(1usize, tag.to_expr::<R>(span));
     call.set_item(2usize, ObjectLit::dummy().into());
-    call
+    with_span(span)(call)
   }
 
-  fn new_jsx_fragment<R: JSXRuntime>() -> Self {
-    Self::new_jsx_element::<R>(JSXTagType::Fragment)
+  fn new_fragment<R: JSXRuntime>(span: Span) -> Self {
+    Self::new_element::<R>(span, JSXTagType::Fragment)
   }
 }
 
 impl JSXElementMut for CallExpr {
-  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+  fn as_mut_arg0<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
     let callee = &self.get_item(0usize)?.as_ident()?.sym;
     if callee == R::JSX || callee == R::JSXS {
       self.get_item_mut(1usize)
@@ -70,9 +83,9 @@ impl JSXElementMut for CallExpr {
     }
   }
 
-  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
-    self.as_arg0_mut::<R>()?;
-    self.get_item_mut(2usize)
+  fn as_mut_jsx_props<R: JSXRuntime>(&mut self) -> Option<&mut ObjectLit> {
+    self.as_mut_arg0::<R>()?;
+    self.get_item_mut(2usize).and_then(Expr::as_mut_object)
   }
 
   fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize) {
@@ -83,9 +96,9 @@ impl JSXElementMut for CallExpr {
       return;
     };
     if num_children > 1 {
-      *callee = with_span(Some(callee.span()))(Ident::from(R::JSXS).into());
+      *callee = with_span(callee.span())(Ident::from(R::JSXS).into());
     } else {
-      *callee = with_span(Some(callee.span()))(Ident::from(R::JSX).into());
+      *callee = with_span(callee.span())(Ident::from(R::JSX).into());
     }
   }
 }
@@ -102,15 +115,15 @@ where
     (**self).as_jsx_type::<R>()
   }
 
-  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&Expr> {
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&ObjectLit> {
     (**self).as_jsx_props::<R>()
   }
 
-  fn new_jsx_element<R: JSXRuntime>(_: impl JSXTagDef) -> Self {
+  fn new_element<R: JSXRuntime>(_: Span, _: impl JSXTagDef) -> Self {
     unimplemented!("Cannot call `new_jsx_element` on a reference type")
   }
 
-  fn new_jsx_fragment<R: JSXRuntime>() -> Self {
+  fn new_fragment<R: JSXRuntime>(_: Span) -> Self {
     unimplemented!("Cannot call `new_jsx_fragment` on a reference type")
   }
 }
@@ -119,15 +132,60 @@ impl<T> JSXElementMut for &mut T
 where
   T: JSXElementMut,
 {
-  fn as_arg0_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
-    (**self).as_arg0_mut::<R>()
+  fn as_mut_arg0<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    (**self).as_mut_arg0::<R>()
   }
 
-  fn as_jsx_props_mut<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
-    (**self).as_jsx_props_mut::<R>()
+  fn as_mut_jsx_props<R: JSXRuntime>(&mut self) -> Option<&mut ObjectLit> {
+    (**self).as_mut_jsx_props::<R>()
   }
 
   fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize) {
     (**self).set_jsx_factory::<R>(num_children)
+  }
+}
+
+impl<T> JSXElement for Option<T>
+where
+  T: JSXElement,
+{
+  fn as_arg0<R: JSXRuntime>(&self) -> Option<&Expr> {
+    self.as_ref()?.as_arg0::<R>()
+  }
+
+  fn as_jsx_type<R: JSXRuntime>(&self) -> Option<JSXTagType<'_>> {
+    self.as_ref()?.as_jsx_type::<R>()
+  }
+
+  fn as_jsx_props<R: JSXRuntime>(&self) -> Option<&ObjectLit> {
+    self.as_ref()?.as_jsx_props::<R>()
+  }
+
+  fn new_element<R: JSXRuntime>(span: Span, tag: impl JSXTagDef) -> Self {
+    Some(T::new_element::<R>(span, tag))
+  }
+
+  fn new_fragment<R: JSXRuntime>(span: Span) -> Self {
+    Some(T::new_fragment::<R>(span))
+  }
+}
+
+impl<T> JSXElementMut for Option<T>
+where
+  T: JSXElementMut,
+{
+  fn as_mut_arg0<R: JSXRuntime>(&mut self) -> Option<&mut Expr> {
+    self.as_mut()?.as_mut_arg0::<R>()
+  }
+
+  fn as_mut_jsx_props<R: JSXRuntime>(&mut self) -> Option<&mut ObjectLit> {
+    self.as_mut()?.as_mut_jsx_props::<R>()
+  }
+
+  fn set_jsx_factory<R: JSXRuntime>(&mut self, num_children: usize) {
+    match self {
+      Some(elem) => elem.set_jsx_factory::<R>(num_children),
+      None => unreachable!("cannot set JSX factory on `None` value"),
+    }
   }
 }

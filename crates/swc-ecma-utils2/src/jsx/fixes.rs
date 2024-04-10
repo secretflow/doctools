@@ -49,7 +49,7 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
     call.visit_mut_children_with(self);
 
     let children = {
-      let Some(props) = call.as_jsx_props_mut::<R>().and_then(Expr::as_mut_object) else {
+      let Some(props) = call.as_mut_jsx_props::<R>() else {
         return;
       };
       let Some(children) = props.del_item("children") else {
@@ -95,11 +95,11 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
     };
 
     if let Some(children) = children {
-      call.as_jsx_props_mut::<R>().set_item("children", children);
+      call.as_mut_jsx_props::<R>().set_item("children", children);
     }
 
     let orphan = match call.as_jsx_type::<R>() {
-      Some(tag_test!(<>?)) => match call.as_jsx_props_mut::<R>().get_item_mut("children") {
+      Some(tag_test!(<>?)) => match call.as_mut_jsx_props::<R>().get_item_mut("children") {
         None => None,
         Some(children) => match children.as_mut_array() {
           None => Some(children.take()),
@@ -121,7 +121,7 @@ impl<R: JSXRuntime> VisitMut for FoldFragments<R> {
         *call = orphan;
       }
       Some(expr) => {
-        call.as_jsx_props_mut::<R>().set_item("children", expr);
+        call.as_mut_jsx_props::<R>().set_item("children", expr);
       }
     }
   }
@@ -145,7 +145,7 @@ impl<R: JSXRuntime> VisitMut for FixJSXFactory<R> {
     call.set_jsx_factory::<R>(num_children);
 
     if num_children == 0 {
-      call.as_jsx_props_mut::<R>().del_item("children");
+      call.as_mut_jsx_props::<R>().del_item("children");
     }
   }
 }
@@ -202,12 +202,11 @@ struct ElementDropper<'a, R: JSXRuntime> {
 
 impl<R: JSXRuntime> ElementDropper<'_, R> {
   fn unwrap_elem(&mut self, call: &mut CallExpr) -> Option<()> {
-    let children = call.as_jsx_props_mut::<R>()?.del_item("children");
+    let children = call.as_mut_jsx_props::<R>()?.del_item("children");
     match children {
       Some(children) => {
-        *call = create_fragment::<R>()
-          .arg1(Object!([children]).into())
-          .span(call.span)
+        *call = create_fragment::<R>(call.as_arg0_span::<R>())
+          .arg1(Object!([children]))
           .guarantee();
       }
       None => {

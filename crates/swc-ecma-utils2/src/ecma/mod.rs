@@ -38,7 +38,9 @@ macro_rules! undefined {
 macro_rules! Object {
   ( $([ $($assign:tt)+ ]),* ) => {{
     use swc_core::common::util::take::Take as _;
+    #[allow(unused_imports)]
     use $crate::collections::MutableMapping as _;
+    #[allow(unused_mut)]
     let mut object = swc_core::ecma::ast::ObjectLit::dummy();
     $(
       $crate::object_assign!(object, $($assign)+);

@@ -14,7 +14,12 @@ class Range(NamedTuple):
 
 
 class SphinxJSXTranslator(SphinxTranslator):
-    def __init__(self, document: nodes.document, builder: Builder) -> None:
+    def __init__(
+        self,
+        document: nodes.document,
+        builder: Builder,
+        docname: str,
+    ) -> None:
         from .builder import SphinxJSXBuilder
 
         if not isinstance(builder, SphinxJSXBuilder):
@@ -24,26 +29,30 @@ class SphinxJSXTranslator(SphinxTranslator):
 
         self.builder = builder
         self.bundler = builder.bundler
+        self.docname = docname
+        self.doctree = self.bundler.open(self.builder.env.doc2path(docname))
 
     def visit_Element(self, node: nodes.Element):
         component = type(node).__name__
+
+        file = str(node.source) if node.source else None
+        line = node.line or None
+        source = str(node.rawsource) if node.rawsource else None
+
         attrs = attrs_to_str(node.attributes)
-        file_name = str(node.source) if node.source else None
-        line_number = node.line
-        raw_source = str(node.rawsource) if node.rawsource else None
 
-        self.bundler.chunk(
-            component,
-            attrs,
-            file_name=file_name,
-            line_number=line_number,
-            raw_source=raw_source,
-        )
+        self.doctree.element(component, attrs, file=file, line=line, source=source)
+        self.doctree.enter()
 
-    def depart_Element(self, node: nodes.Element): ...
+    def depart_Element(self, node: nodes.Element):
+        self.doctree.exit()
 
     def visit_Text(self, node: nodes.Text):
+        self.doctree.text(node.astext())
         raise nodes.SkipDeparture
+
+    def depart_document(self, node: nodes.document):
+        self.bundler.seal(self.doctree)
 
 
 def attrs_to_str(attrs: Dict) -> str:

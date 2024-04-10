@@ -62,7 +62,7 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
 
     let name = &*elem.tag_name;
 
-    let mut new = create_element::<R>(ad_hoc_tag!("" name)).guarantee();
+    let mut new = create_element::<R>(Default::default(), ad_hoc_tag!("" name)).guarantee();
 
     let mut classes = String::new();
     let mut styled: Option<String> = None;
@@ -89,8 +89,8 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
       }
       if let Some((key, value)) = convert_attribute(attr) {
         new
-          .as_jsx_props_mut::<R>()
-          .set_item(key, with_span(Some(attr.span))(value.into()));
+          .as_mut_jsx_props::<R>()
+          .set_item(key, with_span(attr.span)(value.into()));
       }
     }
 
@@ -106,17 +106,17 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
 
     if !classes.is_empty() {
       new
-        .as_jsx_props_mut::<R>()
+        .as_mut_jsx_props::<R>()
         .set_item("className", classes.into());
     }
 
     if !children.is_empty() {
       new
-        .as_jsx_props_mut::<R>()
+        .as_mut_jsx_props::<R>()
         .set_item("children", ArrayLit::from_iterable(children).into());
     }
 
-    let element = with_span(Some(elem.span))(new);
+    let element = with_span(elem.span)(new);
 
     match elem.tag_name.as_str() {
       "base" | "link" | "meta" | "noscript" | "script" | "style" | "title"
@@ -133,7 +133,7 @@ impl<R: JSXRuntime> Visit for DOMVisitor<R> {
 
   fn visit_text(&mut self, text: &Text) {
     let parent = self.ancestors.last_mut().expect("expected parent");
-    parent.push(with_span(Some(text.span))(Expr::from(text.data.as_str())));
+    parent.push(with_span(text.span)(Expr::from(text.data.as_str())));
   }
 
   fn visit_document(&mut self, d: &Document) {
@@ -176,10 +176,10 @@ impl<R: JSXRuntime> DOMVisitor<R> {
       });
 
     if !stylesheet.is_empty() {
-      let mut style = create_element::<R>(ad_hoc_tag!("style")).guarantee();
+      let mut style = create_element::<R>(Default::default(), ad_hoc_tag!("style")).guarantee();
 
       style
-        .as_jsx_props_mut::<R>()
+        .as_mut_jsx_props::<R>()
         .set_item("children", ArrayLit::from_iterable(stylesheet).into());
 
       head.push(style.into());

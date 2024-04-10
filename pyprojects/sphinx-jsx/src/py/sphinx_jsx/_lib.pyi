@@ -1,20 +1,26 @@
-from pathlib import Path
 from typing import Optional, Protocol
 
 class SphinxOptions(Protocol):
-    srcdir: Path
-    confdir: Path
-    outdir: Path
+    srcdir: str
+    outdir: str
 
-class SphinxBundler:
+class Bundler:
     def __new__(cls, options: SphinxOptions): ...
     def init(self) -> None: ...
-    def chunk(
+    def open(self, path: str) -> Doctree: ...
+    def seal(self, doctree: Doctree) -> None: ...
+    def emit(self) -> None: ...
+
+class Doctree:
+    def element(
         self,
-        component: str,
+        tag: str,
         attrs: str,
         *,
-        file_name: Optional[str] = None,
-        line_number: Optional[int] = None,
-        raw_source: Optional[str] = None,
-    ) -> None: ...
+        file: Optional[str] = None,
+        line: Optional[int] = None,
+        source: Optional[str] = None,
+    ): ...
+    def enter(self): ...
+    def text(self, text: str): ...
+    def exit(self): ...

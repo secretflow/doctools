@@ -45,7 +45,7 @@ fn translate_attr<R: JSXRuntime, S: I18nSymbols>(attr: &mut Expr) -> Option<Mess
         };
       }
       let (message, result) = message.make_i18n::<R, S>();
-      *attr = with_span(Some(span))(result);
+      *attr = with_span(span)(result);
       Some(message)
     }
 

@@ -1,6 +1,6 @@
 use serde::{ser::SerializeSeq as _, Serialize as _};
 use swc_core::{
-  common::util::take::Take as _,
+  common::{util::take::Take as _, Span},
   ecma::ast::{
     ArrayLit, BigInt, ComputedPropName, Expr, ExprOrSpread, KeyValueProp, Lit, NewExpr, Null,
     ObjectLit, Prop, PropName,
@@ -9,6 +9,7 @@ use swc_core::{
 
 use crate::{
   collections::{MutableMapping, MutableSequence},
+  span::with_span,
   var,
 };
 
@@ -443,8 +444,8 @@ impl serde::ser::Error for RepackError {
   }
 }
 
-pub fn repack_expr<T: serde::Serialize>(value: &T) -> Result<Expr, RepackError> {
-  value.serialize(&mut RepackExpr)
+pub fn repack_expr<T: serde::Serialize>(span: Span, value: &T) -> Result<Expr, RepackError> {
+  Ok(with_span(span)(value.serialize(&mut RepackExpr)?))
 }
 
 #[cfg(test)]
@@ -488,7 +489,7 @@ mod tests {
       body: b"I'm a teapot".to_vec(),
     };
 
-    let expr = repack_expr(&response).unwrap();
+    let expr = repack_expr(Default::default(), &response).unwrap();
 
     let result = print_one(&expr, None, None).unwrap();
     let result = format!("``````js\n{}\n``````", result);

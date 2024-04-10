@@ -6,10 +6,13 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-swc_core = {version = "*", features = ["common_sourcemap"]}
+log = {version = "0.4.21"}
+swc_core = {version = "*", features = ["common_sourcemap", "common_concurrent"]}
+thiserror = "1.0.56"
 
 [dev-dependencies]
 anyhow = "1.0.79"
+env_logger = "0.11.3"
 glob = "0.3.1"
 insta = {version = "1.34.0", features = ["yaml"]}
 miette = {version = "5.10.0", features = ["fancy"]}

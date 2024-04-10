@@ -1,10 +1,10 @@
-use std::marker::PhantomData;
+use std::{borrow::Cow, marker::PhantomData};
 
 use deno_lite::{anyhow, ESFunction, ESModule};
-use html5jsx::html_str_to_jsx;
+use html5jsx::html_to_jsx;
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{util::take::Take as _, Span, Spanned},
+  common::{sync::Lrc, util::take::Take as _, FileName, SourceMap},
   ecma::{
     ast::CallExpr,
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith as _},
@@ -12,7 +12,12 @@ use swc_core::{
 };
 use swc_ecma_utils2::{
   collections::MutableMapping as _,
-  jsx::{create_element, unpack::unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime},
+  jsx::{
+    create_element,
+    unpack::{unpack_jsx, TextNode},
+    JSXDocument, JSXElement, JSXElementMut, JSXRuntime,
+  },
+  span::with_span,
 };
 
 use crate::{components::Transformed, macros::basic_attributes, move_basic_attributes};
@@ -43,7 +48,9 @@ struct Container {
 #[derive(Deserialize, Debug)]
 struct LiteralBlock<'ast> {
   #[serde(alias = "children")]
-  code: &'ast str,
+  #[serde(deserialize_with = "TextNode::into_cow")]
+  #[serde(borrow)]
+  code: Cow<'ast, str>,
   language: Option<String>,
   #[serde(alias = "linenos")]
   show_line_numbers: Option<bool>,
@@ -55,7 +62,9 @@ struct LiteralBlock<'ast> {
 #[derive(Deserialize)]
 struct DoctestBlock<'ast> {
   #[serde(alias = "children")]
-  code: &'ast str,
+  #[serde(deserialize_with = "TextNode::into_cow")]
+  #[serde(borrow)]
+  code: Cow<'ast, str>,
 }
 
 impl<'ast> From<DoctestBlock<'ast>> for LiteralBlock<'ast> {
@@ -119,7 +128,8 @@ enum VisitResult {
 
 struct CodeBlockRenderer<R: JSXRuntime> {
   state: State,
-  module: ESModule,
+  sourcemap: Lrc<SourceMap>,
+  esm: ESModule,
   jsx: PhantomData<R>,
 }
 
@@ -130,10 +140,8 @@ impl<R: JSXRuntime> VisitMut for CodeBlockRenderer<R> {
     match match unpack_jsx::<R, SphinxCodeBlock>(call) {
       Ok(SphinxCodeBlock::Container(elem)) => self.process_container(call, elem),
       Ok(SphinxCodeBlock::Caption) => self.process_caption(call),
-      Ok(SphinxCodeBlock::LiteralBlock(elem)) => self.process_literal_block(call.span(), elem),
-      Ok(SphinxCodeBlock::DoctestBlock(elem)) => {
-        self.process_literal_block(call.span(), elem.into())
-      }
+      Ok(SphinxCodeBlock::LiteralBlock(elem)) => self.process_literal_block(call, elem),
+      Ok(SphinxCodeBlock::DoctestBlock(elem)) => self.process_literal_block(call, elem.into()),
       Err(_) => {
         call.visit_mut_children_with(self);
         Ok(VisitResult::Continue)
@@ -184,7 +192,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
 
   fn process_literal_block(
     &mut self,
-    span: Span,
+    call: &CallExpr,
     mut elem: LiteralBlock,
   ) -> anyhow::Result<VisitResult> {
     if let State::Container { ref mut container }
@@ -216,6 +224,8 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
 
     let show_line_numbers = show_line_numbers.unwrap_or(false);
 
+    let code = code.as_ref();
+
     let document = self.render_code_block(code, lang, line_options.and_then(|f| f.highlighted));
 
     let props = CodeBlockProps {
@@ -232,18 +242,16 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     let result = match document {
       Ok(document) => {
         let child = document.to_fragment::<R>();
-        create_element::<R>(Transformed::CodeBlock)
-          .props(&props)
-          .child(child.into())
-          .span(span)
+        create_element::<R>(call.as_arg0_span::<R>(), Transformed::CodeBlock)
+          .props(call.as_arg1_span::<R>(), &props)
+          .child(with_span(call.span)(child.into()))
           .build()?
       }
       Err(error) => {
         let error = format!("{}", error);
-        create_element::<R>(Transformed::CodeBlock)
-          .props(&props)
-          .child(error.into())
-          .span(span)
+        create_element::<R>(call.as_arg0_span::<R>(), Transformed::CodeBlock)
+          .props(call.as_arg1_span::<R>(), &props)
+          .child(with_span(call.span)(error.into()))
           .build()?
       }
     };
@@ -257,7 +265,7 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
       State::Caption { caption, .. } => {
         let mut result = result;
         result
-          .as_jsx_props_mut::<R>()
+          .as_mut_jsx_props::<R>()
           .set_item("caption", caption.into());
         self.state = State::CodeBlock(result);
         Ok(VisitResult::Continue)
@@ -272,21 +280,26 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     lang: &str,
     highlighted_lines: Option<Vec<usize>>,
   ) -> anyhow::Result<JSXDocument> {
-    let html: String = self.module.call_function(RenderCode {
+    let html: String = self.esm.call_function(RenderCode {
       code,
       lang,
       line_highlight: highlighted_lines,
     })?;
-    let document = html_str_to_jsx::<R>(&html)
+    let html = self.sourcemap.new_source_file(FileName::Anon, html);
+    let document = html_to_jsx::<R>(&html)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }
 }
 
-pub fn render_code<R: JSXRuntime>(esm: &ESModule) -> impl Fold + VisitMut {
+pub fn render_code<R: JSXRuntime>(
+  sourcemap: Lrc<SourceMap>,
+  esm: &ESModule,
+) -> impl Fold + VisitMut {
   as_folder(CodeBlockRenderer {
     state: Default::default(),
-    module: esm.clone(),
+    sourcemap,
+    esm: esm.clone(),
     jsx: PhantomData::<R>,
   })
 }
@@ -304,6 +317,7 @@ fn match_language(lang: &str) -> Option<&'static str> {
     "go" | "golang" => Some("go"),
     "markdown" | "md" => Some("markdown"),
     "cpp" | "c++" => Some("cpp"),
+    "console" => Some("bash"),
     _ => None,
   }
 }

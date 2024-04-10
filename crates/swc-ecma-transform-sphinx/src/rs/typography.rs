@@ -37,9 +37,7 @@ impl<R: JSXRuntime> VisitMut for TransformParagraph<R> {
   fn visit_mut_call_expr(&mut self, call: &mut CallExpr) {
     call.visit_mut_children_with(self);
     match unpack_jsx::<R, ParagraphElement>(call) {
-      Err(err) => {
-        dbg!(err);
-      }
+      Err(_) => {}
       Ok(ParagraphElement::Paragraph { .. }) => {
         *call = jsx_builder2::<R>(call.take())
           .tag(Transformed::Paragraph)
@@ -69,6 +67,6 @@ impl<R: JSXRuntime> VisitMut for TransformParagraph<R> {
   }
 }
 
-pub fn render_typograph<R: JSXRuntime>() -> impl Fold + VisitMut {
+pub fn render_typography<R: JSXRuntime>() -> impl Fold + VisitMut {
   as_folder(TransformParagraph::<R> { jsx: PhantomData })
 }

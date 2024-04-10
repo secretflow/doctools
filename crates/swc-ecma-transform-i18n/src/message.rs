@@ -251,35 +251,49 @@ impl MessageProps {
     if has_newline {
       values.set_item(
         "LF",
-        create_element::<R>(ad_hoc_tag!("br")).guarantee().into(),
+        create_element::<R>(Default::default(), ad_hoc_tag!("br"))
+          .guarantee()
+          .into(),
       );
     }
 
     if has_less_than {
       values.set_item(
         "LT",
-        create_fragment::<R>().child("<".into()).guarantee().into(),
+        create_fragment::<R>(Default::default())
+          .child("<".into())
+          .guarantee()
+          .into(),
       );
     }
 
     if has_greater_than {
       values.set_item(
         "GT",
-        create_fragment::<R>().child(">".into()).guarantee().into(),
+        create_fragment::<R>(Default::default())
+          .child(">".into())
+          .guarantee()
+          .into(),
       );
     }
 
     if has_left_curly {
       values.set_item(
         "LC",
-        create_fragment::<R>().child("{".into()).guarantee().into(),
+        create_fragment::<R>(Default::default())
+          .child("{".into())
+          .guarantee()
+          .into(),
       );
     }
 
     if has_right_curly {
       values.set_item(
         "RC",
-        create_fragment::<R>().child("}".into()).guarantee().into(),
+        create_fragment::<R>(Default::default())
+          .child("}".into())
+          .guarantee()
+          .into(),
       );
     }
 
@@ -287,8 +301,8 @@ impl MessageProps {
       id: self.generate_id(&message),
       message,
       plaintext,
-      components: with_span(Some(self.span))(components),
-      values: with_span(Some(self.span))(values),
+      components: with_span(self.span)(components),
+      values: with_span(self.span)(values),
     }
   }
 
@@ -322,9 +336,9 @@ impl MessageProps {
       unreachable!("Message is empty")
     }
 
-    let trans = create_element::<R>(ad_hoc_tag!(<> S::TRANS))
-      .prop("id", &id)
-      .prop("message", &message)
+    let trans = create_element::<R>(Default::default(), ad_hoc_tag!(<> S::TRANS))
+      .prop(Default::default(), "id", &id)
+      .prop(Default::default(), "message", &message)
       .prop2("components", components.into())
       .prop2("values", values.into())
       .guarantee();
@@ -355,7 +369,7 @@ impl MessageProps {
       var!(S::GETTEXT),
       Object![
         ["id" = id.as_str()],
-        ["message" = with_span(Some(span))(Lit::from(message.as_str()))],
+        ["message" = with_span(span)(Lit::from(message.as_str()))],
         ["values" = values]
       ]
     );

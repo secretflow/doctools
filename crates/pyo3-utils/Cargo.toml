@@ -6,7 +6,7 @@ publish = false
 version = "0.0.0"
 
 [dependencies]
-pyo3 = "0.20.2"
+pyo3 = "0.21.0"
 
 [build-dependencies]
 pyo3-build-utils = {path = "../pyo3-build-utils"}

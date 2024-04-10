@@ -1,102 +1,122 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use deno_lite::DenoLite;
-use fuzzy_sourcemap::{FuzzySourceMap, PathResolver};
+use deno_lite::{DenoLite, ESModule};
 use indexmap::IndexMap;
 use pyo3::prelude::*;
-use swc_core::common::{sync::Lrc, FileLoader, FileName, SourceMap};
-use swc_ecma_utils2::jsx::{DocumentBuilder, JSXRuntime};
+use swc_core::common::{sync::Lrc, FileName, SourceMap};
+use swc_ecma_transform_sphinx::init_esm;
+use swc_ecma_utils2::jsx::JSXDocument;
 
-struct Symbols;
+mod env;
+mod symbols;
+mod tree;
 
-impl JSXRuntime for Symbols {
-  const JSX: &'static str = "_jsx";
-  const JSXS: &'static str = "_jsxs";
-  const FRAGMENT: &'static str = "_Fragment";
-}
+use self::{
+  env::{SphinxEnv, SphinxFileLoader, SphinxOptions},
+  symbols::Symbols,
+};
 
-#[derive(FromPyObject, Clone)]
-struct SphinxEnv {
-  srcdir: PathBuf,
-  outdir: PathBuf,
-  confdir: PathBuf,
-}
-
-impl FileLoader for SphinxEnv {
-  fn file_exists(&self, path: &Path) -> bool {
-    todo!()
-  }
-
-  fn abs_path(&self, path: &Path) -> Option<PathBuf> {
-    todo!()
-  }
-
-  fn read_file(&self, path: &Path) -> std::io::Result<String> {
-    todo!()
-  }
-}
-
-impl PathResolver for SphinxEnv {
-  fn resolve(&self, path: Option<&str>, base: Option<PathBuf>) -> Option<PathBuf> {
-    todo!()
-  }
-}
+pub use self::tree::Doctree;
 
 #[derive(Default)]
 enum BundlerPhase {
   #[default]
   Init,
   SourceMap {
-    pages: IndexMap<FileName, DocumentBuilder<Symbols>>,
-    sourcemap: FuzzySourceMap,
+    esm: ESModule,
+    trees: IndexMap<FileName, JSXDocument>,
   },
 }
 
 #[pyclass(unsendable)]
-pub struct SphinxBundler {
+pub struct Bundler {
+  env: Lrc<SphinxEnv>,
   deno: DenoLite,
-  options: SphinxEnv,
-  sources: Lrc<SourceMap>,
+  files: Lrc<SourceMap>,
   phase: BundlerPhase,
 }
 
-#[pymethods]
-impl SphinxBundler {
-  #[new]
-  fn new(options: SphinxEnv) -> Self {
-    Self {
-      deno: Default::default(),
-      options,
-      sources: Default::default(),
-      phase: Default::default(),
-    }
-  }
-
-  fn init(&mut self) {
-    match self.phase {
-      BundlerPhase::Init => {
-        let sourcemap = FuzzySourceMap::new(self.sources.clone(), Default::default());
-        self.phase = BundlerPhase::SourceMap {
-          pages: Default::default(),
-          sourcemap,
-        };
-      }
-      _ => unreachable!("Invalid phase"),
-    }
-  }
-
-  #[pyo3(signature = (component, attrs, *, file_name = None, line_number = None, raw_source = None))]
-  fn chunk(
-    &mut self,
-    component: &str,
-    attrs: &str,
-    file_name: Option<&str>,
-    line_number: Option<usize>,
-    raw_source: Option<&str>,
-  ) {
-    let BundlerPhase::SourceMap { pages, sourcemap } = &mut self.phase else {
+macro_rules! assert_phase {
+  ($match:pat, $phase:expr) => {
+    let $match = $phase else {
       unreachable!("Invalid phase");
     };
-    dbg!(file_name);
+  };
+}
+
+#[pymethods]
+impl Bundler {
+  #[new]
+  fn new(options: SphinxOptions) -> PyResult<Self> {
+    let env: Lrc<SphinxEnv> = Lrc::new(options.try_into()?);
+
+    let deno = Default::default();
+
+    let files = Lrc::new(SourceMap::with_file_loader(
+      Box::new(SphinxFileLoader::from(env.clone())),
+      Default::default(),
+    ));
+
+    let phase = Default::default();
+
+    Ok(Self {
+      env,
+      deno,
+      files,
+      phase,
+    })
+  }
+
+  fn init(&mut self) -> PyResult<()> {
+    assert_phase!(BundlerPhase::Init, &self.phase);
+    let esm = init_esm(self.deno.clone())?;
+    let trees = Default::default();
+    self.phase = BundlerPhase::SourceMap { esm, trees };
+    Ok(())
+  }
+
+  fn open<'py>(&mut self, py: Python<'py>, path: PathBuf) -> PyResult<Bound<'py, Doctree>> {
+    assert_phase!(BundlerPhase::SourceMap { trees, .. }, &mut self.phase);
+
+    let file = self
+      .files
+      .get_source_file(&FileName::Real(path.clone()))
+      .ok_or(())
+      .or_else(|_| self.files.load_file(&path))?;
+
+    if trees.contains_key(&file.name) {
+      return Err(anyhow::anyhow!("doctree with name {} already exists", file.name.clone()).into());
+    }
+
+    Bound::new(py, Doctree::from((&*self, file.name.clone())))
+  }
+
+  fn seal<'py>(&mut self, _py: Python<'py>, tree: Bound<'py, Doctree>) -> PyResult<()> {
+    assert_phase!(BundlerPhase::SourceMap { trees, .. }, &mut self.phase);
+
+    let (file, tree) = tree.borrow_mut().close()?;
+
+    if trees.contains_key(&file) {
+      return Err(anyhow::anyhow!("doctree with name {} already exists", file).into());
+    }
+
+    trees.insert(file, tree);
+
+    Ok(())
+  }
+
+  fn emit(&mut self) -> PyResult<()> {
+    assert_phase!(BundlerPhase::SourceMap { trees, esm }, &mut self.phase);
+
+    for (file, tree) in trees.drain(..) {
+      self.env.emit_page(
+        &file,
+        self.files.clone(),
+        tree.to_fragment::<Symbols>().into(),
+        esm,
+      )?;
+    }
+
+    Ok(())
   }
 }

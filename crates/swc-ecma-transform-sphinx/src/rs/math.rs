@@ -1,16 +1,24 @@
-use std::marker::PhantomData;
+use std::{borrow::Cow, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
-use swc_core::ecma::{
-  ast::CallExpr,
-  visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
+use swc_core::{
+  common::{sync::Lrc, FileName, SourceMap},
+  ecma::{
+    ast::CallExpr,
+    visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
+  },
 };
 
 use deno_lite::{anyhow, ESFunction, ESModule};
-use html5jsx::html_str_to_jsx;
+use html5jsx::html_to_jsx;
 use swc_ecma_utils2::{
   ad_hoc_tag,
-  jsx::{create_element, unpack::unpack_jsx, JSXDocument, JSXRuntime},
+  jsx::{
+    create_element,
+    unpack::{unpack_jsx, TextNode},
+    JSXDocument, JSXElement, JSXRuntime,
+  },
+  span::with_span,
 };
 
 use crate::macros::basic_attributes;
@@ -23,33 +31,39 @@ struct RenderMath {
 
 #[basic_attributes(#[serde(default)])]
 #[derive(Serialize, Deserialize)]
-struct Math {
+struct Math<'ast> {
   #[serde(alias = "children")]
-  tex: String,
+  #[serde(deserialize_with = "TextNode::into_cow")]
+  #[serde(borrow)]
+  tex: Cow<'ast, str>,
   label: Option<String>,
   number: Option<u32>,
 }
 
 #[derive(Deserialize)]
-enum SphinxMath {
+enum SphinxMath<'ast> {
   #[serde(rename = "math")]
-  Inline(Math),
+  #[serde(borrow)]
+  Inline(Math<'ast>),
   #[serde(rename = "math_block")]
-  Block(Math),
+  #[serde(borrow)]
+  Block(Math<'ast>),
 }
 
 pub struct MathRenderer<R: JSXRuntime> {
-  module: ESModule,
+  sourcemap: Lrc<SourceMap>,
+  esm: ESModule,
   jsx: PhantomData<R>,
 }
 
 impl<R: JSXRuntime> MathRenderer<R> {
   fn render_math(&mut self, tex: &str, inline: bool) -> anyhow::Result<JSXDocument> {
-    let html: String = self.module.call_function(RenderMath {
+    let html: String = self.esm.call_function(RenderMath {
       tex: tex.into(),
       inline,
     })?;
-    let document = html_str_to_jsx::<R>(&html)
+    let html = self.sourcemap.new_source_file(FileName::Anon, html);
+    let document = html_to_jsx::<R>(&html)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
     Ok(document)
   }
@@ -67,17 +81,15 @@ impl<R: JSXRuntime> MathRenderer<R> {
     let document = self.render_math(&props.tex, inline);
 
     *call = match document {
-      Ok(document) => create_element::<R>(ad_hoc_tag!(Math))
-        .props(&props)
-        .prop("inline", &inline)
-        .child(document.to_fragment::<R>().into())
-        .span(call.span)
+      Ok(document) => create_element::<R>(call.as_arg0_span::<R>(), ad_hoc_tag!(Math))
+        .props(call.as_arg1_span::<R>(), &props)
+        .prop(Default::default(), "inline", &inline)
+        .child(with_span(call.span)(document.to_fragment::<R>().into()))
         .build()?,
-      Err(error) => create_element::<R>(ad_hoc_tag!(Math))
-        .props(&props)
-        .prop("inline", &inline)
-        .prop("error", &format!("{}", error))
-        .span(call.span)
+      Err(error) => create_element::<R>(call.as_arg0_span::<R>(), ad_hoc_tag!(Math))
+        .props(call.as_arg1_span::<R>(), &props)
+        .prop(Default::default(), "inline", &inline)
+        .prop(Default::default(), "error", &format!("{}", error))
         .build()?,
     };
 
@@ -97,9 +109,13 @@ impl<R: JSXRuntime> VisitMut for MathRenderer<R> {
   }
 }
 
-pub fn render_math<R: JSXRuntime>(esm: &ESModule) -> impl Fold + VisitMut {
+pub fn render_math<R: JSXRuntime>(
+  sourcemap: Lrc<SourceMap>,
+  esm: &ESModule,
+) -> impl Fold + VisitMut {
   as_folder(MathRenderer {
-    module: esm.clone(),
+    sourcemap,
+    esm: esm.clone(),
     jsx: PhantomData::<R>,
   })
 }

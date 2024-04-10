@@ -244,7 +244,7 @@ impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
     {
       let tag = call.as_jsx_type::<R>()?;
       if matches_tag!(tag, "*"?) {
-        let props = call.as_jsx_props_mut::<R>()?.as_mut_object()?;
+        let props = call.as_mut_jsx_props::<R>()?;
         let messages = translate_attrs::<R, S>(
           props,
           &[
@@ -260,7 +260,7 @@ impl<R: JSXRuntime, S: I18nSymbols> Translator<'_, R, S> {
     }
 
     {
-      let mut props = call.as_jsx_props_mut::<R>()?.as_mut_object()?.take();
+      let mut props = call.as_mut_jsx_props::<R>()?.take();
       let Some(tag) = call.as_jsx_type::<R>() else {
         call.set_item(2usize, props.into());
         return None;

@@ -13,17 +13,24 @@ name = "sphinx_jsx"
 path = "src/rs/lib.rs"
 
 [dependencies]
+anyhow = "1.0.79"
 deno-lite = {path = "../../crates/deno-lite"}
 fuzzy-sourcemap = {path = "../../crates/fuzzy-sourcemap"}
 indexmap = "2.1.0"
-pyo3 = {version = "0.20.0", features = ["indexmap"]}
+miette = {version = "7.2.0", features = ["fancy", "serde"]}
+pyo3 = {version = "0.21.0", features = ["indexmap", "anyhow"]}
+relative-path = "1.9.2"
 serde = {version = "1.0.195", features = ["derive"]}
 serde_json = {version = "1.0.111", features = ["preserve_order"]}
+serde_yaml = "0.9.34"
+swc-ecma-transform-i18n = {path = "../../crates/swc-ecma-transform-i18n"}
+swc-ecma-transform-sphinx = {path = "../../crates/swc-ecma-transform-sphinx"}
 swc-ecma-utils2 = {path = "../../crates/swc-ecma-utils2"}
+thiserror = "1.0.58"
 url = "2.5.0"
 
 [dependencies.swc_core]
-features = ["common_concurrent"]
+features = ["common_concurrent", "ecma_codegen", "ecma_ast_serde"]
 version = "*"
 
 [build-dependencies]

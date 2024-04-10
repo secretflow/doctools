@@ -1,31 +1,39 @@
 use swc_core::{
   common::Span,
-  ecma::visit::{noop_visit_mut_type, VisitMut, VisitMutWith},
+  ecma::{
+    ast::Expr,
+    visit::{noop_visit_mut_type, VisitMut, VisitMutWith},
+  },
 };
 
 struct SetSpan {
-  span: Span,
+  span: Option<Span>,
 }
 
 impl VisitMut for SetSpan {
   noop_visit_mut_type!();
 
+  fn visit_mut_expr(&mut self, expr: &mut Expr) {
+    if self.span.is_some() {
+      expr.visit_mut_children_with(self)
+    }
+  }
+
   fn visit_mut_span(&mut self, span: &mut Span) {
     if span.is_dummy() {
-      *span = self.span;
+      if let Some(new_span) = self.span.take() {
+        *span = new_span;
+      }
     }
   }
 }
 
 #[allow(private_bounds)]
-pub fn with_span<T: VisitMutWith<SetSpan>>(span: Option<Span>) -> impl Fn(T) -> T {
+pub fn with_span<T: VisitMutWith<SetSpan>>(span: Span) -> impl Fn(T) -> T {
   move |mut node| {
-    match span {
-      Some(span) if !span.is_dummy() => {
-        let mut v = SetSpan { span };
-        node.visit_mut_with(&mut v);
-      }
-      _ => {}
+    if !span.is_dummy() {
+      let mut v = SetSpan { span: Some(span) };
+      node.visit_mut_with(&mut v);
     }
     node
   }

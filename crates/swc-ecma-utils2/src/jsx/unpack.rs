@@ -1,8 +1,8 @@
-use std::marker::PhantomData;
+use std::{borrow::Cow, marker::PhantomData};
 
 use serde::{
   de::{Error, IntoDeserializer},
-  Deserializer,
+  Deserialize, Deserializer,
 };
 use swc_core::ecma::ast::{CallExpr, Expr};
 
@@ -182,6 +182,34 @@ where
     call,
     runtime: PhantomData::<R>,
   })
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(untagged)]
+pub enum TextNode<'ast> {
+  #[serde(borrow)]
+  Single(Cow<'ast, str>),
+  #[serde(borrow)]
+  Multiple(Vec<Cow<'ast, str>>),
+}
+
+impl<'ast> From<TextNode<'ast>> for Cow<'ast, str> {
+  fn from(value: TextNode<'ast>) -> Self {
+    match value {
+      TextNode::Single(t) => t,
+      TextNode::Multiple(tt) => Cow::Owned(tt.join("")),
+    }
+  }
+}
+
+impl TextNode<'_> {
+  pub fn into_cow<'de, D>(de: D) -> Result<Cow<'de, str>, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    let this = TextNode::deserialize(de)?;
+    Ok(this.into())
+  }
 }
 
 #[cfg(test)]

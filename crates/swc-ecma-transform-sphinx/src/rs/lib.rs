@@ -18,4 +18,4 @@ pub mod macros;
 pub use code::render_code;
 pub use math::render_math;
 pub use raw::render_raw;
-pub use typography::render_typograph;
+pub use typography::render_typography;

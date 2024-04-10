@@ -23,7 +23,7 @@ impl JSXRuntime for Runtime {
 fn test_conversion(source_path: PathBuf) {
   test_js_fixture(
     source_path,
-    |source| html_to_jsx::<Runtime>(&source).unwrap().to_module(),
+    |source| html_to_jsx::<Runtime>(&source).unwrap().into_module(),
     |_: Value| chain!(fold_fragments::<Runtime>(), fix_jsx_factories::<Runtime>()),
   );
 }

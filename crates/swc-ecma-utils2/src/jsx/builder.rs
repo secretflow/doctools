@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::{fmt::Debug, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
 use swc_core::{
@@ -12,7 +12,6 @@ use swc_core::{
 use crate::{
   collections::{Mapping, MutableMapping, MutableSequence},
   ecma::{repack_expr, RepackError},
-  span::with_span,
   Array,
 };
 
@@ -40,26 +39,26 @@ impl<R: JSXRuntime> JSXBuilder<R> {
   pub fn tag(mut self, tag: impl JSXTagDef) -> Self {
     match self.err {
       Some(_) => {}
-      None => match self.call.as_arg0_mut::<R>() {
+      None => match self.call.as_mut_arg0::<R>() {
         None => {
           self.err = Some(JSXBuilderError::InvalidTag);
         }
         Some(arg0) => {
-          *arg0 = tag.to_expr::<R>();
+          *arg0 = tag.to_expr::<R>(arg0.span());
         }
       },
     }
     self
   }
 
-  pub fn prop<T: Serialize>(mut self, name: &str, value: &T) -> Self {
+  pub fn prop<T: Serialize>(mut self, span: Span, name: &str, value: &T) -> Self {
     match self.err {
       Some(_) => {}
-      None => match repack_expr(value) {
+      None => match repack_expr(span, value) {
         Err(err) => {
           self.err = Some(JSXBuilderError::RepackError(err));
         }
-        Ok(value) => match self.call.as_jsx_props_mut::<R>() {
+        Ok(value) => match self.call.as_mut_jsx_props::<R>() {
           None => {
             self.err = Some(JSXBuilderError::InvalidProps);
           }
@@ -75,7 +74,7 @@ impl<R: JSXRuntime> JSXBuilder<R> {
   pub fn prop2(mut self, name: &str, value: Expr) -> Self {
     match self.err {
       Some(_) => {}
-      None => match self.call.as_jsx_props_mut::<R>() {
+      None => match self.call.as_mut_jsx_props::<R>() {
         None => {
           self.err = Some(JSXBuilderError::InvalidProps);
         }
@@ -90,7 +89,7 @@ impl<R: JSXRuntime> JSXBuilder<R> {
   pub fn child(mut self, child: Expr) -> Self {
     match self.err {
       Some(_) => {}
-      None => match self.call.as_jsx_props_mut::<R>() {
+      None => match self.call.as_mut_jsx_props::<R>() {
         None => {
           self.err = Some(JSXBuilderError::InvalidChildren);
         }
@@ -112,19 +111,19 @@ impl<R: JSXRuntime> JSXBuilder<R> {
     self
   }
 
-  pub fn props<T: Serialize>(mut self, props: &T) -> Self {
+  pub fn props<T: Serialize>(mut self, span: Span, props: &T) -> Self {
     match self.err {
       Some(_) => {}
-      None => match repack_expr(props) {
+      None => match repack_expr(span, props) {
         Err(err) => {
           self.err = Some(JSXBuilderError::RepackError(err));
         }
-        Ok(Expr::Object(props)) => match self.call.as_jsx_props_mut::<R>() {
+        Ok(Expr::Object(props)) => match self.call.as_mut_jsx_props::<R>() {
           None => {
             self.err = Some(JSXBuilderError::InvalidProps);
           }
           Some(old) => {
-            *old = props.into();
+            *old = props;
           }
         },
         Ok(_) => self.err = Some(JSXBuilderError::InvalidProps),
@@ -133,11 +132,11 @@ impl<R: JSXRuntime> JSXBuilder<R> {
     self
   }
 
-  pub fn arg1(mut self, props: Expr) -> Self {
+  pub fn arg1(mut self, props: ObjectLit) -> Self {
     match self.err {
       Some(_) => self,
       None => {
-        match self.call.as_jsx_props_mut::<R>() {
+        match self.call.as_mut_jsx_props::<R>() {
           None => {
             self.err = Some(JSXBuilderError::InvalidProps);
           }
@@ -148,11 +147,6 @@ impl<R: JSXRuntime> JSXBuilder<R> {
         self
       }
     }
-  }
-
-  pub fn span(mut self, span: Span) -> Self {
-    self.call.span = span;
-    self
   }
 
   pub fn build(self) -> Result<CallExpr, JSXBuilderError> {
@@ -179,16 +173,15 @@ pub fn jsx_builder2<R: JSXRuntime>(call: CallExpr) -> JSXBuilder<R> {
 }
 
 #[inline(always)]
-pub fn create_element<R: JSXRuntime>(tag: impl JSXTagDef) -> JSXBuilder<R> {
-  jsx_builder2(<CallExpr as JSXElement>::new_jsx_element::<R>(tag))
+pub fn create_element<R: JSXRuntime>(span: Span, tag: impl JSXTagDef) -> JSXBuilder<R> {
+  jsx_builder2(<CallExpr as JSXElement>::new_element::<R>(span, tag))
 }
 
 #[inline(always)]
-pub fn create_fragment<R: JSXRuntime>() -> JSXBuilder<R> {
-  jsx_builder2(<CallExpr as JSXElement>::new_jsx_fragment::<R>())
+pub fn create_fragment<R: JSXRuntime>(span: Span) -> JSXBuilder<R> {
+  jsx_builder2(<CallExpr as JSXElement>::new_fragment::<R>(span))
 }
 
-#[derive(Debug)]
 struct Context {
   parent: Expr,
   prop: Vec<String>,
@@ -211,14 +204,14 @@ pub struct JSXDocument {
 
 impl JSXDocument {
   pub fn to_fragment<R: JSXRuntime>(self) -> CallExpr {
-    let mut elem = create_fragment::<R>().guarantee();
+    let mut elem = create_fragment::<R>(Default::default()).guarantee();
 
     let mut children = ArrayLit::dummy();
     children.extend(&mut self.head.into_iter());
     children.extend(&mut self.body.into_iter());
 
     elem
-      .as_jsx_props_mut::<R>()
+      .as_mut_jsx_props::<R>()
       .set_item("children", children.into());
 
     elem
@@ -226,9 +219,12 @@ impl JSXDocument {
 }
 
 #[derive(Default)]
+struct Stack(Vec<Context>);
+
+#[derive(Default)]
 pub struct DocumentBuilder<R: JSXRuntime> {
   state: LastElement,
-  context: Vec<Context>,
+  context: Stack,
 
   head: Vec<Expr>,
   body: Vec<Expr>,
@@ -237,30 +233,19 @@ pub struct DocumentBuilder<R: JSXRuntime> {
 }
 
 impl<R: JSXRuntime> DocumentBuilder<R> {
-  pub fn element(
-    &mut self,
-    tag: impl JSXTagDef,
-    props: Option<ObjectLit>,
-    span: Option<Span>,
-  ) -> &mut Self {
-    let mut elem = create_element::<R>(tag).guarantee();
-
-    let mut props = props;
-    let mut props = props.drain().collect::<Vec<_>>();
-
-    props.reverse();
-
-    elem
-      .as_jsx_props_mut::<R>()
-      .update_from(&mut props.drain(..));
-
-    self.push(with_span(span)(elem.into()));
+  pub fn element(&mut self, span: Span, tag: impl JSXTagDef, props: ObjectLit) -> &mut Self {
+    self.push(
+      create_element::<R>(span, tag)
+        .arg1(props)
+        .guarantee()
+        .into(),
+    );
     self
   }
 
   pub fn enter(&mut self, path: &[&str]) -> &mut Self {
     let parent = self.pop();
-    self.context.push(Context {
+    self.context.0.push(Context {
       parent,
       prop: path.iter().map(|s| s.to_string()).collect(),
       children: vec![],
@@ -278,7 +263,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
       mut parent,
       prop,
       children,
-    } = match self.context.pop() {
+    } = match self.context.0.pop() {
       Some(v) => v,
       None => return self,
     };
@@ -291,19 +276,16 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
 
     parent
       .as_mut_call()
-      .unwrap()
-      .as_jsx_props_mut::<R>()
+      .as_mut_jsx_props::<R>()
       .set_item_at_path(prop, children.into())
-      .unwrap();
-
-    let parent = with_span(Some(parent.span()))(parent);
+      .expect("should have props");
 
     self.push(parent);
     self
   }
 
   pub fn flush(&mut self) {
-    while !self.context.is_empty() {
+    while !self.context.0.is_empty() {
       self.exit();
     }
   }
@@ -312,7 +294,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
     match self.state {
       LastElement::Head => self.head.pop(),
       LastElement::Body => self.body.pop(),
-      LastElement::Context => self.context.last_mut().and_then(|ctx| ctx.children.pop()),
+      LastElement::Context => self.context.0.last_mut().and_then(|ctx| ctx.children.pop()),
     }
     .expect("should have an element to enter")
   }
@@ -339,7 +321,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
       self.head.push(value);
       self.state = LastElement::Head;
     } else {
-      match self.context.last_mut() {
+      match self.context.0.last_mut() {
         Some(Context { children, .. }) => {
           children.push(value);
           self.state = LastElement::Context;
@@ -352,7 +334,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
     }
   }
 
-  pub fn to_document(self) -> JSXDocument {
+  pub fn into_document(self) -> JSXDocument {
     JSXDocument {
       head: self.head,
       body: self.body,
@@ -361,7 +343,7 @@ impl<R: JSXRuntime> DocumentBuilder<R> {
 }
 
 impl JSXDocument {
-  pub fn to_module(mut self) -> Module {
+  pub fn into_module(mut self) -> Module {
     Module {
       span: Default::default(),
       body: vec![ModuleItem::ModuleDecl(ModuleDecl::ExportDecl(ExportDecl {
@@ -424,24 +406,115 @@ impl JSXDocument {
   }
 }
 
+impl Debug for Context {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    struct DisplayAsDebug<'a>(&'a str);
+
+    impl Debug for DisplayAsDebug<'_> {
+      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+      }
+    }
+
+    fn expr_to_name(e: &Expr) -> DisplayAsDebug<'_> {
+      DisplayAsDebug(
+        e.as_call()
+          .and_then(|c| c.callee.as_expr())
+          .and_then(|e| e.as_ident())
+          .map(|ident| ident.sym.as_str())
+          .unwrap_or("Expr?"),
+      )
+    }
+
+    let mut t = f.debug_tuple(format!("{:?}", expr_to_name(&self.parent)).as_str());
+
+    self.children.iter().for_each(|e| {
+      t.field(&expr_to_name(e));
+    });
+
+    t.finish()
+  }
+}
+
+impl Debug for Stack {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    struct DisplayAsDebug<'a>(&'a str);
+
+    impl Debug for DisplayAsDebug<'_> {
+      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+      }
+    }
+
+    struct ContextChain<'a>(&'a Vec<Context>, usize);
+
+    impl Debug for ContextChain<'_> {
+      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let Some(ctx) = self.0.get(self.1) else {
+          return Ok(());
+        };
+
+        let mut tuple = f.debug_tuple(format!("{:?}", expr_to_name(&ctx.parent)).as_str());
+
+        ctx.children.iter().for_each(|e| {
+          tuple.field(&expr_to_name(e));
+        });
+
+        if self.1 + 1 < self.0.len() {
+          tuple.field(&ContextChain(self.0, self.1 + 1));
+        }
+
+        tuple.finish()
+      }
+    }
+
+    fn expr_to_name(e: &Expr) -> DisplayAsDebug<'_> {
+      DisplayAsDebug(
+        e.as_call()
+          .and_then(|c| c.args.first())
+          .map(|e| &e.expr)
+          .and_then(|e| e.as_ident())
+          .map(|ident| ident.sym.as_str())
+          .or_else(|| match e.as_lit() {
+            Some(Lit::Str(Str { value, .. })) => Some(&**value),
+            _ => None,
+          })
+          .unwrap_or("Expr?"),
+      )
+    }
+
+    Debug::fmt(&ContextChain(&self.0, 0), f)
+  }
+}
+
+impl<R: JSXRuntime> Debug for DocumentBuilder<R> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("DocumentBuilder")
+      .field("state", &self.state)
+      .field("context", &self.context)
+      .finish()
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use swc_ecma_testing2::{insta, print_one_unchecked};
 
-  use crate::{ad_hoc_tag, json_expr, jsx::JSXSymbols};
+  use crate::{ad_hoc_tag, json_expr, jsx::JSXSymbols, Object};
 
   use super::{create_element, create_fragment, DocumentBuilder};
 
   #[test]
   fn test_fragment() {
-    let document = print_one_unchecked(&create_fragment::<JSXSymbols>().guarantee());
+    let document =
+      print_one_unchecked(&create_fragment::<JSXSymbols>(Default::default()).guarantee());
     insta::assert_snapshot!(document);
   }
 
   #[test]
   fn test_intrinsic() {
     let document = print_one_unchecked(&{
-      create_element::<JSXSymbols>(ad_hoc_tag!("div"))
+      create_element::<JSXSymbols>(Default::default(), ad_hoc_tag!("div"))
         .child("foo".into())
         .guarantee()
     });
@@ -450,16 +523,18 @@ mod tests {
 
   #[test]
   fn test_component() {
-    let document = print_one_unchecked(&create_element::<JSXSymbols>(ad_hoc_tag!(Foo)).guarantee());
+    let document = print_one_unchecked(
+      &create_element::<JSXSymbols>(Default::default(), ad_hoc_tag!(Foo)).guarantee(),
+    );
     insta::assert_snapshot!(document);
   }
 
   #[test]
   fn test_props() {
     let document = print_one_unchecked(&{
-      create_element::<JSXSymbols>(ad_hoc_tag!("div"))
-        .prop("className", &"foo")
-        .prop("id", &"bar")
+      create_element::<JSXSymbols>(Default::default(), ad_hoc_tag!("div"))
+        .prop(Default::default(), "className", &"foo")
+        .prop(Default::default(), "id", &"bar")
         .guarantee()
     });
     insta::assert_snapshot!(document);
@@ -468,13 +543,17 @@ mod tests {
   fn document_builder(build: impl Fn(&mut DocumentBuilder<JSXSymbols>)) -> String {
     let mut builder = Default::default();
     build(&mut builder);
-    print_one_unchecked(&builder.to_document().to_module())
+    print_one_unchecked(&builder.into_document().into_module())
   }
 
   #[test]
   fn test_document_fragment() {
     let document = document_builder(|builder| {
-      builder.element(ad_hoc_tag!(<>), json_expr!({}).object(), None);
+      builder.element(
+        Default::default(),
+        ad_hoc_tag!(<>),
+        json_expr!({}).object().expect("object"),
+      );
     });
     insta::assert_snapshot!(document);
   }
@@ -483,7 +562,11 @@ mod tests {
   fn test_document_intrinsic() {
     let document = document_builder(|builder| {
       builder
-        .element(ad_hoc_tag!("div"), json_expr!({}).object(), None)
+        .element(
+          Default::default(),
+          ad_hoc_tag!("div"),
+          json_expr!({}).object().expect("object"),
+        )
         .enter(&["children"])
         .value("foo".into())
         .exit();
@@ -496,13 +579,14 @@ mod tests {
     let document = document_builder(|builder| {
       builder
         .element(
+          Default::default(),
           ad_hoc_tag!("a"),
           json_expr!({
             "href": "https://example.com",
             "title": "Example"
           })
-          .object(),
-          None,
+          .object()
+          .expect("object"),
         )
         .enter(&["children"])
         .value("Example".into())
@@ -515,22 +599,23 @@ mod tests {
   fn test_document_head() {
     let document = document_builder(|builder| {
       builder
-        .element(ad_hoc_tag!("section"), None, None)
+        .element(Default::default(), ad_hoc_tag!("section"), Object!())
         .enter(&["children"])
-        .element(ad_hoc_tag!("style"), None, None)
+        .element(Default::default(), ad_hoc_tag!("style"), Object!())
         .enter(&["children"])
         .value("p { background: #fff; }".into())
         .exit()
         .element(
+          Default::default(),
           ad_hoc_tag!("link"),
           json_expr!({
             "rel": "preconnect",
             "href": "https://rsms.me/"
           })
-          .object(),
-          None,
+          .object()
+          .expect("object"),
         )
-        .element(ad_hoc_tag!("p"), None, None)
+        .element(Default::default(), ad_hoc_tag!("p"), Object!())
         .enter(&["children"])
         .value("Lorem ipsum".into())
         .exit()

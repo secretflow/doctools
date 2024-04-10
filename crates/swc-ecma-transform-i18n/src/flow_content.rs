@@ -148,7 +148,7 @@ where
         }
         let (message, elem) = message.make_trans::<R, S>();
         messages.push(message);
-        children.push(Some(with_span(Some(span))(elem).into()));
+        children.push(Some(with_span(span)(elem).into()));
       }
       Block::Expr(expr) => children.push(Some(expr)),
     });
@@ -166,7 +166,7 @@ pub fn translate_block<R: JSXRuntime, S: I18nSymbols>(
 ) -> Vec<Message> {
   let mut collector = <FlowContentCollector<R, S>>::new(pre);
 
-  let Some(props) = call.as_jsx_props_mut::<R>() else {
+  let Some(props) = call.as_mut_jsx_props::<R>() else {
     return vec![];
   };
 

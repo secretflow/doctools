@@ -2,10 +2,10 @@
 
 use std::{borrow::Cow, marker::PhantomData};
 
-use html5jsx::html_str_to_jsx;
+use html5jsx::html_to_jsx;
 use serde::{Deserialize, Serialize};
 use swc_core::{
-  common::{util::take::Take, Span, Spanned},
+  common::{sync::Lrc, util::take::Take, FileName, SourceFile, SourceMap, Span, Spanned},
   ecma::{
     ast::{CallExpr, Expr, ExprOrSpread, Ident, KeyValueProp, PropName, Str},
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
@@ -63,6 +63,7 @@ enum State {
 
 struct RawRenderer<R: JSXRuntime> {
   state: State,
+  sourcemap: Lrc<SourceMap>,
   jsx: PhantomData<R>,
 }
 
@@ -87,9 +88,16 @@ impl<R: JSXRuntime> RawRenderer<R> {
     match self.state {
       State::Empty => match &*raw.format {
         "html" => {
-          let document = html_str_to_jsx::<R>(&raw.value)
+          let html = SourceFile::new(
+            FileName::Anon,
+            false,
+            FileName::Anon,
+            raw.value,
+            call.span_lo(),
+          );
+          let document = html_to_jsx::<R>(&html)
             .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
-          *call = with_span(Some(call.span()))(document.to_fragment::<R>());
+          *call = with_span(call.span())(document.to_fragment::<R>());
           Ok(None)
         }
 
@@ -121,11 +129,11 @@ impl<R: JSXRuntime> RawRenderer<R> {
   fn process_other_call(&mut self, call: &mut CallExpr) -> anyhow::Result<Option<State>> {
     match self.state {
       State::NonHTML(ref mut props, ref mut span) => {
-        *call = create_fragment::<R>()
+        let span = span.to(call.span());
+        *call = create_fragment::<R>(Default::default())
           .child(
-            create_element::<R>(Transformed::Raw)
-              .span(span.to(call.span()))
-              .props(props)
+            create_element::<R>(span, Transformed::Raw)
+              .props(span, props)
               .build()?
               .into(),
           )
@@ -162,6 +170,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
 
     struct FindInlineHTML<R: JSXRuntime> {
       state: State,
+      sourcemap: Lrc<SourceMap>,
       jsx: PhantomData<R>,
     }
 
@@ -242,7 +251,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
               if let State::Found(ref mut found) = self.state {
                 found.push(InlineHTML::Expr({
                   let mut expr = call.take();
-                  expr.visit_mut_with(&mut render_raw::<R>());
+                  expr.visit_mut_with(&mut render_raw::<R>(self.sourcemap.clone()));
                   expr.into()
                 }))
               }
@@ -252,7 +261,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
             if let State::Found(ref mut found) = self.state {
               found.push(InlineHTML::Expr({
                 let mut expr = elem.take();
-                expr.visit_mut_with(&mut render_raw::<R>());
+                expr.visit_mut_with(&mut render_raw::<R>(self.sourcemap.clone()));
                 expr
               }))
             }
@@ -316,6 +325,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
 
     let mut visitor = FindInlineHTML {
       state: State::Empty,
+      sourcemap: self.sourcemap.clone(),
       jsx: PhantomData::<R>,
     };
 
@@ -345,7 +355,7 @@ impl<R: JSXRuntime> RawRenderer<R> {
       .collect::<Vec<_>>()
       .join("");
 
-    let mut document = html_str_to_jsx::<R>(&html)
+    let mut document = html_to_jsx::<R>(&self.sourcemap.new_source_file(FileName::Anon, html))
       .map(JSXDocument::to_fragment::<R>)
       .map_err(|err| anyhow::anyhow!("failed to parse math as JSX: {:?}", err))?;
 
@@ -363,7 +373,6 @@ impl<R: JSXRuntime> RawRenderer<R> {
 
     *call = jsx_builder2::<R>(call.take())
       .child(document.into())
-      .span(call.span())
       .build()?;
 
     Ok(None)
@@ -379,8 +388,9 @@ fn format_to_mime_type(format: &str) -> Option<&'static str> {
   }
 }
 
-pub fn render_raw<R: JSXRuntime>() -> impl Fold + VisitMut {
+pub fn render_raw<R: JSXRuntime>(sourcemap: Lrc<SourceMap>) -> impl Fold + VisitMut {
   as_folder(RawRenderer {
+    sourcemap,
     state: Default::default(),
     jsx: PhantomData::<R>,
   })

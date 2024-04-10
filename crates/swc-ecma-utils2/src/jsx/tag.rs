@@ -1,16 +1,19 @@
+use std::fmt::Debug;
+
 use serde::{Deserialize, Serialize};
 use swc_core::{
   atoms::Atom,
+  common::Span,
   ecma::ast::{Expr, Ident, Lit, Str},
 };
 
 use super::JSXRuntime;
 
 pub trait JSXTagDef {
-  fn to_expr<R: JSXRuntime>(&self) -> Expr;
+  fn to_expr<R: JSXRuntime>(&self, span: Span) -> Expr;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(tag = "kind", content = "type")]
 pub enum JSXTagType<'a> {
   Intrinsic(&'a str),
@@ -18,18 +21,32 @@ pub enum JSXTagType<'a> {
   Fragment,
 }
 
-impl JSXTagDef for JSXTagType<'_> {
-  fn to_expr<R: JSXRuntime>(&self) -> Expr {
+impl Debug for JSXTagType<'_> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
-      JSXTagType::Intrinsic(name) => Expr::Lit(name.to_owned().into()),
+      JSXTagType::Intrinsic(name) => write!(f, "<{:?}>", name),
+      JSXTagType::Component(name) => write!(f, "<{}>", name),
+      JSXTagType::Fragment => write!(f, "<>"),
+    }
+  }
+}
+
+impl JSXTagDef for JSXTagType<'_> {
+  fn to_expr<R: JSXRuntime>(&self, span: Span) -> Expr {
+    match self {
+      JSXTagType::Intrinsic(name) => Expr::Lit(Lit::Str(Str {
+        span,
+        value: (*name).into(),
+        raw: None,
+      })),
       JSXTagType::Component(name) => Expr::Ident(Ident {
-        sym: name.to_owned().into(),
-        span: Default::default(),
+        sym: (*name).into(),
+        span,
         optional: false,
       }),
       JSXTagType::Fragment => Expr::Ident(Ident {
         sym: R::FRAGMENT.into(),
-        span: Default::default(),
+        span,
         optional: false,
       }),
     }
@@ -137,10 +154,10 @@ macro_rules! tag_whitelist {
     $vis enum $name { $($tags),* }
 
     impl $crate::jsx::JSXTagDef for $name {
-      fn to_expr<R: $crate::jsx::JSXRuntime>(&self) -> swc_core::ecma::ast::Expr {
+      fn to_expr<R: $crate::jsx::JSXRuntime>(&self, span: swc_core::common::Span) -> swc_core::ecma::ast::Expr {
         match self {
           $(
-            $name::$tags => $crate::jsx::JSXTagType::Component(stringify!($tags)).to_expr::<R>()
+            $name::$tags => $crate::jsx::JSXTagType::Component(stringify!($tags)).to_expr::<R>(span)
           ),*
         }
       }

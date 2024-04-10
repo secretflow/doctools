@@ -103,7 +103,7 @@ where
   noop_visit_mut_type!();
 
   fn visit_mut_call_expr(&mut self, elem: &mut CallExpr) {
-    let Some(children) = elem.as_jsx_props_mut::<R>().del_item("children") else {
+    let Some(children) = elem.as_mut_jsx_props::<R>().del_item("children") else {
       elem.visit_mut_children_with(self);
       return;
     };
@@ -172,9 +172,9 @@ pub fn translate_phrase<R: JSXRuntime, S: I18nSymbols>(
 
     let (message, children) = collector.result();
 
-    let children = with_span(Some(elem.span()))(children);
+    let children = with_span(elem.span())(children);
 
-    elem.as_jsx_props_mut::<R>().set_item("children", children);
+    elem.as_mut_jsx_props::<R>().set_item("children", children);
 
     Some(message)
   } else {
