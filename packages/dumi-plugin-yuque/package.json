@@ -1,7 +1,7 @@
 {
   "name": "@secretflow/dumi-plugin-yuque",
   "license": "MIT",
-  "version": "0.2.1-alpha.1.0",
+  "version": "0.3.0",
   "keywords": [],
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-plugin-yuque",
   "bugs": "https://github.com/secretflow/doctools/issues",

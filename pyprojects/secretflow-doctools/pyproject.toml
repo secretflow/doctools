@@ -22,6 +22,7 @@ dependencies = [
   "requests-unixsocket>=0.3.0",
   "watchfiles>=0.20.0",
   "pathspec>=0.11.1",
+  "ansi2html>=1.9.1",
 ]
 description = "Documentation toolchain for SecretFlow"
 dynamic = ["version"]

@@ -3,6 +3,7 @@ Implement https://github.com/syntax-tree/unist.
 
 Upstream: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/unist/index.d.ts
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, TypedDict, TypeVar

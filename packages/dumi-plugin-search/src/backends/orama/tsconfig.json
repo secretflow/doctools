@@ -3,7 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["ESNext", "WebWorker", "Webworker.Iterable"],
-    "outDir": "../../../build/backends/orama"
+    "outDir": "../../../build/backends/orama",
+    "exactOptionalPropertyTypes": false
   },
   "include": ["./**/*.mts"],
   "references": [{ "path": "../../shared" }]

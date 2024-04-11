@@ -89,43 +89,64 @@ export async function plugin(api: DumiAPI) {
     memo.module
       .rule('dumi-plugin-search/runtime/index')
       .test(/^$/)
-      .resourceQuery(/dumi-plugin-search\/runtime\/index/)
-      .type('json')
+      .resourceQuery(/dumi-plugin-search\/runtime\/.*/)
+      .type('asset/resource')
+      .generator({ filename: 'static/search-index.[hash].gz' })
       .use('dumi-plugin-search/runtime/index')
       .loader(loader)
       .options({
         backend,
         routes: api.appData['routes'],
         pipelines: {
-          mdx: (processor) =>
-            processor
-              .use(remarkParse)
-              .use(remarkMdx)
-              .use(remarkFrontmatter)
-              .use(remarkExtractFrontmatter, { yaml: YAML.parse, name: 'frontmatter' })
-              .use(remarkGfm)
-              .use(remarkDirective)
-              .use(remarkMath)
-              .use(remarkAttrs)
-              .use(remarkRehype, { passThrough: MDX_NODE_TYPES }),
-          md: (processor) =>
-            processor
-              .use(remarkParse)
-              .use(remarkFrontmatter)
-              .use(remarkExtractFrontmatter, { yaml: YAML.parse, name: 'frontmatter' })
-              .use(remarkGfm)
-              .use(remarkDirective)
-              .use(remarkMath)
-              .use(remarkAttrs)
-              .use(remarkRehype)
-              .use(rehypeRaw),
-          html: (processor) =>
-            processor
-              .use(remarkParse)
-              .use(remarkFrontmatter)
-              .use(remarkExtractFrontmatter, { yaml: YAML.parse, name: 'frontmatter' })
-              .use(remarkRehype)
-              .use(rehypeRaw),
+          mdx: {
+            processor: (processor) =>
+              processor
+                .use(remarkParse)
+                .use(remarkMdx)
+                .use(remarkFrontmatter)
+                .use(remarkExtractFrontmatter, {
+                  yaml: YAML.parse,
+                  name: 'frontmatter',
+                })
+                .use(remarkGfm)
+                .use(remarkDirective)
+                .use(remarkMath)
+                .use(remarkAttrs)
+                .use(remarkRehype, { passThrough: MDX_NODE_TYPES }),
+          },
+          md: {
+            processor: (processor) =>
+              processor
+                .use(remarkParse)
+                .use(remarkFrontmatter)
+                .use(remarkExtractFrontmatter, {
+                  yaml: YAML.parse,
+                  name: 'frontmatter',
+                })
+                .use(remarkGfm)
+                .use(remarkDirective)
+                .use(remarkMath)
+                .use(remarkAttrs)
+                .use(remarkRehype)
+                .use(rehypeRaw),
+          },
+          html: {
+            processor: (processor) =>
+              processor
+                .use(remarkParse)
+                .use(remarkFrontmatter)
+                .use(remarkExtractFrontmatter, {
+                  yaml: YAML.parse,
+                  name: 'frontmatter',
+                })
+                .use(remarkRehype, { allowDangerousHtml: true })
+                .use(rehypeRaw),
+            preprocessor: (source) => {
+              const htmlStart = source.search(/<!DOCTYPE html>/i);
+              const frontmatter = source.slice(0, htmlStart);
+              return frontmatter + source.slice(htmlStart).replace(/\n/g, '&#10;');
+            },
+          },
         },
       } satisfies LoaderConfig)
       .end();

@@ -1,5 +1,61 @@
 # @secretflow/dumi-plugin-search
 
+## 0.6.1
+
+### Patch Changes
+
+- fix: avoid spawning worker in worker (it's safari)
+
+## 0.6.0
+
+### Minor Changes
+
+- feat: enable compression
+
+## 0.5.1
+
+### Patch Changes
+
+- fix: fix import
+
+## 0.5.0
+
+### Minor Changes
+
+- feat: load search index more lazily
+
+## 0.4.2
+
+### Patch Changes
+
+- fix: fix incorrect html parsing
+
+## 0.4.1
+
+### Patch Changes
+
+- fix: avoid early exit when path doesn't match standard docs
+
+## 0.4.0
+
+### Minor Changes
+
+- feat: finalize search provider
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [cd10fa5]
+- Updated dependencies [6c952c1]
+  - @secretflow/unified-toolkit@0.4.0
+
+## 0.3.1-alpha.1.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/unified-toolkit@0.4.0-alpha.1.2
+
 ## 0.3.1-alpha.1.0
 
 ### Patch Changes

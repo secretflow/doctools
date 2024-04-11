@@ -1,0 +1,85 @@
+{
+  "title": "Manifest",
+  "type": "object",
+  "properties": {
+    "version": { "title": "Version", "default": "1", "enum": ["1"], "type": "string" },
+    "sidebar": {
+      "title": "Sidebar",
+      "type": "array",
+      "items": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "doc": "#/definitions/SidebarItemDoc",
+            "link": "#/definitions/SidebarItemLink",
+            "category": "#/definitions/SidebarItemCategory"
+          }
+        },
+        "oneOf": [
+          { "$ref": "#/definitions/SidebarItemDoc" },
+          { "$ref": "#/definitions/SidebarItemLink" },
+          { "$ref": "#/definitions/SidebarItemCategory" }
+        ]
+      }
+    }
+  },
+  "required": ["sidebar"],
+  "definitions": {
+    "SidebarItemDoc": {
+      "title": "SidebarItemDoc",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "default": "doc",
+          "enum": ["doc"],
+          "type": "string"
+        },
+        "id": { "title": "Id", "type": "string" },
+        "label": { "title": "Label", "type": "string" }
+      },
+      "required": ["id", "label"]
+    },
+    "SidebarItemLink": {
+      "title": "SidebarItemLink",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "default": "link",
+          "enum": ["link"],
+          "type": "string"
+        },
+        "href": { "title": "Href", "type": "string" },
+        "label": { "title": "Label", "type": "string" }
+      },
+      "required": ["href", "label"]
+    },
+    "SidebarItemCategory": {
+      "title": "SidebarItemCategory",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "default": "category",
+          "enum": ["category"],
+          "type": "string"
+        },
+        "label": { "title": "Label", "type": "string" },
+        "items": {
+          "title": "Items",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/SidebarItemDoc" },
+              { "$ref": "#/definitions/SidebarItemLink" },
+              { "$ref": "#/definitions/SidebarItemCategory" }
+            ]
+          }
+        },
+        "link": { "$ref": "#/definitions/SidebarItemDoc" }
+      },
+      "required": ["label", "items"]
+    }
+  }
+}

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "outDir": "../../build/client"
+    "outDir": "../../build/client",
+    "exactOptionalPropertyTypes": false
   },
   "include": ["./**/*.mts"],
   "references": [{ "path": "../shared" }, { "path": "../worker" }]

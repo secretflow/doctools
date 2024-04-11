@@ -1,5 +1,22 @@
 # @secretflow/unified-toolkit
 
+## 0.4.0
+
+### Minor Changes
+
+- feat: finalize search provider
+- cd10fa5: add transitional openapi features
+
+### Patch Changes
+
+- 6c952c1: fix misc issues
+
+## 0.4.0-alpha.1.2
+
+### Patch Changes
+
+- fix misc issues
+
 ## 0.4.0-alpha.1.0
 
 ### Minor Changes

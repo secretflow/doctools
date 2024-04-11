@@ -2,8 +2,9 @@ export type SearchableContent = {
   url: string;
   title: string;
   content: string;
-  type: 'prose' | 'symbol';
-  topic?: string;
+  type: 'page' | 'fragment' | 'symbol';
+  project: string;
+  version?: string;
   lang?: string;
   symbol?: {
     domain: string;
@@ -25,11 +26,20 @@ export type SearchResultList = {
   queryTokens?: string[];
 };
 
+export type SearchQuery = {
+  project: string;
+  query: string;
+  version?: string;
+  lang?: string;
+  limit?: number;
+  offset?: number;
+};
+
 export interface SearchProvider {
   load: (data: unknown) => Promise<void>;
   dump: () => Promise<unknown>;
   insert: (...content: SearchableContent[]) => Promise<void>;
-  search: (query: string) => Promise<SearchResultList>;
+  search: (options: SearchQuery) => Promise<SearchResultList>;
 }
 
 export type SearchProviderFactory = () => Promise<SearchProvider>;

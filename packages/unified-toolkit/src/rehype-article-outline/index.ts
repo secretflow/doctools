@@ -230,6 +230,12 @@ export function rehypeArticleOutline(): Transformer {
                   const summary = methodData.summary;
                   const description = methodData.description;
                   const contentHint: string[] = [];
+                  if (method) {
+                    contentHint.push(method);
+                  }
+                  if (path) {
+                    contentHint.push(path);
+                  }
                   if (operationId) {
                     contentHint.push(operationId);
                   }
@@ -240,7 +246,7 @@ export function rehypeArticleOutline(): Transformer {
                     contentHint.push(description);
                   }
                   const id = operationId;
-                  const title = `${method.toUpperCase()} ${path}`.trim();
+                  const title = `${summary}`.trim();
                   swagger.push({
                     id,
                     title: title,

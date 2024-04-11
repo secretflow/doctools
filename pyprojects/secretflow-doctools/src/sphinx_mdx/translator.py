@@ -277,10 +277,36 @@ class MDXTranslator(SphinxTranslator):
 
     def visit_literal_block(self, node: nodes.literal_block):
         lang = node.get("language", "plaintext")
+
         if lang == "ipython3":
             lang = "python"
+
+        if lang == "myst-ansi":
+            try:
+                from ansi2html import Ansi2HTMLConverter
+
+                conv = Ansi2HTMLConverter()
+                html = conv.convert(node.astext(), full=False)
+                tree = self.mdclient.html_to_tree(html)
+
+            except ValueError:
+                pass
+
+            else:
+                self.enter_nesting(
+                    node,
+                    mdx.block("pre", classes=("ansi2html-content",)),
+                )
+                self.enter_nesting(node, mdx.block("code"))
+                for elem in tree["children"]:
+                    self.append_child(node, elem)
+                self.leave_nesting(node)
+                self.leave_nesting(node)
+                raise nodes.SkipNode
+
         content = node.astext().strip()
         self.append_child(node, md.code_block(content, lang))
+
         raise nodes.SkipNode
 
     def visit_doctest_block(self, node: nodes.doctest_block):
@@ -1068,7 +1094,47 @@ class MDXTranslator(SphinxTranslator):
 
             return
 
-        # Notebook
+        # myst-nb
+
+        nb_element = node.get("nb_element")
+
+        if nb_element:
+
+            if nb_element == "cell_code":
+                self.context_info["cell_index"] = node.get("cell_index")
+                self.enter_nesting(node, mdx.block("Notebook.Cell"))
+                return
+
+            if nb_element == "cell_code_source":
+                self.enter_nesting(
+                    node,
+                    mdx.block(
+                        "Notebook.CodeArea",
+                        prompt=f"[{self.context_info['cell_index']}]:",
+                        stderr=False,
+                        type="input",
+                    ),
+                )
+                return
+
+            if nb_element == "cell_code_output":
+                try:
+                    block = next(node.findall(nodes.literal_block))
+                    stderr = "stderr" in block.get("classes", [])
+                except StopIteration:
+                    stderr = False
+                self.enter_nesting(
+                    node,
+                    mdx.block(
+                        "Notebook.CodeArea",
+                        prompt=f"[{self.context_info['cell_index']}]:",
+                        stderr=stderr,
+                        type="output",
+                    ),
+                )
+                return
+
+        # nbsphinx
 
         classes = node.get("classes", [])
 

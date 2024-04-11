@@ -4,7 +4,8 @@
     "composite": true,
     "lib": ["ESNext"],
     "types": ["node"],
-    "outDir": "../../build/loader"
+    "outDir": "../../build/loader",
+    "exactOptionalPropertyTypes": false
   },
   "include": ["./**/*.mts", "./**/*.cts"],
   "references": [{ "path": "../shared" }]

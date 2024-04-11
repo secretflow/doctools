@@ -1,7 +1,7 @@
 {
   "name": "dumi-scaffolding",
   "license": "MIT",
-  "version": "0.2.1",
+  "version": "0.2.8",
   "description": "Dumi scaffolding for Sphinx MDX, part of SecretFlow's documentation builder",
   "repository": "https://github.com/secretflow/doctools/tree/main/packages/dumi-scaffolding",
   "bugs": "https://github.com/secretflow/doctools/issues",

@@ -1,5 +1,63 @@
 # dumi-scaffolding
 
+## 0.2.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.6.1
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.6
+
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.6.0
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.5
+
+## 0.2.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.5.1
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.4
+
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.5.0
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.3
+
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.4.2
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.2
+
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @secretflow/dumi-plugin-search@0.4.1
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.1
+
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [cd10fa5]
+- Updated dependencies [6c952c1]
+  - @secretflow/dumi-theme-sphinx-mdx@0.6.0
+  - @secretflow/dumi-plugin-search@0.4.0
+
 ## 0.2.1
 
 ### Patch Changes

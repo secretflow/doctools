@@ -47,6 +47,16 @@ const CSSOverrides = styled.div`
       }
     }
 
+    section[class^='SchemaTree'] {
+      & > div[class^='SchemaHeader'] > div[class^='SchemaHeader'] {
+        line-height: 1.2rem;
+
+        & > span[class^='SchemaHeader'] {
+          line-height: 1.2rem;
+        }
+      }
+    }
+
     .ant-collapse > .ant-collapse-item > .ant-collapse-header {
       align-items: flex-start;
     }
@@ -54,6 +64,34 @@ const CSSOverrides = styled.div`
     ul[class^='SchemaTree'] {
       padding: 0;
       gap: 0;
+    }
+
+    ul[class^='components__'] {
+      display: block;
+    }
+
+    p,
+    ul,
+    ol,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    blockquote,
+    pre {
+      &[class^='components__'] {
+        margin: 6px 0;
+
+        &:first-child {
+          margin-block-start: 0;
+        }
+
+        &:last-child {
+          margin-block-end: 0;
+        }
+      }
     }
   }
 `;
