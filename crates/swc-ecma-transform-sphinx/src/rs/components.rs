@@ -7,6 +7,7 @@ tag_whitelist!(
     Emphasis,
     Code,
     CodeBlock,
+    Math,
     HorizontalRule,
     Span,
     Raw,

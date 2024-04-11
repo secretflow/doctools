@@ -8,7 +8,7 @@ use swc_core::{
     visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
   },
 };
-use swc_ecma_utils2::jsx::{jsx_builder2, unpack::unpack_jsx, JSXRuntime};
+use swc_ecma_utils2::jsx::{jsx_builder2, unpack_jsx, JSXRuntime};
 
 use crate::{components::Transformed, macros::basic_attributes};
 

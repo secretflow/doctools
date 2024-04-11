@@ -1,53 +1,46 @@
 use std::{
   fs,
-  io::Write,
   path::{Path, PathBuf},
 };
 
 use anyhow::Context;
-use deno_lite::ESModule;
 use fuzzy_sourcemap::PathResolver;
 use pyo3::FromPyObject;
-use relative_path::RelativePathBuf;
-use swc_core::{
-  common::{source_map::SourceMapGenConfig, sync::Lrc, FileLoader, FileName, SourceMap, Spanned},
-  ecma::{
-    ast::{Expr, Lit, Str},
-    codegen::{text_writer::JsWriter, Emitter, Node},
-    visit::{noop_visit_type, Visit, VisitMutWith, VisitWith},
-  },
-};
-use swc_ecma_transform_sphinx::{render_code, render_math, render_raw, render_typography};
-use swc_ecma_utils2::{
-  ecma::fixes::remove_invalid,
-  jsx::{
-    fixes::{fix_jsx_factories, fold_fragments},
-    JSXElement,
-  },
-};
+use swc_core::common::FileLoader;
+use swc_core::common::{sync::Lrc, FileName};
 use url::Url;
-
-use crate::bundler::symbols::Symbols;
 
 #[derive(FromPyObject, Clone)]
 pub struct SphinxOptions {
   srcdir: String,
   outdir: String,
+  conf: SphinxConfig,
 }
 
-pub struct SphinxEnv {
-  cwd: Url,
-  src_dir: Url,
-  out_dir: Url,
+#[derive(FromPyObject, Default, Clone)]
+pub struct SphinxConfig {
+  pub extensions: Option<Vec<String>>,
+  pub myst_enable_extensions: Option<Vec<String>>,
 }
 
-impl TryFrom<SphinxOptions> for SphinxEnv {
+pub struct Environment {
+  pub cwd: Url,
+  pub src_dir: Url,
+  pub out_dir: Url,
+  pub conf: SphinxConfig,
+}
+
+impl TryFrom<SphinxOptions> for Environment {
   type Error = anyhow::Error;
 
   fn try_from(options: SphinxOptions) -> anyhow::Result<Self> {
     let cwd = std::env::current_dir().context("failed to get current working directory")?;
 
-    let SphinxOptions { srcdir, outdir } = options;
+    let SphinxOptions {
+      srcdir,
+      outdir,
+      conf,
+    } = options;
 
     let src_dir = cwd.join(srcdir).canonicalize()?;
 
@@ -61,172 +54,32 @@ impl TryFrom<SphinxOptions> for SphinxEnv {
       cwd,
       src_dir,
       out_dir,
+      conf,
     })
   }
 }
 
-impl SphinxEnv {
-  pub fn emit_page(
-    &self,
-    src_name: &FileName,
-    files: Lrc<SourceMap>,
-    mut module: Expr,
-    esm: &ESModule,
-  ) -> anyhow::Result<()> {
-    let FileName::Real(src_path) = src_name else {
-      unreachable!()
-    };
-
-    {
-      module.visit_mut_with(&mut render_code::<Symbols>(files.clone(), esm));
-      module.visit_mut_with(&mut render_math::<Symbols>(files.clone(), esm));
-      module.visit_mut_with(&mut render_raw::<Symbols>(files.clone()));
-      module.visit_mut_with(&mut render_typography::<Symbols>());
-      module.visit_mut_with(&mut fold_fragments::<Symbols>());
-      module.visit_mut_with(&mut fix_jsx_factories::<Symbols>());
-      module.visit_mut_with(&mut remove_invalid())
-    };
-
-    let module = module;
-
-    struct SourceLocation(Lrc<SourceMap>);
-
-    impl SourceLocation {
-      fn maybe_emit(&self, expr: &Expr) -> Option<()> {
-        let span = expr.span();
-        if span.is_dummy() {
-          return None;
-        }
-        let src = {
-          let f = self.0.span_to_filename(span);
-          self.0.get_source_file(&f)
-        }?;
-        let name = match expr {
-          Expr::Call(call) => call.as_jsx_type::<Symbols>().map(|f| format!("{:?}", f)),
-          Expr::Lit(Lit::Str(Str { value, .. })) => Some(value.to_string()),
-          _ => None,
-        }?;
-        let report = miette::miette!(
-          severity = miette::Severity::Advice,
-          labels = vec![miette::LabeledSpan::new(
-            Some(name),
-            (span.lo().0 - src.start_pos.0) as usize,
-            (span.hi().0 - span.lo().0) as usize,
-          )],
-          "source map"
-        )
-        .with_source_code(miette::NamedSource::new(
-          src.name.to_string(),
-          src.src.clone(),
-        ));
-        println!("{:?}", report);
-        Some(())
-      }
-    }
-
-    impl Visit for SourceLocation {
-      noop_visit_type!();
-
-      fn visit_expr(&mut self, expr: &Expr) {
-        self.maybe_emit(expr);
-        expr.visit_children_with(self);
-      }
-    }
-
-    {
-      module.visit_with(&mut SourceLocation(files.clone()));
-    }
-
-    let src_url = Url::from_file_path(src_path).expect("should be a file URL");
-
-    let rel_path = self.src_dir.make_relative(&src_url).ok_or_else(|| {
-      anyhow::anyhow!(
-        "unexpected source file {0} outside or source directory",
-        src_path.to_string_lossy().to_string()
-      )
-    })?;
-
-    let rel_path = RelativePathBuf::from(rel_path);
-
-    let out_url = self.out_dir.join(rel_path.as_str())?;
-
-    assert!(self.out_dir.make_relative(&out_url).is_some());
-
-    let out_js = out_url
-      .to_file_path()
-      .expect("should be a file")
-      .with_extension("js");
-    let out_js_map = out_js.with_extension("js.map");
-    let out_js_map_raw = out_js.with_extension("js.map.txt");
-    let out_yaml = out_js.with_extension("yaml");
-
-    std::fs::create_dir_all(out_js.parent().expect("should have a parent"))?;
-
-    println!("Emitting {}", out_js.to_string_lossy());
-
-    let mut out_js_file = std::fs::File::create(out_js)?;
-    let mut out_js_map_file = std::fs::File::create(out_js_map)?;
-    let mut out_js_map_raw_file = std::fs::File::create(out_js_map_raw)?;
-    let out_yaml_file = std::fs::File::create(out_yaml)?;
-
-    let mut source_map_raw = vec![];
-
-    {
-      let mut emitter = Emitter {
-        cfg: Default::default(),
-        cm: files.clone(),
-        comments: None,
-        wr: Box::new(JsWriter::new(
-          files.clone(),
-          "\n",
-          &mut out_js_file,
-          Some(&mut source_map_raw),
-        )),
-      };
-      module.emit_with(&mut emitter)?;
-    }
-
-    {
-      out_js_map_raw_file.write_all(format!("{:#?}", source_map_raw).as_bytes())?;
-    }
-
-    {
-      struct Config;
-
-      impl SourceMapGenConfig for Config {
-        fn file_name_to_source(&self, f: &FileName) -> String {
-          format!("{}", f)
-        }
-        fn inline_sources_content(&self, _: &FileName) -> bool {
-          true
-        }
-      }
-
-      let source_map = files.build_source_map_with_config(&source_map_raw, None, Config);
-      source_map.to_writer(&mut out_js_map_file)?;
-    }
-
-    {
-      serde_yaml::to_writer(out_yaml_file, &module)?;
-    }
-
-    Ok(())
-  }
-}
-
-impl SphinxEnv {
+impl Environment {
   fn try_files(&self, path: &Path) -> anyhow::Result<Url> {
     try_files(path, [&self.src_dir, &self.cwd].iter().copied())
+  }
+
+  pub fn docname(&self, name: &FileName) -> String {
+    let name = name.to_string();
+    name
+      .strip_prefix(self.src_dir.path())
+      .map(str::to_string)
+      .unwrap_or(name)
   }
 }
 
 #[derive(Clone)]
 pub struct SphinxFileLoader {
-  env: Lrc<SphinxEnv>,
+  env: Lrc<Environment>,
 }
 
-impl From<Lrc<SphinxEnv>> for SphinxFileLoader {
-  fn from(env: Lrc<SphinxEnv>) -> Self {
+impl From<Lrc<Environment>> for SphinxFileLoader {
+  fn from(env: Lrc<Environment>) -> Self {
     Self { env }
   }
 }

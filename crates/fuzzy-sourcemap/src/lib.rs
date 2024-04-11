@@ -1,6 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use swc_core::common::{sync::Lrc, BytePos, FileName, SourceFile, SourceMap, Span};
+use swc_core::common::{
+  source_map::Pos, sync::Lrc, BytePos, FileName, SourceFile, SourceMap, Span,
+};
+
+#[cfg(test)]
+mod unicode;
 
 #[macro_export]
 macro_rules! one_indexed {
@@ -151,6 +156,23 @@ impl FuzzySourceMap {
         }
       }
     }
+
+    debug_assert!({
+      if let SpanResult::HighConfidence { span, .. }
+      | SpanResult::LowConfidence { span, .. }
+      | SpanResult::RegionOnly { region: span } = result
+      {
+        let buffer = file.src.as_bytes();
+        let offset = span.lo - file.start_pos;
+        let offset = offset.to_usize();
+        let length = span.hi - span.lo;
+        let length = length.to_usize();
+        let sliced = buffer[offset..offset + length].to_vec();
+        String::from_utf8(sliced).is_ok()
+      } else {
+        true
+      }
+    });
 
     match result {
       SpanResult::HighConfidence { region, span } => {
@@ -556,7 +578,7 @@ fn trim_line_bounds(src: &SourceFile, (lower, upper): (BytePos, BytePos)) -> (By
     let begin = lower.0 - src.start_pos.0;
     let end = upper.0 - src.start_pos.0;
     if src.src[begin as usize..end as usize].ends_with('\n') {
-      upper - BytePos(1)
+      upper - BytePos::from_usize('\n'.len_utf8())
     } else {
       upper
     }

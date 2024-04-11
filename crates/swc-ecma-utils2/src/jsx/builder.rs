@@ -172,14 +172,20 @@ pub fn jsx_builder2<R: JSXRuntime>(call: CallExpr) -> JSXBuilder<R> {
   }
 }
 
-#[inline(always)]
 pub fn create_element<R: JSXRuntime>(span: Span, tag: impl JSXTagDef) -> JSXBuilder<R> {
   jsx_builder2(<CallExpr as JSXElement>::new_element::<R>(span, tag))
 }
 
-#[inline(always)]
 pub fn create_fragment<R: JSXRuntime>(span: Span) -> JSXBuilder<R> {
   jsx_builder2(<CallExpr as JSXElement>::new_fragment::<R>(span))
+}
+
+pub fn replace_element<R: JSXRuntime, T: Serialize>(
+  existing: &impl JSXElement,
+  tag: impl JSXTagDef,
+  props: &T,
+) -> JSXBuilder<R> {
+  create_element::<R>(existing.as_arg0_span::<R>(), tag).props(existing.as_arg1_span::<R>(), props)
 }
 
 struct Context {

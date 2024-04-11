@@ -1,2 +1,2 @@
-export { renderCode } from "./code.ts";
-export { renderMath } from "./math.ts";
+export { renderCode } from "./code.js";
+export { renderMath } from "./math.js";

@@ -28,9 +28,8 @@ class SphinxJSXTranslator(SphinxTranslator):
         super().__init__(document, builder)
 
         self.builder = builder
-        self.bundler = builder.bundler
         self.docname = docname
-        self.doctree = self.bundler.open(self.builder.env.doc2path(docname))
+        self.doctree = self.builder.source_map.open(self.builder.env.doc2path(docname))
 
     def visit_Element(self, node: nodes.Element):
         component = type(node).__name__
@@ -52,7 +51,7 @@ class SphinxJSXTranslator(SphinxTranslator):
         raise nodes.SkipDeparture
 
     def depart_document(self, node: nodes.document):
-        self.bundler.seal(self.doctree)
+        self.builder.source_map.seal(self.doctree)
 
 
 def attrs_to_str(attrs: Dict) -> str:

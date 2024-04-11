@@ -2,7 +2,7 @@ use fuzzy_sourcemap::FuzzySourceMap;
 use pyo3::prelude::*;
 use serde::de::Error;
 use swc_core::{
-  common::FileName,
+  common::{sync::Lrc, FileName, SourceMap},
   ecma::ast::{Expr, ObjectLit},
 };
 use swc_ecma_utils2::{
@@ -11,7 +11,10 @@ use swc_ecma_utils2::{
   jsx::{DocumentBuilder, JSXDocument},
 };
 
-use super::{env::SphinxFileLoader, symbols::Symbols, Bundler};
+use super::{
+  env::{Environment, SphinxFileLoader},
+  symbols::Symbols,
+};
 
 #[pyclass]
 pub struct Doctree {
@@ -21,10 +24,8 @@ pub struct Doctree {
   current_line: Option<usize>,
 }
 
-impl From<(&Bundler, FileName)> for Doctree {
-  fn from((bundler, file): (&Bundler, FileName)) -> Self {
-    let files = bundler.files.clone();
-    let env = bundler.env.clone();
+impl From<(Lrc<SourceMap>, Lrc<Environment>, FileName)> for Doctree {
+  fn from((files, env, file): (Lrc<SourceMap>, Lrc<Environment>, FileName)) -> Self {
     Self {
       file,
       tree: Default::default(),
@@ -65,7 +66,7 @@ impl Doctree {
       self.current_line = line;
     }
 
-    let props: ObjectLit = repack_expr(span, &props)
+    let props: ObjectLit = repack_expr(Default::default(), &props)
       .expect("serializing JSON to AST should never fail")
       .object()
       .expect("props should always be an object");

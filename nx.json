@@ -11,6 +11,7 @@
     ":rust": ["{workspaceRoot}/Cargo.toml", "{workspaceRoot}/Cargo.lock"]
   },
   "targetDefaults": {
+    "prepare": {},
     "lint:eslint": {
       "inputs": [
         ":default",
@@ -80,7 +81,7 @@
     },
     "build:cargo": {
       "inputs": [":default", ":rust"],
-      "dependsOn": ["^build:vite"],
+      "dependsOn": ["^build:vite", "^prepare", "prepare"],
       "cache": false
     },
     "publish:maturin": {

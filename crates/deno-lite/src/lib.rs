@@ -161,6 +161,8 @@ impl DenoLite {
       let scope = &mut deno.handle_scope();
       let result = v8::Local::<v8::Value>::new(scope, result);
 
+      // TODO: Error handling
+
       Ok(serde_v8::from_v8(scope, result)?)
     })
   }
@@ -174,6 +176,10 @@ impl DenoLite {
       .modules
       .lock()
       .map_err(|_| anyhow::anyhow!("failed to acquire module map"))
+  }
+
+  pub fn driver(&self) -> Arc<tokio::runtime::Runtime> {
+    self.driver.clone()
   }
 }
 

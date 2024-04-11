@@ -12,11 +12,7 @@ use swc_core::{
 };
 use swc_ecma_utils2::{
   collections::MutableMapping as _,
-  jsx::{
-    create_element,
-    unpack::{unpack_jsx, TextNode},
-    JSXDocument, JSXElement, JSXElementMut, JSXRuntime,
-  },
+  jsx::{replace_element, unpack_jsx, JSXDocument, JSXElementMut, JSXRuntime, TextNode},
   span::with_span,
 };
 
@@ -242,15 +238,13 @@ impl<R: JSXRuntime> CodeBlockRenderer<R> {
     let result = match document {
       Ok(document) => {
         let child = document.to_fragment::<R>();
-        create_element::<R>(call.as_arg0_span::<R>(), Transformed::CodeBlock)
-          .props(call.as_arg1_span::<R>(), &props)
+        replace_element::<R, _>(call, Transformed::CodeBlock, &props)
           .child(with_span(call.span)(child.into()))
           .build()?
       }
       Err(error) => {
         let error = format!("{}", error);
-        create_element::<R>(call.as_arg0_span::<R>(), Transformed::CodeBlock)
-          .props(call.as_arg1_span::<R>(), &props)
+        replace_element::<R, _>(call, Transformed::CodeBlock, &props)
           .child(with_span(call.span)(error.into()))
           .build()?
       }

@@ -12,16 +12,11 @@ use swc_core::{
 use deno_lite::{anyhow, ESFunction, ESModule};
 use html5jsx::html_to_jsx;
 use swc_ecma_utils2::{
-  ad_hoc_tag,
-  jsx::{
-    create_element,
-    unpack::{unpack_jsx, TextNode},
-    JSXDocument, JSXElement, JSXRuntime,
-  },
+  jsx::{replace_element, unpack_jsx, JSXDocument, JSXRuntime, TextNode},
   span::with_span,
 };
 
-use crate::macros::basic_attributes;
+use crate::{components::Transformed, macros::basic_attributes};
 
 #[derive(Serialize, ESFunction)]
 struct RenderMath {
@@ -81,13 +76,11 @@ impl<R: JSXRuntime> MathRenderer<R> {
     let document = self.render_math(&props.tex, inline);
 
     *call = match document {
-      Ok(document) => create_element::<R>(call.as_arg0_span::<R>(), ad_hoc_tag!(Math))
-        .props(call.as_arg1_span::<R>(), &props)
+      Ok(document) => replace_element::<R, _>(call, Transformed::Math, &props)
         .prop(Default::default(), "inline", &inline)
         .child(with_span(call.span)(document.to_fragment::<R>().into()))
         .build()?,
-      Err(error) => create_element::<R>(call.as_arg0_span::<R>(), ad_hoc_tag!(Math))
-        .props(call.as_arg1_span::<R>(), &props)
+      Err(error) => replace_element::<R, _>(call, Transformed::Math, &props)
         .prop(Default::default(), "inline", &inline)
         .prop(Default::default(), "error", &format!("{}", error))
         .build()?,

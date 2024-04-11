@@ -13,9 +13,7 @@ use swc_core::{
 };
 use swc_ecma_utils2::{
   anyhow,
-  jsx::{
-    create_element, create_fragment, jsx_builder2, unpack::unpack_jsx, JSXDocument, JSXRuntime,
-  },
+  jsx::{create_element, create_fragment, jsx_builder2, unpack_jsx, JSXDocument, JSXRuntime},
   span::with_span,
 };
 

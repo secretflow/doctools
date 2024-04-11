@@ -1,4 +1,4 @@
-import { codeToHtml } from "shiki";
+import { codeToHtml, bundledLanguages } from "shiki";
 
 type Options = {
   code: string;
@@ -8,7 +8,7 @@ type Options = {
 };
 
 export async function renderCode({ code, lang, lineHighlight }: Options) {
-  const language = lang || "text";
+  const language = lang && lang in bundledLanguages ? lang : "text";
   const highlighted = lineHighlight || [];
   return await codeToHtml(code, {
     lang: language,

@@ -29,6 +29,7 @@ fn test_conversion(source_path: PathBuf) {
 }
 
 #[cfg(test)]
+#[cfg(not(any(feature = "unsafe-allow", feature = "unsafe-ignore")))]
 mod test_rejections {
   use html5jsx::html_to_jsx;
   use swc_core::common::{sync::Lrc, FileName, SourceFile, SourceMap};

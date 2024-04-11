@@ -7,12 +7,14 @@ version = "0.0.0"
 
 [dependencies]
 anyhow = "1.0.79"
-miette = {version = "5.10.0", features = ["fancy"]}
+miette = {version = "7", features = ["fancy"]}
 num-bigint = {version = "0.4.4", features = ["serde"]}
 once_cell = "1"
 serde = {version = "1", features = ["derive"]}
 serde_json = "*"
+swc-ecma-testing2 = {path = "../swc-ecma-testing2"}
 swc-ecma-utils2 = {path = "../swc-ecma-utils2"}
+textwrap = "0.16.1"
 thiserror = "1.0.56"
 url = "2.5.0"
 
@@ -24,6 +26,7 @@ features = [
   "ecma_visit",
   "ecma_utils",
   "ecma_codegen",
+  "ecma_quote",
   "testing",
   "testing_transform",
 ]

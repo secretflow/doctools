@@ -20,16 +20,9 @@ members = ["pyprojects/*"]
 dev-dependencies = [
   "black[jupyter]>=24",
   "docutils-stubs>=0.0.22",
-  "hatch~=1.8",
   "ipython~=8.12",
-  "jupyterlab~=4.0",
-  "maturin~=1.4",
-  "myst-parser~=2.0",
-  "pip~=23.3",
-  "pytest-cov~=4.1",
-  "pytest~=7.4.0",
+  "maturin~=1.5", # "myst-parser~=2.0",
   "ruff>=0.0.284",
-  "snakeviz>=2.2.0",
   "watchfiles>=0.21.0",
 ]
 managed = true

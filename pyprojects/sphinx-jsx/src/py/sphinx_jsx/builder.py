@@ -10,7 +10,7 @@ from sphinx.builders.html import BuildInfo
 from sphinx.environment import BuildEnvironment
 
 from ._lib import Bundler
-from .options import SphinxOptions
+from .options import SphinxConfig, SphinxOptions
 from .translator import SphinxJSXTranslator
 
 
@@ -34,6 +34,12 @@ class SphinxJSXBuilder(Builder):
         self.build_info: BuildInfo
         self.bundler = Bundler(
             SphinxOptions(
+                conf=SphinxConfig(
+                    extensions=[*app.extensions.keys()],
+                    myst_enable_extensions=getattr(
+                        app.config, "myst_enable_extensions", None
+                    ),
+                ),
                 srcdir=str(self.srcdir),
                 outdir=str(self.outdir),
             )
@@ -44,7 +50,7 @@ class SphinxJSXBuilder(Builder):
 
     def init(self) -> None:
         self.build_info = self.create_build_info()
-        self.bundler.init()
+        self.source_map = self.bundler.sourcemap()
 
     def create_build_info(self) -> BuildInfo:
         return BuildInfo(self.config, self.tags, ["jsx"])
@@ -65,4 +71,4 @@ class SphinxJSXBuilder(Builder):
         doctree.walkabout(translator)
 
     def finish(self):
-        self.bundler.emit()
+        self.bundler.build(self.source_map)
