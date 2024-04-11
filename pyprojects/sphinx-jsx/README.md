@@ -1,131 +1,100 @@
-# secretflow-docpack
+# @secretflow/doctools
 
-## General workflow
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue)][MIT] ![CI status](https://github.com/secretflow/doctools/actions/workflows/ci.yml/badge.svg)
 
-- Every `sphinx-build` results in a [**standard**][npm-package-json] [NPM package](#npm-package-structure);
-- Every build is **versioned** and **published** to NPM;
-- Docs are consumed however NPM packages are consumed — `npm install`, or through [one][jsdelivr] [of][esm-sh] [the][unpkg] [many][cdnjs] CDN providers.
+Documentation toolchain for [SecretFlow] | [SecretFlow] 文档构建工具
 
-[npm-package-json]: https://docs.npmjs.com/cli/v10/configuring-npm/package-json
-[jsdelivr]: https://jsdelivr.com/
-[esm-sh]: https://esm.sh/
-[unpkg]: https://unpkg.com/
-[cdnjs]: https://cdnjs.com/
+<span id="en-US"></span>
 
-## NPM package structure
+English | [简体中文](#zh-Hans)
 
-- `api` - see [API extraction](#api-extraction)
-- `assets/` - see [static asset bundling](#static-asset-bundling)
-  - `static/<locale>/**/*` - static files
-  - `client.js` - ES module: asset names + locales to URLs
-  - `server.js` - ES module: asset names + locales to static imports
-- `indices/<locale>.js` - ES modules: full-text search index
-- `package.json` - NPM package metadata; see [versioning](#versioning)
-- `pages/<locale>/**/*.js` - ES modules: pages as React components
-- `redirects.js` - ES module: redirects (page move), see [Redirects](#redirects)
-- `sitemap.js` - ES module: metadata: paths, fragments, titles, and locale availability; all languages
+## What is this?
 
-## Versioning
+This repository contains packages for building documentation for [SecretFlow] projects. It provides a [Sphinx] extension to build [MDX] (Markdown + JSX) documents from a Sphinx project. It also has several Node packages for integrating MDX into [Dumi].
 
-Every build has a unique version identifier, consisting of the following parts:
+## Install
 
-- _Semver-like_ version: a [semver] or [PEP-440] version number, e.g. `1.2.3`, `1.2.3a4`, or `1.2.3-rc4`;
-  - This can be sourced from git tags or provided as Sphinx options;
-  - NPM requires strict semantic versions, PEP-440 versions will be converted to an equivalent semver string with as little loss of information as possible; see the [`semver` package][node-semver];
-- _Build number_: MUST come from `git rev-parse --short HEAD`;
-  - This will be appended to the version string as `build.<commit>`, e.g. `build.0292fd8`;
-  - Connecting character depends on whether additional segments are already present in the version string, see examples below; note that this is never `+` because `+build` will be omitted by NPM;
+Install _doctools_ with `pip`:
 
-Builds SHOULD have a _semver-like_ version. If it is unavailable at build time, `0.0.0` will be used.
+```bash
+pip install secretflow-doctools
+```
 
-Builds MUST have a _build number_. If it is unavailable at build time, (e.g. if not building from a git repository), `version` will be omitted from `package.json` entirely, and the resulting package will not be publishable.
+## Use
 
-Additionally, Git tags SHOULD become NPM [dist tags][dist-tags].
+Add _doctools_ as a Sphinx extension to your Sphinx project's `conf.py`:
 
-Examples:
+```python
+extensions = [
+    # ...
+    "secretflow_doctools",
+]
+```
 
-- commit `0292fd8`, nearest git tag `1.2.3` → `1.2.3-build.0292fd8`
-- commit `0292fd8`, `__version__ = (2, 1, 0, "rc", 3)` → `2.1.0-rc.3.build.0292fd8`
-- commit `0292fd8`, no version provided → `0.0.0-build.0292fd8`
+Then specify `mdx` as the [builder][sphinx-build-builder]:
 
-[semver]: https://semver.org/
-[PEP-440]: https://www.python.org/dev/peps/pep-0440/
-[node-semver]: https://www.npmjs.com/package/semver
-[dist-tags]: https://docs.npmjs.com/cli/v10/commands/npm-dist-tag
+```bash
+python3 -m sphinx -b mdx [...] [sourcedir] [outputdir]
+```
 
-TODO: formal description of version extraction algorithm
+Or use `make`:
 
-## API extraction
+```bash
+make mdx
+```
 
-In general, API documentation are extracted as _structured data_ from _source code_ and then added to resulting NPM package.
+## License
 
-We are primarily interested in extracting the following types of information:
+[MIT] © [SecretFlow]
 
-- **Data types**: structs, Protocol Buffers messages, Pydantic models, etc.
-- **Functions**: Python functions, but also RPC methods and HTTP handlers.
+---
 
-We aim to represent such information in formats that are _machine-readable,_ such as JSON Schema and Protocol Buffers.
+<span id="zh-Hans"></span>
 
-The following are high-level descriptions of input and output formats we plan to support.
+[English](#en-US) | 简体中文
 
-TODO: formal description API data formats
+## 这是什么？
 
-### Protocol Buffers & Family
+这个仓库包含了用于构建 [SecretFlow] 项目文档的工具。它提供了一个 [Sphinx] 扩展，用于从 Sphinx 项目构建 [MDX]（Markdown + JSX）文档。它还包含了一些 Node 包，用于将 MDX 集成到 [Dumi] 中。
 
-This encompasses all data types and services defined through `.proto` files.
+## 安装
 
-The idea is to generate **machine-readable and language-agnostic** representations of Protobuf messages and services using `protoc` — thus structured docs are generated in tandem with Go/Python/Java/... stub files.
+使用 `pip` 安装这个工具：
 
-#### Output format
+```bash
+pip install secretflow-doctools
+```
 
-Output will most likely be **JSON Schema** and closely related specs (Swagger/OpenAPI).
+## 使用
 
-No matter which plugins/tools we choose (below), it is likely we will need to annotate the resulting schema with additional metadata in order to support searching/cross-referencing on the website.
+将 doctools 作为 Sphinx 插件添加到你的 Sphinx 项目的 `conf.py` 中：
 
-#### `protoc` plugin candidates
+```python
+extensions = [
+    # ...
+    "secretflow_doctools",
+]
+```
 
-- [pseudomuto/protoc-gen-doc] — _already used by SPU and SCQL_ to generate Markdown docs (messages are rendered as tables). We could instead utilize its JSON output.
-- [chrusty/protoc-gen-jsonschema] — generates JSON Schema from `.proto` files. A slight problem is that JSON Schema may not expressive all of Protobuf's features (e.g. integers of different sizes); additionally, JSON Schema has no concept of services or API endpoints.
-- **[grpc-ecosystem/grpc-gateway]** — generates HTTP server stubs from gRPC definitions, and has a built-in `protoc-gen-openapiv2` for generating Swagger specs. Requires annotating `.proto` files with HTTP-specific metadata.
-- **[google/gnostic]** — generates OpenAPI v3 specs from gRPC definitions. Also requires annotating `.proto` files with HTTP-specific metadata.
+然后将 `mdx` 指定为 [builder][sphinx-build-builder]：
 
-[pseudomuto/protoc-gen-doc]: https://github.com/pseudomuto/protoc-gen-doc
-[chrusty/protoc-gen-jsonschema]: https://github.com/chrusty/protoc-gen-jsonschema
-[grpc-ecosystem/grpc-gateway]: https://github.com/grpc-ecosystem/grpc-gateway
-[google/gnostic]: https://github.com/google/gnostic
+```bash
+python3 -m sphinx -b mdx [...] [sourcedir] [outputdir]
+```
 
-#### Recommendation
+或者使用 `make`：
 
-**We recommend [Buf][buf-build] as our tooling of choice for all things Protocol Buffers related.**
+```bash
+make mdx
+```
 
-**For a demo of incorporating Buf into `secretflow/scql`, see <https://github.com/tonywu6/scql/blob/main/buf-demo.md>.**
+## 许可证
 
-[buf-build]: https://buf.build/
+[MIT] © [SecretFlow]
 
-### Pydantic
-
-### Python symbols
-
-## Static asset bundling
-
-## Redirects
-
-## i18n
-
-[lingui]: https://lingui.dev/
-
-## Statuspage
-
-## Internals
-
-### SWC
-
-### Deno
-
-### Quality-of-life improvements
-
-#### Decorated links
-
-#### Prettier
-
-#### Linting
+[SecretFlow]: https://www.secretflow.org.cn/
+[Sphinx]: https://www.sphinx-doc.org/
+[MDX]: https://mdxjs.com/
+[Dumi]: https://d.umijs.org/
+[sphinx-build-builder]: https://www.sphinx-doc.org/en/master/man/sphinx-build.html#cmdoption-sphinx-build-b
+[MIT]: ./LICENSE

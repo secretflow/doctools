@@ -1,4 +1,4 @@
-name: 'Code: CI'
+name: "Code: CI"
 
 on:
   pull_request:
@@ -7,6 +7,8 @@ on:
       - edited
       - reopened
       - synchronize
+    branches:
+      - "!next"
   workflow_call:
 
 permissions:
@@ -15,7 +17,7 @@ permissions:
 
 jobs:
   ci-javascript:
-    name: 'CI: JavaScript'
+    name: "CI: JavaScript"
     uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
     with:
       node-version: ${{ matrix.node-version }}
@@ -23,10 +25,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['16.20.x']
+        node-version: ["16.20.x"]
 
   ci-python:
-    name: 'CI: Python'
+    name: "CI: Python"
     uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
     with:
       node-version: 16.20.x
@@ -34,4 +36,4 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8.x', '3.9.x', '3.10.x']
+        python-version: ["3.8.x", "3.9.x", "3.10.x"]

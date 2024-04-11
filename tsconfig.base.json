@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "composite": true,
     "downlevelIteration": true,
+    "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "experimentalDecorators": true,
