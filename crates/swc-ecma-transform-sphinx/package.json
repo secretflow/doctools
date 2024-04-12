@@ -7,9 +7,7 @@
   },
   "name": "swc-ecma-transform-sphinx",
   "private": true,
-  "scripts": {
-    "prepare": "node ./scripts/build.js"
-  },
+  "scripts": {},
   "type": "module",
   "version": "0.0.0"
 }

@@ -31,10 +31,10 @@ jobs:
             target: aarch64
           - runner: ubuntu-latest
             target: armv7
-          - runner: ubuntu-latest
-            target: s390x
-          - runner: ubuntu-latest
-            target: ppc64le
+          # - runner: ubuntu-latest
+          #   target: s390x
+          # - runner: ubuntu-latest
+          #   target: ppc64le
         python:
           - "3.9"
           - "3.10"
@@ -43,17 +43,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      # - uses: pnpm/action-setup@v3
+      #   with:
+      #     version: 8
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: "18"
+      # - run: pnpm install
+      # - uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ matrix.python }}
+      - uses: denoland/setup-deno@v1
         with:
-          version: 8
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "pnpm"
-      - run: pnpm install
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+          deno-version: v1.x
+      - name: Build static files
+        run: deno run -A crates/swc-ecma-transform-sphinx/scripts/build.js
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -86,17 +90,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      # - uses: pnpm/action-setup@v3
+      #   with:
+      #     version: 8
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: "18"
+      #     cache: "pnpm"
+      # - run: pnpm install
+      # - uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ matrix.python }}
+      - uses: denoland/setup-deno@v1
         with:
-          version: 8
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "pnpm"
-      - run: pnpm install
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+          deno-version: v1.x
+      - name: Build static files
+        run: deno run -A crates/swc-ecma-transform-sphinx/scripts/build.js
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
