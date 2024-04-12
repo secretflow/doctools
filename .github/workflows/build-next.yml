@@ -64,7 +64,9 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter --manifest-path pyprojects/sphinx-jsx/Cargo.toml
           sccache: "true"
-          manylinux: auto
+          manylinux: manylinux2014
+          before-script-linux: |
+            yum install -y openssl-devel
       - name: Test
         run: cargo test --release --all-features
       - name: Upload wheels
