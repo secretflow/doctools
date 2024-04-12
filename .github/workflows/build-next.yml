@@ -63,7 +63,7 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter --manifest-path pyprojects/sphinx-jsx/Cargo.toml
-          sccache: "true"
+          # sccache: "true"
           manylinux: "2_28"
       - name: Test
         run: cargo test --release --all-features
