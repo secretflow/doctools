@@ -47,3 +47,6 @@ pyo3-build-utils = {path = "../../crates/pyo3-build-utils"}
 
 [dev-dependencies]
 maturin = "1.5.1"
+
+[tool.maturin]
+compatibility = "manylinux2_28"
