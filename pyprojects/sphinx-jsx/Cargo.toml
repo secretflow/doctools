@@ -22,6 +22,7 @@ indexmap = "2.1.0"
 indoc = "2.0.5"
 log = "0.4.21"
 miette = {version = "7.2.0", features = ["fancy", "serde"]}
+openssl = {version = "0.10", features = ["vendored"]}
 pyo3 = {version = "0.21.0", features = ["indexmap", "anyhow"]}
 regex = "1.10.4"
 relative-path = "1.9.2"
