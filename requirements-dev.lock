@@ -185,6 +185,9 @@ ruamel-yaml==0.18.6
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
 ruff==0.2.2
+setuptools==69.1.1
+    # via sphinx-intl
+    # via zope-interface
 shellingham==1.5.4
     # via hatch
 six==1.16.0
@@ -267,6 +270,3 @@ zope-interface==6.2
     # via twisted
 zstandard==0.22.0
     # via hatch
-setuptools==69.1.1
-    # via sphinx-intl
-    # via zope-interface

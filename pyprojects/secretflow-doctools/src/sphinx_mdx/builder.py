@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import re
 import shutil
 import subprocess
 from contextlib import suppress
@@ -9,7 +8,7 @@ from datetime import datetime
 from os import path
 from pathlib import Path
 from typing import Iterator, Literal, Optional, Set, Tuple, Union
-from urllib.parse import urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from docutils import nodes
 from pydantic import BaseModel
@@ -32,6 +31,47 @@ from .utils.logging import get_logger
 
 yaml = YAML(typ="safe", pure=True)
 yaml.indent(mapping=2, sequence=4, offset=2)
+
+
+class RemoteVCS(BaseModel):
+    hostname: str
+    path: str
+    repo: str
+
+    def permalink(self, revision: str, path: str, kind="blob"):
+        prefix = self.path.removesuffix("/").removesuffix(".git")
+        return f"https://{self.hostname}{prefix}/{kind}/{revision}/{path}"
+
+
+def guess_remote_vcs(origin: str) -> Optional[RemoteVCS]:
+    try:
+        url = urlsplit(origin)
+        if not url.hostname:
+            raise ValueError
+    except ValueError:
+        pass
+    else:
+        hostname = url.hostname
+        path = url.path
+        try:
+            *_, owner, repo = filter(None, path.split("/"))
+            repo = f"{owner}/{repo}"
+        except ValueError:
+            repo = path.split("/")[-1]
+        if repo.endswith(".git"):
+            repo = repo[:-4]
+        return RemoteVCS(hostname=hostname, path=path, repo=repo)
+    try:
+        auth, hostpath = origin.split("@", 1)
+        sep = hostpath.rfind(":")
+        if sep == -1:
+            raise ValueError
+        hostname = hostpath[:sep]
+        path = hostpath[sep + 1 :]
+        url = urlunsplit(("ssh", hostname, path, "", ""))
+        return guess_remote_vcs(url)
+    except ValueError:
+        return None
 
 
 class Manifest(BaseModel):
@@ -87,9 +127,7 @@ class MDXBuilder(Builder):
         self.pathfinder: Pathfinder
         self.staticfiles: StaticFiles
 
-        self.git_host: Optional[str] = None
-        self.git_owner: Optional[str] = None
-        self.git_repo: Optional[str] = None
+        self.git_remote: Optional[RemoteVCS] = None
         self.git_root: Optional[Path] = None
         self.git_revision_commit: Optional[str] = None
         self.git_revision_time: Optional[str] = None
@@ -125,21 +163,8 @@ class MDXBuilder(Builder):
                 .stdout.decode("utf-8")
                 .strip()
             )
-            match = re.match(
-                r"git@(?:.*)github\.com:(?P<owner>[^/]+)/(?P<repo>[^/]+)",
-                git_origin,
-            ) or re.match(
-                r"https://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/]+)",
-                git_origin,
-            )
-            if match:
-                owner = match["owner"]
-                repo = match["repo"]
-                if repo.endswith(".git"):
-                    repo = repo[:-4]
-                self.git_host = "github.com"
-                self.git_owner = owner
-                self.git_repo = repo
+            self.git_remote = guess_remote_vcs(git_origin)
+
         with suppress(subprocess.CalledProcessError):
             self.git_revision_commit = (
                 subprocess.run(
@@ -182,27 +207,21 @@ class MDXBuilder(Builder):
             return None
 
     def get_origin_url(self, docname: str) -> Optional[str]:
-        if not self.git_revision_commit or self.git_host != "github.com":
+        if not self.git_revision_commit or not self.git_remote:
             return None
         if not (path := self.get_source_tree_path(docname)):
             return None
-        path = (
-            f"/{self.git_owner}/{self.git_repo}/blob/{self.git_revision_commit}/{path}"
-        )
-        return urlunsplit(("https", self.git_host, path, "", ""))
+        return self.git_remote.permalink(self.git_revision_commit, path, kind="tree")
 
     def get_download_url(self, docname: str) -> Optional[str]:
-        if not self.git_revision_commit or self.git_host != "github.com":
+        if not self.git_revision_commit or not self.git_remote:
             return None
         if not (path := self.get_source_tree_path(docname)):
             return None
-        path = (
-            f"/{self.git_owner}/{self.git_repo}/raw/{self.git_revision_commit}/{path}"
-        )
-        return urlunsplit(("https", self.git_host, path, "", ""))
+        return self.git_remote.permalink(self.git_revision_commit, path, kind="raw")
 
     def get_last_modified(self, docname: str) -> Tuple[Optional[str], Optional[str]]:
-        if not self.git_revision_commit or self.git_host != "github.com":
+        if not self.git_revision_commit:
             return (None, None)
         if not (path := self.get_source_tree_path(docname)):
             return (None, None)
@@ -301,14 +320,19 @@ class MDXBuilder(Builder):
         doctree.walkabout(translator)
 
         origin_url = self.get_origin_url(docname)
-        if origin_url:
+        if origin_url and self.git_remote:
+            try:
+                owner, repo = self.git_remote.repo.split("/")
+            except ValueError:
+                owner = None
+                repo = self.git_remote.repo
             last_modified_date, last_modified_commit = self.get_last_modified(docname)
             translator.metadata.update(
                 {
                     "git_origin_url": origin_url,
                     "git_download_url": self.get_download_url(docname),
-                    "git_owner": self.git_owner,
-                    "git_repo": self.git_repo,
+                    "git_owner": owner,
+                    "git_repo": repo,
                     "git_revision_commit": self.git_revision_commit,
                     "git_revision_time": self.git_revision_time,
                     "git_last_modified_commit": last_modified_commit,

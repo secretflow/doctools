@@ -1,5 +1,11 @@
 # doctools
 
+## 0.7.2
+
+### Patch Changes
+
+- feat: support any VCS remote
+
 ## 0.7.1
 
 ### Patch Changes
