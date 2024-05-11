@@ -1,5 +1,11 @@
 # doctools
 
+## 0.7.1
+
+### Patch Changes
+
+- bb2cd23: fix: ignore circular ref in sidebar generation
+
 ## 0.7.0
 
 ### Minor Changes
