@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Literal, Union
+from typing import List, Literal, Set, Union
 
 from docutils import nodes
 from pydantic import BaseModel
@@ -16,26 +16,26 @@ logger = get_logger(__name__)
 # after https://docusaurus.io/docs/sidebar/items
 
 
-class SidebarItemDoc(BaseModel):
+class SidebarDoc(BaseModel):
     type: Literal["doc"] = "doc"
     id: str  # this is currently the file path
     label: str
 
 
-class SidebarItemLink(BaseModel):
+class SidebarLink(BaseModel):
     type: Literal["link"] = "link"
     href: str
     label: str
 
 
-class SidebarItemCategory(BaseModel):
+class SidebarCategory(BaseModel):
     type: Literal["category"] = "category"
     label: str
-    items: List[Union[SidebarItemDoc, SidebarItemLink, SidebarItemCategory]]
-    link: Union[SidebarItemDoc, None] = None
+    items: List[Union[SidebarDoc, SidebarLink, SidebarCategory]]
+    link: Union[SidebarDoc, None] = None
 
 
-SidebarItem = Union[SidebarItemDoc, SidebarItemLink, SidebarItemCategory]
+SidebarItem = Union[SidebarDoc, SidebarLink, SidebarCategory]
 Sidebar = List[SidebarItem]
 
 
@@ -44,6 +44,8 @@ def generate_sidebar(
     pathfinder: Pathfinder,
     env: BuildEnvironment,
 ) -> Sidebar:
+    seen: Set[str] = set()
+
     def resolve_doctree(doctree: nodes.document) -> Sidebar:
         root: Sidebar = []
         # current level of sidebar
@@ -61,7 +63,7 @@ def generate_sidebar(
             # (which causes Sphinx to emit warnings)
 
             if toctree.get("caption"):
-                category = SidebarItemCategory(label=toctree["caption"], items=[])
+                category = SidebarCategory(label=toctree["caption"], items=[])
                 curr.append(category)
                 curr = category.items
 
@@ -71,7 +73,7 @@ def generate_sidebar(
 
                 if pathfinder.is_external_url(ref):
                     # external link
-                    entry = SidebarItemLink(label=title or ref, href=ref)
+                    entry = SidebarLink(label=title or ref, href=ref)
                     curr.append(entry)
                     continue
 
@@ -84,11 +86,17 @@ def generate_sidebar(
                 file = file.relative_to(pathfinder.output_root)
                 title = title or clean_astext(env.titles[ref])
 
-                entry = SidebarItemDoc(label=title, id=str(file))
+                entry = SidebarDoc(label=title, id=str(file))
+
+                if ref in seen:
+                    logger.warning(f"Ignoring circular sidebar ref {ref} -> {ref}")
+                    continue
+
+                seen.add(ref)
 
                 items = resolve_doctree(env.get_doctree(ref))
                 if items:
-                    entry = SidebarItemCategory(label=title, items=items, link=entry)
+                    entry = SidebarCategory(label=title, items=items, link=entry)
 
                 curr.append(entry)
 
