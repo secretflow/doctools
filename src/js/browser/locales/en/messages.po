@@ -1,0 +1,509 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-04-01 10:29+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. placeholder {0}: total ?? 0
+#: src/js/browser/search/index.tsx:165
+msgid "{0, plural, one {# result} other {# results}}"
+msgstr "{0, plural, one {# result} other {# results}}"
+
+#. placeholder {0}: schema.maxLength
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:204
+msgid "{0, plural, one {maximum # character} other {maximum # characters}}"
+msgstr "{0, plural, one {maximum # character} other {maximum # characters}}"
+
+#. placeholder {0}: schema.maxItems
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:242
+msgid "{0, plural, one {maximum # item} other {maximum # items}}"
+msgstr "{0, plural, one {maximum # item} other {maximum # items}}"
+
+#. placeholder {0}: schema.maxProperties
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:279
+msgid "{0, plural, one {maximum # property} other {maximum # properties}}"
+msgstr "{0, plural, one {maximum # property} other {maximum # properties}}"
+
+#. placeholder {0}: schema.minLength
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:193
+msgid "{0, plural, one {minimum # character} other {minimum # characters}}"
+msgstr "{0, plural, one {minimum # character} other {minimum # characters}}"
+
+#. placeholder {0}: schema.minItems
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:235
+msgid "{0, plural, one {minimum # item} other {minimum # items}}"
+msgstr "{0, plural, one {minimum # item} other {minimum # items}}"
+
+#. placeholder {0}: schema.minProperties
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:268
+msgid "{0, plural, one {minimum # property} other {minimum # properties}}"
+msgstr "{0, plural, one {minimum # property} other {minimum # properties}}"
+
+#. placeholder {0}: quoteUrl(projectName)
+#. placeholder {1}: quoteUrl(ref)
+#: src/js/browser/banners/NoSuchVersion.tsx:31
+msgid "{0} does not have documentation for version {1}."
+msgstr "{0} does not have documentation for version {1}."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:119
+msgid "{count, plural, one {array} =1 {array} other {arrays}}"
+msgstr "{count, plural, one {array} =1 {array} other {arrays}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:81
+msgid "{count, plural, one {base64 string} =1 {base64 string} other {base64 strings}}"
+msgstr "{count, plural, one {base64 string} =1 {base64 string} other {base64 strings}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:99
+msgid "{count, plural, one {boolean} =1 {boolean} other {booleans}}"
+msgstr "{count, plural, one {boolean} =1 {boolean} other {booleans}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:32
+msgid "{count, plural, one {date} =1 {date} other {dates}}"
+msgstr "{count, plural, one {date} =1 {date} other {dates}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:29
+msgid "{count, plural, one {date/time} =1 {date/time} other {dates/times}}"
+msgstr "{count, plural, one {date/time} =1 {date/time} other {dates/times}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:77
+msgid "{count, plural, one {double} =1 {double} other {doubles}}"
+msgstr "{count, plural, one {double} =1 {double} other {doubles}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:37
+msgid "{count, plural, one {duration} =1 {duration} other {durations}}"
+msgstr "{count, plural, one {duration} =1 {duration} other {durations}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:41
+msgid "{count, plural, one {email} =1 {email} other {emails}}"
+msgstr "{count, plural, one {email} =1 {email} other {emails}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:73
+msgid "{count, plural, one {float} =1 {float} other {floats}}"
+msgstr "{count, plural, one {float} =1 {float} other {floats}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:45
+msgid "{count, plural, one {hostname} =1 {hostname} other {hostnames}}"
+msgstr "{count, plural, one {hostname} =1 {hostname} other {hostnames}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:103
+msgid "{count, plural, one {integer} =1 {integer} other {integers}}"
+msgstr "{count, plural, one {integer} =1 {integer} other {integers}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:49
+msgid "{count, plural, one {IPv4 address} =1 {IPv4 address} other {IPv4 addresses}}"
+msgstr "{count, plural, one {IPv4 address} =1 {IPv4 address} other {IPv4 addresses}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:57
+msgid "{count, plural, one {IPv6 address} =1 {IPv6 address} other {IPv6 addresses}}"
+msgstr "{count, plural, one {IPv6 address} =1 {IPv6 address} other {IPv6 addresses}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:146
+msgid "{count, plural, one {map} =1 {map} other {maps}}"
+msgstr "{count, plural, one {map} =1 {map} other {maps}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:107
+msgid "{count, plural, one {number} =1 {number} other {numbers}}"
+msgstr "{count, plural, one {number} =1 {number} other {numbers}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:111
+msgid "{count, plural, one {object} =1 {object} other {objects}}"
+msgstr "{count, plural, one {object} =1 {object} other {objects}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:91
+msgid "{count, plural, one {password} =1 {password} other {passwords}}"
+msgstr "{count, plural, one {password} =1 {password} other {passwords}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:115
+msgid "{count, plural, one {string} =1 {string} other {strings}}"
+msgstr "{count, plural, one {string} =1 {string} other {strings}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:64
+msgid "{count, plural, one {URI} =1 {URI} other {URIs}}"
+msgstr "{count, plural, one {URI} =1 {URI} other {URIs}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:66
+msgid "{count, plural, one {UUID} =1 {UUID} other {UUIDs}}"
+msgstr "{count, plural, one {UUID} =1 {UUID} other {UUIDs}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:138
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:148
+msgid "{head} of {modifier}"
+msgstr "{head} of {modifier}"
+
+#: src/js/browser/layout/SuggestEdit.tsx:24
+msgid "### Suggest an edit to documentation"
+msgstr "### Suggest an edit to documentation"
+
+#: src/js/browser/layout/SuggestEdit.tsx:26
+msgid "<!-- Do not edit below this line -->"
+msgstr "<!-- Do not edit below this line -->"
+
+#: src/js/browser/layout/SuggestEdit.tsx:25
+msgid "<!-- Please describe the issue you encountered -->"
+msgstr "<!-- Please describe the issue you encountered -->"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:16
+msgid "<0> – </0>"
+msgstr "<0> – </0>"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:4
+msgid "<0>, </0>"
+msgstr "<0>, </0>"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:10
+msgid "<0>: </0>"
+msgstr "<0>: </0>"
+
+#. placeholder {0}: title ? ( <span> {" "} <SchemaTree.ObjectName>{title}</SchemaTree.ObjectName> </span> ) : null
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:193
+msgid "<0>object</0>{0}"
+msgstr "<0>object</0>{0}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:166
+msgid "array"
+msgstr "array"
+
+#: src/js/browser/layout/useColumnLayout.tsx:232
+msgid "Back to Page"
+msgstr "Back to Page"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:88
+msgid "binary data"
+msgstr "binary data"
+
+#: src/js/browser/layout/useColumnLayout.tsx:213
+msgid "Chapters"
+msgstr "Chapters"
+
+#: src/js/browser/banners/PageNotFound.tsx:109
+msgid "Click here to return to the home page of {versionName}"
+msgstr "Click here to return to the home page of {versionName}"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:51
+#: src/js/browser/banners/UncaughtRouteError.tsx:58
+msgid "Could not display this page"
+msgstr "Could not display this page"
+
+#. placeholder {0}: quoteUrl(repo)
+#: src/js/browser/banners/RepoNotFound.tsx:39
+msgid "Could not find documentation for <0>{0}</0>."
+msgstr "Could not find documentation for <0>{0}</0>."
+
+#: src/js/browser/page/components/Container.tsx:106
+msgid "Danger"
+msgstr "Danger"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:101
+msgid "default ="
+msgstr "default ="
+
+#. placeholder {0}: quoteUrl(versionName)
+#. placeholder {1}: printLocaleNameIn(i18n.locale, lang)
+#. placeholder {2}: printLocaleNameIn(i18n.locale, project.lang)
+#: src/js/browser/banners/NotTranslated.tsx:37
+msgid "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
+msgstr "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
+
+#: src/js/browser/banners/RepoNotFound.tsx:21
+#: src/js/browser/banners/RepoNotFound.tsx:27
+msgid "Documentation not found"
+msgstr "Documentation not found"
+
+#: src/js/browser/banners/IsNotebook.tsx:92
+msgid "Download"
+msgstr "Download"
+
+#: src/js/browser/search/index.tsx:118
+msgid "Downloading search index ..."
+msgstr "Downloading search index ..."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:116
+msgid "example:"
+msgstr "example:"
+
+#: src/js/browser/app.tsx:910
+msgid "Failed to display article content"
+msgstr "Failed to display article content"
+
+#: src/js/browser/app.tsx:936
+msgid "Failed to display article outline"
+msgstr "Failed to display article outline"
+
+#: src/js/browser/app.tsx:866
+msgid "Failed to display navigation menus"
+msgstr "Failed to display navigation menus"
+
+#: src/js/browser/app.tsx:879
+msgid "Failed to display table of contents"
+msgstr "Failed to display table of contents"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OpenAPIViewer.tsx:53
+msgid "Failed to parse OpenAPI schema"
+msgstr "Failed to parse OpenAPI schema"
+
+#: src/js/browser/layout/StatusBanner.tsx:27
+msgid "For Preview Only"
+msgstr "For Preview Only"
+
+#: src/js/browser/layout/NextPage.tsx:75
+msgid "Homepage"
+msgstr "Homepage"
+
+#: src/js/browser/banners/IsNotebook.tsx:110
+msgid "How to use"
+msgstr "How to use"
+
+#: src/js/browser/banners/RepoNotFound.tsx:44
+#: src/js/browser/banners/PageNotFound.tsx:81
+msgid "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
+msgstr "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:68
+msgid "int32"
+msgstr "int32"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:70
+msgid "int64"
+msgstr "int64"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:249
+msgid "items must be unique"
+msgstr "items must be unique"
+
+#: src/js/browser/layout/BuildInfo.tsx:69
+msgid "Last modified"
+msgstr "Last modified"
+
+#: src/js/browser/page/components/Mermaid.tsx:36
+msgid "Loading Mermaid diagram ..."
+msgstr "Loading Mermaid diagram ..."
+
+#: src/js/browser/search/index.tsx:131
+msgid "Loading more results ..."
+msgstr "Loading more results ..."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:211
+msgid "map"
+msgstr "map"
+
+#. placeholder {0}: schema.multipleOf
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:175
+msgid "multiple of {0}"
+msgstr "multiple of {0}"
+
+#. placeholder {0}: schema.pattern
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:215
+msgid "must match regular expression <0>{0}</0>"
+msgstr "must match regular expression <0>{0}</0>"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:41
+msgid "Network problems occurred while downloading page content."
+msgstr "Network problems occurred while downloading page content."
+
+#: src/js/browser/layout/NextPage.tsx:113
+msgid "Next page"
+msgstr "Next page"
+
+#: src/js/browser/layout/VersionPicker.tsx:119
+msgid "nightlies"
+msgstr "nightlies"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:290
+msgid "no extra keys allowed"
+msgstr "no extra keys allowed"
+
+#: src/js/browser/page/components/Container.tsx:112
+msgid "Note"
+msgstr "Note"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:133
+msgid "one of"
+msgstr "one of"
+
+#: src/js/browser/banners/IsNotebook.tsx:100
+msgid "Open on GitHub"
+msgstr "Open on GitHub"
+
+#: src/js/browser/layout/VersionPicker.tsx:133
+msgid "other versions"
+msgstr "other versions"
+
+#: src/js/browser/layout/SuggestEdit.tsx:30
+msgid "Page"
+msgstr "Page"
+
+#: src/js/browser/layout/BuildInfo.tsx:85
+msgid "Page built"
+msgstr "Page built"
+
+#: src/js/browser/error.tsx:209
+msgid "Page error"
+msgstr "Page error"
+
+#: src/js/browser/banners/PageNotFound.tsx:71
+#: src/js/browser/banners/PageNotFound.tsx:73
+msgid "Page not found"
+msgstr "Page not found"
+
+#: src/js/browser/layout/VersionPicker.tsx:112
+msgid "prereleases"
+msgstr "prereleases"
+
+#: src/js/browser/layout/NextPage.tsx:86
+msgid "Previous page"
+msgstr "Previous page"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:230
+msgid "Query parameters"
+msgstr "Query parameters"
+
+#. placeholder {0}: error.cause.res.status
+#: src/js/browser/banners/UncaughtRouteError.tsx:28
+msgid "Received an HTTP {0} error while downloading page content."
+msgstr "Received an HTTP {0} error while downloading page content."
+
+#. placeholder {0}: wordBreak(quoteUrl(printed))
+#: src/js/browser/banners/RedirectedFrom.tsx:51
+msgid "Redirected from {0}"
+msgstr "Redirected from {0}"
+
+#: src/js/browser/layout/VersionPicker.tsx:105
+msgid "releases"
+msgstr "releases"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:251
+msgid "Request body"
+msgstr "Request body"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:206
+msgid "Request examples"
+msgstr "Request examples"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:76
+msgid "required"
+msgstr "required"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:306
+msgid "Response body"
+msgstr "Response body"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:297
+msgid "Response examples"
+msgstr "Response examples"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:371
+msgid "Responses"
+msgstr "Responses"
+
+#: src/js/browser/layout/Search.tsx:18
+msgid "Search"
+msgstr "Search"
+
+#: src/js/browser/search/index.tsx:118
+msgid "Search in {title} ..."
+msgstr "Search in {title} ..."
+
+#: src/js/browser/banners/PageNotFound.tsx:115
+msgid "Searching for more pages ..."
+msgstr "Searching for more pages ..."
+
+#: src/js/browser/layout/HTMLTitle.tsx:46
+msgid "SecretFlow Docs"
+msgstr "SecretFlow Docs"
+
+#: src/js/browser/layout/StatusBanner.tsx:16
+msgid "SecretFlow Documentation"
+msgstr "SecretFlow Documentation"
+
+#: src/js/browser/layout/useColumnLayout.tsx:220
+msgid "Sections"
+msgstr "Sections"
+
+#: src/js/browser/main.tsx:217
+msgid "Sitemap"
+msgstr "Sitemap"
+
+#: src/js/browser/layout/SuggestEdit.tsx:33
+msgid "Source"
+msgstr "Source"
+
+#: src/js/browser/layout/SuggestEdit.tsx:51
+msgid "Suggest an edit"
+msgstr "Suggest an edit"
+
+#: src/js/browser/layout/SuggestEdit.tsx:28
+#: src/js/browser/banners/ErrorDetails.tsx:31
+msgid "Technical info"
+msgstr "Technical info"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:19
+msgid "The application encountered an unexpected error. We apologize for the inconvenience."
+msgstr "The application encountered an unexpected error. We apologize for the inconvenience."
+
+#. placeholder {0}: wordBreak(quoteUrl(suffix))
+#: src/js/browser/banners/PageNotFound.tsx:75
+msgid "The page <0>{0}</0> was not found in {versionName}."
+msgstr "The page <0>{0}</0> was not found in {versionName}."
+
+#: src/js/browser/banners/IsNotebook.tsx:65
+msgid "This is a Jupyter Notebook"
+msgstr "This is a Jupyter Notebook"
+
+#. placeholder {0}: current.label
+#. placeholder {1}: current.raw
+#. placeholder {2}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:82
+msgid "This is documentation for <0>{0}</0> version {1}; {button} is the <1>latest {2}</1> version."
+msgstr "This is documentation for <0>{0}</0> version {1}; {button} is the <1>latest {2}</1> version."
+
+#. placeholder {0}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:59
+msgid "This is documentation for an <0>unreleased</0> version. {button} is the <1>latest {0}</1> version."
+msgstr "This is documentation for an <0>unreleased</0> version. {button} is the <1>latest {0}</1> version."
+
+#. placeholder {0}: current.raw
+#. placeholder {1}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:98
+msgid "This is documentation for version {0}; {button} is the <0>latest</0> {1} version."
+msgstr "This is documentation for version {0}; {button} is the <0>latest</0> {1} version."
+
+#: src/js/browser/banners/SuggestLanguage.tsx:55
+msgid "This page is also available in <0><1>{localeName}</1><2/></0>."
+msgstr "This page is also available in <0><1>{localeName}</1><2/></0>."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:34
+msgid "time"
+msgstr "time"
+
+#: src/js/browser/page/components/Container.tsx:109
+msgid "Tip"
+msgstr "Tip"
+
+#: src/js/browser/layout/SuggestEdit.tsx:34
+msgid "User-Agent"
+msgstr "User-Agent"
+
+#: src/js/browser/layout/ViewPageSource.tsx:31
+msgid "View page source"
+msgstr "View page source"
+
+#: src/js/browser/page/components/Container.tsx:103
+msgid "Warning"
+msgstr "Warning"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:70
+msgid "You may <0>refresh this page</0>, or try again later."
+msgstr "You may <0>refresh this page</0>, or try again later."
+
+#: src/js/browser/banners/PageNotFound.tsx:89
+msgid "You may also be looking for:"
+msgstr "You may also be looking for:"

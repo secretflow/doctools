@@ -1,0 +1,25 @@
+- article:
+  - heading "Welcome to SecretFlow Open Specification" [level=1]:
+    - link "Direct link to Welcome to SecretFlow Open Specification":
+      - /url: "#welcome-to-secretflow-open-specification"
+  - paragraph: SecretFlow Open Specification is a protocol stack designed for privacy-preserving applications.
+  - paragraph: At this moment, SecretFlow Open Specification consists of Data, Component and Node Evaluation protocols. We are going to introduce Workflow protocol soon.
+  - paragraph: "SecretFlow Open Specification are used by SecretFlow ecosystem, including:"
+  - list:
+    - listitem: "SecretFlow: a unified framework for privacy-preserving data analysis and machine learning"
+    - listitem: "Kuscia: a K8s-based privacy-preserving computing task orchestration framework."
+    - listitem: "SecretPad: a privacy-preserving computing web platform based on the Kuscia framework, designed to provide easy access to privacy-preserving data intelligence and machine learning functions."
+    - listitem: SCQL and TEE engine will also use SecretFlow Open Specification in future.
+  - paragraph:
+    - img
+  - heading "Announcement" [level=2]:
+    - link "Direct link to Announcement":
+      - /url: "#announcement"
+  - heading /Oct, \d+/ [level=3]:
+    - link /Direct link to Oct, \d+/:
+      - /url: "#oct-2023"
+  - paragraph: SecretFlow Open Specification v1.0 is launched.
+  - heading /July, \d+/ [level=3]:
+    - link /Direct link to July, \d+/:
+      - /url: "#july-2023"
+  - paragraph: We officially launch the first version of Specification with SecretFlow 1.0.0.

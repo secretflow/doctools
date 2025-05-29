@@ -3,46 +3,20 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-  "inputs": [
-    {
-      "id": "sphinxBuildFormat",
-      "type": "promptString",
-      "description": "Sphinx build format",
-      "default": "mdx"
-    },
-    {
-      "id": "sphinxBuildSource",
-      "type": "promptString",
-      "description": "Sphinx source dir",
-      "default": "source"
-    },
-    {
-      "id": "sphinxBuildTarget",
-      "type": "promptString",
-      "description": "Sphinx target dir",
-      "default": "build"
-    },
-    {
-      "id": "sphinxBuildLanguage",
-      "type": "promptString",
-      "description": "Sphinx build language",
-      "default": "en"
-    },
-    {
-      "id": "pytestFilter",
-      "type": "promptString",
-      "description": "Pytest filter",
-      "default": "test"
-    }
-  ],
   "configurations": [
     {
-      "name": "doctools: pytest",
-      "type": "python",
+      "name": "build mdx",
+      "type": "debugpy",
       "request": "launch",
-      "module": "pytest",
-      "args": ["-vv", "-s", "-k", "${input:pytestFilter}"],
-      "cwd": "${workspaceFolder}/pyproject",
+      "module": "sphinx",
+      "args": [
+        "-T",
+        "-E",
+        "-b",
+        "mdx",
+        "tests/demo",
+        "tests/demo/_build/mdx/demo/main/en"
+      ],
       "justMyCode": false
     }
   ]

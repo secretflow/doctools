@@ -1,1 +1,0 @@
-export const OTHER_PROJECTS = 'OTHER_PROJECTS';

@@ -1,100 +1,41 @@
 {
-  "files.associations": {
-    // Turborepo
-    "turbo.json": "jsonc",
-    // Nx
-    "nx.json": "jsonc",
-    "project.json": "jsonc",
-    // tsconfig
-    "**/tooling/tsconfig/*.json": "jsonc",
-    "**/tooling/tsconfig/package.json": "json",
-    "tsconfig.*.json": "jsonc",
-    "tsconfig.json": "jsonc",
-    // rye
-    "requirements.lock": "pip-requirements",
-    "requirements-dev.lock": "pip-requirements"
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.sortImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "cSpell.allowCompoundWords": true,
-  "cSpell.enabled": true,
-  "editor.rulers": [88],
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "files.insertFinalNewline": true,
-  "black-formatter.args": ["--config", "pyproject.toml"],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.validate": [
+  "[typescript][typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.fixAll.stylelint": "explicit",
+      "source.organizeImports": "never",
+      "source.sortImports": "never"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": ["fflate", "mdclient"],
+  "deno.enable": false,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.associations": {
+    "**/project.json": "jsonc"
+  },
+  "markdown.validate.ignoredLinks": [
+    "dist/**",
+    "tests/demo/_build/**",
+    "**/secretflow_doctools/js/web.tar"
+  ],
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.terminal.activateEnvironment": true,
+  "stylelint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact",
-    "mdx"
+    "css"
   ],
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-issue-config.json": ".github/ISSUE_TEMPLATE/config.yml"
-  },
-  "[python]": {
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "never",
-      "source.fixAll": "explicit"
-    },
-    "editor.defaultFormatter": "ms-python.black-formatter"
-  },
-  "[typescriptreact]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
-  "[typescript]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
-  "[javascriptreact]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
-  "[javascript]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
-  "[json]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[markdown]": {
-    "editor.quickSuggestions": {
-      "other": true,
-      "comments": true,
-      "strings": true
-    }
-  },
-  "[mdx]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[css]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.stylelint": "explicit"
-    }
-  },
-  "[javascript][javascriptreact][typescript][typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  }
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true
 }

@@ -1,0 +1,31 @@
+- navigation:
+  - combobox
+  - text: demo
+  - combobox
+  - text: main
+  - button "Search"
+  - combobox
+  - text: English
+  - separator
+  - menu:
+    - menuitem "Markdown":
+      - link "Markdown":
+        - /url: /en/docs/demo/main/markdown
+    - menuitem "reStructuredText":
+      - link "reStructuredText":
+        - /url: /en/docs/demo/main/restructuredtext
+    - menuitem "Rich content":
+      - link "Rich content":
+        - /url: /en/docs/demo/main/rich
+    - menuitem "Jupyter Notebook":
+      - link "Jupyter Notebook":
+        - /url: /en/docs/demo/main/notebook
+    - menuitem "APIs":
+      - link "APIs":
+        - /url: /en/docs/demo/main/api
+    - menuitem "Swagger":
+      - link "Swagger":
+        - /url: /en/docs/demo/main/swagger
+    - menuitem "Lorem ipsum":
+      - link "Lorem ipsum":
+        - /url: /en/docs/demo/main/lorem.ipsum.dolor

@@ -1,0 +1,826 @@
+- article:
+  - heading "Algorithm Selection" [level=1]:
+    - link "Direct link to Algorithm Selection":
+      - /url: "#id1"
+  - paragraph: HEU provides a variety of PHE algorithms, and this document describes the characteristics of each to help you choose the right one.
+  - complementary:
+    - heading "Note" [level=4]
+    - paragraph: "Initialize HEU requires specifying the SchemaType parameter, for example:"
+    - button "Copy":
+      - img "copy"
+    - code: python
+    - code: /from heu import phe kit = phe\.setup\(phe\.SchemaType\.ZPaillier, \d+\)/
+  - paragraph: This doc indicates how to choose phe.SchemaType parameter.
+  - heading "Algorithm Overview" [level=2]:
+    - link "Direct link to Algorithm Overview":
+      - /url: "#id2"
+  - table:
+    - rowgroup:
+      - row "SchemaType Algorithm family brief description Overall Recommendation":
+        - cell "SchemaType":
+          - paragraph: SchemaType
+        - cell "Algorithm family":
+          - paragraph: Algorithm family
+        - cell "brief description":
+          - paragraph: brief description
+        - cell "Overall Recommendation":
+          - paragraph: Overall Recommendation
+    - rowgroup:
+      - row "ZPaillier Paillier Highly optimized Paillier algorithm, suitable for use on all platforms. ★★★★★":
+        - cell "ZPaillier":
+          - paragraph: ZPaillier
+        - cell "Paillier":
+          - paragraph: Paillier
+        - cell "Highly optimized Paillier algorithm, suitable for use on all platforms.":
+          - paragraph: Highly optimized Paillier algorithm, suitable for use on all platforms.
+        - cell "★★★★★":
+          - paragraph: ★★★★★
+      - row "FPaillier Paillier The performance is very low and ZPaillier is recommended instead ★":
+        - cell "FPaillier":
+          - paragraph: FPaillier
+        - cell "Paillier":
+          - paragraph: Paillier
+        - cell "The performance is very low and ZPaillier is recommended instead":
+          - paragraph: The performance is very low and ZPaillier is recommended instead
+        - cell "★":
+          - paragraph: ★
+      - row "IPCL Paillier Intel’s contributed implementation of Paillier, which supports AVX512-IFMA instruction set and Intel QAT hardware acceleration, is currently being gradually improved and refined. ★★★":
+        - cell "IPCL":
+          - paragraph: IPCL
+        - cell "Paillier":
+          - paragraph: Paillier
+        - cell "Intel’s contributed implementation of Paillier, which supports AVX512-IFMA instruction set and Intel QAT hardware acceleration, is currently being gradually improved and refined.":
+          - paragraph: Intel’s contributed implementation of Paillier, which supports AVX512-IFMA instruction set and Intel QAT hardware acceleration, is currently being gradually improved and refined.
+        - cell "★★★":
+          - paragraph: ★★★
+      - row "OU Okamoto-Uchiyama Functionality is the same as Paillier, but with higher performance and less ciphertext bloat, but with slightly lower security, see below for a detailed description. ★★★★★":
+        - cell "OU":
+          - paragraph: OU
+        - cell "Okamoto-Uchiyama":
+          - paragraph: Okamoto-Uchiyama
+        - cell "Functionality is the same as Paillier, but with higher performance and less ciphertext bloat, but with slightly lower security, see below for a detailed description.":
+          - paragraph: Functionality is the same as Paillier, but with higher performance and less ciphertext bloat, but with slightly lower security, see below for a detailed description.
+        - cell "★★★★★":
+          - paragraph: ★★★★★
+      - row "EC ElGamal ElGamal The ElGamal algorithm based on elliptic curves offers better performance and a lower ciphertext expansion rate compared to Paillier and OU. However, its drawbacks include slower decryption and a very small value space, which can lead to decryption failure if exceeded. ★★★★":
+        - cell "EC ElGamal":
+          - paragraph: EC ElGamal
+        - cell "ElGamal":
+          - paragraph: ElGamal
+        - cell "The ElGamal algorithm based on elliptic curves offers better performance and a lower ciphertext expansion rate compared to Paillier and OU. However, its drawbacks include slower decryption and a very small value space, which can lead to decryption failure if exceeded.":
+          - paragraph: The ElGamal algorithm based on elliptic curves offers better performance and a lower ciphertext expansion rate compared to Paillier and OU. However, its drawbacks include slower decryption and a very small value space, which can lead to decryption failure if exceeded.
+        - cell "★★★★":
+          - paragraph: ★★★★
+      - row "Mock None Not encrypted, for testing or debugging purposes only, strictly for online use. ★":
+        - cell "Mock":
+          - paragraph: Mock
+        - cell "None":
+          - paragraph: None
+        - cell "Not encrypted, for testing or debugging purposes only, strictly for online use.":
+          - paragraph: Not encrypted, for testing or debugging purposes only, strictly for online use.
+        - cell "★":
+          - paragraph: ★
+  - paragraph: "Note: The recommendation index is comprehensively based on performance, security, applicability and stability, and dynamically changes with the iterative upgrading of the algorithm."
+  - heading "Paillier" [level=2]:
+    - link "Direct link to Paillier":
+      - /url: "#paillier"
+  - heading "Introduction to Algorithmic Theory" [level=3]:
+    - link "Direct link to Introduction to Algorithmic Theory":
+      - /url: "#id3"
+  - paragraph:
+    - text: /Paillier’s algorithm was proposed by Pascal Paillier in \d+, see:/
+    - link "Algorithm details (Wikipedia)":
+      - /url: https://en.wikipedia.org/wiki/Paillier_cryptosystem
+    - text: .
+  - table "Information of Paillier":
+    - caption:
+      - paragraph: Information of Paillier
+    - rowgroup:
+      - row "Type of Algorithm Additive homomorphic encryption":
+        - cell "Type of Algorithm":
+          - paragraph: Type of Algorithm
+        - cell "Additive homomorphic encryption":
+          - paragraph: Additive homomorphic encryption
+      - row "security IND-CPA Security, Semantic Security":
+        - cell "security":
+          - paragraph: security
+        - cell "IND-CPA Security, Semantic Security":
+          - paragraph: IND-CPA Security, Semantic Security
+      - row "Hard Assumption Decisional Composite Residuosity Assumption decisional composite residuosity assumption (DCRA)":
+        - cell "Hard Assumption":
+          - paragraph: Hard Assumption
+        - cell "Decisional Composite Residuosity Assumption decisional composite residuosity assumption (DCRA)":
+          - paragraph: Decisional Composite Residuosity Assumption
+          - paragraph: decisional composite residuosity assumption (DCRA)
+      - row /Security Strength \d+-bit key length equal to or slightly lower than \d+ bits of security strength \d+-bit key length equal to or slightly lower than \d+ bits of security strength/:
+        - cell "Security Strength":
+          - paragraph: Security Strength
+        - cell /\d+-bit key length equal to or slightly lower than \d+ bits of security strength \d+-bit key length equal to or slightly lower than \d+ bits of security strength/:
+          - paragraph: /\d+-bit key length equal to or slightly lower than \d+ bits of security strength/
+          - paragraph: /\d+-bit key length equal to or slightly lower than \d+ bits of security strength/
+  - complementary:
+    - heading "Decisional composite residuosity assumption" [level=4]
+    - paragraph:
+      - text: DCRA states that given a composite N and an integer z, it is hard to decide whether z is an
+      - math: "N"
+      - text: "-residue modulo"
+      - math: N 2
+      - text: (whether there exists a y such that
+      - math: z ≡ y N m o d N 2
+      - text: )
+  - strong: Regarding Security Strength
+  - paragraph:
+    - text: Currently, there is no direct literature indicating the correlation between the key length of DCRA (Decisional Composite Residuosity Assumption) and the number of secure bits. The generally considered difficulty is DCRA <= FACTORING <= DLP (Discrete Logarithm Problem) in
+    - math: Z N ∗
+    - superscript:
+      - link "1":
+        - /url: "#id6"
+    - text: /\. In the context of DLP, a group size of \d+ corresponds to \d+ bits, and a group size of \d+ corresponds to \d+ bits/
+    - superscript:
+      - link "2":
+        - /url: "#id7"
+    - text: . Therefore, the security strength of Paillier is equivalent to or slightly lower than this value.
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "1":
+        - /url: "#id4"
+      - text: "]"
+    - paragraph:
+      - text: European Network of Excellence in Cryptology II.
+      - link "https://www.ecrypt.eu.org/ecrypt2/documents/D.MAYA.6.pdf":
+        - /url: https://www.ecrypt.eu.org/ecrypt2/documents/D.MAYA.6.pdf
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "2":
+        - /url: "#id5"
+      - text: "]"
+    - paragraph:
+      - link "https://www.keylength.com/en/4/":
+        - /url: https://www.keylength.com/en/4/
+  - 'heading "Implementation: Paillier" [level=3]':
+    - 'link "Direct link to Implementation: Paillier"':
+      - /url: "#zpaillier"
+  - paragraph:
+    - text: Z in ZPaillier has the same meaning as
+    - math: Z
+    - text: in mathematics, which represents integers, that is, a set of Paillier
+  - table "ZPaillier Feature Quick Check":
+    - caption:
+      - paragraph: ZPaillier Feature Quick Check
+    - rowgroup:
+      - row "SchemaType parameter name phe.SchemaType.ZPaillier":
+        - cell "SchemaType parameter name":
+          - paragraph: SchemaType parameter name
+        - cell "phe.SchemaType.ZPaillier":
+          - paragraph: phe.SchemaType.ZPaillier
+      - row "Implementation Algorithm Paillier":
+        - cell "Implementation Algorithm":
+          - paragraph: Implementation Algorithm
+        - cell "Paillier":
+          - paragraph: Paillier
+      - row "stability stabilize":
+        - cell "stability":
+          - paragraph: stability
+        - cell "stabilize":
+          - paragraph: stabilize
+      - row "Supported Platforms Linux，macOS（Intel & Arm）":
+        - cell "Supported Platforms":
+          - paragraph: Supported Platforms
+        - cell "Linux，macOS（Intel & Arm）":
+          - paragraph: Linux，macOS（Intel & Arm）
+      - row "Whether it depends on specific hardware Independent":
+        - cell "Whether it depends on specific hardware":
+          - paragraph: Whether it depends on specific hardware
+        - cell "Independent":
+          - paragraph: Independent
+      - row "Whether hardware acceleration is supported Not supported":
+        - cell "Whether hardware acceleration is supported":
+          - paragraph: Whether hardware acceleration is supported
+        - cell "Not supported":
+          - paragraph: Not supported
+      - row "Relative performance High":
+        - cell "Relative performance":
+          - paragraph: Relative performance
+        - cell "High":
+          - paragraph: High
+  - complementary:
+    - heading "Note" [level=4]
+    - paragraph: HEU has made a number of optimizations to ZPaillier, which is a high performance set of Paillier algorithm implementations and does not depend on specific hardware. ZPaillier is a high performance Paillier algorithm implementation that is hardware-independent and available on all platforms, so when you don’t know how to choose an algorithm, you can use ZPaillier by default.
+  - paragraph: "Implementation of Paper based on:"
+  - list:
+    - listitem:
+      - text: /Jurik, M\. \(\d+\)\. Extensions to the paillier cryptosystem with applications to cryptological protocols\. Brics, August\./
+      - link /https:\/\/www\.brics\.dk\/DS\/\d+\/9\/BRICS-DS-\d+-9\.pdf/:
+        - /url: https://www.brics.dk/DS/03/9/BRICS-DS-03-9.pdf
+  - 'heading "Implementation: Paillier" [level=3]':
+    - 'link "Direct link to Implementation: Paillier"':
+      - /url: "#fpaillier"
+  - paragraph:
+    - text: The F in FPaillier denotes a floating point number
+    - math: F
+    - text: ", the Paillier algorithm itself only supports integers, FPaillier FPaillier extends Paillier to support floating point numbers."
+  - table "FPaillier Features Quick Facts":
+    - caption:
+      - paragraph: FPaillier Features Quick Facts
+    - rowgroup:
+      - row "SchemaType parameter name phe.SchemaType.FPaillier":
+        - cell "SchemaType parameter name":
+          - paragraph: SchemaType parameter name
+        - cell "phe.SchemaType.FPaillier":
+          - paragraph: phe.SchemaType.FPaillier
+      - row "Implementation Algorithm Paillier":
+        - cell "Implementation Algorithm":
+          - paragraph: Implementation Algorithm
+        - cell "Paillier":
+          - paragraph: Paillier
+      - row "stability stabilize":
+        - cell "stability":
+          - paragraph: stability
+        - cell "stabilize":
+          - paragraph: stabilize
+      - row "Supported Platforms Linux，macOS（Intel & Arm）":
+        - cell "Supported Platforms":
+          - paragraph: Supported Platforms
+        - cell "Linux，macOS（Intel & Arm）":
+          - paragraph: Linux，macOS（Intel & Arm）
+      - row "Whether it depends on specific hardware Independent":
+        - cell "Whether it depends on specific hardware":
+          - paragraph: Whether it depends on specific hardware
+        - cell "Independent":
+          - paragraph: Independent
+      - row "Whether hardware acceleration is supported Not supported":
+        - cell "Whether hardware acceleration is supported":
+          - paragraph: Whether hardware acceleration is supported
+        - cell "Not supported":
+          - paragraph: Not supported
+      - row "Relative performance Low":
+        - cell "Relative performance":
+          - paragraph: Relative performance
+        - cell "Low":
+          - paragraph: Low
+  - complementary:
+    - heading "Note" [level=4]
+    - paragraph:
+      - text: The algorithm principle of FPaillier is similar to the
+      - link "Python-Paillier":
+        - /url: https://github.com/data61/pythonpaillier
+      - text: library.
+  - paragraph:
+    - text: "The principle of FPaillier supporting floating point numbers is to represent the input data in the form of int_rep:"
+    - code: scalar = int_rep * (BASE ** exponent)
+  - figure "Calculation of int_rep and exponent":
+    - paragraph: Calculation of int_rep and exponent
+    - button "Copy":
+      - img "copy"
+    - code: python
+    - code: "/# math\\.frexp\\(\\) returns the mantissa and exponent of x, as pair \\(m, e\\)\\. m is a float and e is an int, such that x = m \\* 2\\.\\*\\*e\\. bin_flt_exponent = math\\.frexp\\(scalar\\)\\[1\\] # The least significant bit has value 2 \\*\\* bin_lsb_exponent bin_lsb_exponent = bin_flt_exponent - cls\\.FLOAT_MANTISSA_BITS # FLOAT_MANTISSA_BITS = \\d+ exponent = bin_lsb_exponent # math\\.floor\\(bin_lsb_exponent \\/ cls\\.LOG2_BASE\\) int_rep = round\\(fractions\\.Fraction\\(scalar\\) \\* fractions\\.Fraction\\(cls\\.BASE\\) \\*\\* -exponent\\)/"
+  - strong: Encryption
+  - paragraph: When scalar is encrypted, only the value of int_rep is encrypted, and exponent is stored in plaintext. Please note the security risk.
+  - strong: Homomorphic Operation
+  - paragraph:
+    - text: First align the exponents, reduce the exponent of the number with the larger exponent to the smaller exponent (new_exp), that is,
+    - code: int_rep = int_rep * (base**(exponent-new_exp))
+    - text: ", then perform the homomorphic operation."
+  - complementary:
+    - heading "Note" [level=4]
+    - paragraph:
+      - text: The floating-point operation interface of FPaillier is not exposed at the Python level. The interface provided by FPaillier at the Python end is consistent with ZPaillier. To use the FPaillier floating-point functionality, you must call it through the C++ interface. For more details, please refer to
+      - link "FPaillier Unit Test":
+        - /url: https://github.com/secretflow/heu/blob/main/heu/library/algorithms/paillier_float/paillier_test.cc
+      - text: .
+  - 'heading "Algorithm Implementation: IPCL" [level=3]':
+    - 'link "Direct link to Algorithm Implementation: IPCL"':
+      - /url: "#ipcl"
+  - paragraph: IPCL stands for Intel Paillier Cryptosystem Library, which is a Paillier algorithm implementation contributed by Intel. Its features are that it supports AVX512-IFMA instruction set and Intel QAT hardware accelerator for acceleration.
+  - table "IPCL Feature Quick Check":
+    - caption:
+      - paragraph: IPCL Feature Quick Check
+    - rowgroup:
+      - row "SchemaType parameter name phe.SchemaType.IPCL":
+        - cell "SchemaType parameter name":
+          - paragraph: SchemaType parameter name
+        - cell "phe.SchemaType.IPCL":
+          - paragraph: phe.SchemaType.IPCL
+      - row "Implementation Algorithm Paillier":
+        - cell "Implementation Algorithm":
+          - paragraph: Implementation Algorithm
+        - cell "Paillier":
+          - paragraph: Paillier
+      - row "stability Experimental, for testing and evaluation purposes only, still in continuous improvement":
+        - cell "stability":
+          - paragraph: stability
+        - cell "Experimental, for testing and evaluation purposes only, still in continuous improvement":
+          - paragraph: Experimental, for testing and evaluation purposes only, still in continuous improvement
+      - row "Supported Platforms Linux，macOS（Intel）":
+        - cell "Supported Platforms":
+          - paragraph: Supported Platforms
+        - cell "Linux，macOS（Intel）":
+          - paragraph: Linux，macOS（Intel）
+      - row "Whether it depends on specific hardware Independent":
+        - cell "Whether it depends on specific hardware":
+          - paragraph: Whether it depends on specific hardware
+        - cell "Independent":
+          - paragraph: Independent
+      - row "Whether hardware acceleration is supported Supports AVX512-IFMA instruction set and/or Intel QAT accelerator":
+        - cell "Whether hardware acceleration is supported":
+          - paragraph: Whether hardware acceleration is supported
+        - cell "Supports AVX512-IFMA instruction set and/or Intel QAT accelerator":
+          - paragraph: Supports AVX512-IFMA instruction set and/or Intel QAT accelerator
+      - row "Relative performance High":
+        - cell "Relative performance":
+          - paragraph: Relative performance
+        - cell "High":
+          - paragraph: High
+  - paragraph: "Implementation is based on this code library:"
+  - list:
+    - listitem:
+      - link "pailliercryptolib":
+        - /url: https://github.com/intel/pailliercryptolib
+  - heading "Okamoto-Uchiyama" [level=2]:
+    - link "Direct link to Okamoto-Uchiyama":
+      - /url: "#okamoto-uchiyama"
+  - heading "Introduction to Algorithmic Theory" [level=3]:
+    - link "Direct link to Introduction to Algorithmic Theory":
+      - /url: "#id9"
+  - paragraph:
+    - text: /The Okamoto-Uchiyama algorithm was proposed by Tatsuaki Okamoto and Shigenori Uchiyama in \d+\. See/
+    - link "Algorithm Details (Wikipedia)":
+      - /url: https://en.wikipedia.org/wiki/Okamoto%E2%80%93Uchiyama_cryptosystem
+  - table "Information of Okamoto-Uchiyama":
+    - caption:
+      - paragraph: Information of Okamoto-Uchiyama
+    - rowgroup:
+      - row "Type of Algorithm Additive homomorphic encryption":
+        - cell "Type of Algorithm":
+          - paragraph: Type of Algorithm
+        - cell "Additive homomorphic encryption":
+          - paragraph: Additive homomorphic encryption
+      - row "security IND-CPA Security, Semantic Security":
+        - cell "security":
+          - paragraph: security
+        - cell "IND-CPA Security, Semantic Security":
+          - paragraph: IND-CPA Security, Semantic Security
+      - row "Hard Assumption p-subgroup assumption":
+        - cell "Hard Assumption":
+          - paragraph: Hard Assumption
+        - cell "p-subgroup assumption":
+          - paragraph:
+            - strong: p
+            - text: "-subgroup assumption"
+      - row "Security Strength There is debate, the security bit strength of OU with the same key length is the same or slightly lower than that of Paillier, see the explanation below.":
+        - cell "Security Strength":
+          - paragraph: Security Strength
+        - cell "There is debate, the security bit strength of OU with the same key length is the same or slightly lower than that of Paillier, see the explanation below.":
+          - paragraph: There is debate, the security bit strength of OU with the same key length is the same or slightly lower than that of Paillier, see the explanation below.
+  - complementary:
+    - heading "p-subgroup assumption" [level=4]
+    - paragraph:
+      - text: It is difficult to determine whether an element x in
+      - math: ( Z / n Z ) ∗
+      - text: is in the subgroup of order p
+  - strong: Regarding Security Strength
+  - paragraph:
+    - text: In Paillier’s case,
+    - math: n = p q
+    - text: ", while for OU,"
+    - math: n = p 2 q
+    - text: ; there are differing opinions on whether the security strength is the same when the length of n is aligned. The original OU paper
+    - superscript:
+      - link "3":
+        - /url: "#id13"
+    - text: posits that the fastest factoring algorithm available is the Field sieve method, the complexity of which is solely related to n. Therefore, aligning n would result in the same security strength.
+  - paragraph:
+    - text: /However, there are some papers that suggest OU’s n needs to be \d+~\d+ bits larger than Paillier’s for equivalent security/
+    - superscript:
+      - link "4":
+        - /url: "#id14"
+    - text: ", and there are even articles"
+    - superscript:
+      - link "5":
+        - /url: "#id15"
+    - text: claiming that the factorization of n is only related to p. Therefore, if security is a particular concern, it is advisable to increase the key length of OU appropriately.
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "3":
+        - /url: "#id10"
+      - text: "]"
+    - paragraph:
+      - text: /Okamoto, T\., & Uchiyama, S\. \(\d+\)\. A new public-key cryptosystem as secure as factoring\. Lecture Notes in Computer Science \(Including Subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics\), \d+, \d+-\d+\./
+      - link /https:\/\/doi\.org\/\d+\.\d+\/BFb0054135/:
+        - /url: https://doi.org/10.1007/BFb0054135
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "4":
+        - /url: "#id11"
+      - text: "]"
+    - paragraph:
+      - text: "/Boneh, D\\., Durfee, G\\., Howgrave-Graham, N\\. \\(\\d+\\)\\. Factoring N = p r q for Large r \\. In: Wiener, M\\. \\(eds\\) Advances in Cryptology — CRYPTO’ \\d+\\. CRYPTO \\d+\\. Lecture Notes in Computer Science, vol \\d+\\. Springer, Berlin, Heidelberg\\./"
+      - link /https:\/\/doi\.org\/\d+\.\d+\/3-\d+-\d+-1_21/:
+        - /url: https://doi.org/10.1007/3-540-48405-1_21
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "5":
+        - /url: "#id12"
+      - text: "]"
+    - paragraph:
+      - link /https:\/\/crypto\.stanford\.edu\/cs359c\/\d+[hmsp]+\/projects\/NathanManoharBenFisch\.pdf/:
+        - /url: https://crypto.stanford.edu/cs359c/17sp/projects/NathanManoharBenFisch.pdf
+  - heading "Comparison between OU and Paillier" [level=4]:
+    - link "Direct link to Comparison between OU and Paillier":
+      - /url: "#ou-paillier"
+  - paragraph: "Advantages of OU:"
+  - list:
+    - listitem: In the same usage scenario, the computational performance of OU is much higher than that of Paillier.
+    - listitem: In the same usage scenario, the ciphertext size of OU is only half that of Paillier. Assuming the key length is N, the ciphertext size of Paillier is 2N bits, while the ciphertext of OU is N bits.
+    - listitem: The security of OU is the same as that of Paillier, both achieve IND-CPA security, and neither satisfy IND-CCA security
+  - paragraph: Disadvantages of OU.
+  - list:
+    - listitem: OU is not as well-known academically as Paillier.
+    - listitem:
+      - text: The plaintext value range of OU is not clear. Assuming the key length is N, the plaintext value range of Paillier is
+      - math: Z N
+      - text: ", while the plaintext value range of OU is"
+      - math: Z p
+      - text: ", where p is a parameter in the private key, so the value range of OU is not public."
+    - listitem: Although theoretically neither satisfy the IND-CCA security definition, in practical IND-CCA scenarios OU has known attacks, while no effective attacks have been found for Paillier.
+  - heading "Risk Warning" [level=4]:
+    - link "Direct link to Risk Warning":
+      - /url: "#id16"
+  - paragraph: Although OU and Paillier have the same academic security level, both satisfy IND-CPA security and neither achieve IND-CCA security, in practice in IND-CCA scenarios, OU has a plaintext space overflow attack, while no effective attacks have been found for Paillier.
+  - heading "OU Plaintext Space Overflow Attack" [level=5]:
+    - link "Direct link to OU Plaintext Space Overflow Attack":
+      - /url: "#ou"
+  - paragraph:
+    - text: The plaintext space of OU is
+    - math: Z p
+    - text: ", that is, the decryption of OU’s ciphertext exists with a mod p effect. If an attacker is allowed to encrypt a plaintext larger than p, it is easy to infer p, leading to the leakage of the private key. The specific principle is as follows:"
+  - list:
+    - listitem:
+      - text: The attacker chooses a plaintext
+      - math: m 1 > p
+      - text: ", encrypts it, and can get the decrypted result"
+      - math: m 2
+      - text: .
+    - listitem:
+      - text: Obviously,
+      - math: m 1 > p , m 2 < p
+      - text: ，and
+      - math: m 1 ≡ m 2 m o d p
+      - text: 。
+    - listitem:
+      - text: By calculating the greatest common divisor
+      - math: g c d ( m 1 − m 2 , n )
+      - text: ", p can be obtained."
+  - paragraph: "OU usually has restrictions in its implementation and does not directly allow encryption of plaintext larger than p. However, since OU supports homomorphic addition and plaintext-ciphertext multiplication, the above overflow attack is still possible:"
+  - list:
+    - listitem:
+      - text: The attacker selects a plaintext m close to but less than
+      - math: p
+      - text: ", encrypts it to get c"
+    - listitem:
+      - text: Execute t times ciphertext addition for this ciphertext c（or one time cleartext-ciphertext multiplication) to satisfy
+      - math: m ∗ t > p
+      - text: ", and then decrypt to get"
+      - math: m ′
+    - listitem:
+      - text: The attacker obtains
+      - math: m ′
+      - text: ", and can get the private key"
+      - math: p
+      - text: using the congruence relation
+  - complementary:
+    - heading "Warning" [level=4]
+    - paragraph: When using the OU algorithm, it is essential to determine whether the attack is feasible in the upper-level application environment. If so, immediately employ the defense methods described below to detect and block the attack, ensuring that the upper-level application can avoid such an attack.
+  - heading "Attack Defense" [level=5]:
+    - link "Direct link to Attack Defense":
+      - /url: "#id17"
+  - paragraph:
+    - text: The key to the above attack lies in two points, one is that the attacker needs to be able to construct a ciphertext larger than p, and the other is that the attacker needs to obtain the decryption result. Both are indispensable. This is a typical chosen ciphertext attack (CCA) scenario. When using OU,
+    - strong: one should avoid using OU where CCA is valid
+    - text: .
+  - paragraph: For some simple scenarios, such as the calculation between Alice and Bob, assuming Alice has a private key and Bob is a malicious participant, the calculation process is that Alice encrypts the data and sends it to Bob for calculation, and Bob returns the calculation result to Alice. At this time, even if Bob constructs a malicious ciphertext c, Bob cannot get the decryption result of c. Bob’s attack will cause calculation errors, but the key will not be leaked.
+  - paragraph:
+    - text: "In some complex privacy-preserving computing scenarios, the interaction in the next round depends on the result of the previous round of interaction. The CCA scenario may be inevitable, but it does not mean that OU cannot be used. If Alice has an effective means to block the attack, OU can still be selected. Let’s review the attack process again: the plaintext m corresponding to the ciphertext c constructed by Bob, Alice decrypts to get"
+    - math: m ′ = m m o d p
+    - text: . The actual problem is that
+    - math: m ′
+    - text: might be very large, far exceeding the range that can be expressed by int64 commonly used in business, because it is very difficult for Bob to
+    - strong: construct
+    - text: /a ciphertext slightly larger than p, p is usually very large, when the key size is \d+, p is about \d+ bits\. The probability of Bob blindly guessing a number m satisfying/
+    - math: /m ′ < 2 \d+/
+    - text: is less than
+    - math: /2 − \( \d+ − \d+ \)/
+    - text: ", that is, the high 618bits of the m guessed by Bob is exactly the same as p, this probability can be ignored, so it can be considered that"
+    - math: m ′
+    - text: is still a large number. When Alice decrypts and finds that the plaintext is not within the reasonable value range, she can reject Bob’s result, thereby preventing Bob’s attack.
+  - 'heading "Algorithm Implementation: OU" [level=3]':
+    - 'link "Direct link to Algorithm Implementation: OU"':
+      - /url: "#id18"
+  - paragraph:
+    - text: OU has implemented the Okamoto-Uchiyama algorithm, its functionality is consistent with ZPaillier, and its performance is higher. It can often be a substitute for ZPaillier. However, OU has a known attack. For details, see the
+    - link "Okamoto-Uchiyama":
+      - /url: "#okamoto-uchiyama"
+    - text: algorithm theory introduction section
+  - table "OU Feature Quick Check":
+    - caption:
+      - paragraph: OU Feature Quick Check
+    - rowgroup:
+      - row "SchemaType parameter name phe.SchemaType.OU":
+        - cell "SchemaType parameter name":
+          - paragraph: SchemaType parameter name
+        - cell "phe.SchemaType.OU":
+          - paragraph: phe.SchemaType.OU
+      - row "Implementation Algorithm Okamoto-Uchiyama":
+        - cell "Implementation Algorithm":
+          - paragraph: Implementation Algorithm
+        - cell "Okamoto-Uchiyama":
+          - paragraph: Okamoto-Uchiyama
+      - row "stability stabilize":
+        - cell "stability":
+          - paragraph: stability
+        - cell "stabilize":
+          - paragraph: stabilize
+      - row "Supported Platforms Linux，macOS（Intel & Arm）":
+        - cell "Supported Platforms":
+          - paragraph: Supported Platforms
+        - cell "Linux，macOS（Intel & Arm）":
+          - paragraph: Linux，macOS（Intel & Arm）
+      - row "Whether it depends on specific hardware Independent":
+        - cell "Whether it depends on specific hardware":
+          - paragraph: Whether it depends on specific hardware
+        - cell "Independent":
+          - paragraph: Independent
+      - row "Whether hardware acceleration is supported Not supported":
+        - cell "Whether hardware acceleration is supported":
+          - paragraph: Whether hardware acceleration is supported
+        - cell "Not supported":
+          - paragraph: Not supported
+      - row "Relative performance High":
+        - cell "Relative performance":
+          - paragraph: Relative performance
+        - cell "High":
+          - paragraph: High
+  - paragraph: "Implementation of Paper based on:"
+  - list:
+    - listitem:
+      - text: /Coron, J\. S\., Naccache, D\., & Paillier, P\. \(\d+\)\. Accelerating Okamoto-Uchiyama public-key cryptosystem\. Electronics Letters, \d+\(4\), \d+–\d+\./
+      - link /https:\/\/doi\.org\/\d+\.\d+\/el:\d+/:
+        - /url: https://doi.org/10.1049/el:19990229
+  - heading "ElGamal" [level=2]:
+    - link "Direct link to ElGamal":
+      - /url: "#elgamal"
+  - heading "Introduction to Algorithmic Theory" [level=3]:
+    - link "Direct link to Introduction to Algorithmic Theory":
+      - /url: "#id19"
+  - paragraph:
+    - text: /ElGamal is an asymmetric encryption algorithm based on the Diffie–Hellman key exchange, proposed by Taher Elgamal in \d+/
+    - superscript:
+      - link "6":
+        - /url: "#id21"
+    - text: . The original ElGamal has multiplicative homomorphic properties, which stem from the ciphertext component
+    - math: m h r
+    - text: .
+  - paragraph: "In the subsequent Generalized ElGamal algorithm, the entire cryptosystem is defined on the cyclic group G, and its encryption security also depends on the difficulty of the Discrete Logarithm Problem (DLP) on G. Therefore, the cyclic group G used to construct Generalized ElGamal must meet the following two requirements:"
+  - list:
+    - listitem: "Efficiency: Computations on G must be very fast"
+    - listitem: "Security: Solving the Discrete Logarithm Problem (DLP) on G is very difficult"
+  - paragraph: "Below are some specific examples of the cyclic group G that meet the aforementioned requirements:"
+  - list:
+    - listitem:
+      - text: The multiplicative group
+      - math: Z p ∗
+      - text: of the integers modulo a prime
+      - math: p
+      - text: .
+    - listitem:
+      - text: The multiplicative group
+      - math: F 2 m ∗
+      - text: of the finite field
+      - math: F 2 m
+      - text: of characteristic two.
+    - listitem: The group of points on an elliptic curve over a finite field.
+    - listitem:
+      - text: The multiplicative group
+      - math: F q ∗
+      - text: of the finite field
+      - math: F q
+      - text: ", where"
+      - math: q = p m
+      - text: and p is a prime.
+    - listitem:
+      - text: The group of units
+      - math: Z n ∗
+      - text: ", where n is a composite integer."
+    - listitem: The jacobian of a hyperelliptic curve defined over a finite field
+    - listitem: The class group of an imaginary quadratic number field.
+  - paragraph: To achieve additive homomorphic properties as well as computational efficiency, we have chosen to use the elliptic curve point group (EC Group) as the underlying G for ElGamal, making the ElGamal in HEU known as EC ElGamal.
+  - table "ElGamal Algorithm Information":
+    - caption:
+      - paragraph: ElGamal Algorithm Information
+    - rowgroup:
+      - row "Type of Algorithm The homomorphic properties depend on the definition of the underlying cyclic group G. Depending on G, ElGamal can exhibit additive homomorphism, multiplicative homomorphism, or no homomorphic properties at all.":
+        - cell "Type of Algorithm":
+          - paragraph: Type of Algorithm
+        - cell "The homomorphic properties depend on the definition of the underlying cyclic group G. Depending on G, ElGamal can exhibit additive homomorphism, multiplicative homomorphism, or no homomorphic properties at all.":
+          - paragraph: The homomorphic properties depend on the definition of the underlying cyclic group G. Depending on G, ElGamal can exhibit additive homomorphism, multiplicative homomorphism, or no homomorphic properties at all.
+      - row "security If the Decisional Diffie–Hellman assumption (DDH) defined on G is difficult, then the algorithm is semantically secure, with indistinguishability satisfying IND-CPA.":
+        - cell "security":
+          - paragraph: security
+        - cell "If the Decisional Diffie–Hellman assumption (DDH) defined on G is difficult, then the algorithm is semantically secure, with indistinguishability satisfying IND-CPA.":
+          - paragraph: If the Decisional Diffie–Hellman assumption (DDH) defined on G is difficult, then the algorithm is semantically secure, with indistinguishability satisfying IND-CPA.
+      - row "Hard Assumption CDH & DDH":
+        - cell "Hard Assumption":
+          - paragraph: Hard Assumption
+        - cell "CDH & DDH":
+          - paragraph: CDH & DDH
+      - row "Security Strength Dependent on G":
+        - cell "Security Strength":
+          - paragraph: Security Strength
+        - cell "Dependent on G":
+          - paragraph: Dependent on G
+  - paragraph: "If the cyclic group is chosen to be an elliptic curve point group (EC Group), then the algorithm information is as follows:"
+  - table "Information on EC ElGamal Algorithm":
+    - caption:
+      - paragraph: Information on EC ElGamal Algorithm
+    - rowgroup:
+      - row "Type of Algorithm Dependent on the mapping of plaintext to EC Group, if the mapping is appropriate, then EC ElGamal satisfies additive homomorphic properties":
+        - cell "Type of Algorithm":
+          - paragraph: Type of Algorithm
+        - cell "Dependent on the mapping of plaintext to EC Group, if the mapping is appropriate, then EC ElGamal satisfies additive homomorphic properties":
+          - paragraph: Dependent on the mapping of plaintext to EC Group, if the mapping is appropriate, then EC ElGamal satisfies additive homomorphic properties
+      - row "security IND-CPA Security, Semantic Security":
+        - cell "security":
+          - paragraph: security
+        - cell "IND-CPA Security, Semantic Security":
+          - paragraph: IND-CPA Security, Semantic Security
+      - row "Hard Assumption CDH & DDH defined on elliptic curves":
+        - cell "Hard Assumption":
+          - paragraph: Hard Assumption
+        - cell "CDH & DDH defined on elliptic curves":
+          - paragraph: CDH & DDH defined on elliptic curves
+      - row "Security Strength Dependent on the specific curve chosen, here a list of the security strengths for some curves is provided":
+        - cell "Security Strength":
+          - paragraph: Security Strength
+        - cell "Dependent on the specific curve chosen, here a list of the security strengths for some curves is provided":
+          - paragraph:
+            - text: Dependent on the specific curve chosen,
+            - link "here":
+              - /url: http://safecurves.cr.yp.to/rho.html
+            - text: a list of the security strengths for some curves is provided
+  - complementary:
+    - emphasis:
+      - text: "["
+      - link "6":
+        - /url: "#id20"
+      - text: "]"
+    - paragraph:
+      - text: /ElGamal, T\. \(\d+\)\. A Public Key Cryptosystem and a Signature Scheme Based on Discrete Logarithms\. Lecture Notes in Computer Science \(Including Subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics\), \d+ LNCS\(4\), \d+–\d+\./
+      - link /https:\/\/doi\.org\/\d+\.\d+\/3-\d+-\d+-7_2/:
+        - /url: https://doi.org/10.1007/3-540-39568-7_2
+  - 'heading "Algorithm Implementation: EC ElGamal" [level=3]':
+    - 'link "Direct link to Algorithm Implementation: EC ElGamal"':
+      - /url: "#ec-elgamal"
+  - paragraph: HEU has implemented the EC ElGamal algorithm, which is an ElGamal algorithm defined over the elliptic curve point group (EC Group). Compared to other cyclic groups G, the EC Group offers higher computational efficiency, resulting in excellent overall performance for EC ElGamal.
+  - paragraph:
+    - text: On the other hand, to maintain the additive homomorphic property, EC ElGamal maps plaintext to EC Group using the method
+    - math: m ′ = m G
+    - text: ", where"
+    - math: m
+    - text: is the plaintext and
+    - math: m ′
+    - text: is the mapped plaintext, a point on the elliptic curve, with G being the generator of the EC Group. This is a typical one-way function, and after EC ElGamal decryption, obtaining
+    - math: m ′
+    - text: it is very difficult to reverse calculate the actual plaintext
+    - math: m
+    - text: ", as there is no direct solving algorithm, making EC ElGamal decryption very slow, which is a drawback of EC ElGamal."
+  - table "EC ElGamal Feature Quick Reference":
+    - caption:
+      - paragraph: EC ElGamal Feature Quick Reference
+    - rowgroup:
+      - row "SchemaType parameter name phe.SchemaType.ElGamal":
+        - cell "SchemaType parameter name":
+          - paragraph: SchemaType parameter name
+        - cell "phe.SchemaType.ElGamal":
+          - paragraph: phe.SchemaType.ElGamal
+      - row "Implementation Algorithm ElGamal":
+        - cell "Implementation Algorithm":
+          - paragraph: Implementation Algorithm
+        - cell "ElGamal":
+          - paragraph: ElGamal
+      - row "Homomorphic Properties Additive homomorphic encryption":
+        - cell "Homomorphic Properties":
+          - paragraph: Homomorphic Properties
+        - cell "Additive homomorphic encryption":
+          - paragraph: Additive homomorphic encryption
+      - row "stability For non-production use only":
+        - cell "stability":
+          - paragraph: stability
+        - cell "For non-production use only":
+          - paragraph: For non-production use only
+      - row "Supported Platforms Linux, macOS":
+        - cell "Supported Platforms":
+          - paragraph: Supported Platforms
+        - cell "Linux, macOS":
+          - paragraph: Linux, macOS
+      - row "Whether it depends on specific hardware Independent":
+        - cell "Whether it depends on specific hardware":
+          - paragraph: Whether it depends on specific hardware
+        - cell "Independent":
+          - paragraph: Independent
+      - 'row "Whether hardware acceleration is supported Dependent on the choice of curve type. (Note: Currently, no curves support hardware acceleration)"':
+        - cell "Whether hardware acceleration is supported":
+          - paragraph: Whether hardware acceleration is supported
+        - 'cell "Dependent on the choice of curve type. (Note: Currently, no curves support hardware acceleration)"':
+          - paragraph: "Dependent on the choice of curve type. (Note: Currently, no curves support hardware acceleration)"
+      - row "Relative performance High":
+        - cell "Relative performance":
+          - paragraph: Relative performance
+        - cell "High":
+          - paragraph: High
+  - paragraph:
+    - text: The underlying elliptic curve computations for EC ElGamal are based on
+    - link "Yacl ECC SPI":
+      - /url: https://github.com/secretflow/yacl/tree/main/yacl/crypto/base/ecc
+    - text: .
+  - heading "Algorithm Performance" [level=2]:
+    - link "Direct link to Algorithm Performance":
+      - /url: "#id22"
+  - paragraph: "HEU provides a Benchmark to test the performance of each algorithm. To run the Benchmark, please clone the HEU code repository, then execute the following command in the project root directory:"
+  - button "Copy":
+    - img "copy"
+  - code: shell
+  - code: "# 测试算法在 scalar 运算场景下的性能 # Test the performance of algorithms in scalar computing scenarios bazel run -c opt heu/library/benchmark:phe -- --schema=zpaillier # 测试算法在矩阵运算场景下的性能 # Test the performance of algorithms in matrix operation scenarios bazel run -c opt heu/library/benchmark:np -- --schema=zpaillier"
+  - paragraph: "Note: By changing the schema parameter in the above command, you can run the Benchmark of different algorithms. The first run of Benchmark will automatically trigger code compilation."
+  - heading "Reference Performance" [level=3]:
+    - link "Direct link to Reference Performance":
+      - /url: "#id23"
+  - paragraph: "Below are the reference performances of some algorithms, excluding acceleration hardware. Configuration parameters:"
+  - list:
+    - listitem: /CPU Intel\(R\) Xeon\(R\) Gold \d+ CPU @ 2\.30GHz/
+    - listitem: /Key size = \d+/
+  - paragraph: /The entries in the table indicate the total time in ms for \d+,\d+ operations in a single thread\./
+  - table:
+    - rowgroup:
+      - row "SchemaType encryption Ciphertext + Ciphertext Ciphertext + Plaintext Ciphertext * Plaintext Decryption":
+        - cell "SchemaType":
+          - paragraph: SchemaType
+        - cell "encryption":
+          - paragraph: encryption
+        - cell "Ciphertext + Ciphertext":
+          - paragraph: Ciphertext + Ciphertext
+        - cell "Ciphertext + Plaintext":
+          - paragraph: Ciphertext + Plaintext
+        - cell "Ciphertext * Plaintext":
+          - paragraph: Ciphertext * Plaintext
+        - cell "Decryption":
+          - paragraph: Decryption
+    - rowgroup:
+      - row /OU \d+ \d+\.\d+ \d+\.\d+ \d+ \d+/:
+        - cell "OU":
+          - paragraph: OU
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+\.\d+/:
+          - paragraph: /\d+\.\d+/
+        - cell /\d+\.\d+/:
+          - paragraph: /\d+\.\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+      - row /ZPaillier \d+ \d+\.\d+ \d+ \d+ \d+/:
+        - cell "ZPaillier":
+          - paragraph: ZPaillier
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+\.\d+/:
+          - paragraph: /\d+\.\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+      - row /FPaillier \d+ \d+ \d+ \d+ \d+/:
+        - cell "FPaillier":
+          - paragraph: FPaillier
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell /\d+/:
+          - paragraph: /\d+/
+  - paragraph:
+    - text: A reminder that even if the key size of algorithms is the same, their security strength may not be equivalent; OU’s security might be weaker than Paillier, see the
+    - link "Okamoto-Uchiyama":
+      - /url: "#okamoto-uchiyama"
+    - text: algorithm theoretical introduction section for details.

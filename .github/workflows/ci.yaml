@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: CI
+
+    strategy:
+      matrix:
+        platform:
+          - ubuntu-latest
+
+      fail-fast: false
+
+    timeout-minutes: 60
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.8"
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - run: pnpm run bootstrap
+
+      - run: pnpm nx ci
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 3
+
+      - run: pnpm nx build:wheels
+
+      - run: pnpm nx publish:pypi
+        if: ${{ success() && inputs.release == true }}
+        env:
+          HATCH_INDEX_USER: "__token__"
+          HATCH_INDEX_AUTH: ${{secrets.HATCH_INDEX_AUTH}}

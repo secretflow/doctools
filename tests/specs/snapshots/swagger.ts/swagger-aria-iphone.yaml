@@ -1,0 +1,544 @@
+- article:
+  - heading "Swagger" [level=1]:
+    - link "Direct link to Swagger":
+      - /url: "#swagger"
+  - heading "uploads an imageDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#uploadFile"
+  - text: post
+  - code: "/pet/{petId}/uploadImage"
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded multipart/form-data" [expanded]:
+    - img "expanded"
+    - heading "multipart/form-data" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"additionalMetadata\": \"string\", \"file\": \"string\" }"
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - separator
+  - heading "Add a new pet to the storeDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#addPet"
+  - text: post
+  - code: /pet
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"id\": 0, \"category\": { \"id\": 0, \"name\": \"string\" }, \"name\": \"doggie\", \"photoUrls\": [ \"string\" ], \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"status\": \"available\" }"
+  - heading "Request body" [level=3]
+  - list:
+    - listitem:
+      - code: id
+      - text: int64
+    - listitem:
+      - code: category
+      - text: object
+      - button "object Category":
+        - paragraph:
+          - text: object
+          - code: Category
+    - listitem:
+      - code: name
+      - text: string
+      - emphasis: required
+      - paragraph:
+        - strong: "example:"
+        - code: doggie
+    - listitem:
+      - code: photoUrls
+      - text: array of strings
+      - emphasis: required
+    - listitem:
+      - code: tags
+      - text: array of objects
+      - button "array":
+        - paragraph: array
+    - listitem:
+      - code: status
+      - text: string
+      - paragraph: pet status in the store
+      - paragraph:
+        - strong: one of
+        - code: available
+        - code: pending
+        - code: sold
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid input/:
+    - img "collapsed"
+    - heading /\d+ Invalid input/ [level=4]
+  - separator
+  - heading "Update an existing petDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#updatePet"
+  - text: put
+  - code: /pet
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"id\": 0, \"category\": { \"id\": 0, \"name\": \"string\" }, \"name\": \"doggie\", \"photoUrls\": [ \"string\" ], \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"status\": \"available\" }"
+  - heading "Request body" [level=3]
+  - list:
+    - listitem:
+      - code: id
+      - text: int64
+    - listitem:
+      - code: category
+      - text: object
+      - button "object Category":
+        - paragraph:
+          - text: object
+          - code: Category
+    - listitem:
+      - code: name
+      - text: string
+      - emphasis: required
+      - paragraph:
+        - strong: "example:"
+        - code: doggie
+    - listitem:
+      - code: photoUrls
+      - text: array of strings
+      - emphasis: required
+    - listitem:
+      - code: tags
+      - text: array of objects
+      - button "array":
+        - paragraph: array
+    - listitem:
+      - code: status
+      - text: string
+      - paragraph: pet status in the store
+      - paragraph:
+        - strong: one of
+        - code: available
+        - code: pending
+        - code: sold
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid ID supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid ID supplied/ [level=4]
+  - button /collapsed \d+ Pet not found/:
+    - img "collapsed"
+    - heading /\d+ Pet not found/ [level=4]
+  - button /collapsed \d+ Validation exception/:
+    - img "collapsed"
+    - heading /\d+ Validation exception/ [level=4]
+  - separator
+  - heading "Finds Pets by statusDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#findPetsByStatus"
+  - text: get
+  - code: /pet/findByStatus
+  - button "Copy":
+    - img "copy"
+  - paragraph: Multiple status values can be provided with comma separated strings
+  - heading "Request examples" [level=3]
+  - heading "Query parameters" [level=3]
+  - list:
+    - listitem:
+      - code: status
+      - text: array of strings
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid status value/:
+    - img "collapsed"
+    - heading /\d+ Invalid status value/ [level=4]
+  - separator
+  - heading "Finds Pets by tagsDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#findPetsByTags"
+  - text: get
+  - code: /pet/findByTags
+  - button "Copy":
+    - img "copy"
+  - paragraph: Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+  - heading "Request examples" [level=3]
+  - heading "Query parameters" [level=3]
+  - list:
+    - listitem:
+      - code: tags
+      - text: array of strings
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid tag value/:
+    - img "collapsed"
+    - heading /\d+ Invalid tag value/ [level=4]
+  - separator
+  - heading "Find pet by IDDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#getPetById"
+  - text: get
+  - code: "/pet/{petId}"
+  - button "Copy":
+    - img "copy"
+  - paragraph: Returns a single pet
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid ID supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid ID supplied/ [level=4]
+  - button /collapsed \d+ Pet not found/:
+    - img "collapsed"
+    - heading /\d+ Pet not found/ [level=4]
+  - separator
+  - heading "Updates a pet in the store with form dataDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#updatePetWithForm"
+  - text: post
+  - code: "/pet/{petId}"
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/x-www-form-urlencoded" [expanded]:
+    - img "expanded"
+    - heading "application/x-www-form-urlencoded" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"name\": \"string\", \"status\": \"string\" }"
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid input/:
+    - img "collapsed"
+    - heading /\d+ Invalid input/ [level=4]
+  - separator
+  - heading "Deletes a petDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#deletePet"
+  - text: delete
+  - code: "/pet/{petId}"
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid ID supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid ID supplied/ [level=4]
+  - button /collapsed \d+ Pet not found/:
+    - img "collapsed"
+    - heading /\d+ Pet not found/ [level=4]
+  - separator
+  - heading "Returns pet inventories by statusDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#getInventory"
+  - text: get
+  - code: /store/inventory
+  - button "Copy":
+    - img "copy"
+  - paragraph: Returns a map of status codes to quantities
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - separator
+  - heading "Place an order for a petDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#placeOrder"
+  - text: post
+  - code: /store/order
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "/\\{ \"id\": 0, \"petId\": 0, \"quantity\": 0, \"shipDate\": \"\\d+-\\d+-\\d+T\\d+:\\d+:\\d+\\.\\d+Z\", \"status\": \"placed\", \"complete\": true \\}/"
+  - heading "Request body" [level=3]
+  - list:
+    - listitem:
+      - code: id
+      - text: int64
+    - listitem:
+      - code: petId
+      - text: int64
+    - listitem:
+      - code: quantity
+      - text: int32
+    - listitem:
+      - code: shipDate
+      - text: date/time
+    - listitem:
+      - code: status
+      - text: string
+      - paragraph: Order Status
+      - paragraph:
+        - strong: one of
+        - code: placed
+        - code: approved
+        - code: delivered
+    - listitem:
+      - code: complete
+      - text: boolean
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid Order/:
+    - img "collapsed"
+    - heading /\d+ Invalid Order/ [level=4]
+  - separator
+  - heading "Find purchase order by IDDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#getOrderById"
+  - text: get
+  - code: "/store/order/{orderId}"
+  - button "Copy":
+    - img "copy"
+  - paragraph: /For valid response try integer IDs with value >= 1 and <= \d+\. Other values will generated exceptions/
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid ID supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid ID supplied/ [level=4]
+  - button /collapsed \d+ Order not found/:
+    - img "collapsed"
+    - heading /\d+ Order not found/ [level=4]
+  - separator
+  - heading "Delete purchase order by IDDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#deleteOrder"
+  - text: delete
+  - code: "/store/order/{orderId}"
+  - button "Copy":
+    - img "copy"
+  - paragraph: For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid ID supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid ID supplied/ [level=4]
+  - button /collapsed \d+ Order not found/:
+    - img "collapsed"
+    - heading /\d+ Order not found/ [level=4]
+  - separator
+  - heading "Creates list of users with given input arrayDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#createUsersWithListInput"
+  - text: post
+  - code: /user/createWithList
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "[ { \"id\": 0, \"username\": \"string\", \"firstName\": \"string\", \"lastName\": \"string\", \"email\": \"string\", \"password\": \"string\", \"phone\": \"string\", \"userStatus\": 0 } ]"
+  - heading "Request body" [level=3]
+  - button "object User":
+    - paragraph:
+      - text: object
+      - code: User
+  - heading "Responses" [level=3]
+  - separator
+  - heading "Get user by user nameDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#getUserByName"
+  - text: get
+  - code: "/user/{username}"
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid username supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid username supplied/ [level=4]
+  - button /collapsed \d+ User not found/:
+    - img "collapsed"
+    - heading /\d+ User not found/ [level=4]
+  - separator
+  - heading "Updated userDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#updateUser"
+  - text: put
+  - code: "/user/{username}"
+  - button "Copy":
+    - img "copy"
+  - paragraph: This can only be done by the logged in user.
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"id\": 0, \"username\": \"string\", \"firstName\": \"string\", \"lastName\": \"string\", \"email\": \"string\", \"password\": \"string\", \"phone\": \"string\", \"userStatus\": 0 }"
+  - heading "Request body" [level=3]
+  - list:
+    - listitem:
+      - code: id
+      - text: int64
+    - listitem:
+      - code: username
+      - text: string
+    - listitem:
+      - code: firstName
+      - text: string
+    - listitem:
+      - code: lastName
+      - text: string
+    - listitem:
+      - code: email
+      - text: string
+    - listitem:
+      - code: password
+      - text: string
+    - listitem:
+      - code: phone
+      - text: string
+    - listitem:
+      - code: userStatus
+      - text: int32
+      - paragraph: User Status
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid user supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid user supplied/ [level=4]
+  - button /collapsed \d+ User not found/:
+    - img "collapsed"
+    - heading /\d+ User not found/ [level=4]
+  - separator
+  - heading "Delete userDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#deleteUser"
+  - text: delete
+  - code: "/user/{username}"
+  - button "Copy":
+    - img "copy"
+  - paragraph: This can only be done by the logged in user.
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ Invalid username supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid username supplied/ [level=4]
+  - button /collapsed \d+ User not found/:
+    - img "collapsed"
+    - heading /\d+ User not found/ [level=4]
+  - separator
+  - heading "Logs user into the systemDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#loginUser"
+  - text: get
+  - code: /user/login
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - heading "Query parameters" [level=3]
+  - list:
+    - listitem:
+      - code: username
+      - text: string
+    - listitem:
+      - code: password
+      - text: string
+  - heading "Responses" [level=3]
+  - button /collapsed \d+ successful operation/:
+    - img "collapsed"
+    - heading /\d+ successful operation/ [level=4]
+  - button /collapsed \d+ Invalid username\/password supplied/:
+    - img "collapsed"
+    - heading /\d+ Invalid username\/password supplied/ [level=4]
+  - separator
+  - heading "Logs out current logged in user sessionDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#logoutUser"
+  - text: get
+  - code: /user/logout
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - heading "Responses" [level=3]
+  - separator
+  - heading "Creates list of users with given input arrayDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#createUsersWithArrayInput"
+  - text: post
+  - code: /user/createWithArray
+  - button "Copy":
+    - img "copy"
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "[ { \"id\": 0, \"username\": \"string\", \"firstName\": \"string\", \"lastName\": \"string\", \"email\": \"string\", \"password\": \"string\", \"phone\": \"string\", \"userStatus\": 0 } ]"
+  - heading "Request body" [level=3]
+  - button "object User":
+    - paragraph:
+      - text: object
+      - code: User
+  - heading "Responses" [level=3]
+  - separator
+  - heading "Create userDirect link to this section" [level=2]:
+    - link "Direct link to this section":
+      - /url: "#createUser"
+  - text: post
+  - code: /user
+  - button "Copy":
+    - img "copy"
+  - paragraph: This can only be done by the logged in user.
+  - heading "Request examples" [level=3]
+  - button "expanded application/json" [expanded]:
+    - img "expanded"
+    - heading "application/json" [level=4]
+  - button "Copy":
+    - img "copy"
+  - code: "{ \"id\": 0, \"username\": \"string\", \"firstName\": \"string\", \"lastName\": \"string\", \"email\": \"string\", \"password\": \"string\", \"phone\": \"string\", \"userStatus\": 0 }"
+  - heading "Request body" [level=3]
+  - list:
+    - listitem:
+      - code: id
+      - text: int64
+    - listitem:
+      - code: username
+      - text: string
+    - listitem:
+      - code: firstName
+      - text: string
+    - listitem:
+      - code: lastName
+      - text: string
+    - listitem:
+      - code: email
+      - text: string
+    - listitem:
+      - code: password
+      - text: string
+    - listitem:
+      - code: phone
+      - text: string
+    - listitem:
+      - code: userStatus
+      - text: int32
+      - paragraph: User Status
+  - heading "Responses" [level=3]

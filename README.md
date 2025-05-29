@@ -1,3 +1,3 @@
-# @secretflow/doctools
+# secretflow-doctools
 
-See [secretflow-doctools](./pyprojects/secretflow-doctools/README.md).
+Documentation tools for SecretFlow.
