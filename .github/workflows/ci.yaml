@@ -45,6 +45,10 @@ jobs:
         with:
           deno-version: v2.x
 
+      - run: |
+          sudo apt-spy2 fix --commit --launchpad --country=US
+          sudo apt-get update
+
       - run: pnpm run bootstrap
 
       - run: pnpm nx ci
