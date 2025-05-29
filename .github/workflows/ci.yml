@@ -45,10 +45,7 @@ jobs:
         with:
           deno-version: v2.x
 
-      - run: |
-          sudo gem install apt-spy2
-          sudo apt-spy2 fix --commit --launchpad --country=US
-          sudo apt-get update
+      - run: sudo apt-get update
 
       - run: pnpm run bootstrap
 
