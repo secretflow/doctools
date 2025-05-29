@@ -1,0 +1,135 @@
+- article:
+  - heading "SCQL Documentation" [level=1]:
+    - link "Direct link to SCQL Documentation":
+      - /url: "#scql-documentation"
+  - paragraph:
+    - text: Secure Collaborative Query Language (SCQL) is a system that translates SQL statements into a hybrid MPC-plaintext execution graph and executes them on a federation of database systems. The MPC framework is powered by
+    - link "SPU":
+      - /url: https://github.com/secretflow/spu
+    - text: .
+  - heading "Getting started" [level=2]:
+    - link "Direct link to Getting started":
+      - /url: "#getting-started"
+  - paragraph:
+    - text: Follow the
+    - link "tutorial":
+      - /url: /en/docs/scql/0.9.3b1/intro/p2p-tutorial
+    - text: and try out SCQL on your machine!
+  - heading "SCQL Systems" [level=2]:
+    - link "Direct link to SCQL Systems":
+      - /url: "#scql-systems"
+  - list:
+    - listitem:
+      - strong: Overview
+      - text: ":"
+      - link "System overview and architecture":
+        - /url: /en/docs/scql/0.9.3b1/topics/system/intro
+      - text: "|"
+      - link "P2P vs. Centralized":
+        - /url: /en/docs/scql/0.9.3b1/topics/system/deploy-arch
+    - listitem:
+      - strong: Security
+      - text: ":"
+      - link "Security overview":
+        - /url: /en/docs/scql/0.9.3b1/topics/security/overview
+    - listitem:
+      - strong: Reference
+      - text: ":"
+      - link "SCQL implementation status":
+        - /url: /en/docs/scql/0.9.3b1/reference/implementation-status
+  - heading "The SCQL Language" [level=2]:
+    - link "Direct link to The SCQL Language":
+      - /url: "#the-scql-language"
+  - list:
+    - listitem:
+      - strong: Reference
+      - text: ":"
+      - link "SCQL language manual":
+        - /url: /en/docs/scql/0.9.3b1/reference/lang/manual
+      - text: "|"
+      - link "Compatibility with MySQL":
+        - /url: /en/docs/scql/0.9.3b1/reference/lang/mysql-compatibility
+  - heading "Column Control List (CCL)" [level=2]:
+    - link "Direct link to Column Control List (CCL)":
+      - /url: "#column-control-list-ccl"
+  - list:
+    - listitem:
+      - strong: Overview
+      - text: ":"
+      - link "Introduction to CCL":
+        - /url: /en/docs/scql/0.9.3b1/topics/ccl/intro
+    - listitem:
+      - strong: Guides
+      - text: ":"
+      - link "Common usage and advice":
+        - /url: /en/docs/scql/0.9.3b1/topics/ccl/usage
+    - listitem:
+      - strong: Reference
+      - text: ":"
+      - link "GRANT and REVOKE":
+        - /url: /en/docs/scql/0.9.3b1/topics/clients/integrate-scdb#scql-grant-revoke
+      - text: "|"
+      - link "How CCL works":
+        - /url: /en/docs/scql/0.9.3b1/topics/ccl/intro#how-ccl-works
+  - heading "Clients" [level=2]:
+    - link "Direct link to Clients":
+      - /url: "#clients"
+  - list:
+    - listitem:
+      - strong: P2P
+      - list:
+        - listitem:
+          - link "Broker HTTP API reference":
+            - /url: /en/docs/scql/0.9.3b1/reference/broker-api
+    - listitem:
+      - strong: Centralized
+      - list:
+        - listitem:
+          - link "Overview of SCQL clients":
+            - /url: /en/docs/scql/0.9.3b1/topics/clients/integrate-scdb
+        - listitem:
+          - link "SCDB HTTP API reference":
+            - /url: /en/docs/scql/0.9.3b1/reference/scdb-api
+  - heading "Deployment" [level=2]:
+    - link "Direct link to Deployment":
+      - /url: "#deployment"
+  - list:
+    - listitem:
+      - strong: P2P
+      - list:
+        - listitem:
+          - strong: Guides
+          - text: ":"
+          - link "P2P Deployment":
+            - /url: /en/docs/scql/0.9.3b1/topics/deployment/how-to-deploy-p2p-cluster
+        - listitem:
+          - strong: Reference
+          - text: ":"
+          - link "P2P Configuration":
+            - /url: /en/docs/scql/0.9.3b1/reference/p2p-deploy-config
+    - listitem:
+      - strong: Centralized
+      - list:
+        - listitem:
+          - strong: "Guides:"
+          - link "Centralized Deployment":
+            - /url: /en/docs/scql/0.9.3b1/topics/deployment/how-to-deploy-centralized-cluster
+        - listitem:
+          - strong: Reference
+          - text: ":"
+          - link "Centralized Configuration":
+            - /url: /en/docs/scql/0.9.3b1/reference/centralized-deploy-config
+    - listitem:
+      - strong: With Kuscia
+      - text: ":"
+      - link "Run SCQL on Kuscia":
+        - /url: /en/docs/scql/0.9.3b1/topics/deployment/run-scql-on-kuscia
+  - heading "For contributors" [level=2]:
+    - link "Direct link to For contributors":
+      - /url: "#for-contributors"
+  - list:
+    - listitem:
+      - strong: Reference
+      - text: ":"
+      - link "SCQL operators":
+        - /url: /en/docs/scql/0.9.3b1/reference/operators

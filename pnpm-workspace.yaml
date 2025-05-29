@@ -1,5 +1,6 @@
-packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'docs'
-  - 'pyprojects/*'
+packages: []
+onlyBuiltDependencies:
+  - "@swc/core"
+  - "esbuild"
+  - "nx"
+  - "unrs-resolver"

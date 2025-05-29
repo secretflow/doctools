@@ -1,0 +1,187 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "doctools",
+  "namedInputs": {
+    "default": [
+      "{workspaceRoot}/**/*",
+      "!{workspaceRoot}/build/**/*",
+      "!{workspaceRoot}/dist/**/*"
+    ],
+    "js": [
+      "default",
+      "!{workspaceRoot}/pyproject.toml",
+      "!{workspaceRoot}/uv.lock",
+      "!{workspaceRoot}/src/py/**/*"
+    ],
+    "no-test": ["!{workspaceRoot}/tests/**/*", "!{workspaceRoot}/playwright.config.ts"],
+    "py": [
+      "default",
+      "!{workspaceRoot}/*.json",
+      "!{workspaceRoot}/*.js",
+      "!{workspaceRoot}/*.ts",
+      "!{workspaceRoot}/src/js/**/*"
+    ]
+  },
+  "targets": {
+    "babel:update": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "inputs": ["{workspaceRoot}/src/py/**/*"],
+      "options": {
+        "commands": [
+          ".venv/bin/python -m babel.messages.frontend extract -o src/py/secretflow_doctools/locales/messages.pot src/py/secretflow_doctools",
+          ".venv/bin/python -m babel.messages.frontend update -i src/py/secretflow_doctools/locales/messages.pot -d src/py/secretflow_doctools/locales -l zh_CN --omit-header",
+          ".venv/bin/python -m babel.messages.frontend compile -d src/py/secretflow_doctools/locales -l zh_CN --use-fuzzy"
+        ],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/src/py/secretflow_doctools/locales"]
+    },
+    "build:cli": {
+      "cache": true,
+      "command": "node scripts/build-cli.js",
+      "inputs": ["js", "no-test"],
+      "outputs": ["{workspaceRoot}/src/py/secretflow_doctools/js/cli.js"]
+    },
+    "build:demo": {
+      "cache": true,
+      "dependsOn": ["build:cli"],
+      "executor": "nx:run-commands",
+      "inputs": [
+        "py",
+        "{workspaceRoot}/tests/demo/**/*",
+        "!{workspaceRoot}/tests/specs/**/*"
+      ],
+      "options": {
+        "commands": [
+          ".venv/bin/python -m coverage run -m sphinx -T -E -b mdx tests/demo tests/demo/_build/mdx/demo/main/en",
+          ".venv/bin/python -m coverage html",
+          "node src/py/secretflow_doctools/js/cli.js bundle -i tests/demo/_build/mdx -o tests/demo/_build/esm"
+        ],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/tests/demo/_build/**/*"]
+    },
+    "build:lib": {
+      "dependsOn": ["build:lib:dts", "build:lib:esm"],
+      "executor": "nx:noop"
+    },
+    "build:lib:dts": {
+      "cache": true,
+      "command": "tsc --build --force",
+      "inputs": ["js", "no-test"],
+      "outputs": ["{workspaceRoot}/dist/dts"]
+    },
+    "build:lib:esm": {
+      "cache": true,
+      "command": "vite build --config vite.config.lib.ts",
+      "dependsOn": ["lingui:extract"],
+      "inputs": ["js", "no-test"],
+      "outputs": ["{workspaceRoot}/dist/esm"]
+    },
+    "build:sdist": {
+      "cache": true,
+      "command": ".venv/bin/python -m hatch build -t sdist",
+      "dependsOn": ["build:cli", "build:web", "babel:update"],
+      "inputs": ["default", "no-test"],
+      "outputs": ["{workspaceRoot}/dist/*.tar.gz"]
+    },
+    "build:web": {
+      "cache": true,
+      "command": "vite build",
+      "dependsOn": ["lingui:extract"],
+      "inputs": ["js", "no-test"],
+      "outputs": ["{workspaceRoot}/dist/web"]
+    },
+    "build:web.tar": {
+      "cache": true,
+      "command": ".venv/bin/python scripts/sdist_build_hook.py",
+      "dependsOn": ["build:web"],
+      "inputs": ["default", "no-test"],
+      "outputs": ["{workspaceRoot}/src/py/secretflow_doctools/js/web.tar"]
+    },
+    "build:wheels": {
+      "cache": true,
+      "command": ".venv/bin/python -m hatch build -t custom",
+      "dependsOn": ["build:sdist"],
+      "inputs": ["default", "no-test"],
+      "outputs": ["{workspaceRoot}/dist/*.whl"]
+    },
+    "check:eslint": {
+      "cache": true,
+      "command": "eslint src/js",
+      "inputs": ["js", "no-test"],
+      "outputs": []
+    },
+    "check:prettier": {
+      "cache": true,
+      "command": "prettier src/js --check",
+      "inputs": ["js", "no-test"],
+      "outputs": []
+    },
+    "check:pyright": {
+      "cache": true,
+      "command": "pyright",
+      "inputs": ["py", "no-test"],
+      "outputs": []
+    },
+    "check:ruff": {
+      "cache": true,
+      "executor": "nx:run-commands",
+      "inputs": ["py"],
+      "options": {
+        "commands": [
+          ".venv/bin/python -m ruff check src/py scripts tests",
+          ".venv/bin/python -m ruff format --check src/py scripts tests"
+        ],
+        "parallel": true
+      },
+      "outputs": []
+    },
+    "check:stylelint": {
+      "cache": true,
+      "command": "stylelint src/js",
+      "inputs": ["js", "no-test"],
+      "outputs": []
+    },
+    "ci": {
+      "cache": false,
+      "command": "nx run-many -t build:lib -t check:eslint -t check:stylelint -t check:prettier -t check:pyright -t check:ruff -t test"
+    },
+    "dev": {
+      "cache": false,
+      "command": ".venv/bin/python scripts/dev_server.py",
+      "dependsOn": ["build:demo"]
+    },
+    "lingui:extract": {
+      "cache": true,
+      "command": "lingui extract --clean",
+      "inputs": ["js", "no-test"],
+      "outputs": ["{workspaceRoot}/src/js/browser/locales/*/messages.po"]
+    },
+    "publish:pypi": {
+      "cache": false,
+      "command": ".venv/bin/python -m hatch publish -n dist/",
+      "dependsOn": ["build:wheels"]
+    },
+    "test": {
+      "cache": false,
+      "dependsOn": [
+        "build:cli",
+        "build:web",
+        "build:web.tar",
+        "build:demo",
+        "test:deps"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["playwright test"],
+        "parallel": false
+      }
+    },
+    "test:deps": {
+      "cache": false,
+      "command": "playwright install --with-deps"
+    }
+  }
+}

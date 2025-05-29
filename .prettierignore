@@ -1,27 +1,7 @@
-pnpm-lock.yaml
-**/node_modules
-**/.venv
+src/py
 
-# build artifacts
-**/build
-**/_build
-**/dist
-**/coverage
+src/js/browser/locales
+src/js/browser/public
 
-# generated code
-**/.dumi/tmp
-**/.dumi/tmp-production
-**/.docusaurus
-
-# protobuf
-**/*_pb.ts
-**/*_connect.ts
-
-# sphinx_mdx tests
-**/tests/**/expect/**/*
-
-# vendored files
-**/vendor/**
-
-# symlinks
-.github/pull_request_template.md
+*.hbs
+*.mdx

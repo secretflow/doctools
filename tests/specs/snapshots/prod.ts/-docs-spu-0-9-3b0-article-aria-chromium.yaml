@@ -1,0 +1,31 @@
+- article:
+  - heading "SPU" [level=1]:
+    - link "Direct link to SPU":
+      - /url: "#spu"
+  - paragraph:
+    - text: SPU(Secure Processing Unit) consists of a frontend
+    - strong: compiler
+    - text: and a backend
+    - strong: runtime
+    - text: . The frontend compiler accepts an ML program as input and converts it into an
+    - strong: MPC-specific intermediate representation
+    - text: . After a series of delicate code optimizations, programs will be executed by a performant backend runtime as MPC protocols. Based on SPU, we can run ML programs of different frameworks with minor modifications in a privacy-preserving manner.
+  - paragraph:
+    - text: SPU is a major part of
+    - link "SecretFlow":
+      - /url: /en/docs/secretflow/
+    - text: project. SPU is designed to be easily integrated into other distributed system, it’s
+    - strong: recommended to use
+    - text: SecretFlow to write SPU program.
+  - heading "Citing" [level=2]:
+    - link "Direct link to Citing":
+      - /url: "#citing"
+  - paragraph:
+    - text: /SPU was accepted by USENIX ATC’\d+\. Please check the paper/
+    - link "here":
+      - /url: https://www.usenix.org/conference/atc23/presentation/ma
+    - text: .
+  - button "Copy":
+    - img "copy"
+  - code: python
+  - code: "/@inproceedings \\{\\d+, author = \\{Junming Ma and Yancheng Zheng and Jun Feng and Derun Zhao and Haoqi Wu and Wenjing Fang and Jin Tan and Chaofan Yu and Benyu Zhang and Lei Wang\\}, title = \\{\\{SecretFlow-SPU\\}: A Performant and \\{User-Friendly\\} Framework for \\{Privacy-Preserving\\} Machine Learning\\}, booktitle = \\{\\d+ USENIX Annual Technical Conference \\(USENIX ATC \\d+\\)\\}, year = \\{\\d+\\}, isbn = \\{\\d+-1-\\d+-\\d+-9\\}, address = \\{Boston, MA\\}, pages = \\{\\d+--\\d+\\}, url = \\{https:\\/\\/www\\.usenix\\.org\\/conference\\/atc23\\/presentation\\/ma\\}, publisher = \\{USENIX Association\\}, month = jul, \\}/"

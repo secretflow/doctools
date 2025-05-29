@@ -1,0 +1,27 @@
+- article:
+  - heading "隐私计算平台互联互通文档" [level=1]:
+    - link "Direct link to 隐私计算平台互联互通文档":
+      - /url: "#id1"
+  - paragraph:
+    - paragraph: 目录
+  - list:
+    - listitem:
+      - link "隐语互联互通协议手册":
+        - /url: /zh-CN/docs/interconnection/0.1.0b1/protocols
+      - list:
+        - listitem:
+          - link "传输层协议（一期）":
+            - /url: /zh-CN/docs/interconnection/0.1.0b1/protocols/transport
+        - listitem:
+          - link "ECDH-PSI 协议":
+            - /url: /zh-CN/docs/interconnection/0.1.0b1/protocols/ecdh-psi
+        - listitem:
+          - link "SS-LR 协议":
+            - /url: /zh-CN/docs/interconnection/0.1.0b1/protocols/ss-lr
+    - listitem:
+      - link "隐私计算联盟指导文件":
+        - /url: /zh-CN/docs/interconnection/0.1.0b1/ppca
+      - list:
+        - listitem:
+          - link "开放算法协议":
+            - /url: /zh-CN/docs/interconnection/0.1.0b1/ppca#id2

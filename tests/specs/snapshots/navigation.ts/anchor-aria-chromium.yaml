@@ -1,0 +1,24 @@
+- link "Markdown":
+  - /url: "#markdown"
+- link "Lorem ipsum":
+  - /url: "#lorem-ipsum"
+- link "Haskell":
+  - /url: "#haskell"
+- link "Python":
+  - /url: "#python"
+- link "List of lists of lists":
+  - /url: "#list-of-lists-of-lists"
+- link "General reference":
+  - /url: "#general-reference"
+- link "Society and social sciences":
+  - /url: "#society-and-social-sciences"
+- link "Grapefruit":
+  - /url: "#grapefruit"
+- link "MyST-Parser":
+  - /url: "#myst-parser"
+- link "Admonitions":
+  - /url: "#admonitions"
+- link "Tables":
+  - /url: "#tables"
+- link "Cross-references":
+  - /url: "#cross-references"

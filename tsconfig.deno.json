@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "declarationDir": "build/dts",
+    "exactOptionalPropertyTypes": false,
+    "lib": [
+      "ESNext",
+      "WebWorker" // only for `WebAssembly`
+    ],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig.deno.tsbuildinfo",
+    "types": ["node"]
+  },
+  "extends": "./tsconfig.json",
+  "include": [
+    "./scripts/**/*",
+    "./src/js/deno",
+    "./tests/specs",
+    "./playwright.config.ts",
+    "./vite.config.ts",
+    "./vite.config.lib.ts",
+    "./package.json"
+  ],
+  "references": [{ "path": "./tsconfig.neutral.json" }]
+}
