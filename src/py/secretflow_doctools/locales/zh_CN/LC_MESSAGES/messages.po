@@ -1,0 +1,292 @@
+#: src/py/secretflow_doctools/__main__.py:21
+msgid "path to the directory containing Sphinx's `conf.py` file"
+msgstr "`conf.py` 文件所在目录的路径"
+
+#: src/py/secretflow_doctools/__main__.py:30
+msgid ""
+"path to the directory containing documentation source files. generated "
+"page paths will be relative to this directory"
+msgstr "文档源码所在目录的路径"
+
+#: src/py/secretflow_doctools/__main__.py:41
+msgid "path for the generated output files"
+msgstr "输出文件的路径"
+
+#: src/py/secretflow_doctools/__main__.py:45
+msgid "build docs"
+msgstr "构建文档"
+
+#: src/py/secretflow_doctools/__main__.py:55
+#, python-brace-format
+msgid ""
+"\n"
+"        the language to build docs in. to build in multiple languages\n"
+"        at once, specify this option multiple times, for example:\n"
+"\n"
+"            --lang en --lang zh_CN\n"
+"\n"
+"        {_NO_WRAP}\n"
+"        see https://www.sphinx-doc.org/en/master/usage/configuration.html"
+"#confval-language\n"
+"        {_NO_WRAP}\n"
+"        "
+msgstr ""
+"\n"
+"        要构建的语言。如果要一次性构建多个语言的版本\n"
+"        该选项可以指定多次，比如\n"
+"\n"
+"            --lang en --lang zh_CN\n"
+"\n"
+"        {_NO_WRAP}\n"
+"        另见 https://www.sphinx-doc.org/en/master/usage/configuration.html"
+"#confval-language\n"
+"        {_NO_WRAP}\n"
+"        "
+
+#: src/py/secretflow_doctools/__main__.py:71
+#, python-brace-format
+msgid ""
+"\n"
+"        path mapping, in the format of:\n"
+"\n"
+"        {_NO_WRAP}\n"
+"            actual-repo:actual-path:mapped-repo:mapped-path\n"
+"        {_NO_WRAP}\n"
+"        "
+msgstr ""
+"\n"
+"        路径映射，格式是:\n"
+"\n"
+"        {_NO_WRAP}\n"
+"            实际项目名:实际路径前缀:映射项目名:映射路径前缀\n"
+"        {_NO_WRAP}\n"
+"        "
+
+#: src/py/secretflow_doctools/__main__.py:85
+msgid "locally preview previously built docs"
+msgstr "本地预览构建好的文档"
+
+#: src/py/secretflow_doctools/__main__.py:94
+msgid "update translation files"
+msgstr "更新翻译文件"
+
+#: src/py/secretflow_doctools/__main__.py:102
+msgid "the language to be translated"
+msgstr "要生成翻译文件的语言"
+
+#: src/py/secretflow_doctools/__main__.py:108
+msgid ""
+"in addition to updating .po files, also update translation files for "
+"translating Swagger schemas"
+msgstr "除了更新 .po 文件以外，也更新用于翻译 Swagger 文档的文件"
+
+#: src/py/secretflow_doctools/__main__.py:118
+msgid "publish built docs to npm"
+msgstr "将构建好的文档发布到 npm"
+
+#: src/py/secretflow_doctools/__main__.py:119
+msgid "full name of the npm package"
+msgstr "npm 包全称"
+
+#: src/py/secretflow_doctools/__main__.py:120
+msgid "the dist-tag to use"
+msgstr "npm dist-tag"
+
+#: src/py/secretflow_doctools/__main__.py:125
+msgid "path to `dist/index.js`"
+msgstr "`dist/index.js` 文件的路径"
+
+#: src/py/secretflow_doctools/__main__.py:130
+msgid "the npm registry to publish the package to"
+msgstr "目标 npm 源"
+
+#: src/py/secretflow_doctools/__main__.py:136
+msgid "clean up files from previously built docs"
+msgstr "清理文档构建产生的文件"
+
+#: src/py/secretflow_doctools/builder.py:160
+msgid "failed to get git commit"
+msgstr "无法获取仓库最新的提交信息"
+
+#: src/py/secretflow_doctools/builder.py:171
+msgid "failed to get git commit time"
+msgstr "无法获取仓库最新的提交时间"
+
+#: src/py/secretflow_doctools/builder.py:182
+msgid "failed to get git root dir"
+msgstr "无法获取仓库的根目录"
+
+#: src/py/secretflow_doctools/sidebar.py:89
+#, python-brace-format
+msgid "ignoring circular sidebar ref {ref} -> {ref}"
+msgstr "目录树存在循环路径，已忽略 {ref} -> {ref}"
+
+#: src/py/secretflow_doctools/translator.py:1017
+#, python-format
+msgid "malformed HTML: %s"
+msgstr "HTML 格式错误: %s"
+
+#: src/py/secretflow_doctools/vcs.py:60
+msgid "failed to get git remote"
+msgstr "无法获取仓库的远程地址"
+
+#: src/py/secretflow_doctools/vcs.py:136
+#, python-brace-format
+msgid "unexpected git describe output: {output}"
+msgstr "未预期的 git describe 输出: {output}"
+
+#: src/py/secretflow_doctools/cmd/build.py:50
+msgid "failed to get current tag, falling back to `main`"
+msgstr "无法获取当前提交对应的标签，将会使用 `main` 作为版本号"
+
+#: src/py/secretflow_doctools/cmd/build.py:58
+#, python-brace-format
+msgid "using {ref} as version, source: current commit is tagged"
+msgstr "将会使用 {ref} 作为版本；来源：当前提交的 tag"
+
+#: src/py/secretflow_doctools/cmd/build.py:64
+#, python-brace-format
+msgid "using {ref} as version, source: nearest tag on release branch {branch}"
+msgstr "将会使用 {ref} 作为版本；来源：当前 release 分支 {branch} 上最近的 tag"
+
+#: src/py/secretflow_doctools/cmd/build.py:73
+#, python-brace-format
+msgid "using {ref} as version, source: current branch name"
+msgstr "将会使用 {ref} 作为版本；来源：当前分支名"
+
+#: src/py/secretflow_doctools/cmd/build.py:80
+#: src/py/secretflow_doctools/cmd/update_translations.py:48
+#, python-brace-format
+msgid "source dir: {dir}"
+msgstr "文档路径: {dir}"
+
+#: src/py/secretflow_doctools/cmd/build.py:81
+#: src/py/secretflow_doctools/cmd/update_translations.py:49
+#, python-brace-format
+msgid "output dir: {dir}"
+msgstr "输出路径: {dir}"
+
+#: src/py/secretflow_doctools/cmd/build.py:106
+msgid "compiling to JavaScript"
+msgstr "正在编译 JavaScript"
+
+#: src/py/secretflow_doctools/cmd/build.py:127
+#, python-brace-format
+msgid "to preview, run: {prog_name} preview -c {config_dir}"
+msgstr "要预览，请运行: {prog_name} preview -c {config_dir}"
+
+#: src/py/secretflow_doctools/cmd/clean.py:28
+msgid "do you want to continue?"
+msgstr "是否继续？"
+
+#: src/py/secretflow_doctools/cmd/publish.py:34
+msgid ""
+"refusing to publish: the current commit is not:\n"
+"  - tagged, or\n"
+"  - on a release branch containing a tagged commit, or\n"
+"  - main or master"
+msgstr ""
+"拒绝发布：当前提交不符合以下条件:\n"
+"  - 已打标签，或\n"
+"  - 在包含标签的发布分支上，或\n"
+"  - 在 main 或 master 分支上"
+
+#: src/py/secretflow_doctools/cmd/publish.py:126
+msgid "refusing to publish: git has uncommitted changes"
+msgstr "拒绝发布：仓库存在未提交的更改"
+
+#: src/py/secretflow_doctools/cmd/update_translations.py:52
+#, python-brace-format
+msgid "cleaning up autogenerated *.mo files in {dir}"
+msgstr "将会清理 {dir} 目录下自动生成的 *.mo 文件"
+
+#: src/py/secretflow_doctools/cmd/update_translations.py:57
+#, python-brace-format
+msgid "removing {mo}"
+msgstr "删除 {mo}"
+
+#: src/py/secretflow_doctools/cmd/update_translations.py:61
+#, python-brace-format
+msgid "failed to remove {mo}"
+msgstr "无法删除 {mo}"
+
+#: src/py/secretflow_doctools/cmd/update_translations.py:110
+msgid "finished updating translation files"
+msgstr "已更新翻译文件"
+
+#: src/py/secretflow_doctools/cmd/util.py:71
+msgid ""
+"could not detect Sphinx config directory: none of the following exists: "
+"`./conf.py`, `./docs/conf.py`, `./docs/source/conf.py`"
+msgstr ""
+"无法检测到 Sphinx 配置文件路径: 尝试过以下路径均不存在: `./conf.py`, `./docs/conf.py`, "
+"`./docs/source/conf.py`"
+
+#: src/py/secretflow_doctools/cmd/util.py:77
+msgid "help: specify Sphinx config directory using the `--config-dir` option"
+msgstr "帮助: 使用 `--config-dir` 选项指定 Sphinx 配置文件的路径"
+
+#: src/py/secretflow_doctools/cmd/util.py:111
+#, python-brace-format
+msgid "the following options cannot be specified: {}"
+msgstr "不支持的命令行选项: {}"
+
+#: src/py/secretflow_doctools/cmd/util.py:114
+msgid "checking Sphinx config"
+msgstr "正在检查 Sphinx 配置文件"
+
+#: src/py/secretflow_doctools/cmd/util.py:121
+msgid "\"secretflow_doctools\" must be in `extensions` in conf.py"
+msgstr "conf.py 中的 `extensions` 选项必须包含 \"secretflow_doctools\""
+
+#: src/py/secretflow_doctools/cmd/util.py:125
+msgid "failed to get git origin url"
+msgstr "无法获取仓库的远程地址"
+
+#: src/py/secretflow_doctools/cmd/util.py:130
+msgid "failed to get project name from git origin"
+msgstr "无法获取仓库最新的提交信息"
+
+#: src/py/secretflow_doctools/cmd/util.py:151
+msgid "failed to validate Sphinx conf.py"
+msgstr "Sphinx 配置文件校验不通过"
+
+#: src/py/secretflow_doctools/cmd/util.py:165
+#, python-brace-format
+msgid "provide the environment variable {env}"
+msgstr "请提供环境变量 {env}"
+
+#: src/py/secretflow_doctools/cmd/util.py:174
+msgid "missing required environment variables"
+msgstr "未提供所有必需的环境变量"
+
+#: src/py/secretflow_doctools/js/cli.py:26
+#, python-brace-format
+msgid "a required file {file} was not found"
+msgstr "关键文件 {file} 不存在"
+
+#: src/py/secretflow_doctools/js/cli.py:33
+msgid "neither deno nor node is available on PATH"
+msgstr "未有在 PATH 上找到 deno 或者 node"
+
+#: src/py/secretflow_doctools/js/cli.py:49
+msgid ""
+"help: the package `secretflow-doctools` was not installed correctly. "
+"please reinstall it."
+msgstr "帮助： Python 包 `secretflow-doctools` 未有正确安装，请重新安装该依赖。"
+
+#: src/py/secretflow_doctools/js/cli.py:55
+msgid ""
+"in development: please run `pnpm nx build:sdist` to ensure JavaScript "
+"resources are compiled correctly"
+msgstr "开发中：请先运行 `pnpm nx build:sdist` 来确保所有 JavaScript 资源已经成功构建"
+
+#: src/py/secretflow_doctools/utils/subprocess.py:22
+#, python-brace-format
+msgid ""
+"failed to run command, see above for errors\n"
+"Command: {cmd}"
+msgstr ""
+"步骤运行失败，请查看上面的错误信息\n"
+"命令: {cmd}"
+

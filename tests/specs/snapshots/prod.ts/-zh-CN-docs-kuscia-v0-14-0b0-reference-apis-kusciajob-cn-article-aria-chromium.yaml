@@ -1,0 +1,1939 @@
+- article:
+  - heading "KusciaJob" [level=1]:
+    - link "Direct link to KusciaJob":
+      - /url: "#kusciajob"
+  - paragraph:
+    - text: 在 Kuscia 中，你可以使用 KusciaJob 来表示一个任务流程。请参考
+    - link "KusciaJob":
+      - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn
+    - text: 。 您可以从
+    - link "这里":
+      - /url: https://github.com/secretflow/kuscia/tree/main/proto/api/v1alpha1/kusciaapi/job.proto
+    - text: 找到对应的 protobuf 文件。
+  - heading "接口总览" [level=2]:
+    - link "Direct link to 接口总览":
+      - /url: "#id1"
+  - table:
+    - rowgroup:
+      - row "方法名 请求类型 响应类型 描述":
+        - cell "方法名":
+          - paragraph: 方法名
+        - cell "请求类型":
+          - paragraph: 请求类型
+        - cell "响应类型":
+          - paragraph: 响应类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "CreateJob CreateJobRequest CreateJobResponse 创建 Job":
+        - cell "CreateJob":
+          - paragraph:
+            - link "CreateJob":
+              - /url: "#create-job"
+        - cell "CreateJobRequest":
+          - paragraph: CreateJobRequest
+        - cell "CreateJobResponse":
+          - paragraph: CreateJobResponse
+        - cell "创建 Job":
+          - paragraph: 创建 Job
+      - row "QueryJob QueryJobRequest QueryJobResponse 查询 Job":
+        - cell "QueryJob":
+          - paragraph:
+            - link "QueryJob":
+              - /url: "#query-job"
+        - cell "QueryJobRequest":
+          - paragraph: QueryJobRequest
+        - cell "QueryJobResponse":
+          - paragraph: QueryJobResponse
+        - cell "查询 Job":
+          - paragraph: 查询 Job
+      - row "BatchQueryJobStatus BatchQueryJobStatusRequest BatchQueryJobStatusResponse 批量查询 Job 状态":
+        - cell "BatchQueryJobStatus":
+          - paragraph:
+            - link "BatchQueryJobStatus":
+              - /url: "#batch-query-job-status"
+        - cell "BatchQueryJobStatusRequest":
+          - paragraph: BatchQueryJobStatusRequest
+        - cell "BatchQueryJobStatusResponse":
+          - paragraph: BatchQueryJobStatusResponse
+        - cell "批量查询 Job 状态":
+          - paragraph: 批量查询 Job 状态
+      - row "DeleteJob DeleteJobRequest DeleteJobResponse 删除 Job":
+        - cell "DeleteJob":
+          - paragraph:
+            - link "DeleteJob":
+              - /url: "#delete-job"
+        - cell "DeleteJobRequest":
+          - paragraph: DeleteJobRequest
+        - cell "DeleteJobResponse":
+          - paragraph: DeleteJobResponse
+        - cell "删除 Job":
+          - paragraph: 删除 Job
+      - row "StopJob StopJobRequest StopJobResponse 停止 Job":
+        - cell "StopJob":
+          - paragraph:
+            - link "StopJob":
+              - /url: "#stop-job"
+        - cell "StopJobRequest":
+          - paragraph: StopJobRequest
+        - cell "StopJobResponse":
+          - paragraph: StopJobResponse
+        - cell "停止 Job":
+          - paragraph: 停止 Job
+      - row "WatchJob WatchJobRequest WatchJobEventResponse stream 监听 Job":
+        - cell "WatchJob":
+          - paragraph:
+            - link "WatchJob":
+              - /url: "#watch-job"
+        - cell "WatchJobRequest":
+          - paragraph: WatchJobRequest
+        - cell "WatchJobEventResponse stream":
+          - paragraph: WatchJobEventResponse stream
+        - cell "监听 Job":
+          - paragraph: 监听 Job
+      - row "ApproveJob ApproveJobRequest ApproveJobResponse 审批 Job":
+        - cell "ApproveJob":
+          - paragraph:
+            - link "ApproveJob":
+              - /url: "#approval-job"
+        - cell "ApproveJobRequest":
+          - paragraph: ApproveJobRequest
+        - cell "ApproveJobResponse":
+          - paragraph: ApproveJobResponse
+        - cell "审批 Job":
+          - paragraph: 审批 Job
+      - row "SuspendJob SuspendJobRequest SuspendJobResponse 暂停 Job":
+        - cell "SuspendJob":
+          - paragraph:
+            - link "SuspendJob":
+              - /url: "#suspend-job"
+        - cell "SuspendJobRequest":
+          - paragraph: SuspendJobRequest
+        - cell "SuspendJobResponse":
+          - paragraph: SuspendJobResponse
+        - cell "暂停 Job":
+          - paragraph: 暂停 Job
+      - row "RestartJob RestartJobRequest RestartJobResponse 重跑 Job":
+        - cell "RestartJob":
+          - paragraph:
+            - link "RestartJob":
+              - /url: "#restart-job"
+        - cell "RestartJobRequest":
+          - paragraph: RestartJobRequest
+        - cell "RestartJobResponse":
+          - paragraph: RestartJobResponse
+        - cell "重跑 Job":
+          - paragraph: 重跑 Job
+      - row "CancelJob CancelJobRequest CancelJobResponse 取消 Job":
+        - cell "CancelJob":
+          - paragraph:
+            - link "CancelJob":
+              - /url: "#cancel-job"
+        - cell "CancelJobRequest":
+          - paragraph: CancelJobRequest
+        - cell "CancelJobResponse":
+          - paragraph: CancelJobResponse
+        - cell "取消 Job":
+          - paragraph: 取消 Job
+  - heading "接口详情" [level=2]:
+    - link "Direct link to 接口详情":
+      - /url: "#id2"
+  - heading "创建 Job" [level=3]:
+    - link "Direct link to 创建 Job":
+      - /url: "#create-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#http"
+  - paragraph: /api/v1/job/create
+  - heading "请求（CreateJobRequest）" [level=4]:
+    - link "Direct link to 请求（CreateJobRequest）":
+      - /url: "#createjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row /job_id string 必填 JobID，满足 RFC \d+ 标签名规则要求/:
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell /JobID，满足 RFC \d+ 标签名规则要求/:
+          - paragraph:
+            - text: JobID，满足
+            - link /RFC \d+ 标签名规则要求/:
+              - /url: https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/names/#dns-label-names
+      - row "initiator string 必填 发起方节点 ID":
+        - cell "initiator":
+          - paragraph: initiator
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "发起方节点 ID":
+          - paragraph: 发起方节点 ID
+      - row "max_parallelism int32 可选 并发度，参考 KusciaJob 概念":
+        - cell "max_parallelism":
+          - paragraph: max_parallelism
+        - cell "int32":
+          - paragraph: int32
+        - cell "可选":
+          - paragraph: 可选
+        - cell "并发度，参考 KusciaJob 概念":
+          - paragraph:
+            - text: 并发度，参考
+            - link "KusciaJob 概念":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn
+      - row "tasks Task[] 必填 任务参数":
+        - cell "tasks":
+          - paragraph: tasks
+        - cell "Task[]":
+          - paragraph:
+            - link "Task":
+              - /url: "#task"
+            - text: "[]"
+        - cell "必填":
+          - paragraph: 必填
+        - cell "任务参数":
+          - paragraph: 任务参数
+      - row /custom_fields map<string, string> 可选 自定义参数，会同步给参与方，key不超过\d+个字符，value不超过\d+个字符。/:
+        - cell "custom_fields":
+          - paragraph: custom_fields
+        - cell "map<string, string>":
+          - paragraph: map<string, string>
+        - cell "可选":
+          - paragraph: 可选
+        - cell /自定义参数，会同步给参与方，key不超过\d+个字符，value不超过\d+个字符。/:
+          - paragraph: /自定义参数，会同步给参与方，key不超过\d+个字符，value不超过\d+个字符。/
+  - heading "响应（CreateJobResponse）" [level=4]:
+    - link "Direct link to 响应（CreateJobResponse）":
+      - /url: "#createjobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data CreateJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "CreateJobResponseData":
+          - paragraph: CreateJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id3"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/create' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\", \"initiator\": \"alice\", \"max_parallelism\": 2, \"tasks\": \\[ \\{ \"task_id\": \"job-psi\", \"app_image\": \"secretflow-image\", \"parties\": \\[ \\{ \"domain_id\": \"alice\" \\}, \\{ \"domain_id\": \"bob\" \\} \\], \"alias\": \"job-psi\", \"dependencies\": \\[\\], \"task_input_config\": \"\\{\\\\\"sf_datasource_config\\\\\":\\{\\\\\"alice\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\},\\\\\"bob\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\}\\},\\\\\"sf_cluster_desc\\\\\":\\{\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"devices\\\\\":\\[\\{\\\\\"name\\\\\":\\\\\"spu\\\\\",\\\\\"type\\\\\":\\\\\"spu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"runtime_config\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"REF2K\\\\\\\\\\\\\",\\\\\\\\\\\\\"field\\\\\\\\\\\\\":\\\\\\\\\\\\\"FM64\\\\\\\\\\\\\"\\},\\\\\\\\\\\\\"link_desc\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"connect_retry_times\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"connect_retry_interval_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"brpc_channel_protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"http\\\\\\\\\\\\\",\\\\\\\\\\\\\"brpc_channel_connection_type\\\\\\\\\\\\\":\\\\\\\\\\\\\"pooled\\\\\\\\\\\\\",\\\\\\\\\\\\\"recv_timeout_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"http_timeout_ms\\\\\\\\\\\\\":\\d+\\}\\}\\\\\"\\},\\{\\\\\"name\\\\\":\\\\\"heu\\\\\",\\\\\"type\\\\\":\\\\\"heu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"mode\\\\\\\\\\\\\": \\\\\\\\\\\\\"PHEU\\\\\\\\\\\\\", \\\\\\\\\\\\\"schema\\\\\\\\\\\\\": \\\\\\\\\\\\\"paillier\\\\\\\\\\\\\", \\\\\\\\\\\\\"key_size\\\\\\\\\\\\\": \\d+\\}\\\\\"\\}\\],\\\\\"ray_fed_config\\\\\":\\{\\\\\"cross_silo_comm_backend\\\\\":\\\\\"brpc_link\\\\\"\\}\\},\\\\\"sf_node_eval_param\\\\\":\\{\\\\\"domain\\\\\":\\\\\"data_prep\\\\\",\\\\\"name\\\\\":\\\\\"psi\\\\\",\\\\\"version\\\\\":\\\\\"0\\.0\\.5\\\\\",\\\\\"attr_paths\\\\\":\\[\\\\\"protocol\\\\\",\\\\\"sort_result\\\\\",\\\\\"allow_duplicate_keys\\\\\",\\\\\"allow_duplicate_keys\\/yes\\/join_type\\\\\",\\\\\"allow_duplicate_keys\\/yes\\/join_type\\/left_join\\/left_side\\\\\",\\\\\"input\\/receiver_input\\/key\\\\\",\\\\\"input\\/sender_input\\/key\\\\\"\\],\\\\\"attrs\\\\\":\\[\\{\\\\\"s\\\\\":\\\\\"PROTOCOL_RR22\\\\\"\\},\\{\\\\\"b\\\\\":true\\},\\{\\\\\"s\\\\\":\\\\\"yes\\\\\"\\},\\{\\\\\"s\\\\\":\\\\\"left_join\\\\\"\\},\\{\\\\\"ss\\\\\":\\[\\\\\"alice\\\\\"\\]\\},\\{\\\\\"ss\\\\\":\\[\\\\\"id1\\\\\"\\]\\},\\{\\\\\"ss\\\\\":\\[\\\\\"id2\\\\\"\\]\\}\\]\\},\\\\\"sf_input_ids\\\\\":\\[\\\\\"alice-table\\\\\",\\\\\"bob-table\\\\\"\\],\\\\\"sf_output_ids\\\\\":\\[\\\\\"psi-output\\\\\"\\],\\\\\"sf_output_uris\\\\\":\\[\\\\\"psi-output\\.csv\\\\\"\\]\\}\", \"priority\": \\d+ \\}, \\{ \"task_id\": \"job-split\", \"app_image\": \"secretflow-image\", \"parties\": \\[ \\{ \"domain_id\": \"alice\" \\}, \\{ \"domain_id\": \"bob\" \\} \\], \"alias\": \"job-split\", \"dependencies\": \\[ \"job-psi\" \\], \"task_input_config\": \"\\{\\\\\"sf_datasource_config\\\\\":\\{\\\\\"alice\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\},\\\\\"bob\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\}\\},\\\\\"sf_cluster_desc\\\\\":\\{\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"devices\\\\\":\\[\\{\\\\\"name\\\\\":\\\\\"spu\\\\\",\\\\\"type\\\\\":\\\\\"spu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"runtime_config\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"REF2K\\\\\\\\\\\\\",\\\\\\\\\\\\\"field\\\\\\\\\\\\\":\\\\\\\\\\\\\"FM64\\\\\\\\\\\\\"\\},\\\\\\\\\\\\\"link_desc\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"connect_retry_times\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"connect_retry_interval_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"brpc_channel_protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"http\\\\\\\\\\\\\",\\\\\\\\\\\\\"brpc_channel_connection_type\\\\\\\\\\\\\":\\\\\\\\\\\\\"pooled\\\\\\\\\\\\\",\\\\\\\\\\\\\"recv_timeout_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"http_timeout_ms\\\\\\\\\\\\\":\\d+\\}\\}\\\\\"\\},\\{\\\\\"name\\\\\":\\\\\"heu\\\\\",\\\\\"type\\\\\":\\\\\"heu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"mode\\\\\\\\\\\\\": \\\\\\\\\\\\\"PHEU\\\\\\\\\\\\\", \\\\\\\\\\\\\"schema\\\\\\\\\\\\\": \\\\\\\\\\\\\"paillier\\\\\\\\\\\\\", \\\\\\\\\\\\\"key_size\\\\\\\\\\\\\": \\d+\\}\\\\\"\\}\\],\\\\\"ray_fed_config\\\\\":\\{\\\\\"cross_silo_comm_backend\\\\\":\\\\\"brpc_link\\\\\"\\}\\},\\\\\"sf_node_eval_param\\\\\":\\{\\\\\"domain\\\\\":\\\\\"data_prep\\\\\",\\\\\"name\\\\\":\\\\\"train_test_split\\\\\",\\\\\"version\\\\\":\\\\\"0\\.0\\.1\\\\\",\\\\\"attr_paths\\\\\":\\[\\\\\"train_size\\\\\",\\\\\"test_size\\\\\",\\\\\"random_state\\\\\",\\\\\"shuffle\\\\\"\\],\\\\\"attrs\\\\\":\\[\\{\\\\\"f\\\\\":\\d+\\.\\d+\\},\\{\\\\\"f\\\\\":\\d+\\.\\d+\\},\\{\\\\\"i64\\\\\":\\d+\\},\\{\\\\\"b\\\\\":true\\}\\]\\},\\\\\"sf_output_uris\\\\\":\\[\\\\\"train-dataset\\.csv\\\\\",\\\\\"test-dataset\\.csv\\\\\"\\],\\\\\"sf_output_ids\\\\\":\\[\\\\\"train-dataset\\\\\",\\\\\"test-dataset\\\\\"\\],\\\\\"sf_input_ids\\\\\":\\[\\\\\"psi-output\\\\\"\\]\\}\", \"priority\": \\d+ \\} \\] \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - complementary:
+    - heading "注意" [level=4]
+    - paragraph:
+      - text: 上述请求示例中的引擎镜像基于 SecretFlow
+      - code: 1.7.0b0
+      - text: 版本。算子参数的
+      - code: taskInputConfig
+      - text: 内容可参考
+      - link "KusciaJob":
+        - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn#create-kuscia-job
+  - heading "查询 Job" [level=3]:
+    - link "Direct link to 查询 Job":
+      - /url: "#query-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id4"
+  - paragraph: /api/v1/job/query
+  - heading "请求（QueryJobRequest）" [level=4]:
+    - link "Direct link to 请求（QueryJobRequest）":
+      - /url: "#queryjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "响应（QueryJobResponse）" [level=4]:
+    - link "Direct link to 响应（QueryJobResponse）":
+      - /url: "#queryjobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data QueryJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "QueryJobResponseData":
+          - paragraph: QueryJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+      - row "data.initiator string 发起方":
+        - cell "data.initiator":
+          - paragraph: data.initiator
+        - cell "string":
+          - paragraph: string
+        - cell "发起方":
+          - paragraph: 发起方
+      - row "data.max_parallelism int32 并发度":
+        - cell "data.max_parallelism":
+          - paragraph: data.max_parallelism
+        - cell "int32":
+          - paragraph: int32
+        - cell "并发度":
+          - paragraph: 并发度
+      - row "data.tasks TaskConfig[] 任务列表":
+        - cell "data.tasks":
+          - paragraph: data.tasks
+        - cell "TaskConfig[]":
+          - paragraph:
+            - link "TaskConfig":
+              - /url: "#task-config"
+            - text: "[]"
+        - cell "任务列表":
+          - paragraph: 任务列表
+      - row "data.status JobStatusDetail Job 状态":
+        - cell "data.status":
+          - paragraph: data.status
+        - cell "JobStatusDetail":
+          - paragraph:
+            - link "JobStatusDetail":
+              - /url: "#job-status-detail"
+        - cell "Job 状态":
+          - paragraph: Job 状态
+      - row "data.custom_fields map<string, string> 可选":
+        - cell "data.custom_fields":
+          - paragraph: data.custom_fields
+        - cell "map<string, string>":
+          - paragraph: map<string, string>
+        - cell "可选":
+          - paragraph: 可选
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id5"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/query' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\", \"initiator\": \"alice\", \"max_parallelism\": 2, \"tasks\": \\[ \\{ \"app_image\": \"secretflow-image\", \"parties\": \\[ \\{ \"domain_id\": \"alice\" \\}, \\{ \"domain_id\": \"bob\" \\} \\], \"alias\": \"job-psi\", \"task_id\": \"job-psi\", \"dependencies\": \\[ \"\" \\], \"task_input_config\": \"\\{\\\\\"sf_datasource_config\\\\\":\\{\\\\\"alice\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\},\\\\\"bob\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\}\\},\\\\\"sf_cluster_desc\\\\\":\\{\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"devices\\\\\":\\[\\{\\\\\"name\\\\\":\\\\\"spu\\\\\",\\\\\"type\\\\\":\\\\\"spu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"runtime_config\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"REF2K\\\\\\\\\\\\\",\\\\\\\\\\\\\"field\\\\\\\\\\\\\":\\\\\\\\\\\\\"FM64\\\\\\\\\\\\\"\\},\\\\\\\\\\\\\"link_desc\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"connect_retry_times\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"connect_retry_interval_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"brpc_channel_protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"http\\\\\\\\\\\\\",\\\\\\\\\\\\\"brpc_channel_connection_type\\\\\\\\\\\\\":\\\\\\\\\\\\\"pooled\\\\\\\\\\\\\",\\\\\\\\\\\\\"recv_timeout_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"http_timeout_ms\\\\\\\\\\\\\":\\d+\\}\\}\\\\\"\\},\\{\\\\\"name\\\\\":\\\\\"heu\\\\\",\\\\\"type\\\\\":\\\\\"heu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"mode\\\\\\\\\\\\\": \\\\\\\\\\\\\"PHEU\\\\\\\\\\\\\", \\\\\\\\\\\\\"schema\\\\\\\\\\\\\": \\\\\\\\\\\\\"paillier\\\\\\\\\\\\\", \\\\\\\\\\\\\"key_size\\\\\\\\\\\\\": \\d+\\}\\\\\"\\}\\],\\\\\"ray_fed_config\\\\\":\\{\\\\\"cross_silo_comm_backend\\\\\":\\\\\"brpc_link\\\\\"\\}\\},\\\\\"sf_node_eval_param\\\\\":\\{\\\\\"domain\\\\\":\\\\\"data_prep\\\\\",\\\\\"name\\\\\":\\\\\"psi\\\\\",\\\\\"version\\\\\":\\\\\"0\\.0\\.5\\\\\",\\\\\"attr_paths\\\\\":\\[\\\\\"protocol\\\\\",\\\\\"sort_result\\\\\",\\\\\"allow_duplicate_keys\\\\\",\\\\\"allow_duplicate_keys\\/yes\\/join_type\\\\\",\\\\\"allow_duplicate_keys\\/yes\\/join_type\\/left_join\\/left_side\\\\\",\\\\\"input\\/receiver_input\\/key\\\\\",\\\\\"input\\/sender_input\\/key\\\\\"\\],\\\\\"attrs\\\\\":\\[\\{\\\\\"s\\\\\":\\\\\"PROTOCOL_RR22\\\\\"\\},\\{\\\\\"b\\\\\":true\\},\\{\\\\\"s\\\\\":\\\\\"yes\\\\\"\\},\\{\\\\\"s\\\\\":\\\\\"left_join\\\\\"\\},\\{\\\\\"ss\\\\\":\\[\\\\\"alice\\\\\"\\]\\},\\{\\\\\"ss\\\\\":\\[\\\\\"id1\\\\\"\\]\\},\\{\\\\\"ss\\\\\":\\[\\\\\"id2\\\\\"\\]\\}\\]\\},\\\\\"sf_input_ids\\\\\":\\[\\\\\"alice-table\\\\\",\\\\\"bob-table\\\\\"\\],\\\\\"sf_output_ids\\\\\":\\[\\\\\"psi-output\\\\\"\\],\\\\\"sf_output_uris\\\\\":\\[\\\\\"psi-output\\.csv\\\\\"\\]\\}\", \"priority\": \\d+ \\}, \\{ \"app_image\": \"secretflow-image\", \"parties\": \\[ \\{ \"domain_id\": \"alice\" \\}, \\{ \"domain_id\": \"bob\" \\} \\], \"alias\": \"job-split\", \"task_id\": \"job-split\", \"dependencies\": \\[ \"job-psi\" \\], \"task_input_config\": \"\\{\\\\\"sf_datasource_config\\\\\":\\{\\\\\"alice\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\},\\\\\"bob\\\\\":\\{\\\\\"id\\\\\":\\\\\"default-data-source\\\\\"\\}\\},\\\\\"sf_cluster_desc\\\\\":\\{\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"devices\\\\\":\\[\\{\\\\\"name\\\\\":\\\\\"spu\\\\\",\\\\\"type\\\\\":\\\\\"spu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"runtime_config\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"REF2K\\\\\\\\\\\\\",\\\\\\\\\\\\\"field\\\\\\\\\\\\\":\\\\\\\\\\\\\"FM64\\\\\\\\\\\\\"\\},\\\\\\\\\\\\\"link_desc\\\\\\\\\\\\\":\\{\\\\\\\\\\\\\"connect_retry_times\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"connect_retry_interval_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"brpc_channel_protocol\\\\\\\\\\\\\":\\\\\\\\\\\\\"http\\\\\\\\\\\\\",\\\\\\\\\\\\\"brpc_channel_connection_type\\\\\\\\\\\\\":\\\\\\\\\\\\\"pooled\\\\\\\\\\\\\",\\\\\\\\\\\\\"recv_timeout_ms\\\\\\\\\\\\\":\\d+,\\\\\\\\\\\\\"http_timeout_ms\\\\\\\\\\\\\":\\d+\\}\\}\\\\\"\\},\\{\\\\\"name\\\\\":\\\\\"heu\\\\\",\\\\\"type\\\\\":\\\\\"heu\\\\\",\\\\\"parties\\\\\":\\[\\\\\"alice\\\\\",\\\\\"bob\\\\\"\\],\\\\\"config\\\\\":\\\\\"\\{\\\\\\\\\\\\\"mode\\\\\\\\\\\\\": \\\\\\\\\\\\\"PHEU\\\\\\\\\\\\\", \\\\\\\\\\\\\"schema\\\\\\\\\\\\\": \\\\\\\\\\\\\"paillier\\\\\\\\\\\\\", \\\\\\\\\\\\\"key_size\\\\\\\\\\\\\": \\d+\\}\\\\\"\\}\\],\\\\\"ray_fed_config\\\\\":\\{\\\\\"cross_silo_comm_backend\\\\\":\\\\\"brpc_link\\\\\"\\}\\},\\\\\"sf_node_eval_param\\\\\":\\{\\\\\"domain\\\\\":\\\\\"data_prep\\\\\",\\\\\"name\\\\\":\\\\\"train_test_split\\\\\",\\\\\"version\\\\\":\\\\\"0\\.0\\.1\\\\\",\\\\\"attr_paths\\\\\":\\[\\\\\"train_size\\\\\",\\\\\"test_size\\\\\",\\\\\"random_state\\\\\",\\\\\"shuffle\\\\\"\\],\\\\\"attrs\\\\\":\\[\\{\\\\\"f\\\\\":\\d+\\.\\d+\\},\\{\\\\\"f\\\\\":\\d+\\.\\d+\\},\\{\\\\\"i64\\\\\":\\d+\\},\\{\\\\\"b\\\\\":true\\}\\]\\},\\\\\"sf_output_uris\\\\\":\\[\\\\\"train-dataset\\.csv\\\\\",\\\\\"test-dataset\\.csv\\\\\"\\],\\\\\"sf_output_ids\\\\\":\\[\\\\\"train-dataset\\\\\",\\\\\"test-dataset\\\\\"\\],\\\\\"sf_input_ids\\\\\":\\[\\\\\"psi-output\\\\\"\\]\\}\", \"priority\": \\d+ \\} \\], \"status\": \\{ \"state\": \"Failed\", \"err_msg\": \"\", \"create_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"start_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"end_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"tasks\": \\[ \\{ \"task_id\": \"job-psi\", \"state\": \"\", \"err_msg\": \"\", \"create_time\": \"\", \"start_time\": \"\", \"end_time\": \"\", \"parties\": \\[\\] \\}, \\{ \"task_id\": \"job-split\", \"state\": \"\", \"err_msg\": \"\", \"create_time\": \"\", \"start_time\": \"\", \"end_time\": \"\", \"parties\": \\[\\] \\} \\] \\} \\} \\}/"
+  - heading "批量查询 Job 状态" [level=3]:
+    - link "Direct link to 批量查询 Job 状态":
+      - /url: "#batch-query-job-status"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id6"
+  - paragraph: /api/v1/job/status/batchQuery
+  - heading "请求（BatchQueryJobStatusRequest）" [level=4]:
+    - link "Direct link to 请求（BatchQueryJobStatusRequest）":
+      - /url: "#batchqueryjobstatusrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_ids string[] 必填 JobID 列表":
+        - cell "job_ids":
+          - paragraph: job_ids
+        - cell "string[]":
+          - paragraph: string[]
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID 列表":
+          - paragraph: JobID 列表
+  - heading "响应（BatchQueryJobStatusResponse）" [level=4]:
+    - link "Direct link to 响应（BatchQueryJobStatusResponse）":
+      - /url: "#batchqueryjobstatusresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data BatchQueryJobStatusResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "BatchQueryJobStatusResponseData":
+          - paragraph: BatchQueryJobStatusResponseData
+        - cell
+      - row "data.jobs JobStatus[] Job 状态列表":
+        - cell "data.jobs":
+          - paragraph: data.jobs
+        - cell "JobStatus[]":
+          - paragraph:
+            - link "JobStatus":
+              - /url: "#job-status"
+            - text: "[]"
+        - cell "Job 状态列表":
+          - paragraph: Job 状态列表
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id7"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/status\\/batchQuery' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_ids\": \\[ \"job-alice-bob-\\d+\" \\] \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"jobs\": \\[ \\{ \"job_id\": \"job-alice-bob-\\d+\", \"status\": \\{ \"state\": \"Failed\", \"err_msg\": \"\", \"create_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"start_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"end_time\": \"\\d+-\\d+-17T07:\\d+:39Z\", \"tasks\": \\[ \\{ \"task_id\": \"job-psi\", \"state\": \"\", \"err_msg\": \"\", \"create_time\": \"\", \"start_time\": \"\", \"end_time\": \"\", \"parties\": \\[\\] \\}, \\{ \"task_id\": \"job-split\", \"state\": \"\", \"err_msg\": \"\", \"create_time\": \"\", \"start_time\": \"\", \"end_time\": \"\", \"parties\": \\[\\] \\} \\] \\} \\} \\] \\} \\}/"
+  - heading "删除 Job" [level=3]:
+    - link "Direct link to 删除 Job":
+      - /url: "#delete-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id8"
+  - paragraph: /api/v1/job/delete
+  - heading "请求（DeleteJobRequest）" [level=4]:
+    - link "Direct link to 请求（DeleteJobRequest）":
+      - /url: "#deletejobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "响应（DeleteJobResponse）" [level=4]:
+    - link "Direct link to 响应（DeleteJobResponse）":
+      - /url: "#deletejobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data DeleteJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "DeleteJobResponseData":
+          - paragraph: DeleteJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id9"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/delete' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - heading "停止 Job" [level=3]:
+    - link "Direct link to 停止 Job":
+      - /url: "#stop-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id10"
+  - paragraph: /api/v1/job/stop
+  - heading "请求（StopJobRequest）" [level=4]:
+    - link "Direct link to 请求（StopJobRequest）":
+      - /url: "#stopjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+      - row "reason string 可选 停止Job的原因":
+        - cell "reason":
+          - paragraph: reason
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "停止Job的原因":
+          - paragraph: 停止Job的原因
+  - heading "响应（StopJobResponse）" [level=4]:
+    - link "Direct link to 响应（StopJobResponse）":
+      - /url: "#stopjobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data StopJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "StopJobResponseData":
+          - paragraph: StopJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id11"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/stop' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - heading "监控 Job" [level=3]:
+    - link "Direct link to 监控 Job":
+      - /url: "#watch-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id12"
+  - paragraph: /api/v1/job/watch
+  - heading "请求（WatchJobRequest）" [level=4]:
+    - link "Direct link to 请求（WatchJobRequest）":
+      - /url: "#watchjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row /timeout_seconds int64 可选 请求连接的生命周期，服务端将在超时后断开连接，不管是否有活跃事件。超时时间取值范围：\[0, 2\^\d+-1\]，默认为0，表示不超时。即使在未设置超时时间的情况下, 也会因为网络环境导致断连，客户端根据需求决定是否重新发起请求/:
+        - cell "timeout_seconds":
+          - paragraph: timeout_seconds
+        - cell "int64":
+          - paragraph: int64
+        - cell "可选":
+          - paragraph: 可选
+        - cell /请求连接的生命周期，服务端将在超时后断开连接，不管是否有活跃事件。超时时间取值范围：\[0, 2\^\d+-1\]，默认为0，表示不超时。即使在未设置超时时间的情况下, 也会因为网络环境导致断连，客户端根据需求决定是否重新发起请求/:
+          - paragraph: /请求连接的生命周期，服务端将在超时后断开连接，不管是否有活跃事件。超时时间取值范围：\[0, 2\^\d+-1\]，默认为0，表示不超时。即使在未设置超时时间的情况下, 也会因为网络环境导致断连，客户端根据需求决定是否重新发起请求/
+  - heading "响应（WatchJobEventResponse）" [level=4]:
+    - link "Direct link to 响应（WatchJobEventResponse）":
+      - /url: "#watchjobeventresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "类型 EventType 事件类型":
+        - cell "类型":
+          - paragraph: 类型
+        - cell "EventType":
+          - paragraph:
+            - link "EventType":
+              - /url: "#event-type"
+        - cell "事件类型":
+          - paragraph: 事件类型
+      - row "object JobStatus Job 状态":
+        - cell "object":
+          - paragraph: object
+        - cell "JobStatus":
+          - paragraph:
+            - link "JobStatus":
+              - /url: "#job-status"
+        - cell "Job 状态":
+          - paragraph: Job 状态
+  - heading "审批 Job" [level=3]:
+    - link "Direct link to 审批 Job":
+      - /url: "#approval-job"
+  - paragraph:
+    - text: 只有在 P2P 组网模式下且
+    - link "开启 Job 审批":
+      - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn#enable-approval
+    - text: 的情况下才需要调用此接口进行 job 审批。
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id13"
+  - paragraph: /api/v1/job/approve
+  - heading "请求（ApprovalJobRequest）" [level=4]:
+    - link "Direct link to 请求（ApprovalJobRequest）":
+      - /url: "#approvaljobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row /job_id string 必填 JobID，满足 RFC \d+ 标签名规则要求/:
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell /JobID，满足 RFC \d+ 标签名规则要求/:
+          - paragraph:
+            - text: JobID，满足
+            - link /RFC \d+ 标签名规则要求/:
+              - /url: https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/names/#dns-label-names
+      - row "result ApproveResult 必填 审批结果，接收或拒绝，接收则作业(job)可以执行，拒绝则作业不可执行":
+        - cell "result":
+          - paragraph: result
+        - cell "ApproveResult":
+          - paragraph:
+            - link "ApproveResult":
+              - /url: "#approve-result"
+        - cell "必填":
+          - paragraph: 必填
+        - cell "审批结果，接收或拒绝，接收则作业(job)可以执行，拒绝则作业不可执行":
+          - paragraph: 审批结果，接收或拒绝，接收则作业(job)可以执行，拒绝则作业不可执行
+      - row "reason string 可选 接收或拒绝的理由":
+        - cell "reason":
+          - paragraph: reason
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "接收或拒绝的理由":
+          - paragraph: 接收或拒绝的理由
+  - heading "响应（ApprovalJobResponse）" [level=4]:
+    - link "Direct link to 响应（ApprovalJobResponse）":
+      - /url: "#approvaljobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data ApprovalJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "ApprovalJobResponseData":
+          - paragraph: ApprovalJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "暂停 Job" [level=3]:
+    - link "Direct link to 暂停 Job":
+      - /url: "#suspend-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id14"
+  - paragraph: /api/v1/job/suspend
+  - heading "请求（SuspendJobRequest）" [level=4]:
+    - link "Direct link to 请求（SuspendJobRequest）":
+      - /url: "#suspendjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+      - row "reason string 可选 暂停Job的原因":
+        - cell "reason":
+          - paragraph: reason
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "暂停Job的原因":
+          - paragraph: 暂停Job的原因
+  - heading "响应（SuspendJobResponse）" [level=4]:
+    - link "Direct link to 响应（SuspendJobResponse）":
+      - /url: "#suspendjobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data SuspendJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "SuspendJobResponseData":
+          - paragraph: SuspendJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id15"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/suspend' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - heading "重跑 Job" [level=3]:
+    - link "Direct link to 重跑 Job":
+      - /url: "#restart-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id16"
+  - paragraph: /api/v1/job/restart
+  - heading "请求（RestartJobRequest）" [level=4]:
+    - link "Direct link to 请求（RestartJobRequest）":
+      - /url: "#restartjobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+      - row "reason string 可选 重跑Job的原因":
+        - cell "reason":
+          - paragraph: reason
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "重跑Job的原因":
+          - paragraph: 重跑Job的原因
+  - heading "响应（RestartJobResponse）" [level=4]:
+    - link "Direct link to 响应（RestartJobResponse）":
+      - /url: "#restartjobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data RestartJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "RestartJobResponseData":
+          - paragraph: RestartJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id17"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/restart' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - heading "取消 Job" [level=3]:
+    - link "Direct link to 取消 Job":
+      - /url: "#cancel-job"
+  - heading "HTTP 路径" [level=4]:
+    - link "Direct link to HTTP 路径":
+      - /url: "#id18"
+  - paragraph: /api/v1/job/cancel
+  - heading "请求（CancelJobRequest）" [level=4]:
+    - link "Direct link to 请求（CancelJobRequest）":
+      - /url: "#canceljobrequest"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "header RequestHeader 可选 自定义请求内容":
+        - cell "header":
+          - paragraph: header
+        - cell "RequestHeader":
+          - paragraph:
+            - link "RequestHeader":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#requestheader
+        - cell "可选":
+          - paragraph: 可选
+        - cell "自定义请求内容":
+          - paragraph: 自定义请求内容
+      - row "job_id string 必填 JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "JobID":
+          - paragraph: JobID
+      - row "reason string 可选 取消Job的原因":
+        - cell "reason":
+          - paragraph: reason
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "取消Job的原因":
+          - paragraph: 取消Job的原因
+  - heading "响应（CancelJobResponse）" [level=4]:
+    - link "Direct link to 响应（CancelJobResponse）":
+      - /url: "#canceljobresponse"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "status Status 状态信息":
+        - cell "status":
+          - paragraph: status
+        - cell "Status":
+          - paragraph:
+            - link "Status":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/apis/summary_cn#status
+        - cell "状态信息":
+          - paragraph: 状态信息
+      - row "data CancelJobResponseData":
+        - cell "data":
+          - paragraph: data
+        - cell "CancelJobResponseData":
+          - paragraph: CancelJobResponseData
+        - cell
+      - row "data.job_id string JobID":
+        - cell "data.job_id":
+          - paragraph: data.job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+  - heading "请求示例" [level=4]:
+    - link "Direct link to 请求示例":
+      - /url: "#id19"
+  - paragraph: 发起请求：
+  - button "复制":
+    - img "copy"
+  - code: sh
+  - code: "/# 在容器内执行示例 export CTR_CERTS_ROOT=\\/home\\/kuscia\\/var\\/certs curl -k -X POST 'https:\\/\\/localhost:\\d+\\/api\\/v1\\/job\\/cancel' \\\\ --header \"Token: \\$\\(cat \\$\\{CTR_CERTS_ROOT\\}\\/token\\)\" \\\\ --header 'Content-Type: application\\/json' \\\\ --cert \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.crt \\\\ --key \\$\\{CTR_CERTS_ROOT\\}\\/kusciaapi-server\\.key \\\\ --cacert \\$\\{CTR_CERTS_ROOT\\}\\/ca\\.crt \\\\ -d '\\{ \"job_id\": \"job-alice-bob-\\d+\" \\}'/"
+  - paragraph: 请求响应成功结果：
+  - button "复制":
+    - img "copy"
+  - code: json
+  - code: "/\\{ \"status\": \\{ \"code\": 0, \"message\": \"success\", \"details\": \\[\\] \\}, \"data\": \\{ \"job_id\": \"job-alice-bob-\\d+\" \\} \\}/"
+  - heading "公共" [level=2]:
+    - link "Direct link to 公共":
+      - /url: "#id20"
+  - heading "JobStatus" [level=3]:
+    - link "Direct link to JobStatus":
+      - /url: "#job-status"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "job_id string JobID":
+        - cell "job_id":
+          - paragraph: job_id
+        - cell "string":
+          - paragraph: string
+        - cell "JobID":
+          - paragraph: JobID
+      - row "status JobStatusDetail Job 状态详情":
+        - cell "status":
+          - paragraph: status
+        - cell "JobStatusDetail":
+          - paragraph:
+            - link "JobStatusDetail":
+              - /url: "#job-status-detail"
+        - cell "Job 状态详情":
+          - paragraph: Job 状态详情
+  - heading "JobStatusDetail" [level=3]:
+    - link "Direct link to JobStatusDetail":
+      - /url: "#job-status-detail"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "state string 作业状态, 参考 State":
+        - cell "state":
+          - paragraph: state
+        - cell "string":
+          - paragraph: string
+        - cell "作业状态, 参考 State":
+          - paragraph:
+            - text: 作业状态, 参考
+            - link "State":
+              - /url: "#state"
+      - row "err_msg string 错误信息":
+        - cell "err_msg":
+          - paragraph: err_msg
+        - cell "string":
+          - paragraph: string
+        - cell "错误信息":
+          - paragraph: 错误信息
+      - row "create_time string 创建时间":
+        - cell "create_time":
+          - paragraph: create_time
+        - cell "string":
+          - paragraph: string
+        - cell "创建时间":
+          - paragraph: 创建时间
+      - row "start_time string 启动时间":
+        - cell "start_time":
+          - paragraph: start_time
+        - cell "string":
+          - paragraph: string
+        - cell "启动时间":
+          - paragraph: 启动时间
+      - row "end_time string 结束时间":
+        - cell "end_time":
+          - paragraph: end_time
+        - cell "string":
+          - paragraph: string
+        - cell "结束时间":
+          - paragraph: 结束时间
+      - row "tasks TaskStatus[] 任务列表":
+        - cell "tasks":
+          - paragraph: tasks
+        - cell "TaskStatus[]":
+          - paragraph:
+            - link "TaskStatus":
+              - /url: "#task-status"
+            - text: "[]"
+        - cell "任务列表":
+          - paragraph: 任务列表
+  - heading "Party" [level=3]:
+    - link "Direct link to Party":
+      - /url: "#party"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "domain_id string 必填 DomainID":
+        - cell "domain_id":
+          - paragraph: domain_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "DomainID":
+          - paragraph: DomainID
+      - row "role string 可选 参与方角色，该字段由引擎自定义，对应到 appImage 的部署模版中；更多参考 KusciaJob":
+        - cell "role":
+          - paragraph: role
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "参与方角色，该字段由引擎自定义，对应到 appImage 的部署模版中；更多参考 KusciaJob":
+          - paragraph:
+            - text: 参与方角色，该字段由引擎自定义，对应到
+            - link "appImage":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/appimage_cn#appimage-ref
+            - text: 的部署模版中；更多参考
+            - link "KusciaJob":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn#create-kuscia-job
+      - row "resources JobResource 可选 参与方资源配置":
+        - cell "resources":
+          - paragraph: resources
+        - cell "JobResource":
+          - paragraph: JobResource
+        - cell "可选":
+          - paragraph: 可选
+        - cell "参与方资源配置":
+          - paragraph: 参与方资源配置
+      - row "bandwidth_limits BandwidthLimit[] 可选 节点请求其他节点的带宽限制配置":
+        - cell "bandwidth_limits":
+          - paragraph: bandwidth_limits
+        - cell "BandwidthLimit[]":
+          - paragraph:
+            - link "BandwidthLimit":
+              - /url: "#bandwidth-limit"
+            - text: "[]"
+        - cell "可选":
+          - paragraph: 可选
+        - cell "节点请求其他节点的带宽限制配置":
+          - paragraph: 节点请求其他节点的带宽限制配置
+  - heading "JobResource" [level=3]:
+    - link "Direct link to JobResource":
+      - /url: "#jobresource"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "cpu string 可选 参与方可用 CPU 资源上限":
+        - cell "cpu":
+          - paragraph: cpu
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "参与方可用 CPU 资源上限":
+          - paragraph: 参与方可用 CPU 资源上限
+      - row "memory string 可选 参与方可用内存资源上限":
+        - cell "memory":
+          - paragraph: memory
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "参与方可用内存资源上限":
+          - paragraph: 参与方可用内存资源上限
+  - heading "PartyStatus" [level=3]:
+    - link "Direct link to PartyStatus":
+      - /url: "#party-status"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "domain_id string 节点 ID":
+        - cell "domain_id":
+          - paragraph: domain_id
+        - cell "string":
+          - paragraph: string
+        - cell "节点 ID":
+          - paragraph: 节点 ID
+      - row "state string 参与方任务状态, 参考 State":
+        - cell "state":
+          - paragraph: state
+        - cell "string":
+          - paragraph: string
+        - cell "参与方任务状态, 参考 State":
+          - paragraph:
+            - text: 参与方任务状态, 参考
+            - link "State":
+              - /url: "#state"
+      - row "err_msg string 错误信息":
+        - cell "err_msg":
+          - paragraph: err_msg
+        - cell "string":
+          - paragraph: string
+        - cell "错误信息":
+          - paragraph: 错误信息
+      - row "endpoints JobPartyEndpoint[] 应用对外暴露的访问地址信息":
+        - cell "endpoints":
+          - paragraph: endpoints
+        - cell "JobPartyEndpoint[]":
+          - paragraph:
+            - link "JobPartyEndpoint":
+              - /url: "#job-party-endpoint"
+            - text: "[]"
+        - cell "应用对外暴露的访问地址信息":
+          - paragraph: 应用对外暴露的访问地址信息
+  - heading "Task" [level=3]:
+    - link "Direct link to Task":
+      - /url: "#task"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "app_image string 必填 任务镜像":
+        - cell "app_image":
+          - paragraph: app_image
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "任务镜像":
+          - paragraph: 任务镜像
+      - row "parties Party[] 必填 参与方节点 ID":
+        - cell "parties":
+          - paragraph: parties
+        - cell "Party[]":
+          - paragraph:
+            - link "Party":
+              - /url: "#party"
+            - text: "[]"
+        - cell "必填":
+          - paragraph: 必填
+        - cell "参与方节点 ID":
+          - paragraph: 参与方节点 ID
+      - row /alias string 必填 任务别名，同一个 Job 中唯一，满足 RFC \d+ 标签名规则要求/:
+        - cell "alias":
+          - paragraph: alias
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell /任务别名，同一个 Job 中唯一，满足 RFC \d+ 标签名规则要求/:
+          - paragraph:
+            - text: 任务别名，同一个 Job 中唯一，满足
+            - link /RFC \d+ 标签名规则要求/:
+              - /url: https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/names/#dns-label-names
+      - row /task_id string 可选 任务 ID，如果不填，Kuscia 将随机生成唯一的 task_id ，满足 RFC \d+ 标签名规则要求/:
+        - cell "task_id":
+          - paragraph: task_id
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell /任务 ID，如果不填，Kuscia 将随机生成唯一的 task_id ，满足 RFC \d+ 标签名规则要求/:
+          - paragraph:
+            - text: 任务 ID，如果不填，Kuscia 将随机生成唯一的 task_id ，满足
+            - link /RFC \d+ 标签名规则要求/:
+              - /url: https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/names/#dns-label-names
+      - row "dependencies string[] 必填 依赖任务，通过 alias 字段来编排 Job 中 Task 之间的依赖关系":
+        - cell "dependencies":
+          - paragraph: dependencies
+        - cell "string[]":
+          - paragraph: string[]
+        - cell "必填":
+          - paragraph: 必填
+        - cell "依赖任务，通过 alias 字段来编排 Job 中 Task 之间的依赖关系":
+          - paragraph: 依赖任务，通过 alias 字段来编排 Job 中 Task 之间的依赖关系
+      - row "task_input_config string 必填 任务配置":
+        - cell "task_input_config":
+          - paragraph: task_input_config
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "任务配置":
+          - paragraph: 任务配置
+      - row "priority string 可选 优先级，值越大优先级越高":
+        - cell "priority":
+          - paragraph: priority
+        - cell "string":
+          - paragraph: string
+        - cell "可选":
+          - paragraph: 可选
+        - cell "优先级，值越大优先级越高":
+          - paragraph: 优先级，值越大优先级越高
+      - row "schedule_config ScheduleConfig 可选 任务调度配置":
+        - cell "schedule_config":
+          - paragraph: schedule_config
+        - cell "ScheduleConfig":
+          - paragraph:
+            - link "ScheduleConfig":
+              - /url: "#schedule-config"
+        - cell "可选":
+          - paragraph: 可选
+        - cell "任务调度配置":
+          - paragraph: 任务调度配置
+      - row "tolerable bool 可选 标识 Task 是否可容忍失败（默认为 false），若 tolerable=true 即使此 task 失败也不会导致 Job 失败。若 tolerable=false 则此 task 失败会判定整个 Job 失败。":
+        - cell "tolerable":
+          - paragraph: tolerable
+        - cell "bool":
+          - paragraph: bool
+        - cell "可选":
+          - paragraph: 可选
+        - cell "标识 Task 是否可容忍失败（默认为 false），若 tolerable=true 即使此 task 失败也不会导致 Job 失败。若 tolerable=false 则此 task 失败会判定整个 Job 失败。":
+          - paragraph: 标识 Task 是否可容忍失败（默认为 false），若 tolerable=true 即使此 task 失败也不会导致 Job 失败。若 tolerable=false 则此 task 失败会判定整个 Job 失败。
+  - heading "ScheduleConfig" [level=3]:
+    - link "Direct link to ScheduleConfig":
+      - /url: "#schedule-config"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - 'row /task_timeout_seconds int32 可选 任务超时时间，默认值: \d+，当任务在 \d+ 秒内没有被调度成功时，会将任务置为失败状态/':
+        - cell "task_timeout_seconds":
+          - paragraph: task_timeout_seconds
+        - cell "int32":
+          - paragraph: int32
+        - cell "可选":
+          - paragraph: 可选
+        - 'cell /任务超时时间，默认值: \d+，当任务在 \d+ 秒内没有被调度成功时，会将任务置为失败状态/':
+          - paragraph: "/任务超时时间，默认值: \\d+，当任务在 \\d+ 秒内没有被调度成功时，会将任务置为失败状态/"
+      - 'row /resource_reserved_seconds int32 可选 任务预留资源时间，默认值: \d+，当任务参与方在扣减完资源\(cpu\/memory\)后，会占用 \d+ 秒，如果在 \d+ 秒内，存在部分参与方没有成功扣减资源，那么已扣减资源的参与方将会释放扣减的资源/':
+        - cell "resource_reserved_seconds":
+          - paragraph: resource_reserved_seconds
+        - cell "int32":
+          - paragraph: int32
+        - cell "可选":
+          - paragraph: 可选
+        - 'cell /任务预留资源时间，默认值: \d+，当任务参与方在扣减完资源\(cpu\/memory\)后，会占用 \d+ 秒，如果在 \d+ 秒内，存在部分参与方没有成功扣减资源，那么已扣减资源的参与方将会释放扣减的资源/':
+          - paragraph: "/任务预留资源时间，默认值: \\d+，当任务参与方在扣减完资源\\(cpu\\/memory\\)后，会占用 \\d+ 秒，如果在 \\d+ 秒内，存在部分参与方没有成功扣减资源，那么已扣减资源的参与方将会释放扣减的资源/"
+      - 'row /resource_reallocation_interval_seconds int32 可选 任务重新扣减资源的时间间隔，默认值: \d+，当已扣减资源的参与方在释放完扣减的资源后，下次重新扣减资源的时间间隔/':
+        - cell "resource_reallocation_interval_seconds":
+          - paragraph: resource_reallocation_interval_seconds
+        - cell "int32":
+          - paragraph: int32
+        - cell "可选":
+          - paragraph: 可选
+        - 'cell /任务重新扣减资源的时间间隔，默认值: \d+，当已扣减资源的参与方在释放完扣减的资源后，下次重新扣减资源的时间间隔/':
+          - paragraph: "/任务重新扣减资源的时间间隔，默认值: \\d+，当已扣减资源的参与方在释放完扣减的资源后，下次重新扣减资源的时间间隔/"
+  - heading "TaskConfig" [level=3]:
+    - link "Direct link to TaskConfig":
+      - /url: "#task-config"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "app_image string 任务镜像":
+        - cell "app_image":
+          - paragraph: app_image
+        - cell "string":
+          - paragraph: string
+        - cell "任务镜像":
+          - paragraph: 任务镜像
+      - row "parties Party[] 参与方":
+        - cell "parties":
+          - paragraph: parties
+        - cell "Party[]":
+          - paragraph:
+            - link "Party":
+              - /url: "#party"
+            - text: "[]"
+        - cell "参与方":
+          - paragraph: 参与方
+      - row "alias string 任务别名":
+        - cell "alias":
+          - paragraph: alias
+        - cell "string":
+          - paragraph: string
+        - cell "任务别名":
+          - paragraph: 任务别名
+      - row "task_id string 任务 ID":
+        - cell "task_id":
+          - paragraph: task_id
+        - cell "string":
+          - paragraph: string
+        - cell "任务 ID":
+          - paragraph: 任务 ID
+      - row "dependencies string[] 依赖任务":
+        - cell "dependencies":
+          - paragraph: dependencies
+        - cell "string[]":
+          - paragraph: string[]
+        - cell "依赖任务":
+          - paragraph: 依赖任务
+      - row "task_input_config string 任务配置":
+        - cell "task_input_config":
+          - paragraph: task_input_config
+        - cell "string":
+          - paragraph: string
+        - cell "任务配置":
+          - paragraph: 任务配置
+      - row "priority string 优先级，值越大优先级越高":
+        - cell "priority":
+          - paragraph: priority
+        - cell "string":
+          - paragraph: string
+        - cell "优先级，值越大优先级越高":
+          - paragraph: 优先级，值越大优先级越高
+  - heading "TaskStatus" [level=3]:
+    - link "Direct link to TaskStatus":
+      - /url: "#task-status"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "task_id string 任务 ID":
+        - cell "task_id":
+          - paragraph: task_id
+        - cell "string":
+          - paragraph: string
+        - cell "任务 ID":
+          - paragraph: 任务 ID
+      - row "alias string 任务别名":
+        - cell "alias":
+          - paragraph: alias
+        - cell "string":
+          - paragraph: string
+        - cell "任务别名":
+          - paragraph: 任务别名
+      - row "state string 任务状态，参考 State":
+        - cell "state":
+          - paragraph: state
+        - cell "string":
+          - paragraph: string
+        - cell "任务状态，参考 State":
+          - paragraph:
+            - text: 任务状态，参考
+            - link "State":
+              - /url: "#state"
+      - row "err_msg string 错误信息":
+        - cell "err_msg":
+          - paragraph: err_msg
+        - cell "string":
+          - paragraph: string
+        - cell "错误信息":
+          - paragraph: 错误信息
+      - row "create_time string 创建事件":
+        - cell "create_time":
+          - paragraph: create_time
+        - cell "string":
+          - paragraph: string
+        - cell "创建事件":
+          - paragraph: 创建事件
+      - row "start_time string 开始事件":
+        - cell "start_time":
+          - paragraph: start_time
+        - cell "string":
+          - paragraph: string
+        - cell "开始事件":
+          - paragraph: 开始事件
+      - row "end_time string 结束事件":
+        - cell "end_time":
+          - paragraph: end_time
+        - cell "string":
+          - paragraph: string
+        - cell "结束事件":
+          - paragraph: 结束事件
+      - row "parties PartyStatus[] 参与方":
+        - cell "parties":
+          - paragraph: parties
+        - cell "PartyStatus[]":
+          - paragraph:
+            - link "PartyStatus":
+              - /url: "#party-status"
+            - text: "[]"
+        - cell "参与方":
+          - paragraph: 参与方
+  - heading "EventType" [level=3]:
+    - link "Direct link to EventType":
+      - /url: "#event-type"
+  - table:
+    - rowgroup:
+      - row "Name Number 描述":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "ADDED 0 增加事件":
+        - cell "ADDED":
+          - paragraph: ADDED
+        - cell "0":
+          - paragraph: "0"
+        - cell "增加事件":
+          - paragraph: 增加事件
+      - row "MODIFIED 1 修改事件":
+        - cell "MODIFIED":
+          - paragraph: MODIFIED
+        - cell "1":
+          - paragraph: "1"
+        - cell "修改事件":
+          - paragraph: 修改事件
+      - row "DELETED 2 删除事件":
+        - cell "DELETED":
+          - paragraph: DELETED
+        - cell "2":
+          - paragraph: "2"
+        - cell "删除事件":
+          - paragraph: 删除事件
+      - row "ERROR 3 错误事件":
+        - cell "ERROR":
+          - paragraph: ERROR
+        - cell "3":
+          - paragraph: "3"
+        - cell "错误事件":
+          - paragraph: 错误事件
+      - row "HEARTBEAT 4 心跳事件":
+        - cell "HEARTBEAT":
+          - paragraph: HEARTBEAT
+        - cell "4":
+          - paragraph: "4"
+        - cell "心跳事件":
+          - paragraph: 心跳事件
+  - heading "ApproveResult" [level=3]:
+    - link "Direct link to ApproveResult":
+      - /url: "#approve-result"
+  - table:
+    - rowgroup:
+      - row "Name Number 描述":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "APPROVE_RESULT_UNKNOWN 0 未知状态":
+        - cell "APPROVE_RESULT_UNKNOWN":
+          - paragraph: APPROVE_RESULT_UNKNOWN
+        - cell "0":
+          - paragraph: "0"
+        - cell "未知状态":
+          - paragraph: 未知状态
+      - row "APPROVE_RESULT_ACCEPT 1 审批通过":
+        - cell "APPROVE_RESULT_ACCEPT":
+          - paragraph: APPROVE_RESULT_ACCEPT
+        - cell "1":
+          - paragraph: "1"
+        - cell "审批通过":
+          - paragraph: 审批通过
+      - row "APPROVE_RESULT_REJECT 2 审批拒绝":
+        - cell "APPROVE_RESULT_REJECT":
+          - paragraph: APPROVE_RESULT_REJECT
+        - cell "2":
+          - paragraph: "2"
+        - cell "审批拒绝":
+          - paragraph: 审批拒绝
+  - heading "State" [level=3]:
+    - link "Direct link to State":
+      - /url: "#state"
+  - paragraph:
+    - text: KusciaJob 状态详细介绍见
+    - link "文档":
+      - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/kusciajob_cn#kuscia-state
+    - text: 。
+  - table:
+    - rowgroup:
+      - row "Name Number 描述":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "Unknown 0 未知":
+        - cell "Unknown":
+          - paragraph: Unknown
+        - cell "0":
+          - paragraph: "0"
+        - cell "未知":
+          - paragraph: 未知
+      - row "Pending 1 未开始运行":
+        - cell "Pending":
+          - paragraph: Pending
+        - cell "1":
+          - paragraph: "1"
+        - cell "未开始运行":
+          - paragraph: 未开始运行
+      - row "Running 2 运行中":
+        - cell "Running":
+          - paragraph: Running
+        - cell "2":
+          - paragraph: "2"
+        - cell "运行中":
+          - paragraph: 运行中
+      - row "Succeeded 3 成功":
+        - cell "Succeeded":
+          - paragraph: Succeeded
+        - cell "3":
+          - paragraph: "3"
+        - cell "成功":
+          - paragraph: 成功
+      - row "Failed 4 失败":
+        - cell "Failed":
+          - paragraph: Failed
+        - cell "4":
+          - paragraph: "4"
+        - cell "失败":
+          - paragraph: 失败
+      - row "AwaitingApproval 5 等待参与方审批 Job":
+        - cell "AwaitingApproval":
+          - paragraph: AwaitingApproval
+        - cell "5":
+          - paragraph: "5"
+        - cell "等待参与方审批 Job":
+          - paragraph: 等待参与方审批 Job
+      - row "ApprovalReject 6 Job 被审批为拒绝执行":
+        - cell "ApprovalReject":
+          - paragraph: ApprovalReject
+        - cell "6":
+          - paragraph: "6"
+        - cell "Job 被审批为拒绝执行":
+          - paragraph: Job 被审批为拒绝执行
+      - row "Cancelled 7 Job 被取消，被取消的 Job 不可被再次执行":
+        - cell "Cancelled":
+          - paragraph: Cancelled
+        - cell "7":
+          - paragraph: "7"
+        - cell "Job 被取消，被取消的 Job 不可被再次执行":
+          - paragraph: Job 被取消，被取消的 Job 不可被再次执行
+      - row "Suspended 8 Job 被暂停，可通过 Restart 接口重跑":
+        - cell "Suspended":
+          - paragraph: Suspended
+        - cell "8":
+          - paragraph: "8"
+        - cell "Job 被暂停，可通过 Restart 接口重跑":
+          - paragraph: Job 被暂停，可通过 Restart 接口重跑
+      - row "Initialized 9 Job 初始状态":
+        - cell "Initialized":
+          - paragraph: Initialized
+        - cell "9":
+          - paragraph: "9"
+        - cell "Job 初始状态":
+          - paragraph: Job 初始状态
+  - heading "JobPartyEndpoint" [level=3]:
+    - link "Direct link to JobPartyEndpoint":
+      - /url: "#job-party-endpoint"
+  - table:
+    - rowgroup:
+      - row "字段 类型 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "port_name string 应用服务端口名称，详细解释请参考AppImage deployTemplates.spec.containers.ports.name":
+        - cell "port_name":
+          - paragraph: port_name
+        - cell "string":
+          - paragraph: string
+        - cell "应用服务端口名称，详细解释请参考AppImage deployTemplates.spec.containers.ports.name":
+          - paragraph:
+            - text: 应用服务端口名称，详细解释请参考
+            - link "AppImage":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/appimage_cn
+            - code: deployTemplates.spec.containers.ports.name
+      - row "scope string 应用服务使用范围，详细解释请参考AppImage deployTemplates.spec.containers.ports.scope":
+        - cell "scope":
+          - paragraph: scope
+        - cell "string":
+          - paragraph: string
+        - cell "应用服务使用范围，详细解释请参考AppImage deployTemplates.spec.containers.ports.scope":
+          - paragraph:
+            - text: 应用服务使用范围，详细解释请参考
+            - link "AppImage":
+              - /url: /zh-CN/docs/kuscia/v0.14.0b0/reference/concepts/appimage_cn
+            - code: deployTemplates.spec.containers.ports.scope
+      - row "endpoint string 应用服务访问地址":
+        - cell "endpoint":
+          - paragraph: endpoint
+        - cell "string":
+          - paragraph: string
+        - cell "应用服务访问地址":
+          - paragraph: 应用服务访问地址
+  - heading "BandwidthLimit" [level=3]:
+    - link "Direct link to BandwidthLimit":
+      - /url: "#bandwidth-limit"
+  - table:
+    - rowgroup:
+      - row "字段 类型 选填 描述":
+        - cell "字段":
+          - paragraph: 字段
+        - cell "类型":
+          - paragraph: 类型
+        - cell "选填":
+          - paragraph: 选填
+        - cell "描述":
+          - paragraph: 描述
+    - rowgroup:
+      - row "destination_id string 必填 目标节点 ID":
+        - cell "destination_id":
+          - paragraph: destination_id
+        - cell "string":
+          - paragraph: string
+        - cell "必填":
+          - paragraph: 必填
+        - cell "目标节点 ID":
+          - paragraph: 目标节点 ID
+      - row "limit_kbps int64 必填 带宽限制，单位为 KiB/s":
+        - cell "limit_kbps":
+          - paragraph: limit_kbps
+        - cell "int64":
+          - paragraph: int64
+        - cell "必填":
+          - paragraph: 必填
+        - cell "带宽限制，单位为 KiB/s":
+          - paragraph: 带宽限制，单位为 KiB/s

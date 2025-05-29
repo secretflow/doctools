@@ -1,0 +1,13 @@
+{{#each assets}}
+  import {{this.variable}} from {{json this.path}};
+{{/each}}
+
+const {{ESBUILD_STATIC}} = {
+  {{#each assets}}
+    {{json this.variable}}: {{this.variable}},
+  {{/each}}
+};
+
+export async function render() {
+  {{body}}
+}

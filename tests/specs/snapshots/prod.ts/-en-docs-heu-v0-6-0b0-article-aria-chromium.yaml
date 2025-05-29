@@ -1,0 +1,54 @@
+- article:
+  - heading "HEU Documentation" [level=1]:
+    - link "Direct link to HEU Documentation":
+      - /url: "#heu"
+  - paragraph: Homomorphic Encryption processing Unit (HEU) is a sub-project of Secretflow that implements high-performance homomorphic encryption algorithms.
+  - paragraph: HEU aims to simplify the use of homomorphic encryption (HE) for data scientists. Particular care was given to the simplicity of our Python package in order to make it usable by any data scientist, even those without prior cryptography knowledge.
+  - paragraph:
+    - img
+  - paragraph: Since HEU is still in its infancy, HEU can only be used as a library and it is not ready to execute arbitrary programs like SPU.
+  - paragraph:
+    - paragraph: Contents
+  - list:
+    - listitem:
+      - link "Getting started":
+        - /url: /en/docs/heu/v0.6.0b0/getting_started
+      - list:
+        - listitem:
+          - link "Installation":
+            - /url: /en/docs/heu/v0.6.0b0/getting_started/installation
+        - listitem:
+          - link "Quick start":
+            - /url: /en/docs/heu/v0.6.0b0/getting_started/quick_start
+        - listitem:
+          - link "Matrix Operations":
+            - /url: /en/docs/heu/v0.6.0b0/getting_started/numpy
+        - listitem:
+          - link "Algorithm Selection":
+            - /url: /en/docs/heu/v0.6.0b0/getting_started/algo_choice
+        - listitem:
+          - link "Frequently asked questions (FAQ)":
+            - /url: /en/docs/heu/v0.6.0b0/getting_started/faq
+    - listitem:
+      - link "Development":
+        - /url: /en/docs/heu/v0.6.0b0/development
+      - list:
+        - listitem:
+          - link "HEU Architecture":
+            - /url: /en/docs/heu/v0.6.0b0/development/arch
+        - listitem:
+          - link "Develop new algorithms":
+            - /url: /en/docs/heu/v0.6.0b0/development/phe_dev
+    - listitem:
+      - link "API Reference":
+        - /url: /en/docs/heu/v0.6.0b0/references
+      - list:
+        - listitem:
+          - link "PHE Module":
+            - /url: /en/docs/heu/v0.6.0b0/references/phe_api
+        - listitem:
+          - link "Numpy Module":
+            - /url: /en/docs/heu/v0.6.0b0/references/numpy_api
+        - listitem:
+          - link "Upgrade Guide":
+            - /url: /en/docs/heu/v0.6.0b0/references/upgrade_guide

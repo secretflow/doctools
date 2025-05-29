@@ -1,0 +1,1695 @@
+- article:
+  - heading "SPU Runtime Configuration" [level=1]:
+    - link "Direct link to SPU Runtime Configuration":
+      - /url: "#spu-runtime-configuration"
+  - heading "Table of Contents" [level=2]:
+    - link "Direct link to Table of Contents":
+      - /url: "#table-of-contents"
+  - list:
+    - listitem:
+      - text: Messages
+      - list:
+        - listitem:
+          - link "CheetahConfig":
+            - /url: "#cheetahconfig"
+        - listitem:
+          - link "CompilationSource":
+            - /url: "#compilationsource"
+        - listitem:
+          - link "CompilerOptions":
+            - /url: "#compileroptions"
+        - listitem:
+          - link "ExecutableProto":
+            - /url: "#executableproto"
+        - listitem:
+          - link "RuntimeConfig":
+            - /url: "#runtimeconfig"
+        - listitem:
+          - link "ShapeProto":
+            - /url: "#shapeproto"
+        - listitem:
+          - link "TTPBeaverConfig":
+            - /url: "#ttpbeaverconfig"
+        - listitem:
+          - link "ValueChunkProto":
+            - /url: "#valuechunkproto"
+        - listitem:
+          - link "ValueMetaProto":
+            - /url: "#valuemetaproto"
+    - listitem:
+      - text: Enums
+      - list:
+        - listitem:
+          - link "CheetahOtKind":
+            - /url: "#cheetahotkind"
+        - listitem:
+          - link "DataType":
+            - /url: "#datatype"
+        - listitem:
+          - link "FieldType":
+            - /url: "#fieldtype"
+        - listitem:
+          - link "ProtocolKind":
+            - /url: "#protocolkind"
+        - listitem:
+          - link "PtType":
+            - /url: "#pttype"
+        - listitem:
+          - link "RuntimeConfig.BeaverType":
+            - /url: "#runtimeconfig-beavertype"
+        - listitem:
+          - link "RuntimeConfig.ExpMode":
+            - /url: "#runtimeconfig-expmode"
+        - listitem:
+          - link "RuntimeConfig.LogMode":
+            - /url: "#runtimeconfig-logmode"
+        - listitem:
+          - link "RuntimeConfig.SigmoidMode":
+            - /url: "#runtimeconfig-sigmoidmode"
+        - listitem:
+          - link "SourceIRType":
+            - /url: "#sourceirtype"
+        - listitem:
+          - link "Visibility":
+            - /url: "#visibility"
+        - listitem:
+          - link "XLAPrettyPrintKind":
+            - /url: "#xlaprettyprintkind"
+    - listitem:
+      - link "Scalar Value Types":
+        - /url: "#scalar-value-types"
+  - heading "Messages" [level=2]:
+    - link "Direct link to Messages":
+      - /url: "#messages"
+  - heading "CheetahConfig" [level=3]:
+    - link "Direct link to CheetahConfig":
+      - /url: "#cheetahconfig"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "disable_matmul_pack bool disable the ciphertext packing for matmul":
+        - cell "disable_matmul_pack":
+          - paragraph: disable_matmul_pack
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "disable the ciphertext packing for matmul":
+          - paragraph: disable the ciphertext packing for matmul
+      - row "enable_mul_lsb_error bool allow least significant bits error for point-wise mul":
+        - cell "enable_mul_lsb_error":
+          - paragraph: enable_mul_lsb_error
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "allow least significant bits error for point-wise mul":
+          - paragraph: allow least significant bits error for point-wise mul
+      - row "ot_kind CheetahOtKind Setup for cheetah ot":
+        - cell "ot_kind":
+          - paragraph: ot_kind
+        - cell "CheetahOtKind":
+          - paragraph:
+            - link "CheetahOtKind":
+              - /url: "#cheetahotkind"
+        - cell "Setup for cheetah ot":
+          - paragraph: Setup for cheetah ot
+  - heading "CompilationSource" [level=3]:
+    - link "Direct link to CompilationSource":
+      - /url: "#compilationsource"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "ir_type SourceIRType Input IR type":
+        - cell "ir_type":
+          - paragraph: ir_type
+        - cell "SourceIRType":
+          - paragraph:
+            - link "SourceIRType":
+              - /url: "#sourceirtype"
+        - cell "Input IR type":
+          - paragraph: Input IR type
+      - row "ir_txt bytes IR":
+        - cell "ir_txt":
+          - paragraph: ir_txt
+        - cell "bytes":
+          - paragraph:
+            - link "bytes":
+              - /url: "#bytes"
+        - cell "IR":
+          - paragraph: IR
+      - row "input_visibility repeated Visibility Input visibilities":
+        - cell "input_visibility":
+          - paragraph: input_visibility
+        - cell "repeated Visibility":
+          - paragraph:
+            - link "repeated Visibility":
+              - /url: "#visibility"
+        - cell "Input visibilities":
+          - paragraph: Input visibilities
+  - heading "CompilerOptions" [level=3]:
+    - link "Direct link to CompilerOptions":
+      - /url: "#compileroptions"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "enable_pretty_print bool Pretty print":
+        - cell "enable_pretty_print":
+          - paragraph: enable_pretty_print
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Pretty print":
+          - paragraph: Pretty print
+      - row "pretty_print_dump_dir string none":
+        - cell "pretty_print_dump_dir":
+          - paragraph: pretty_print_dump_dir
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - cell "none":
+          - paragraph: none
+      - row "xla_pp_kind XLAPrettyPrintKind none":
+        - cell "xla_pp_kind":
+          - paragraph: xla_pp_kind
+        - cell "XLAPrettyPrintKind":
+          - paragraph:
+            - link "XLAPrettyPrintKind":
+              - /url: "#xlaprettyprintkind"
+        - cell "none":
+          - paragraph: none
+      - row "disable_sqrt_plus_epsilon_rewrite bool Disable sqrt(x) + eps to sqrt(x+eps) rewrite":
+        - cell "disable_sqrt_plus_epsilon_rewrite":
+          - paragraph: disable_sqrt_plus_epsilon_rewrite
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable sqrt(x) + eps to sqrt(x+eps) rewrite":
+          - paragraph: Disable sqrt(x) + eps to sqrt(x+eps) rewrite
+      - row "disable_div_sqrt_rewrite bool Disable x/sqrt(y) to x*rsqrt(y) rewrite":
+        - cell "disable_div_sqrt_rewrite":
+          - paragraph: disable_div_sqrt_rewrite
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable x/sqrt(y) to x*rsqrt(y) rewrite":
+          - paragraph: Disable x/sqrt(y) to x*rsqrt(y) rewrite
+      - row "disable_reduce_truncation_optimization bool Disable reduce truncation optimization":
+        - cell "disable_reduce_truncation_optimization":
+          - paragraph: disable_reduce_truncation_optimization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable reduce truncation optimization":
+          - paragraph: Disable reduce truncation optimization
+      - row "disable_maxpooling_optimization bool Disable maxpooling optimization":
+        - cell "disable_maxpooling_optimization":
+          - paragraph: disable_maxpooling_optimization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable maxpooling optimization":
+          - paragraph: Disable maxpooling optimization
+      - row "disallow_mix_types_opts bool Disallow mix type operations":
+        - cell "disallow_mix_types_opts":
+          - paragraph: disallow_mix_types_opts
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disallow mix type operations":
+          - paragraph: Disallow mix type operations
+      - row "disable_select_optimization bool Disable SelectOp optimization":
+        - cell "disable_select_optimization":
+          - paragraph: disable_select_optimization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable SelectOp optimization":
+          - paragraph: Disable SelectOp optimization
+      - row "enable_optimize_denominator_with_broadcast bool Enable optimize x/bcast(y) -> x * bcast(1/y)":
+        - cell "enable_optimize_denominator_with_broadcast":
+          - paragraph: enable_optimize_denominator_with_broadcast
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Enable optimize x/bcast(y) -> x * bcast(1/y)":
+          - paragraph: Enable optimize x/bcast(y) -> x * bcast(1/y)
+      - row "disable_deallocation_insertion bool Disable deallocation insertion pass":
+        - cell "disable_deallocation_insertion":
+          - paragraph: disable_deallocation_insertion
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable deallocation insertion pass":
+          - paragraph: Disable deallocation insertion pass
+      - row "disable_partial_sort_optimization bool Disable sort->topk rewrite when only partial sort is required":
+        - cell "disable_partial_sort_optimization":
+          - paragraph: disable_partial_sort_optimization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable sort->topk rewrite when only partial sort is required":
+          - paragraph: Disable sort->topk rewrite when only partial sort is required
+  - heading "ExecutableProto" [level=3]:
+    - link "Direct link to ExecutableProto":
+      - /url: "#executableproto"
+  - paragraph: The executable format accepted by SPU runtime.
+  - list:
+    - listitem: Inputs should be prepared before running executable.
+    - listitem: Output is maintained after execution, and can be fetched by output name.
+  - button "Copy":
+    - img "copy"
+  - code: python
+  - code: "rt = spu.Runtime(...) # create an spu runtime. rt.set_var('x', ...) # set variable to the runtime. exe = spu.ExecutableProto( # prepare the executable. name = 'balabala', input_names = ['x'], output_names = ['y'], code = ...) rt.run(exe) # run the executable. y = rt.get_var('y') # get the executable from spu runtime."
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "name string The name of the executable.":
+        - cell "name":
+          - paragraph: name
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - cell "The name of the executable.":
+          - paragraph: The name of the executable.
+      - row "input_names repeated string The input names.":
+        - cell "input_names":
+          - paragraph: input_names
+        - cell "repeated string":
+          - paragraph:
+            - link "repeated string":
+              - /url: "#string"
+        - cell "The input names.":
+          - paragraph: The input names.
+      - row "output_names repeated string The output names.":
+        - cell "output_names":
+          - paragraph: output_names
+        - cell "repeated string":
+          - paragraph:
+            - link "repeated string":
+              - /url: "#string"
+        - cell "The output names.":
+          - paragraph: The output names.
+      - row "code bytes The bytecode of the program, with format IR_MLIR_SPU.":
+        - cell "code":
+          - paragraph: code
+        - cell "bytes":
+          - paragraph:
+            - link "bytes":
+              - /url: "#bytes"
+        - cell "The bytecode of the program, with format IR_MLIR_SPU.":
+          - paragraph: The bytecode of the program, with format IR_MLIR_SPU.
+  - heading "RuntimeConfig" [level=3]:
+    - link "Direct link to RuntimeConfig":
+      - /url: "#runtimeconfig"
+  - paragraph: The SPU runtime configuration.
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "protocol ProtocolKind The protocol kind.":
+        - cell "protocol":
+          - paragraph: protocol
+        - cell "ProtocolKind":
+          - paragraph:
+            - link "ProtocolKind":
+              - /url: "#protocolkind"
+        - cell "The protocol kind.":
+          - paragraph: The protocol kind.
+      - row "field FieldType The field type.":
+        - cell "field":
+          - paragraph: field
+        - cell "FieldType":
+          - paragraph:
+            - link "FieldType":
+              - /url: "#fieldtype"
+        - cell "The field type.":
+          - paragraph: The field type.
+      - row "fxp_fraction_bits int64 Number of fraction bits of fixed-point number. 0(default) indicates implementation defined.":
+        - cell "fxp_fraction_bits":
+          - paragraph: fxp_fraction_bits
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "Number of fraction bits of fixed-point number. 0(default) indicates implementation defined.":
+          - paragraph: Number of fraction bits of fixed-point number. 0(default) indicates implementation defined.
+      - row "max_concurrency int32 Max number of cores":
+        - cell "max_concurrency":
+          - paragraph: max_concurrency
+        - cell "int32":
+          - paragraph:
+            - link "int32":
+              - /url: "#int32"
+        - cell "Max number of cores":
+          - paragraph: Max number of cores
+      - row "enable_action_trace bool When enabled, runtime prints verbose info of the call stack, debug purpose only.":
+        - cell "enable_action_trace":
+          - paragraph: enable_action_trace
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "When enabled, runtime prints verbose info of the call stack, debug purpose only.":
+          - paragraph: When enabled, runtime prints verbose info of the call stack, debug purpose only.
+      - 'row "enable_type_checker bool When enabled, runtime checks runtime type infos against the compile-time ones, exceptions are raised if mismatches happen. Note: Runtime outputs prefer runtime type infos even when flag is on."':
+        - cell "enable_type_checker":
+          - paragraph: enable_type_checker
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - 'cell "When enabled, runtime checks runtime type infos against the compile-time ones, exceptions are raised if mismatches happen. Note: Runtime outputs prefer runtime type infos even when flag is on."':
+          - paragraph: "When enabled, runtime checks runtime type infos against the compile-time ones, exceptions are raised if mismatches happen. Note: Runtime outputs prefer runtime type infos even when flag is on."
+      - row "enable_pphlo_trace bool When enabled, runtime prints executed pphlo list, debug purpose only.":
+        - cell "enable_pphlo_trace":
+          - paragraph: enable_pphlo_trace
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "When enabled, runtime prints executed pphlo list, debug purpose only.":
+          - paragraph: When enabled, runtime prints executed pphlo list, debug purpose only.
+      - row "enable_runtime_snapshot bool When enabled, runtime dumps executed executables in the dump_dir, debug purpose only.":
+        - cell "enable_runtime_snapshot":
+          - paragraph: enable_runtime_snapshot
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "When enabled, runtime dumps executed executables in the dump_dir, debug purpose only.":
+          - paragraph: When enabled, runtime dumps executed executables in the dump_dir, debug purpose only.
+      - row "snapshot_dump_dir string none":
+        - cell "snapshot_dump_dir":
+          - paragraph: snapshot_dump_dir
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - cell "none":
+          - paragraph: none
+      - 'row "enable_pphlo_profile bool When enabled, runtime records detailed pphlo timing data, debug purpose only. WARNING: the send bytes information is only accurate when experimental_enable_inter_op_par and experimental_enable_intra_op_par options are disabled."':
+        - cell "enable_pphlo_profile":
+          - paragraph: enable_pphlo_profile
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - 'cell "When enabled, runtime records detailed pphlo timing data, debug purpose only. WARNING: the send bytes information is only accurate when experimental_enable_inter_op_par and experimental_enable_intra_op_par options are disabled."':
+          - paragraph:
+            - text: "When enabled, runtime records detailed pphlo timing data, debug purpose only. WARNING: the"
+            - code: send bytes
+            - text: information is only accurate when
+            - code: experimental_enable_inter_op_par
+            - text: and
+            - code: experimental_enable_intra_op_par
+            - text: options are disabled.
+      - 'row "enable_hal_profile bool When enabled, runtime records detailed hal timing data, debug purpose only. WARNING: the send bytes information is only accurate when experimental_enable_inter_op_par and experimental_enable_intra_op_par options are disabled."':
+        - cell "enable_hal_profile":
+          - paragraph: enable_hal_profile
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - 'cell "When enabled, runtime records detailed hal timing data, debug purpose only. WARNING: the send bytes information is only accurate when experimental_enable_inter_op_par and experimental_enable_intra_op_par options are disabled."':
+          - paragraph:
+            - text: "When enabled, runtime records detailed hal timing data, debug purpose only. WARNING: the"
+            - code: send bytes
+            - text: information is only accurate when
+            - code: experimental_enable_inter_op_par
+            - text: and
+            - code: experimental_enable_intra_op_par
+            - text: options are disabled.
+      - 'row "public_random_seed uint64 The public random variable generated by the runtime, the concrete prg function is implementation defined. Note: this seed only applies to public variable only, it has nothing to do with security."':
+        - cell "public_random_seed":
+          - paragraph: public_random_seed
+        - cell "uint64":
+          - paragraph:
+            - link "uint64":
+              - /url: "#uint64"
+        - 'cell "The public random variable generated by the runtime, the concrete prg function is implementation defined. Note: this seed only applies to public variable only, it has nothing to do with security."':
+          - paragraph:
+            - text: "The public random variable generated by the runtime, the concrete prg function is implementation defined. Note: this seed only applies to"
+            - code: public variable
+            - text: only, it has nothing to do with security.
+      - 'row /share_max_chunk_size uint64 max chunk size for Value::toProto default: \d+ \* \d+ \* \d+/':
+        - cell "share_max_chunk_size":
+          - paragraph: share_max_chunk_size
+        - cell "uint64":
+          - paragraph:
+            - link "uint64":
+              - /url: "#uint64"
+        - 'cell /max chunk size for Value::toProto default: \d+ \* \d+ \* \d+/':
+          - paragraph: "/max chunk size for Value::toProto default: \\d+ \\* \\d+ \\* \\d+/"
+      - row "fxp_div_goldschmidt_iters int64 The iterations use in f_div with Goldschmidt method. 0(default) indicates implementation defined.":
+        - cell "fxp_div_goldschmidt_iters":
+          - paragraph: fxp_div_goldschmidt_iters
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "The iterations use in f_div with Goldschmidt method. 0(default) indicates implementation defined.":
+          - paragraph: The iterations use in f_div with Goldschmidt method. 0(default) indicates implementation defined.
+      - row "fxp_exp_mode RuntimeConfig.ExpMode The exponent approximation method.":
+        - cell "fxp_exp_mode":
+          - paragraph: fxp_exp_mode
+        - cell "RuntimeConfig.ExpMode":
+          - paragraph:
+            - link "RuntimeConfig.ExpMode":
+              - /url: "#runtimeconfig-expmode"
+        - cell "The exponent approximation method.":
+          - paragraph: The exponent approximation method.
+      - row "fxp_exp_iters int64 Number of iterations of exp approximation, 0(default) indicates impl defined.":
+        - cell "fxp_exp_iters":
+          - paragraph: fxp_exp_iters
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "Number of iterations of exp approximation, 0(default) indicates impl defined.":
+          - paragraph:
+            - text: Number of iterations of
+            - code: exp
+            - text: approximation, 0(default) indicates impl defined.
+      - row "fxp_log_mode RuntimeConfig.LogMode The logarithm approximation method.":
+        - cell "fxp_log_mode":
+          - paragraph: fxp_log_mode
+        - cell "RuntimeConfig.LogMode":
+          - paragraph:
+            - link "RuntimeConfig.LogMode":
+              - /url: "#runtimeconfig-logmode"
+        - cell "The logarithm approximation method.":
+          - paragraph: The logarithm approximation method.
+      - row "fxp_log_iters int64 Number of iterations of log approximation, 0(default) indicates impl-defined.":
+        - cell "fxp_log_iters":
+          - paragraph: fxp_log_iters
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "Number of iterations of log approximation, 0(default) indicates impl-defined.":
+          - paragraph:
+            - text: Number of iterations of
+            - code: log
+            - text: approximation, 0(default) indicates impl-defined.
+      - row "fxp_log_orders int64 Number of orders of log approximation, 0(default) indicates impl defined.":
+        - cell "fxp_log_orders":
+          - paragraph: fxp_log_orders
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "Number of orders of log approximation, 0(default) indicates impl defined.":
+          - paragraph:
+            - text: Number of orders of
+            - code: log
+            - text: approximation, 0(default) indicates impl defined.
+      - row "sigmoid_mode RuntimeConfig.SigmoidMode The sigmoid function approximation model.":
+        - cell "sigmoid_mode":
+          - paragraph: sigmoid_mode
+        - cell "RuntimeConfig.SigmoidMode":
+          - paragraph:
+            - link "RuntimeConfig.SigmoidMode":
+              - /url: "#runtimeconfig-sigmoidmode"
+        - cell "The sigmoid function approximation model.":
+          - paragraph: The sigmoid function approximation model.
+      - row "enable_lower_accuracy_rsqrt bool Enable a simpler rsqrt approximation":
+        - cell "enable_lower_accuracy_rsqrt":
+          - paragraph: enable_lower_accuracy_rsqrt
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Enable a simpler rsqrt approximation":
+          - paragraph: Enable a simpler rsqrt approximation
+      - row "sine_cosine_iters int64 Sine/Cosine approximation iterations":
+        - cell "sine_cosine_iters":
+          - paragraph: sine_cosine_iters
+        - cell "int64":
+          - paragraph:
+            - link "int64":
+              - /url: "#int64"
+        - cell "Sine/Cosine approximation iterations":
+          - paragraph: Sine/Cosine approximation iterations
+      - row "beaver_type RuntimeConfig.BeaverType beaver config, works for semi2k and spdz2k for now.":
+        - cell "beaver_type":
+          - paragraph: beaver_type
+        - cell "RuntimeConfig.BeaverType":
+          - paragraph:
+            - link "RuntimeConfig.BeaverType":
+              - /url: "#runtimeconfig-beavertype"
+        - cell "beaver config, works for semi2k and spdz2k for now.":
+          - paragraph: beaver config, works for semi2k and spdz2k for now.
+      - row "ttp_beaver_config TTPBeaverConfig TrustedThirdParty configs.":
+        - cell "ttp_beaver_config":
+          - paragraph: ttp_beaver_config
+        - cell "TTPBeaverConfig":
+          - paragraph:
+            - link "TTPBeaverConfig":
+              - /url: "#ttpbeaverconfig"
+        - cell "TrustedThirdParty configs.":
+          - paragraph: TrustedThirdParty configs.
+      - row "cheetah_2pc_config CheetahConfig Cheetah 2PC configs.":
+        - cell "cheetah_2pc_config":
+          - paragraph: cheetah_2pc_config
+        - cell "CheetahConfig":
+          - paragraph:
+            - link "CheetahConfig":
+              - /url: "#cheetahconfig"
+        - cell "Cheetah 2PC configs.":
+          - paragraph: Cheetah 2PC configs.
+      - row "trunc_allow_msb_error bool For protocol like SecureML, the most significant bit may have error with low probability, which lead to huge calculation error.":
+        - cell "trunc_allow_msb_error":
+          - paragraph: trunc_allow_msb_error
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "For protocol like SecureML, the most significant bit may have error with low probability, which lead to huge calculation error.":
+          - paragraph: For protocol like SecureML, the most significant bit may have error with low probability, which lead to huge calculation error.
+      - 'row "experimental_disable_mmul_split bool Experimental: DO NOT USE"':
+        - cell "experimental_disable_mmul_split":
+          - paragraph: experimental_disable_mmul_split
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - 'cell "Experimental: DO NOT USE"':
+          - paragraph: "Experimental: DO NOT USE"
+      - row "experimental_enable_inter_op_par bool Inter op parallel, aka, DAG level parallel.":
+        - cell "experimental_enable_inter_op_par":
+          - paragraph: experimental_enable_inter_op_par
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Inter op parallel, aka, DAG level parallel.":
+          - paragraph: Inter op parallel, aka, DAG level parallel.
+      - row "experimental_enable_intra_op_par bool Intra op parallel, aka, hal/mpc level parallel.":
+        - cell "experimental_enable_intra_op_par":
+          - paragraph: experimental_enable_intra_op_par
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Intra op parallel, aka, hal/mpc level parallel.":
+          - paragraph: Intra op parallel, aka, hal/mpc level parallel.
+      - row "experimental_disable_vectorization bool Disable kernel level vectorization.":
+        - cell "experimental_disable_vectorization":
+          - paragraph: experimental_disable_vectorization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Disable kernel level vectorization.":
+          - paragraph: Disable kernel level vectorization.
+      - row "experimental_inter_op_concurrency uint64 Inter op concurrency.":
+        - cell "experimental_inter_op_concurrency":
+          - paragraph: experimental_inter_op_concurrency
+        - cell "uint64":
+          - paragraph:
+            - link "uint64":
+              - /url: "#uint64"
+        - cell "Inter op concurrency.":
+          - paragraph: Inter op concurrency.
+      - row "experimental_enable_colocated_optimization bool Enable use of private type":
+        - cell "experimental_enable_colocated_optimization":
+          - paragraph: experimental_enable_colocated_optimization
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "Enable use of private type":
+          - paragraph: Enable use of private type
+  - heading "ShapeProto" [level=3]:
+    - link "Direct link to ShapeProto":
+      - /url: "#shapeproto"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "dims repeated int64 none":
+        - cell "dims":
+          - paragraph: dims
+        - cell "repeated int64":
+          - paragraph:
+            - link "repeated int64":
+              - /url: "#int64"
+        - cell "none":
+          - paragraph: none
+  - heading "TTPBeaverConfig" [level=3]:
+    - link "Direct link to TTPBeaverConfig":
+      - /url: "#ttpbeaverconfig"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "server_host string TrustedThirdParty beaver server’s remote ip:port or load-balance uri.":
+        - cell "server_host":
+          - paragraph: server_host
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - cell "TrustedThirdParty beaver server’s remote ip:port or load-balance uri.":
+          - paragraph: TrustedThirdParty beaver server’s remote ip:port or load-balance uri.
+      - row "adjust_rank int32 which rank do adjust rpc call, usually choose the rank closer to the server.":
+        - cell "adjust_rank":
+          - paragraph: adjust_rank
+        - cell "int32":
+          - paragraph:
+            - link "int32":
+              - /url: "#int32"
+        - cell "which rank do adjust rpc call, usually choose the rank closer to the server.":
+          - paragraph: which rank do adjust rpc call, usually choose the rank closer to the server.
+      - 'row /asym_crypto_schema string asym_crypto_schema: support \[“SM2”\] Will support \d+ in the future, after yacl supported it\./':
+        - cell "asym_crypto_schema":
+          - paragraph: asym_crypto_schema
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - 'cell /asym_crypto_schema: support \[“SM2”\] Will support \d+ in the future, after yacl supported it\./':
+          - paragraph: "/asym_crypto_schema: support \\[“SM2”\\] Will support \\d+ in the future, after yacl supported it\\./"
+      - row "server_public_key bytes server’s public key":
+        - cell "server_public_key":
+          - paragraph: server_public_key
+        - cell "bytes":
+          - paragraph:
+            - link "bytes":
+              - /url: "#bytes"
+        - cell "server’s public key":
+          - paragraph: server’s public key
+  - heading "ValueChunkProto" [level=3]:
+    - link "Direct link to ValueChunkProto":
+      - /url: "#valuechunkproto"
+  - paragraph: The spu Value proto, used for spu value serialization.
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "total_bytes uint64 chunk info":
+        - cell "total_bytes":
+          - paragraph: total_bytes
+        - cell "uint64":
+          - paragraph:
+            - link "uint64":
+              - /url: "#uint64"
+        - cell "chunk info":
+          - paragraph: chunk info
+      - row "chunk_offset uint64 none":
+        - cell "chunk_offset":
+          - paragraph: chunk_offset
+        - cell "uint64":
+          - paragraph:
+            - link "uint64":
+              - /url: "#uint64"
+        - cell "none":
+          - paragraph: none
+      - row "content bytes chunk bytes":
+        - cell "content":
+          - paragraph: content
+        - cell "bytes":
+          - paragraph:
+            - link "bytes":
+              - /url: "#bytes"
+        - cell "chunk bytes":
+          - paragraph: chunk bytes
+  - heading "ValueMetaProto" [level=3]:
+    - link "Direct link to ValueMetaProto":
+      - /url: "#valuemetaproto"
+  - table:
+    - rowgroup:
+      - row "Field Type Description":
+        - cell "Field":
+          - paragraph: Field
+        - cell "Type":
+          - paragraph: Type
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "data_type DataType The data type.":
+        - cell "data_type":
+          - paragraph: data_type
+        - cell "DataType":
+          - paragraph:
+            - link "DataType":
+              - /url: "#datatype"
+        - cell "The data type.":
+          - paragraph: The data type.
+      - row "is_complex bool none":
+        - cell "is_complex":
+          - paragraph: is_complex
+        - cell "bool":
+          - paragraph:
+            - link "bool":
+              - /url: "#bool"
+        - cell "none":
+          - paragraph: none
+      - row "visibility Visibility The data visibility.":
+        - cell "visibility":
+          - paragraph: visibility
+        - cell "Visibility":
+          - paragraph:
+            - link "Visibility":
+              - /url: "#visibility"
+        - cell "The data visibility.":
+          - paragraph: The data visibility.
+      - row "shape ShapeProto The shape of the value.":
+        - cell "shape":
+          - paragraph: shape
+        - cell "ShapeProto":
+          - paragraph:
+            - link "ShapeProto":
+              - /url: "#shapeproto"
+        - cell "The shape of the value.":
+          - paragraph: The shape of the value.
+      - row "storage_type string The storage type, defined by the underline evaluation engine. i.e. aby3.AShr<FM64> means an aby3 arithmetic share in FM64. usually, the application does not care about this attribute.":
+        - cell "storage_type":
+          - paragraph: storage_type
+        - cell "string":
+          - paragraph:
+            - link "string":
+              - /url: "#string"
+        - cell "The storage type, defined by the underline evaluation engine. i.e. aby3.AShr<FM64> means an aby3 arithmetic share in FM64. usually, the application does not care about this attribute.":
+          - paragraph:
+            - text: The storage type, defined by the underline evaluation engine. i.e.
+            - code: aby3.AShr<FM64>
+            - text: means an aby3 arithmetic share in FM64. usually, the application does not care about this attribute.
+  - heading "Enums" [level=2]:
+    - link "Direct link to Enums":
+      - /url: "#enums"
+  - heading "CheetahOtKind" [level=3]:
+    - link "Direct link to CheetahOtKind":
+      - /url: "#cheetahotkind"
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "YACL_Ferret 0 none":
+        - cell "YACL_Ferret":
+          - paragraph: YACL_Ferret
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "YACL_Softspoken 1 none":
+        - cell "YACL_Softspoken":
+          - paragraph: YACL_Softspoken
+        - cell "1":
+          - paragraph: "1"
+        - cell "none":
+          - paragraph: none
+      - row "EMP_Ferret 2 none":
+        - cell "EMP_Ferret":
+          - paragraph: EMP_Ferret
+        - cell "2":
+          - paragraph: "2"
+        - cell "none":
+          - paragraph: none
+  - heading "DataType" [level=3]:
+    - link "Direct link to DataType":
+      - /url: "#datatype"
+  - paragraph: The SPU datatype
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "DT_INVALID 0 none":
+        - cell "DT_INVALID":
+          - paragraph: DT_INVALID
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "DT_I1 1 1bit integer (bool).":
+        - cell "DT_I1":
+          - paragraph: DT_I1
+        - cell "1":
+          - paragraph: "1"
+        - cell "1bit integer (bool).":
+          - paragraph: 1bit integer (bool).
+      - row "DT_I8 2 int8":
+        - cell "DT_I8":
+          - paragraph: DT_I8
+        - cell "2":
+          - paragraph: "2"
+        - cell "int8":
+          - paragraph: int8
+      - row "DT_U8 3 uint8":
+        - cell "DT_U8":
+          - paragraph: DT_U8
+        - cell "3":
+          - paragraph: "3"
+        - cell "uint8":
+          - paragraph: uint8
+      - row "DT_I16 4 int16":
+        - cell "DT_I16":
+          - paragraph: DT_I16
+        - cell "4":
+          - paragraph: "4"
+        - cell "int16":
+          - paragraph: int16
+      - row "DT_U16 5 uint16":
+        - cell "DT_U16":
+          - paragraph: DT_U16
+        - cell "5":
+          - paragraph: "5"
+        - cell "uint16":
+          - paragraph: uint16
+      - row "DT_I32 6 int32":
+        - cell "DT_I32":
+          - paragraph: DT_I32
+        - cell "6":
+          - paragraph: "6"
+        - cell "int32":
+          - paragraph: int32
+      - row "DT_U32 7 uint32":
+        - cell "DT_U32":
+          - paragraph: DT_U32
+        - cell "7":
+          - paragraph: "7"
+        - cell "uint32":
+          - paragraph: uint32
+      - row "DT_I64 8 int64":
+        - cell "DT_I64":
+          - paragraph: DT_I64
+        - cell "8":
+          - paragraph: "8"
+        - cell "int64":
+          - paragraph: int64
+      - row "DT_U64 9 uint64":
+        - cell "DT_U64":
+          - paragraph: DT_U64
+        - cell "9":
+          - paragraph: "9"
+        - cell "uint64":
+          - paragraph: uint64
+      - row /DT_F16 \d+ half/:
+        - cell "DT_F16":
+          - paragraph: DT_F16
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "half":
+          - paragraph: half
+      - row /DT_F32 \d+ float/:
+        - cell "DT_F32":
+          - paragraph: DT_F32
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "float":
+          - paragraph: float
+      - row /DT_F64 \d+ double/:
+        - cell "DT_F64":
+          - paragraph: DT_F64
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "double":
+          - paragraph: double
+  - heading "FieldType" [level=3]:
+    - link "Direct link to FieldType":
+      - /url: "#fieldtype"
+  - paragraph: A security parameter type.
+  - paragraph: The secure evaluation is based on some algebraic structure (ring or field),
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "FT_INVALID 0 none":
+        - cell "FT_INVALID":
+          - paragraph: FT_INVALID
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row /FM32 1 Ring 2\^\d+/:
+        - cell "FM32":
+          - paragraph: FM32
+        - cell "1":
+          - paragraph: "1"
+        - cell /Ring 2\^\d+/:
+          - paragraph: /Ring 2\^\d+/
+      - row /FM64 2 Ring 2\^\d+/:
+        - cell "FM64":
+          - paragraph: FM64
+        - cell "2":
+          - paragraph: "2"
+        - cell /Ring 2\^\d+/:
+          - paragraph: /Ring 2\^\d+/
+      - row /FM128 3 Ring 2\^\d+/:
+        - cell "FM128":
+          - paragraph: FM128
+        - cell "3":
+          - paragraph: "3"
+        - cell /Ring 2\^\d+/:
+          - paragraph: /Ring 2\^\d+/
+  - heading "ProtocolKind" [level=3]:
+    - link "Direct link to ProtocolKind":
+      - /url: "#protocolkind"
+  - paragraph: The protocol kind.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "PROT_INVALID 0 Invalid protocol.":
+        - cell "PROT_INVALID":
+          - paragraph: PROT_INVALID
+        - cell "0":
+          - paragraph: "0"
+        - cell "Invalid protocol.":
+          - paragraph: Invalid protocol.
+      - 'row /REF2K 1 The reference implementation in ring\^[\d,.]+[bkmBKM]+, note: this ‘protocol’ only behave-like a fixed point secure protocol without any security guarantee\. Hence, it should only be selected for debugging purposes\./':
+        - cell "REF2K":
+          - paragraph: REF2K
+        - cell "1":
+          - paragraph: "1"
+        - 'cell /The reference implementation in ring\^[\d,.]+[bkmBKM]+, note: this ‘protocol’ only behave-like a fixed point secure protocol without any security guarantee\. Hence, it should only be selected for debugging purposes\./':
+          - paragraph:
+            - text: The reference implementation in
+            - code: /ring\^[\d,.]+[bkmBKM]+/
+            - text: ", note: this ‘protocol’ only behave-like a fixed point secure protocol without any security guarantee. Hence, it should only be selected for debugging purposes."
+      - row "SEMI2K 2 A semi-honest multi-party protocol. This protocol requires a trusted third party to generate the offline correlated randoms. Currently, SecretFlow by default ships this protocol with a trusted first party. Hence, it should only be used for debugging purposes.":
+        - cell "SEMI2K":
+          - paragraph: SEMI2K
+        - cell "2":
+          - paragraph: "2"
+        - cell "A semi-honest multi-party protocol. This protocol requires a trusted third party to generate the offline correlated randoms. Currently, SecretFlow by default ships this protocol with a trusted first party. Hence, it should only be used for debugging purposes.":
+          - paragraph: A semi-honest multi-party protocol. This protocol requires a trusted third party to generate the offline correlated randoms. Currently, SecretFlow by default ships this protocol with a trusted first party. Hence, it should only be used for debugging purposes.
+      - row "ABY3 3 A honest majority 3PC-protocol. SecretFlow provides the semi-honest implementation without Yao.":
+        - cell "ABY3":
+          - paragraph: ABY3
+        - cell "3":
+          - paragraph: "3"
+        - cell "A honest majority 3PC-protocol. SecretFlow provides the semi-honest implementation without Yao.":
+          - paragraph: A honest majority 3PC-protocol. SecretFlow provides the semi-honest implementation without Yao.
+      - row "CHEETAH 4 The famous Cheetah protocol, a very fast 2PC protocol.":
+        - cell "CHEETAH":
+          - paragraph: CHEETAH
+        - cell "4":
+          - paragraph: "4"
+        - cell "The famous Cheetah protocol, a very fast 2PC protocol.":
+          - paragraph:
+            - text: The famous
+            - link "Cheetah":
+              - /url: https://eprint.iacr.org/2022/207
+            - text: protocol, a very fast 2PC protocol.
+      - row /SECURENN 5 A semi-honest 3PC-protocol for Neural Network, P2 as the helper, \(https:\/\/eprint\.iacr\.org\/\d+\/\d+ \)/:
+        - cell "SECURENN":
+          - paragraph: SECURENN
+        - cell "5":
+          - paragraph: "5"
+        - cell /A semi-honest 3PC-protocol for Neural Network, P2 as the helper, \(https:\/\/eprint\.iacr\.org\/\d+\/\d+ \)/:
+          - paragraph:
+            - text: A semi-honest 3PC-protocol for Neural Network, P2 as the helper, (
+            - link /https:\/\/eprint\.iacr\.org\/\d+\/\d+/:
+              - /url: https://eprint.iacr.org/2018/442
+            - text: )
+  - heading "PtType" [level=3]:
+    - link "Direct link to PtType":
+      - /url: "#pttype"
+  - paragraph: Plaintext type
+  - paragraph: SPU runtime does not process with plaintext directly, plaintext type is mainly used for IO purposes, when converting a plaintext buffer to an SPU buffer, we have to let spu know which type the plaintext buffer is.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "PT_INVALID 0 none":
+        - cell "PT_INVALID":
+          - paragraph: PT_INVALID
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "PT_I8 1 int8_t":
+        - cell "PT_I8":
+          - paragraph: PT_I8
+        - cell "1":
+          - paragraph: "1"
+        - cell "int8_t":
+          - paragraph: int8_t
+      - row "PT_U8 2 uint8_t":
+        - cell "PT_U8":
+          - paragraph: PT_U8
+        - cell "2":
+          - paragraph: "2"
+        - cell "uint8_t":
+          - paragraph: uint8_t
+      - row "PT_I16 3 int16_t":
+        - cell "PT_I16":
+          - paragraph: PT_I16
+        - cell "3":
+          - paragraph: "3"
+        - cell "int16_t":
+          - paragraph: int16_t
+      - row "PT_U16 4 uint16_t":
+        - cell "PT_U16":
+          - paragraph: PT_U16
+        - cell "4":
+          - paragraph: "4"
+        - cell "uint16_t":
+          - paragraph: uint16_t
+      - row "PT_I32 5 int32_t":
+        - cell "PT_I32":
+          - paragraph: PT_I32
+        - cell "5":
+          - paragraph: "5"
+        - cell "int32_t":
+          - paragraph: int32_t
+      - row "PT_U32 6 uint32_t":
+        - cell "PT_U32":
+          - paragraph: PT_U32
+        - cell "6":
+          - paragraph: "6"
+        - cell "uint32_t":
+          - paragraph: uint32_t
+      - row "PT_I64 7 int64_t":
+        - cell "PT_I64":
+          - paragraph: PT_I64
+        - cell "7":
+          - paragraph: "7"
+        - cell "int64_t":
+          - paragraph: int64_t
+      - row "PT_U64 8 uint64_t":
+        - cell "PT_U64":
+          - paragraph: PT_U64
+        - cell "8":
+          - paragraph: "8"
+        - cell "uint64_t":
+          - paragraph: uint64_t
+      - row "PT_I128 9 int128_t":
+        - cell "PT_I128":
+          - paragraph: PT_I128
+        - cell "9":
+          - paragraph: "9"
+        - cell "int128_t":
+          - paragraph: int128_t
+      - row /PT_U128 \d+ uint128_t/:
+        - cell "PT_U128":
+          - paragraph: PT_U128
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "uint128_t":
+          - paragraph: uint128_t
+      - row /PT_I1 \d+ bool/:
+        - cell "PT_I1":
+          - paragraph: PT_I1
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "bool":
+          - paragraph: bool
+      - row /PT_F16 \d+ half/:
+        - cell "PT_F16":
+          - paragraph: PT_F16
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "half":
+          - paragraph: half
+      - row /PT_F32 \d+ float/:
+        - cell "PT_F32":
+          - paragraph: PT_F32
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "float":
+          - paragraph: float
+      - row /PT_F64 \d+ double/:
+        - cell "PT_F64":
+          - paragraph: PT_F64
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "double":
+          - paragraph: double
+      - row /PT_CF32 \d+ complex float/:
+        - cell "PT_CF32":
+          - paragraph: PT_CF32
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "complex float":
+          - paragraph: complex float
+      - row /PT_CF64 \d+ complex double/:
+        - cell "PT_CF64":
+          - paragraph: PT_CF64
+        - cell /\d+/:
+          - paragraph: /\d+/
+        - cell "complex double":
+          - paragraph: complex double
+  - heading "RuntimeConfig.BeaverType" [level=3]:
+    - link "Direct link to RuntimeConfig.BeaverType":
+      - /url: "#runtimeconfig-beavertype"
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - 'row "TrustedFirstParty 0 Assume first party (rank0) as trusted party to generate beaver triple. WARNING: It is NOT SAFE and SHOULD NOT BE used in production."':
+        - cell "TrustedFirstParty":
+          - paragraph: TrustedFirstParty
+        - cell "0":
+          - paragraph: "0"
+        - 'cell "Assume first party (rank0) as trusted party to generate beaver triple. WARNING: It is NOT SAFE and SHOULD NOT BE used in production."':
+          - paragraph: "Assume first party (rank0) as trusted party to generate beaver triple. WARNING: It is NOT SAFE and SHOULD NOT BE used in production."
+      - row "TrustedThirdParty 1 Generate beaver triple through an additional trusted third party.":
+        - cell "TrustedThirdParty":
+          - paragraph: TrustedThirdParty
+        - cell "1":
+          - paragraph: "1"
+        - cell "Generate beaver triple through an additional trusted third party.":
+          - paragraph: Generate beaver triple through an additional trusted third party.
+      - row "MultiParty 2 Generate beaver triple through multi-party.":
+        - cell "MultiParty":
+          - paragraph: MultiParty
+        - cell "2":
+          - paragraph: "2"
+        - cell "Generate beaver triple through multi-party.":
+          - paragraph: Generate beaver triple through multi-party.
+  - heading "RuntimeConfig.ExpMode" [level=3]:
+    - link "Direct link to RuntimeConfig.ExpMode":
+      - /url: "#runtimeconfig-expmode"
+  - paragraph: The exponential approximation method.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "EXP_DEFAULT 0 Implementation defined.":
+        - cell "EXP_DEFAULT":
+          - paragraph: EXP_DEFAULT
+        - cell "0":
+          - paragraph: "0"
+        - cell "Implementation defined.":
+          - paragraph: Implementation defined.
+      - row "EXP_PADE 1 The pade approximation.":
+        - cell "EXP_PADE":
+          - paragraph: EXP_PADE
+        - cell "1":
+          - paragraph: "1"
+        - cell "The pade approximation.":
+          - paragraph: The pade approximation.
+      - row "EXP_TAYLOR 2 Taylor series approximation.":
+        - cell "EXP_TAYLOR":
+          - paragraph: EXP_TAYLOR
+        - cell "2":
+          - paragraph: "2"
+        - cell "Taylor series approximation.":
+          - paragraph: Taylor series approximation.
+  - heading "RuntimeConfig.LogMode" [level=3]:
+    - link "Direct link to RuntimeConfig.LogMode":
+      - /url: "#runtimeconfig-logmode"
+  - paragraph: The logarithm approximation method.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "LOG_DEFAULT 0 Implementation defined.":
+        - cell "LOG_DEFAULT":
+          - paragraph: LOG_DEFAULT
+        - cell "0":
+          - paragraph: "0"
+        - cell "Implementation defined.":
+          - paragraph: Implementation defined.
+      - row "LOG_PADE 1 The pade approximation.":
+        - cell "LOG_PADE":
+          - paragraph: LOG_PADE
+        - cell "1":
+          - paragraph: "1"
+        - cell "The pade approximation.":
+          - paragraph: The pade approximation.
+      - row "LOG_NEWTON 2 The newton approximation.":
+        - cell "LOG_NEWTON":
+          - paragraph: LOG_NEWTON
+        - cell "2":
+          - paragraph: "2"
+        - cell "The newton approximation.":
+          - paragraph: The newton approximation.
+      - row "LOG_MINMAX 3 The minmax approximation.":
+        - cell "LOG_MINMAX":
+          - paragraph: LOG_MINMAX
+        - cell "3":
+          - paragraph: "3"
+        - cell "The minmax approximation.":
+          - paragraph: The minmax approximation.
+  - heading "RuntimeConfig.SigmoidMode" [level=3]:
+    - link "Direct link to RuntimeConfig.SigmoidMode":
+      - /url: "#runtimeconfig-sigmoidmode"
+  - paragraph: The sigmoid approximation method.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "SIGMOID_DEFAULT 0 Implementation defined.":
+        - cell "SIGMOID_DEFAULT":
+          - paragraph: SIGMOID_DEFAULT
+        - cell "0":
+          - paragraph: "0"
+        - cell "Implementation defined.":
+          - paragraph: Implementation defined.
+      - row /SIGMOID_MM1 1 Minmax approximation one order\. f\(x\) = 0\.5 \+ \d+\.\d+ \* x/:
+        - cell "SIGMOID_MM1":
+          - paragraph: SIGMOID_MM1
+        - cell "1":
+          - paragraph: "1"
+        - cell /Minmax approximation one order\. f\(x\) = 0\.5 \+ \d+\.\d+ \* x/:
+          - paragraph: /Minmax approximation one order\. f\(x\) = 0\.5 \+ \d+\.\d+ \* x/
+      - row "SIGMOID_SEG3 2 Piece-wise simulation. f(x) = 0.5 + 0.125x if -4 <= x <= 4 1 if x > 4 0 if -4 > x":
+        - cell "SIGMOID_SEG3":
+          - paragraph: SIGMOID_SEG3
+        - cell "2":
+          - paragraph: "2"
+        - cell "Piece-wise simulation. f(x) = 0.5 + 0.125x if -4 <= x <= 4 1 if x > 4 0 if -4 > x":
+          - paragraph: Piece-wise simulation. f(x) = 0.5 + 0.125x if -4 <= x <= 4 1 if x > 4 0 if -4 > x
+      - row "SIGMOID_REAL 3 The real definition, which depends on exp’s accuracy. f(x) = 1 / (1 + exp(-x))":
+        - cell "SIGMOID_REAL":
+          - paragraph: SIGMOID_REAL
+        - cell "3":
+          - paragraph: "3"
+        - cell "The real definition, which depends on exp’s accuracy. f(x) = 1 / (1 + exp(-x))":
+          - paragraph: The real definition, which depends on exp’s accuracy. f(x) = 1 / (1 + exp(-x))
+  - heading "SourceIRType" [level=3]:
+    - link "Direct link to SourceIRType":
+      - /url: "#sourceirtype"
+  - paragraph: Compiler relate definition ////////////////////////////////////////////////////////////////////////
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "XLA 0 none":
+        - cell "XLA":
+          - paragraph: XLA
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "STABLEHLO 1 none":
+        - cell "STABLEHLO":
+          - paragraph: STABLEHLO
+        - cell "1":
+          - paragraph: "1"
+        - cell "none":
+          - paragraph: none
+  - heading "Visibility" [level=3]:
+    - link "Direct link to Visibility":
+      - /url: "#visibility"
+  - paragraph: The visibility type.
+  - paragraph: SPU is a secure evaluation runtime, but not all data are secret, some of them are publicly known to all parties, marking them as public will improve performance significantly.
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "VIS_INVALID 0 none":
+        - cell "VIS_INVALID":
+          - paragraph: VIS_INVALID
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "VIS_SECRET 1 Invisible(unknown) for all or some of the parties.":
+        - cell "VIS_SECRET":
+          - paragraph: VIS_SECRET
+        - cell "1":
+          - paragraph: "1"
+        - cell "Invisible(unknown) for all or some of the parties.":
+          - paragraph: Invisible(unknown) for all or some of the parties.
+      - row "VIS_PUBLIC 2 Visible(public) for all parties.":
+        - cell "VIS_PUBLIC":
+          - paragraph: VIS_PUBLIC
+        - cell "2":
+          - paragraph: "2"
+        - cell "Visible(public) for all parties.":
+          - paragraph: Visible(public) for all parties.
+      - row "VIS_PRIVATE 3 Visible for only one party":
+        - cell "VIS_PRIVATE":
+          - paragraph: VIS_PRIVATE
+        - cell "3":
+          - paragraph: "3"
+        - cell "Visible for only one party":
+          - paragraph: Visible for only one party
+  - heading "XLAPrettyPrintKind" [level=3]:
+    - link "Direct link to XLAPrettyPrintKind":
+      - /url: "#xlaprettyprintkind"
+  - table:
+    - rowgroup:
+      - row "Name Number Description":
+        - cell "Name":
+          - paragraph: Name
+        - cell "Number":
+          - paragraph: Number
+        - cell "Description":
+          - paragraph: Description
+    - rowgroup:
+      - row "TEXT 0 none":
+        - cell "TEXT":
+          - paragraph: TEXT
+        - cell "0":
+          - paragraph: "0"
+        - cell "none":
+          - paragraph: none
+      - row "DOT 1 none":
+        - cell "DOT":
+          - paragraph: DOT
+        - cell "1":
+          - paragraph: "1"
+        - cell "none":
+          - paragraph: none
+      - row "HTML 2 none":
+        - cell "HTML":
+          - paragraph: HTML
+        - cell "2":
+          - paragraph: "2"
+        - cell "none":
+          - paragraph: none
+  - heading "Scalar Value Types" [level=2]:
+    - link "Direct link to Scalar Value Types":
+      - /url: "#scalar-value-types"
+  - table:
+    - rowgroup:
+      - row ".proto Type Notes C++ Type Java Type Python Type":
+        - cell ".proto Type":
+          - paragraph: .proto Type
+        - cell "Notes":
+          - paragraph: Notes
+        - cell "C++ Type":
+          - paragraph: C++ Type
+        - cell "Java Type":
+          - paragraph: Java Type
+        - cell "Python Type":
+          - paragraph: Python Type
+    - rowgroup:
+      - row "double double double float":
+        - cell "double":
+          - paragraph:
+            - heading [level=4]
+            - text: double
+        - cell
+        - cell "double":
+          - paragraph: double
+        - cell "double":
+          - paragraph: double
+        - cell "float":
+          - paragraph: float
+      - row "float float float float":
+        - cell "float":
+          - paragraph:
+            - heading [level=4]
+            - text: float
+        - cell
+        - cell "float":
+          - paragraph: float
+        - cell "float":
+          - paragraph: float
+        - cell "float":
+          - paragraph: float
+      - row "int32 Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead. int32 int int":
+        - cell "int32":
+          - paragraph:
+            - heading [level=4]
+            - text: int32
+        - cell "Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.":
+          - paragraph: Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.
+        - cell "int32":
+          - paragraph: int32
+        - cell "int":
+          - paragraph: int
+        - cell "int":
+          - paragraph: int
+      - row "int64 Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead. int64 long int/long":
+        - cell "int64":
+          - paragraph:
+            - heading [level=4]
+            - text: int64
+        - cell "Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.":
+          - paragraph: Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.
+        - cell "int64":
+          - paragraph: int64
+        - cell "long":
+          - paragraph: long
+        - cell "int/long":
+          - paragraph: int/long
+      - row "uint32 Uses variable-length encoding. uint32 int int/long":
+        - cell "uint32":
+          - paragraph:
+            - heading [level=4]
+            - text: uint32
+        - cell "Uses variable-length encoding.":
+          - paragraph: Uses variable-length encoding.
+        - cell "uint32":
+          - paragraph: uint32
+        - cell "int":
+          - paragraph: int
+        - cell "int/long":
+          - paragraph: int/long
+      - row "uint64 Uses variable-length encoding. uint64 long int/long":
+        - cell "uint64":
+          - paragraph:
+            - heading [level=4]
+            - text: uint64
+        - cell "Uses variable-length encoding.":
+          - paragraph: Uses variable-length encoding.
+        - cell "uint64":
+          - paragraph: uint64
+        - cell "long":
+          - paragraph: long
+        - cell "int/long":
+          - paragraph: int/long
+      - row "sint32 Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s. int32 int int":
+        - cell "sint32":
+          - paragraph:
+            - heading [level=4]
+            - text: sint32
+        - cell "Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.":
+          - paragraph: Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.
+        - cell "int32":
+          - paragraph: int32
+        - cell "int":
+          - paragraph: int
+        - cell "int":
+          - paragraph: int
+      - row "sint64 Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s. int64 long int/long":
+        - cell "sint64":
+          - paragraph:
+            - heading [level=4]
+            - text: sint64
+        - cell "Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.":
+          - paragraph: Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.
+        - cell "int64":
+          - paragraph: int64
+        - cell "long":
+          - paragraph: long
+        - cell "int/long":
+          - paragraph: int/long
+      - row /fixed32 Always four bytes\. More efficient than uint32 if values are often greater than 2\^\d+\. uint32 int int/:
+        - cell "fixed32":
+          - paragraph:
+            - heading [level=4]
+            - text: fixed32
+        - cell /Always four bytes\. More efficient than uint32 if values are often greater than 2\^\d+\./:
+          - paragraph: /Always four bytes\. More efficient than uint32 if values are often greater than 2\^\d+\./
+        - cell "uint32":
+          - paragraph: uint32
+        - cell "int":
+          - paragraph: int
+        - cell "int":
+          - paragraph: int
+      - row /fixed64 Always eight bytes\. More efficient than uint64 if values are often greater than 2\^\d+\. uint64 long int\/long/:
+        - cell "fixed64":
+          - paragraph:
+            - heading [level=4]
+            - text: fixed64
+        - cell /Always eight bytes\. More efficient than uint64 if values are often greater than 2\^\d+\./:
+          - paragraph: /Always eight bytes\. More efficient than uint64 if values are often greater than 2\^\d+\./
+        - cell "uint64":
+          - paragraph: uint64
+        - cell "long":
+          - paragraph: long
+        - cell "int/long":
+          - paragraph: int/long
+      - row "sfixed32 Always four bytes. int32 int int":
+        - cell "sfixed32":
+          - paragraph:
+            - heading [level=4]
+            - text: sfixed32
+        - cell "Always four bytes.":
+          - paragraph: Always four bytes.
+        - cell "int32":
+          - paragraph: int32
+        - cell "int":
+          - paragraph: int
+        - cell "int":
+          - paragraph: int
+      - row "sfixed64 Always eight bytes. int64 long int/long":
+        - cell "sfixed64":
+          - paragraph:
+            - heading [level=4]
+            - text: sfixed64
+        - cell "Always eight bytes.":
+          - paragraph: Always eight bytes.
+        - cell "int64":
+          - paragraph: int64
+        - cell "long":
+          - paragraph: long
+        - cell "int/long":
+          - paragraph: int/long
+      - row "bool bool boolean boolean":
+        - cell "bool":
+          - paragraph:
+            - heading [level=4]
+            - text: bool
+        - cell
+        - cell "bool":
+          - paragraph: bool
+        - cell "boolean":
+          - paragraph: boolean
+        - cell "boolean":
+          - paragraph: boolean
+      - row "string A string must always contain UTF-8 encoded or 7-bit ASCII text. string String str/unicode":
+        - cell "string":
+          - paragraph:
+            - heading [level=4]
+            - text: string
+        - cell "A string must always contain UTF-8 encoded or 7-bit ASCII text.":
+          - paragraph: A string must always contain UTF-8 encoded or 7-bit ASCII text.
+        - cell "string":
+          - paragraph: string
+        - cell "String":
+          - paragraph: String
+        - cell "str/unicode":
+          - paragraph: str/unicode
+      - row "bytes May contain any arbitrary sequence of bytes. string ByteString str":
+        - cell "bytes":
+          - paragraph:
+            - heading [level=4]
+            - text: bytes
+        - cell "May contain any arbitrary sequence of bytes.":
+          - paragraph: May contain any arbitrary sequence of bytes.
+        - cell "string":
+          - paragraph: string
+        - cell "ByteString":
+          - paragraph: ByteString
+        - cell "str":
+          - paragraph: str

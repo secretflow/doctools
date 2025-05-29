@@ -1,0 +1,219 @@
+- article:
+  - heading "Kuscia" [level=1]:
+    - link "Direct link to Kuscia":
+      - /url: "#kuscia"
+  - paragraph: "Kuscia (Kubernetes-based Secure Collaborative InfrA) is a lightweight privacy-preserving computing task orchestration framework based on K3s. It is designed to abstract away heterogeneous infrastructures and protocols, and to provide a unified foundation for privacy computing. With Kuscia:"
+  - list:
+    - listitem: "/Lightweight Deployment: You can perform a [\\d,.]+[bkmBKM]+-scale privacy-preserving set intersection \\(PSI\\) with minimal resources \\(as low as 1C2G\\)\\./"
+    - listitem: "Cross-Domain Secure Network Communication: You can achieve port reuse (requiring only a single public port) and secure communication when concurrently executing multiple privacy computing tasks."
+    - listitem:
+      - text: "Unified API Interface: You can integrate privacy computing capabilities using the"
+      - link "HTTP/GRPC API interface":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/summary_cn
+      - text: .
+    - listitem: "Interoperability: You can interconnect with various privacy computing systems in the industry."
+  - paragraph:
+    - text: For more information about Kuscia’s capabilities, please refer to
+    - link "Kuscia Overview":
+      - /url: /en/docs/kuscia/v0.15.0b0/reference/overview
+    - text: .
+  - heading "Getting Started" [level=2]:
+    - link "Direct link to Getting Started":
+      - /url: "#id1"
+  - paragraph: Run your first SecretFlow job from scratch!
+  - list:
+    - listitem:
+      - link "Install Kuscia and Run a Sample Task":
+        - /url: /en/docs/kuscia/v0.15.0b0/getting_started/quickstart_cn
+    - listitem:
+      - link "Submit a KusciaJob":
+        - /url: /en/docs/kuscia/v0.15.0b0/getting_started/run_secretflow_cn
+  - heading "Architecture and Design" [level=2]:
+    - link "Direct link to Architecture and Design":
+      - /url: "#id2"
+  - paragraph: Understand the Kuscia architecture and its key concepts.
+  - list:
+    - listitem:
+      - link "Architecture Overview":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/architecture_cn
+    - listitem:
+      - text: "Kuscia Concepts:"
+      - link "Domain":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/domain_cn
+      - text: "|"
+      - link "DomainRoute":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/domainroute_cn
+      - text: "|"
+      - link "DomainData":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/domaindata_cn
+      - text: "|"
+      - link "KusciaJob":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/kusciajob_cn
+      - text: "|"
+      - link "KusciaTask":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/kusciatask_cn
+      - text: "|"
+      - link "KusciaDeployment":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/kusciadeployment_cn
+      - text: "|"
+      - link "AppImage":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/appimage_cn
+      - text: "|"
+      - link "InteropConfig":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/concepts/interopconfig_cn
+  - heading "Kuscia API" [level=2]:
+    - link "Direct link to Kuscia API":
+      - /url: "#kuscia-api"
+  - list:
+    - listitem:
+      - link "Kuscia API Overview":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/summary_cn
+      - text: "|"
+      - 'link "Tutorial: Running a SecretFlow Job with the Kuscia API"':
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_sf_job_with_api_cn
+    - listitem:
+      - text: "API Reference:"
+      - link "Request and Response":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/summary_cn#%E8%AF%B7%E6%B1%82%E5%92%8C%E5%93%8D%E5%BA%94%E7%BA%A6%E5%AE%9A
+      - text: "|"
+      - link "Domain":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/domain_cn
+      - text: "|"
+      - link "DomainRoute":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/domainroute_cn
+      - text: "|"
+      - link "DomainData":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/domaindata_cn
+      - text: "|"
+      - link "KusciaJob":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/kusciajob_cn
+      - text: "|"
+      - link "Serving":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/serving_cn
+      - text: "|"
+      - link "Health":
+        - /url: /en/docs/kuscia/v0.15.0b0/reference/apis/health_cn
+  - heading "Deployment" [level=2]:
+    - link "Direct link to Deployment":
+      - /url: "#id3"
+  - list:
+    - listitem:
+      - 'link "Guide: Deployment Instructions"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/kuscia_deployment_instructions
+    - listitem:
+      - 'link "Guide: Deployment Requirements"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/deploy_check
+    - listitem:
+      - 'link "Guide: Deploying Kuscia on Multiple Machines with Docker"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/Docker_deployment_kuscia
+    - listitem:
+      - 'link "Guide: Deploying Kuscia on a K8s Cluster"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/K8s_deployment_kuscia
+    - listitem:
+      - 'link "Guide: Deploying Nodes Using RunP Mode"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/deploy_with_runp_cn
+    - listitem:
+      - 'link "Guide: Common Operations"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/operation_cn
+    - listitem:
+      - 'link "Guide: Network Requirements"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/networkrequirements
+    - listitem:
+      - 'link "Guide: Log Description"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/logdescription
+    - listitem:
+      - 'link "Guide: Kuscia Monitoring"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/kuscia_monitor
+    - listitem:
+      - 'link "Guide: Kuscia Engine Metrics Monitoring"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/kuscia_engine_monitor
+    - listitem:
+      - 'link "Guide: Kuscia Configuration Files"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/kuscia_config_cn
+    - listitem:
+      - 'link "Guide: Kuscia Port Introduction"':
+        - /url: /en/docs/kuscia/v0.15.0b0/deployment/kuscia_ports_cn
+  - heading "More Guides" [level=2]:
+    - link "Direct link to More Guides":
+      - /url: "#id4"
+  - list:
+    - listitem:
+      - link "How to Run a SecretFlow Job Using the Kuscia API":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_sf_job_with_api_cn
+    - listitem:
+      - link "How to Run a SecretFlow Serving Using the Kuscia API":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_sf_serving_with_api_cn
+    - listitem:
+      - link "How to Deploy DataProxy Using the Kuscia API":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_dp_on_kuscia_cn
+    - listitem:
+      - link "How to Run a FATE Job":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_fate_cn
+    - listitem:
+      - link "How to Run an SCQL Federated Analysis Task on Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/run_scql_on_kuscia_cn
+    - listitem:
+      - link "How to Use a Custom Image Repository in Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/custom_registry
+    - listitem:
+      - link "How to Render Configuration Files for Custom Applications in Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/config_render
+    - listitem:
+      - link "How to Upgrade the Engine Image in Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/upgrade_engine
+    - listitem:
+      - link "How to Configure Path Rewrite for Requests in Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/kuscia_gateway_with_path
+    - listitem:
+      - link "How to Customize Service Routing in Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/tutorial/user_defined_service_route
+  - heading "Get Help" [level=2]:
+    - link "Direct link to Get Help":
+      - /url: "#id5"
+  - paragraph: Encountering issues with Kuscia? Find help here.
+  - list:
+    - listitem:
+      - link "Frequently Asked Questions (FAQ)":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot
+    - listitem:
+      - link "Kuscia Issues":
+        - /url: https://github.com/secretflow/kuscia/issues
+      - text: and
+      - link "Discussion Forum":
+        - /url: https://github.com/secretflow/kuscia/discussions
+  - heading "Developing Kuscia" [level=2]:
+    - link "Direct link to Developing Kuscia":
+      - /url: "#id6"
+  - list:
+    - listitem:
+      - link "Build Kuscia":
+        - /url: /en/docs/kuscia/v0.15.0b0/development/build_kuscia_cn
+    - listitem:
+      - link "Register a Custom Algorithm Image":
+        - /url: /en/docs/kuscia/v0.15.0b0/development/register_custom_image
+  - heading "Frequently Asked Questions" [level=2]:
+    - link "Direct link to Frequently Asked Questions":
+      - /url: "#id7"
+  - list:
+    - listitem:
+      - link "Concept Clarification":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot/concept
+    - listitem:
+      - link "Deployment Issues":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot/deployment
+    - listitem:
+      - link "Network Issues":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot/network
+    - listitem:
+      - link "Job Execution Issues":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot/runtask
+    - listitem:
+      - link "Parameter Tuning":
+        - /url: /en/docs/kuscia/v0.15.0b0/troubleshoot
+  - heading "Changelog" [level=2]:
+    - link "Direct link to Changelog":
+      - /url: "#id8"
+  - list:
+    - listitem:
+      - link "Changelog":
+        - /url: /en/docs/kuscia/v0.15.0b0/change_log

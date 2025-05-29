@@ -1,26 +1,14 @@
-FROM mcr.microsoft.com/devcontainers/base:bullseye
+FROM ghcr.io/astral-sh/uv:0.7 AS uv
 
-RUN apt-get update \
-  && apt-get install -y unzip curl
+FROM docker.io/denoland/deno:bin-2.3.3 AS deno
 
-# Default non-root user
-USER vscode
+FROM mcr.microsoft.com/devcontainers/typescript-node:20-bookworm
 
-# Install fnm
-RUN curl -fsSL https://fnm.vercel.app/install \
-  | bash -s -- --install-dir $HOME/.fnm
+COPY --from=uv /uv /uvx /usr/local/bin/
+COPY --from=deno /deno /usr/local/bin/
 
-# Install Node
-RUN $HOME/.fnm/fnm install 16.20 \
-  && $HOME/.fnm/fnm default 16.20
+USER node
 
-# Install PNPM
-RUN eval $($HOME/.fnm/fnm env) \
-  && npm install -g pnpm \
-  && SHELL=bash pnpm setup
+RUN npx -y playwright@1.52.0 install --with-deps
 
-# Install Rye
-# https://rye-up.com/guide/installation/
-RUN curl -fsS https://rye-up.com/get \
-  | RYE_INSTALL_OPTION=--yes bash \
-  && echo '\nsource "$HOME/.rye/env"' >> $HOME/.bashrc
+RUN pnpm config set store-dir $HOME/.pnpm-store

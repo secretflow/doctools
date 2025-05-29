@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "declarationDir": "dist/dts",
+    "exactOptionalPropertyTypes": false,
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "rootDir": "src/js",
+    "target": "ESNext",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig.browser.tsbuildinfo",
+    "types": []
+  },
+  "extends": "./tsconfig.json",
+  "include": ["./src/js/browser"],
+  "references": [{ "path": "./tsconfig.neutral.json" }]
+}

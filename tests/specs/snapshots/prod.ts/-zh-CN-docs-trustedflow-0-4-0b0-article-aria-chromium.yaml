@@ -1,0 +1,93 @@
+- article:
+  - heading "TrustFlow" [level=1]:
+    - link "Direct link to TrustFlow":
+      - /url: "#trustflow"
+  - paragraph:
+    - link "TrustFlow":
+      - /url: https://github.com/asterinas/trustflow
+    - text: 是隐语基于可信硬件的隐私保护引擎。 TrustFlow立足于可信执行环境技术，提供受保护和隔离的环境，其中封装了敏感数据，并且提供数据安全存储和计算能力。
+  - paragraph: 可信执行环境(Trusted Execution Environment，TEE) 是一种基于硬件的隐私保护技术。它保证了执行代码的真实性，运行时状态(如寄存器、内存和敏感I/O)的完整性， 以及存储在内存中的代码、数据和运行时状态的机密性。此外，还能够向第三方提供远程认证，以证明其可靠性。基于TEE，TrustFlow可以保护数据的机密性、完整性和可用性。
+  - paragraph: 在TrustFlow中，数据被加密并存储在受控和限制的环境，以防止未经授权访问。 TrustFlow采用多种安全措施，如远程认证、计算隔离、授权管控和审计机制，以确保数据被正确保护。 TrustFlow具有端到端全链路加密能力，提供了零信任安全特性，机构可以对TrustFlow进行验证，限制数据使用最小权限访问。 与此同时，TrustFlow提供了丰富的数据加工处理能力，包括数据预处理、经典机器学习、深度学习、大模型、数据分析等， 在保护数据隐私的同时可以充分释放数据价值。
+  - paragraph: TrustFlow可用于需要安全存储、处理或共享敏感数据的场景，以最大程度地减少暴露或未经授权使用的风险。
+  - paragraph:
+    - img
+  - heading "为什么选择TrustFlow" [level=2]:
+    - link "Direct link to 为什么选择TrustFlow":
+      - /url: "#id2"
+  - paragraph: TrustFlow允许机构在保护数据安全的前提下，探索强大的人工智能（AI）以及大数据分析（BI）技术，充分释放数据价值。 TrustFlow保护了数据使用中（data-in-use）、数据存储（data-at-rest）、数据传输（data-in-transit）的安全。 使用TrustFlow，你可以获得丰富的可信应用。
+  - list:
+    - listitem:
+      - strong: 可信传统机器学习
+      - text: ：基于TrustFlow的传统机器学习能力，用户可以以安全可信的方式运行诸如逻辑回归、树模型等机器学习。
+    - listitem:
+      - strong: 可信深度学习
+      - text: ：基于TrustFlow的深度学习能力，用户可以以安全可信的方式运行常用的深度学习框架（比如PyTorch、TensorFlow）。
+    - listitem:
+      - strong: 可信大模型
+      - text: ：基于TrustFlow的大模型能力，用户可以以安全可信的方式对大模型进行微调（fine-tune）以及部署大模型在线服务。
+    - listitem:
+      - strong: 可信分析
+      - text: ：基于TrustFlow的数据分析能力，用户可以以安全可信的方式对数据进行诸如求交、聚合、统计等分析。
+  - heading "入门" [level=2]:
+    - link "Direct link to 入门":
+      - /url: "#id3"
+  - paragraph:
+    - text: 从零开始，体验如何使用TrustFlow进行联合建模，欢迎阅读
+    - link "快速上手":
+      - /url: /zh-CN/docs/trustedflow/0.4.0b0/quick_start
+    - text: 。
+  - heading "架构和设计" [level=2]:
+    - link "Direct link to 架构和设计":
+      - /url: "#id5"
+  - paragraph:
+    - text: 了解TrustFlow架构、原理和更多功能，欢迎阅读
+    - link "架构设计":
+      - /url: /zh-CN/docs/trustedflow/0.4.0b0/architecture
+    - text: 。
+  - list:
+    - listitem:
+      - link "TrustFlow核心原理":
+        - /url: /zh-CN/docs/trustedflow/0.4.0b0/architecture/principle
+    - listitem:
+      - link "授权策略":
+        - /url: /zh-CN/docs/trustedflow/0.4.0b0/architecture/policy
+    - listitem:
+      - link "可信应用":
+        - /url: /zh-CN/docs/trustedflow/0.4.0b0/architecture/apps
+  - heading "自定义可信组件" [level=2]:
+    - link "Direct link to 自定义可信组件":
+      - /url: "#id10"
+  - paragraph:
+    - text: 开发新的自定义可信组件，欢迎阅读
+    - link "新组件开发教程":
+      - /url: /zh-CN/docs/trustedflow/0.4.0b0/development/new_component
+    - text: 。
+  - heading "高阶话题" [level=2]:
+    - link "Direct link to 高阶话题":
+      - /url: "#id12"
+  - paragraph:
+    - text: 关于TrustFlow的更多话题，欢迎阅读
+    - link "高阶话题":
+      - /url: /zh-CN/docs/trustedflow/0.4.0b0/advanced_topic
+    - text: 。
+  - list:
+    - listitem:
+      - link "基于TrustFlow的跨域管控":
+        - /url: /zh-CN/docs/trustedflow/0.4.0b0/advanced_topic/cross_domain_controll_in_tee
+  - heading "路线图" [level=2]:
+    - link "Direct link to 路线图":
+      - /url: "#id15"
+  - paragraph:
+    - text: TrustFlow功能列表和路线图，欢迎阅读
+    - link "路线图":
+      - /url: /zh-CN/docs/trustedflow/0.4.0b0/advanced_topic/roadmap
+    - text: 。
+  - heading "获得帮助" [level=2]:
+    - link "Direct link to 获得帮助":
+      - /url: "#id17"
+  - paragraph: 使用 TrustFlow 时遇到问题？在这里找到获得帮助的方式。
+  - list:
+    - listitem:
+      - text: TrustFlow 的
+      - link "Issues":
+        - /url: https://github.com/asterinas/trustflow/issues

@@ -1,0 +1,23 @@
+const instances = {
+  {{#each imports}}
+    {{json this.key}}: {
+      ...{{json this.metadata}},
+      module: {
+        sitemap: {
+          {{#each this.routes}}
+            {{json this.name}}: {
+              exports: () => import({{json this.path}}),
+            },
+          {{/each}}
+        },
+        manifest: {{json this.manifest}},
+        database: async () => {
+          const { default: href } = await import({{json this.search}});
+          return await fetch(href, { priority: "low" });
+        },
+      },
+    },
+  {{/each}}
+}
+
+export default instances;

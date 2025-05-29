@@ -1,0 +1,281 @@
+- article:
+  - heading "APIs" [level=1]:
+    - link "Direct link to APIs":
+      - /url: "#apis"
+  - text: myst_parser.sphinx_ext.main.
+  - strong: setup_sphinx
+  - text: (
+  - emphasis: "app: Sphinx"
+  - text: ","
+  - emphasis: "load_parser: bool = False"
+  - text: )
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#myst_parser.sphinx_ext.main.setup_sphinx"
+  - paragraph: Initialize all settings and transforms in Sphinx.
+  - term:
+    - paragraph: Parameters
+  - definition:
+    - list:
+      - listitem:
+        - strong: app
+        - text: – The Sphinx application object.
+      - listitem:
+        - strong: load_parser
+        - text: – Whether to load the parser.
+  - emphasis: class
+  - text: secretflow_doctools.builder.
+  - strong: MdxBuilder
+  - text: (
+  - emphasis: "app: Sphinx"
+  - text: ","
+  - emphasis: "env: BuildEnvironment"
+  - text: )
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder"
+  - emphasis: property
+  - strong: build_info_path
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.build_info_path"
+  - strong: cleanup
+  - text: ()
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.cleanup"
+  - paragraph: Cleanup any resources.
+  - paragraph: The default implementation does nothing.
+  - strong: copy_assets
+  - text: ()
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.copy_assets"
+  - paragraph: Where assets (images, static files, etc) are copied before writing
+  - strong: create_build_info
+  - text: ()
+  - emphasis: → BuildInfo
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.create_build_info"
+  - strong: default_translator_class
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.default_translator_class"
+  - paragraph:
+    - text: alias of
+    - code: MdxTranslator
+  - strong: dump_inventory
+  - text: ()
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.dump_inventory"
+  - strong: file_extension
+  - emphasis: = '.mdx'
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.file_extension"
+  - strong: finish
+  - text: ()
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.finish"
+  - paragraph: Finish the building process.
+  - paragraph: The default implementation does nothing.
+  - strong: format
+  - emphasis: ": str"
+  - emphasis: = 'mdx'
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.format"
+  - paragraph:
+    - text: The builder’s output format, or ‘’ if no document output is produced. This is commonly the file extension, e.g. “html”, though any string value is accepted. The builder’s format string can be used by various components such as
+    - code: SphinxPostTransform
+    - text: or extensions to determine their compatibility with the builder.
+  - strong: get_origin_url
+  - text: (
+  - emphasis: "docname: str"
+  - text: )
+  - emphasis: → str | None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.get_origin_url"
+  - strong: get_outdated_docs
+  - text: ()
+  - emphasis: → Iterator[str]
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.get_outdated_docs"
+  - paragraph: Return an iterable of output files that are outdated, or a string describing what an update build will build.
+  - paragraph: If the builder does not output individual files corresponding to source files, return a string here. If it does, return an iterable of those files that need to be written.
+  - strong: get_source_tree_path
+  - text: (
+  - emphasis: "docname: str"
+  - text: )
+  - emphasis: → str | None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.get_source_tree_path"
+  - strong: get_target_uri
+  - text: (
+  - emphasis: "docname: str"
+  - text: ","
+  - emphasis: "typ: str | None = None"
+  - text: )
+  - emphasis: → str
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.get_target_uri"
+  - paragraph: Return the target URI for a document name.
+  - paragraph:
+    - emphasis: typ
+    - text: can be used to qualify the link characteristic for individual builders.
+  - strong: init
+  - text: ()
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.init"
+  - paragraph: Load necessary templates and perform initialization. The default implementation does nothing.
+  - strong: name
+  - emphasis: ": str"
+  - emphasis: = 'mdx'
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.name"
+  - paragraph: The builder’s name. This is the value used to select builders on the command line.
+  - emphasis: property
+  - strong: output_root
+  - emphasis: ": Path"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.output_root"
+  - strong: resolve_metadata
+  - text: (
+  - emphasis: "docname: str"
+  - text: )
+  - emphasis:
+    - text: →
+    - link "PageMetadata":
+      - /url: "#secretflow_doctools.builder.PageMetadata"
+    - text: "| None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.resolve_metadata"
+  - emphasis: property
+  - strong: source_root
+  - emphasis: ": Path"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.source_root"
+  - strong: supported_data_uri_images
+  - emphasis: ": bool"
+  - emphasis: = True
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.supported_data_uri_images"
+  - paragraph: If set to False, Sphinx will attempt to convert data URIs to image files. Browsers support data URIs, so we set this to True.
+  - strong: supported_image_types
+  - emphasis: ": list[str]"
+  - emphasis: = []
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.supported_image_types"
+  - paragraph: Indicate images that are supported by the builder’s output format, so that Sphinx will not attempt to convert them.
+  - paragraph: Since we are generating JavaScript source code, resources are handled by the downstream bundler and loaders, we use an empty list to indicate we support all images.
+  - strong: supported_remote_images
+  - emphasis: ": bool"
+  - emphasis: = True
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.supported_remote_images"
+  - paragraph: If set to False, Sphinx will attempt to download remote images. We are building web apps so this is necessarily True.
+  - strong: use_message_catalog
+  - emphasis: = True
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.use_message_catalog"
+  - strong: versioning_compare
+  - emphasis: = False
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.versioning_compare"
+  - strong: versioning_method
+  - emphasis: = 'none'
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.versioning_method"
+  - strong: write_buildinfo
+  - text: ()
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.write_buildinfo"
+  - strong: write_doc
+  - text: (
+  - emphasis: "docname: str"
+  - text: ","
+  - emphasis: "doctree: document"
+  - text: )
+  - emphasis: → None
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.write_doc"
+  - paragraph: Write the output file for the document
+  - term:
+    - paragraph: Parameters
+  - definition:
+    - list:
+      - listitem:
+        - strong: docname
+        - text: – the docname.
+      - listitem:
+        - strong: doctree
+        - text: – defines the content to be written.
+  - paragraph:
+    - text: The output filename must be determined within this method, typically by calling
+    - code: get_target_uri()
+    - text: or
+    - code: get_relative_uri()
+    - text: .
+  - strong: write_documents
+  - text: (
+  - emphasis: docnames
+  - text: )
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.write_documents"
+  - paragraph:
+    - text: Write all documents in
+    - emphasis: docnames
+    - text: .
+  - paragraph: This method can be overridden if a builder does not create output files for each document.
+  - strong: write_manifest
+  - text: ()
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.MdxBuilder.write_manifest"
+  - emphasis: class
+  - text: secretflow_doctools.builder.
+  - strong: PageMetadata
+  - text: (
+  - emphasis: "**data: Any"
+  - text: )
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata"
+  - strong: git_download_url
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_download_url"
+  - strong: git_last_modified_commit
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_last_modified_commit"
+  - strong: git_last_modified_time
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_last_modified_time"
+  - strong: git_origin_url
+  - emphasis: ": str"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_origin_url"
+  - strong: git_owner
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_owner"
+  - strong: git_repo
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_repo"
+  - strong: git_revision_commit
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_revision_commit"
+  - strong: git_revision_time
+  - emphasis: ": str | None"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.git_revision_time"
+  - strong: model_config
+  - emphasis: ": ClassVar[ConfigDict]"
+  - emphasis: "= {}"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.model_config"
+  - paragraph: Configuration for the model, should be a dictionary conforming to [ConfigDict][pydantic.config.ConfigDict].
+  - strong: page_dependencies
+  - emphasis: ": list[PageDependency]"
+  - link "Direct link to this section":
+    - /url: "#secretflow_doctools.builder.PageMetadata.page_dependencies"

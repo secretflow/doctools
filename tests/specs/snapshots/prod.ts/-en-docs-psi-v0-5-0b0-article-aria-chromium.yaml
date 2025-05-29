@@ -1,0 +1,28 @@
+- article:
+  - heading "Welcome to SecretFlow PSI Library’s documentation!" [level=1]:
+    - link "Direct link to Welcome to SecretFlow PSI Library’s documentation!":
+      - /url: "#welcome-to-secretflow-psi-library-s-documentation"
+  - paragraph:
+    - text: This is the repo of Private Set Intersection(PSI) and Private Information Retrieval(PIR) from SecretFlow team, which provides PSI and PIR functionality for
+    - link "SecretFlow":
+      - /url: /docs/secretflow
+    - text: ","
+    - link "SCQL":
+      - /url: /zh-Hans/docs/scql/latest/
+    - text: ","
+    - link "SecretPad":
+      - /url: /docs/quickstart/mvp-platform
+    - text: and
+    - link "Easy PSI":
+      - /url: /zh-CN/docs/easy-psi/
+    - text: .
+  - paragraph:
+    - text: This repo is formerly psi/pir part from
+    - link "secretflow/spu":
+      - /url: https://github.com/secretflow/spu
+    - text: repo.
+  - paragraph:
+    - text: We invite you to try
+    - link "Easy PSI":
+      - /url: /zh-CN/docs/easy-psi/
+    - text: ", a standalone PSI product powered by this library."

@@ -1,0 +1,256 @@
+- article:
+  - heading "Test project" [level=1]:
+    - link "Direct link to Test project":
+      - /url: "#test-project"
+  - list:
+    - listitem:
+      - link "Markdown":
+        - /url: /en/docs/demo/main/markdown
+      - list:
+        - listitem:
+          - link "Lorem ipsum":
+            - /url: /en/docs/demo/main/markdown#lorem-ipsum
+        - listitem:
+          - link "Haskell":
+            - /url: /en/docs/demo/main/markdown#haskell
+        - listitem:
+          - link "Python":
+            - /url: /en/docs/demo/main/markdown#python
+        - listitem:
+          - link "List of lists of lists":
+            - /url: /en/docs/demo/main/markdown#list-of-lists-of-lists
+          - list:
+            - listitem:
+              - link "General reference":
+                - /url: /en/docs/demo/main/markdown#general-reference
+            - listitem:
+              - link "Society and social sciences":
+                - /url: /en/docs/demo/main/markdown#society-and-social-sciences
+        - listitem:
+          - link "Grapefruit":
+            - /url: /en/docs/demo/main/markdown#grapefruit
+        - listitem:
+          - link "MyST-Parser":
+            - /url: /en/docs/demo/main/markdown#myst-parser
+          - list:
+            - listitem:
+              - link "Admonitions":
+                - /url: /en/docs/demo/main/markdown#admonitions
+            - listitem:
+              - link "Tables":
+                - /url: /en/docs/demo/main/markdown#tables
+        - listitem:
+          - link "Cross-references":
+            - /url: /en/docs/demo/main/markdown#cross-references
+    - listitem:
+      - link "reStructuredText":
+        - /url: /en/docs/demo/main/restructuredtext
+      - list:
+        - listitem:
+          - link "Tables":
+            - /url: /en/docs/demo/main/restructuredtext#tables
+        - listitem:
+          - link "Lists":
+            - /url: /en/docs/demo/main/restructuredtext#lists
+        - listitem:
+          - link "Blocks":
+            - /url: /en/docs/demo/main/restructuredtext#blocks
+    - listitem:
+      - link "Rich content":
+        - /url: /en/docs/demo/main/rich
+      - list:
+        - listitem:
+          - link "Math":
+            - /url: /en/docs/demo/main/rich#math
+        - listitem:
+          - link "Graphviz":
+            - /url: /en/docs/demo/main/rich#graphviz
+        - listitem:
+          - link "Mermaid":
+            - /url: /en/docs/demo/main/rich#mermaid
+    - listitem:
+      - link "Jupyter Notebook":
+        - /url: /en/docs/demo/main/notebook
+      - list:
+        - listitem:
+          - link "Pandas":
+            - /url: /en/docs/demo/main/notebook#pandas
+        - listitem:
+          - link "Colors and stderr":
+            - /url: /en/docs/demo/main/notebook#colors-and-stderr
+    - listitem:
+      - link "APIs":
+        - /url: /en/docs/demo/main/api
+      - list:
+        - listitem:
+          - link "setup_sphinx()":
+            - /url: /en/docs/demo/main/api#myst_parser.sphinx_ext.main.setup_sphinx
+            - code: setup_sphinx()
+        - listitem:
+          - link "MdxBuilder":
+            - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder
+            - code: MdxBuilder
+          - list:
+            - listitem:
+              - link "MdxBuilder.build_info_path":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.build_info_path
+                - code: MdxBuilder.build_info_path
+            - listitem:
+              - link "MdxBuilder.cleanup()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.cleanup
+                - code: MdxBuilder.cleanup()
+            - listitem:
+              - link "MdxBuilder.copy_assets()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.copy_assets
+                - code: MdxBuilder.copy_assets()
+            - listitem:
+              - link "MdxBuilder.create_build_info()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.create_build_info
+                - code: MdxBuilder.create_build_info()
+            - listitem:
+              - link "MdxBuilder.default_translator_class":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.default_translator_class
+                - code: MdxBuilder.default_translator_class
+            - listitem:
+              - link "MdxBuilder.dump_inventory()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.dump_inventory
+                - code: MdxBuilder.dump_inventory()
+            - listitem:
+              - link "MdxBuilder.file_extension":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.file_extension
+                - code: MdxBuilder.file_extension
+            - listitem:
+              - link "MdxBuilder.finish()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.finish
+                - code: MdxBuilder.finish()
+            - listitem:
+              - link "MdxBuilder.format":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.format
+                - code: MdxBuilder.format
+            - listitem:
+              - link "MdxBuilder.get_origin_url()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.get_origin_url
+                - code: MdxBuilder.get_origin_url()
+            - listitem:
+              - link "MdxBuilder.get_outdated_docs()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.get_outdated_docs
+                - code: MdxBuilder.get_outdated_docs()
+            - listitem:
+              - link "MdxBuilder.get_source_tree_path()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.get_source_tree_path
+                - code: MdxBuilder.get_source_tree_path()
+            - listitem:
+              - link "MdxBuilder.get_target_uri()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.get_target_uri
+                - code: MdxBuilder.get_target_uri()
+            - listitem:
+              - link "MdxBuilder.init()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.init
+                - code: MdxBuilder.init()
+            - listitem:
+              - link "MdxBuilder.name":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.name
+                - code: MdxBuilder.name
+            - listitem:
+              - link "MdxBuilder.output_root":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.output_root
+                - code: MdxBuilder.output_root
+            - listitem:
+              - link "MdxBuilder.resolve_metadata()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.resolve_metadata
+                - code: MdxBuilder.resolve_metadata()
+            - listitem:
+              - link "MdxBuilder.source_root":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.source_root
+                - code: MdxBuilder.source_root
+            - listitem:
+              - link "MdxBuilder.supported_data_uri_images":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.supported_data_uri_images
+                - code: MdxBuilder.supported_data_uri_images
+            - listitem:
+              - link "MdxBuilder.supported_image_types":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.supported_image_types
+                - code: MdxBuilder.supported_image_types
+            - listitem:
+              - link "MdxBuilder.supported_remote_images":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.supported_remote_images
+                - code: MdxBuilder.supported_remote_images
+            - listitem:
+              - link "MdxBuilder.use_message_catalog":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.use_message_catalog
+                - code: MdxBuilder.use_message_catalog
+            - listitem:
+              - link "MdxBuilder.versioning_compare":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.versioning_compare
+                - code: MdxBuilder.versioning_compare
+            - listitem:
+              - link "MdxBuilder.versioning_method":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.versioning_method
+                - code: MdxBuilder.versioning_method
+            - listitem:
+              - link "MdxBuilder.write_buildinfo()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.write_buildinfo
+                - code: MdxBuilder.write_buildinfo()
+            - listitem:
+              - link "MdxBuilder.write_doc()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.write_doc
+                - code: MdxBuilder.write_doc()
+            - listitem:
+              - link "MdxBuilder.write_documents()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.write_documents
+                - code: MdxBuilder.write_documents()
+            - listitem:
+              - link "MdxBuilder.write_manifest()":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.MdxBuilder.write_manifest
+                - code: MdxBuilder.write_manifest()
+        - listitem:
+          - link "PageMetadata":
+            - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata
+            - code: PageMetadata
+          - list:
+            - listitem:
+              - link "PageMetadata.git_download_url":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_download_url
+                - code: PageMetadata.git_download_url
+            - listitem:
+              - link "PageMetadata.git_last_modified_commit":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_last_modified_commit
+                - code: PageMetadata.git_last_modified_commit
+            - listitem:
+              - link "PageMetadata.git_last_modified_time":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_last_modified_time
+                - code: PageMetadata.git_last_modified_time
+            - listitem:
+              - link "PageMetadata.git_origin_url":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_origin_url
+                - code: PageMetadata.git_origin_url
+            - listitem:
+              - link "PageMetadata.git_owner":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_owner
+                - code: PageMetadata.git_owner
+            - listitem:
+              - link "PageMetadata.git_repo":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_repo
+                - code: PageMetadata.git_repo
+            - listitem:
+              - link "PageMetadata.git_revision_commit":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_revision_commit
+                - code: PageMetadata.git_revision_commit
+            - listitem:
+              - link "PageMetadata.git_revision_time":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.git_revision_time
+                - code: PageMetadata.git_revision_time
+            - listitem:
+              - link "PageMetadata.model_config":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.model_config
+                - code: PageMetadata.model_config
+            - listitem:
+              - link "PageMetadata.page_dependencies":
+                - /url: /en/docs/demo/main/api#secretflow_doctools.builder.PageMetadata.page_dependencies
+                - code: PageMetadata.page_dependencies
+    - listitem:
+      - link "Swagger":
+        - /url: /en/docs/demo/main/swagger
+    - listitem:
+      - link "Lorem ipsum":
+        - /url: /en/docs/demo/main/lorem.ipsum.dolor

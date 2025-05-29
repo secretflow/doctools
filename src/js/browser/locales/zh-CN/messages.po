@@ -1,0 +1,509 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-04-01 10:29+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: zh-CN\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. placeholder {0}: total ?? 0
+#: src/js/browser/search/index.tsx:165
+msgid "{0, plural, one {# result} other {# results}}"
+msgstr "{0, plural, one {# 个结果} other {# 个结果}}"
+
+#. placeholder {0}: schema.maxLength
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:204
+msgid "{0, plural, one {maximum # character} other {maximum # characters}}"
+msgstr "{0, plural, one {最长 # 个字符} other {最长 # 个字符}}"
+
+#. placeholder {0}: schema.maxItems
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:242
+msgid "{0, plural, one {maximum # item} other {maximum # items}}"
+msgstr "{0, plural, one {最多 # 个元素} other {最多 # 个元素}}"
+
+#. placeholder {0}: schema.maxProperties
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:279
+msgid "{0, plural, one {maximum # property} other {maximum # properties}}"
+msgstr "{0, plural, one {最多 # 个属性} other {最多 # 个属性}}"
+
+#. placeholder {0}: schema.minLength
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:193
+msgid "{0, plural, one {minimum # character} other {minimum # characters}}"
+msgstr "{0, plural, one {最短 # 个字符} other {最短 # 个字符}}"
+
+#. placeholder {0}: schema.minItems
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:235
+msgid "{0, plural, one {minimum # item} other {minimum # items}}"
+msgstr "{0, plural, one {最少 # 个元素} other {最少 # 个元素}}"
+
+#. placeholder {0}: schema.minProperties
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:268
+msgid "{0, plural, one {minimum # property} other {minimum # properties}}"
+msgstr "{0, plural, one {最少 # 个属性} other {最少 # 个属性}}"
+
+#. placeholder {0}: quoteUrl(projectName)
+#. placeholder {1}: quoteUrl(ref)
+#: src/js/browser/banners/NoSuchVersion.tsx:31
+msgid "{0} does not have documentation for version {1}."
+msgstr "{0} 没有版本 {1} 的文档。"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:119
+msgid "{count, plural, one {array} =1 {array} other {arrays}}"
+msgstr "{count, plural, one {数组} =1 {数组} other {数组}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:81
+msgid "{count, plural, one {base64 string} =1 {base64 string} other {base64 strings}}"
+msgstr "{count, plural, one {base64 字符串} =1 {base64 字符串} other {base64 字符串}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:99
+msgid "{count, plural, one {boolean} =1 {boolean} other {booleans}}"
+msgstr "{count, plural, one {布尔值} =1 {布尔值} other {布尔值}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:32
+msgid "{count, plural, one {date} =1 {date} other {dates}}"
+msgstr "{count, plural, one {日期} =1 {日期} other {日期}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:29
+msgid "{count, plural, one {date/time} =1 {date/time} other {dates/times}}"
+msgstr "{count, plural, one {日期/时间} =1 {日期/时间} other {日期/时间}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:77
+msgid "{count, plural, one {double} =1 {double} other {doubles}}"
+msgstr "{count, plural, one {double} =1 {double} other {doubles}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:37
+msgid "{count, plural, one {duration} =1 {duration} other {durations}}"
+msgstr "{count, plural, one {持续时间} =1 {持续时间} other {持续时间}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:41
+msgid "{count, plural, one {email} =1 {email} other {emails}}"
+msgstr "{count, plural, one {邮箱地址} =1 {邮箱地址} other {邮箱地址}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:73
+msgid "{count, plural, one {float} =1 {float} other {floats}}"
+msgstr "{count, plural, one {float} =1 {float} other {floats}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:45
+msgid "{count, plural, one {hostname} =1 {hostname} other {hostnames}}"
+msgstr "{count, plural, one {主机名} =1 {主机名} other {主机名}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:103
+msgid "{count, plural, one {integer} =1 {integer} other {integers}}"
+msgstr "{count, plural, one {integer} =1 {integer} other {integers}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:49
+msgid "{count, plural, one {IPv4 address} =1 {IPv4 address} other {IPv4 addresses}}"
+msgstr "{count, plural, one {IPv4 地址} =1 {IPv4 地址} other {IPv4 地址}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:57
+msgid "{count, plural, one {IPv6 address} =1 {IPv6 address} other {IPv6 addresses}}"
+msgstr "{count, plural, one {IPv6 地址} =1 {IPv6 地址} other {IPv6 地址}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:146
+msgid "{count, plural, one {map} =1 {map} other {maps}}"
+msgstr "{count, plural, one {映射} =1 {映射} other {映射}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:107
+msgid "{count, plural, one {number} =1 {number} other {numbers}}"
+msgstr "{count, plural, one {数字} =1 {数字} other {数字}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:111
+msgid "{count, plural, one {object} =1 {object} other {objects}}"
+msgstr "{count, plural, one {对象} =1 {对象} other {对象}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:91
+msgid "{count, plural, one {password} =1 {password} other {passwords}}"
+msgstr "{count, plural, one {密码} =1 {密码} other {密码}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:115
+msgid "{count, plural, one {string} =1 {string} other {strings}}"
+msgstr "{count, plural, one {字符串} =1 {字符串} other {字符串}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:64
+msgid "{count, plural, one {URI} =1 {URI} other {URIs}}"
+msgstr "{count, plural, one {URI} =1 {URI} other {URIs}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:66
+msgid "{count, plural, one {UUID} =1 {UUID} other {UUIDs}}"
+msgstr "{count, plural, one {UUID} =1 {UUID} other {UUIDs}}"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:138
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:148
+msgid "{head} of {modifier}"
+msgstr "{modifier}{head}"
+
+#: src/js/browser/layout/SuggestEdit.tsx:24
+msgid "### Suggest an edit to documentation"
+msgstr "### 文档修改建议"
+
+#: src/js/browser/layout/SuggestEdit.tsx:26
+msgid "<!-- Do not edit below this line -->"
+msgstr "<!-- 请勿编辑以下内容 -->"
+
+#: src/js/browser/layout/SuggestEdit.tsx:25
+msgid "<!-- Please describe the issue you encountered -->"
+msgstr "<!-- 请在此描述你遇到的文档问题 -->"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:16
+msgid "<0> – </0>"
+msgstr "<0> – </0>"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:4
+msgid "<0>, </0>"
+msgstr "<0>，</0>"
+
+#: src/js/browser/page/components/OpenAPI/components/i18n/punctuations.tsx:10
+msgid "<0>: </0>"
+msgstr "<0>：</0>"
+
+#. placeholder {0}: title ? ( <span> {" "} <SchemaTree.ObjectName>{title}</SchemaTree.ObjectName> </span> ) : null
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:193
+msgid "<0>object</0>{0}"
+msgstr "{0} <0>对象</0>"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:166
+msgid "array"
+msgstr "数组"
+
+#: src/js/browser/layout/useColumnLayout.tsx:232
+msgid "Back to Page"
+msgstr "返回正文"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:88
+msgid "binary data"
+msgstr "二进制数据"
+
+#: src/js/browser/layout/useColumnLayout.tsx:213
+msgid "Chapters"
+msgstr "文档导航"
+
+#: src/js/browser/banners/PageNotFound.tsx:109
+msgid "Click here to return to the home page of {versionName}"
+msgstr "点击此处回到 {versionName} 文档的首页"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:51
+#: src/js/browser/banners/UncaughtRouteError.tsx:58
+msgid "Could not display this page"
+msgstr "尝试显示本页面时遇到了问题"
+
+#. placeholder {0}: quoteUrl(repo)
+#: src/js/browser/banners/RepoNotFound.tsx:39
+msgid "Could not find documentation for <0>{0}</0>."
+msgstr "找不到关于 <0>{0}</0> 的文档。"
+
+#: src/js/browser/page/components/Container.tsx:106
+msgid "Danger"
+msgstr "危险"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:101
+msgid "default ="
+msgstr "默认是"
+
+#. placeholder {0}: quoteUrl(versionName)
+#. placeholder {1}: printLocaleNameIn(i18n.locale, lang)
+#. placeholder {2}: printLocaleNameIn(i18n.locale, project.lang)
+#: src/js/browser/banners/NotTranslated.tsx:37
+msgid "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
+msgstr "{0} 的文档还没有翻译成{1}，已为你重定向到{2}版本。"
+
+#: src/js/browser/banners/RepoNotFound.tsx:21
+#: src/js/browser/banners/RepoNotFound.tsx:27
+msgid "Documentation not found"
+msgstr "找不到文档库"
+
+#: src/js/browser/banners/IsNotebook.tsx:92
+msgid "Download"
+msgstr "下载"
+
+#: src/js/browser/search/index.tsx:118
+msgid "Downloading search index ..."
+msgstr "正在加载索引，请稍候 ..."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:116
+msgid "example:"
+msgstr "示例："
+
+#: src/js/browser/app.tsx:910
+msgid "Failed to display article content"
+msgstr "显示文档正文时发生错误"
+
+#: src/js/browser/app.tsx:936
+msgid "Failed to display article outline"
+msgstr "显示文档大纲时发生错误"
+
+#: src/js/browser/app.tsx:866
+msgid "Failed to display navigation menus"
+msgstr "显示导航菜单时发生错误"
+
+#: src/js/browser/app.tsx:879
+msgid "Failed to display table of contents"
+msgstr "显示文档目录时发生错误"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OpenAPIViewer.tsx:53
+msgid "Failed to parse OpenAPI schema"
+msgstr "解析 OpenAPI 描述时发生异常"
+
+#: src/js/browser/layout/StatusBanner.tsx:27
+msgid "For Preview Only"
+msgstr "仅供预览"
+
+#: src/js/browser/layout/NextPage.tsx:75
+msgid "Homepage"
+msgstr "首页"
+
+#: src/js/browser/banners/IsNotebook.tsx:110
+msgid "How to use"
+msgstr "如何使用"
+
+#: src/js/browser/banners/RepoNotFound.tsx:44
+#: src/js/browser/banners/PageNotFound.tsx:81
+msgid "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
+msgstr "如果你是通过输入网址的方式访问本页面，请检查拼写是否正确。该内容也可能已被移动或删除。"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:68
+msgid "int32"
+msgstr "int32"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:70
+msgid "int64"
+msgstr "int64"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:249
+msgid "items must be unique"
+msgstr "每个元素必须唯一"
+
+#: src/js/browser/layout/BuildInfo.tsx:69
+msgid "Last modified"
+msgstr "最近修改于"
+
+#: src/js/browser/page/components/Mermaid.tsx:36
+msgid "Loading Mermaid diagram ..."
+msgstr "正在加载 Mermaid 图表 ..."
+
+#: src/js/browser/search/index.tsx:131
+msgid "Loading more results ..."
+msgstr "加载更多结果 ..."
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaTree.tsx:211
+msgid "map"
+msgstr "映射"
+
+#. placeholder {0}: schema.multipleOf
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:175
+msgid "multiple of {0}"
+msgstr "必须是 {0} 的倍数"
+
+#. placeholder {0}: schema.pattern
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:215
+msgid "must match regular expression <0>{0}</0>"
+msgstr "必须匹配正则表达式 <0>{0}</0>"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:41
+msgid "Network problems occurred while downloading page content."
+msgstr "由于网络异常或者连接超时，页面内容下载失败。"
+
+#: src/js/browser/layout/NextPage.tsx:113
+msgid "Next page"
+msgstr "下一页"
+
+#: src/js/browser/layout/VersionPicker.tsx:119
+msgid "nightlies"
+msgstr "开发版本"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:290
+msgid "no extra keys allowed"
+msgstr "不允许额外的键"
+
+#: src/js/browser/page/components/Container.tsx:112
+msgid "Note"
+msgstr "注意"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:133
+msgid "one of"
+msgstr "枚举"
+
+#: src/js/browser/banners/IsNotebook.tsx:100
+msgid "Open on GitHub"
+msgstr "在 GitHub 上打开"
+
+#: src/js/browser/layout/VersionPicker.tsx:133
+msgid "other versions"
+msgstr "其他版本"
+
+#: src/js/browser/layout/SuggestEdit.tsx:30
+msgid "Page"
+msgstr "页面"
+
+#: src/js/browser/layout/BuildInfo.tsx:85
+msgid "Page built"
+msgstr "页面构建于"
+
+#: src/js/browser/error.tsx:209
+msgid "Page error"
+msgstr "页面异常"
+
+#: src/js/browser/banners/PageNotFound.tsx:71
+#: src/js/browser/banners/PageNotFound.tsx:73
+msgid "Page not found"
+msgstr "页面未找到"
+
+#: src/js/browser/layout/VersionPicker.tsx:112
+msgid "prereleases"
+msgstr "预发布版本"
+
+#: src/js/browser/layout/NextPage.tsx:86
+msgid "Previous page"
+msgstr "上一页"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:230
+msgid "Query parameters"
+msgstr "Query 参数"
+
+#. placeholder {0}: error.cause.res.status
+#: src/js/browser/banners/UncaughtRouteError.tsx:28
+msgid "Received an HTTP {0} error while downloading page content."
+msgstr "加载页面内容时遇到了 HTTP {0} 错误。"
+
+#. placeholder {0}: wordBreak(quoteUrl(printed))
+#: src/js/browser/banners/RedirectedFrom.tsx:51
+msgid "Redirected from {0}"
+msgstr "重定向自 {0}"
+
+#: src/js/browser/layout/VersionPicker.tsx:105
+msgid "releases"
+msgstr "已发布版本"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:251
+msgid "Request body"
+msgstr "请求体"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:206
+msgid "Request examples"
+msgstr "请求体示例"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/SchemaHeader.tsx:76
+msgid "required"
+msgstr "必填"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:306
+msgid "Response body"
+msgstr "响应体"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:297
+msgid "Response examples"
+msgstr "响应体示例"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/OperationViewer.tsx:371
+msgid "Responses"
+msgstr "响应"
+
+#: src/js/browser/layout/Search.tsx:18
+msgid "Search"
+msgstr "搜索"
+
+#: src/js/browser/search/index.tsx:118
+msgid "Search in {title} ..."
+msgstr "在 {title} 中搜索 ..."
+
+#: src/js/browser/banners/PageNotFound.tsx:115
+msgid "Searching for more pages ..."
+msgstr "正在搜索更多页面 ..."
+
+#: src/js/browser/layout/HTMLTitle.tsx:46
+msgid "SecretFlow Docs"
+msgstr "隐语文档"
+
+#: src/js/browser/layout/StatusBanner.tsx:16
+msgid "SecretFlow Documentation"
+msgstr "隐语文档"
+
+#: src/js/browser/layout/useColumnLayout.tsx:220
+msgid "Sections"
+msgstr "本页内容"
+
+#: src/js/browser/main.tsx:217
+msgid "Sitemap"
+msgstr "文档地图"
+
+#: src/js/browser/layout/SuggestEdit.tsx:33
+msgid "Source"
+msgstr "源码"
+
+#: src/js/browser/layout/SuggestEdit.tsx:51
+msgid "Suggest an edit"
+msgstr "报告文档问题"
+
+#: src/js/browser/layout/SuggestEdit.tsx:28
+#: src/js/browser/banners/ErrorDetails.tsx:31
+msgid "Technical info"
+msgstr "技术信息"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:19
+msgid "The application encountered an unexpected error. We apologize for the inconvenience."
+msgstr "页面遇到了未预期的异常。因此造成的不便我们深表歉意。"
+
+#. placeholder {0}: wordBreak(quoteUrl(suffix))
+#: src/js/browser/banners/PageNotFound.tsx:75
+msgid "The page <0>{0}</0> was not found in {versionName}."
+msgstr "页面 <0>{0}</0> 在 {versionName} 中未找到。"
+
+#: src/js/browser/banners/IsNotebook.tsx:65
+msgid "This is a Jupyter Notebook"
+msgstr "这是一个 Jupyter Notebook"
+
+#. placeholder {0}: current.label
+#. placeholder {1}: current.raw
+#. placeholder {2}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:82
+msgid "This is documentation for <0>{0}</0> version {1}; {button} is the <1>latest {2}</1> version."
+msgstr "这是 <0>{0}</0> 版本 {1} 的文档；{button} 是<1>最新的 {2}</1> 版本。"
+
+#. placeholder {0}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:59
+msgid "This is documentation for an <0>unreleased</0> version. {button} is the <1>latest {0}</1> version."
+msgstr "这是一个 <0>未发布</0> 版本的文档。{button} 是<1>最新的 {0}</1> 版本。"
+
+#. placeholder {0}: current.raw
+#. placeholder {1}: stable.label
+#: src/js/browser/banners/IsPrerelease.tsx:98
+msgid "This is documentation for version {0}; {button} is the <0>latest</0> {1} version."
+msgstr "这是版本 {0} 的文档；{button} 是<0>最新的</0> {1} 版本。"
+
+#: src/js/browser/banners/SuggestLanguage.tsx:55
+msgid "This page is also available in <0><1>{localeName}</1><2/></0>."
+msgstr "这篇文档也有<0><1>{localeName}</1>版<2/></0>。"
+
+#: src/js/browser/page/components/OpenAPI/components/openapi/text.ts:34
+msgid "time"
+msgstr "时间"
+
+#: src/js/browser/page/components/Container.tsx:109
+msgid "Tip"
+msgstr "提示"
+
+#: src/js/browser/layout/SuggestEdit.tsx:34
+msgid "User-Agent"
+msgstr "User-Agent"
+
+#: src/js/browser/layout/ViewPageSource.tsx:31
+msgid "View page source"
+msgstr "查看文档源码"
+
+#: src/js/browser/page/components/Container.tsx:103
+msgid "Warning"
+msgstr "警告"
+
+#: src/js/browser/banners/UncaughtRouteError.tsx:70
+msgid "You may <0>refresh this page</0>, or try again later."
+msgstr "你可以<0>尝试刷新本页面</0>，或者稍后再试。"
+
+#: src/js/browser/banners/PageNotFound.tsx:89
+msgid "You may also be looking for:"
+msgstr "你要找的页面也可能是："

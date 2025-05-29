@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "declarationDir": "dist/dts",
+    "rootDir": "src/js",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig.neutral.tsbuildinfo"
+  },
+  "extends": "./tsconfig.json",
+  "include": ["./src/js/docs", "./src/js/mdx", "./src/js/search"]
+}

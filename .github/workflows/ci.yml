@@ -1,35 +1,70 @@
-name: 'Code: CI'
+name: CI
 
 on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - reopened
-      - synchronize
-  workflow_call:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: publish to PyPI after tests
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
 
 jobs:
-  ci-javascript:
-    name: 'CI: JavaScript'
-    uses: secretflow/web-ci/.github/workflows/ci-javascript.yml@main
-    with:
-      node-version: ${{ matrix.node-version }}
-      python-version: ${{ matrix.python-version }}
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ['18', '20']
-        python-version: ['3.8', '3.10']
+  ci:
+    name: CI
 
-  ci-python:
-    name: 'CI: Python'
-    uses: secretflow/web-ci/.github/workflows/ci-python.yml@main
-    with:
-      node-version: ${{ matrix.node-version }}
-      python-version: ${{ matrix.python-version }}
     strategy:
-      fail-fast: false
       matrix:
-        node-version: ['18']
-        python-version: ['3.8', '3.10']
+        platform:
+          - ubuntu-latest
+
+      fail-fast: false
+
+    timeout-minutes: 60
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10"
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.8"
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - run: sudo apt update
+
+      - run: pnpm run bootstrap
+
+      - run: pnpm exec playwright install --with-deps
+
+      - run: pnpm run nx ci
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 1
+
+      - run: pnpm nx build:wheels
+
+      - run: pnpm nx publish:pypi
+        if: ${{ success() && inputs.release == true }}
+        env:
+          HATCH_INDEX_USER: "__token__"
+          HATCH_INDEX_AUTH: ${{secrets.HATCH_INDEX_AUTH}}
