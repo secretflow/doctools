@@ -147,7 +147,7 @@ export const Manifest = ManifestV1.or(ManifestV2);
 type ProjectKey = Pick<Project, "repo"> & Partial<Pick<Project, "ref" | "lang">>;
 
 export function projectKey({ repo, ref, lang }: ProjectKey) {
-  return [repo, ref, lang].filter((x) => x !== undefined).join("/");
+  return [repo, ref, lang?.replace(/_/g, "-")].filter((x) => x !== undefined).join("/");
 }
 
 export function getProject<T extends ProjectKey>(target: ProjectKey, list: T[]) {

@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release:
+        description: publish to PyPI after tests
         type: boolean
         default: false
 
@@ -45,7 +46,7 @@ jobs:
         with:
           deno-version: v2.x
 
-      - run: sudo apt-get update
+      - run: sudo apt update
 
       - run: pnpm run bootstrap
 
