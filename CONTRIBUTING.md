@@ -196,7 +196,7 @@ This will:
 You should be able to open <http://127.0.0.1:5173> and see the "Sitemap" page:
 
 <figure>
-  <img src="./tests/demo/media/dev-sitemap.png" width="1019" height="778">
+  <img src="./tests/demo/media/dev-sitemap.png">
 </figure>
 
 The dev server spawn script is [scripts/dev_server.py](scripts/dev_server.py).
@@ -208,7 +208,7 @@ The dev server spawn script is [scripts/dev_server.py](scripts/dev_server.py).
 > <http://127.0.0.1:5174/static/index.js>:
 >
 > <figure>
->   <img src="./tests/demo/media/dev-static-index.png" width="1019" height="778">
+>   <img src="./tests/demo/media/dev-static-index.png">
 > </figure>
 
 ## Topics
@@ -272,7 +272,7 @@ which will register the MDX [builder](#sphinx-builders).
 docs.
 
 <figure>
-  <img src="https://www.sphinx-doc.org/en/master/_images/graphviz-e87ab1666a7685a706a5bed2a7744d43bb33cbd4.png" width="1352" height="278">
+  <img src="https://www.sphinx-doc.org/en/master/_images/graphviz-e87ab1666a7685a706a5bed2a7744d43bb33cbd4.png">
   <figcaption>
     "Call graph for the standard Sphinx build workflow"<br>
     From <a href="https://www.sphinx-doc.org/en/master/extdev/builderapi.html">Builder API</a>
@@ -352,7 +352,7 @@ Using the
 page as an example:
 
 | File type                          | File path                                                                                                                                                                                                                                      |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| :--------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Source file                        | <a href="https://github.com/secretflow/secretflow/blob/v1.12.0b0/docs/getting_started/deployment.md?plain=1"><code>docs/<strong>getting_started/deployment.md</strong></code></a>                                                              |
 | [Translation](#multiple-languages) | <a href="https://github.com/secretflow/secretflow/blob/v1.12.0b0/docs/locales/zh_CN/LC_MESSAGES/getting_started/deployment.po"><code>docs/locales/<strong>zh_CN</strong>/LC_MESSAGES/<strong>getting_started/deployment.po</strong></code></a> |
 | [MDX output](#mdx-jsx-javascript)  | <code>docs/\_build/mdx/<strong>secretflow/v1.12.0b0/zh-CN/getting_started/deployment.mdx</strong></code>                                                                                                                                       |
@@ -369,7 +369,7 @@ Notable exceptions are:
   files will still have `index.*` as their names**, that is:
 
   | File type   | File path                  |
-  | ----------- | -------------------------- |
+  | :---------- | :------------------------- |
   | Source file | `path/to/folder/index.md`  |
   | Translation | `path/to/folder/index.po`  |
   | MDX output  | `path/to/folder/index.mdx` |
@@ -399,7 +399,7 @@ See ["reStructuredText Primer"][reStructuredText] in Sphinx's documentation for 
 in-depth overview.
 
 |        | Example document                                                                                                      |
-| ------ | --------------------------------------------------------------------------------------------------------------------- |
+| :----- | :-------------------------------------------------------------------------------------------------------------------- |
 | Source | <https://github.com/secretflow/secretflow/blob/v1.12.0b0/docs/user_guide/mpc_ml/generalized_linear_model.rst?plain=1> |
 | Output | <https://www.secretflow.org.cn/en/docs/secretflow/v1.12.0b0/user_guide/mpc_ml/generalized_linear_model>               |
 
@@ -414,7 +414,7 @@ See `myst-parser`'s documentation for guides on [syntax, features][myst-syntax],
 [configuration][myst-config].
 
 |        | Example document                                                                                |
-| ------ | ----------------------------------------------------------------------------------------------- |
+| :----- | :---------------------------------------------------------------------------------------------- |
 | Source | <https://github.com/secretflow/kuscia/blob/v0.15.0b1/docs/reference/apis/summary_cn.md?plain=1> |
 | Output | <https://www.secretflow.org.cn/zh-CN/docs/kuscia/v0.15.0b0/reference/apis/summary_cn>           |
 
@@ -426,7 +426,7 @@ pages.
 See `myst-nb`'s documentation for [configuration][myst-nb-config] options.
 
 |        | Example document                                                                  |
-| ------ | --------------------------------------------------------------------------------- |
+| :----- | :-------------------------------------------------------------------------------- |
 | Source | <https://github.com/secretflow/spu/blob/0.9.3b0/docs/tutorials/quick_start.ipynb> |
 | Output | <https://www.secretflow.org.cn/en/docs/spu/0.9.3b0/tutorials/quick_start>         |
 
@@ -504,7 +504,7 @@ For more information about PO files, see the [GNU gettext manual][gettext-po].
 render their content with a dedicated API viewer.
 
 |        | Example document                                                                        |
-| ------ | --------------------------------------------------------------------------------------- |
+| :----- | :-------------------------------------------------------------------------------------- |
 | Source | <https://github.com/secretflow/scql/blob/0.9.3b1/docs/reference/broker-api.rst?plain=1> |
 | Output | <https://www.secretflow.org.cn/zh-CN/docs/scql/0.9.3b1/reference/broker-api>            |
 
@@ -648,12 +648,12 @@ For example, the [Swagger](#swagger) feature is implemented as follows:
 3. The [`remark-swagger`](src/js/mdx/remark-swagger.ts) plugin (implemented in
    JavaScript) transforms this into:
 
-   ```json
+   ```jsonc
    {
      "type": "root",
      "children": [
        {
-         "type": "heading"
+         "type": "heading",
          // ...
        },
        {
@@ -665,13 +665,13 @@ For example, the [Swagger](#swagger) feature is implemented as follows:
              "name": "schema",
              "value": {
                "type": "mdxJsxAttributeValueExpression",
-               "value": "`swagger: \"2.0\"\\npaths: ...`"
-             }
-           }
+               "value": "`swagger: \"2.0\"\\npaths: ...`",
+             },
+           },
          ],
-         "children": []
-       }
-     ]
+         "children": [],
+       },
+     ],
    }
    ```
 
@@ -896,7 +896,7 @@ identifiers of the document page
 [SCQL 0.9.3b1 → Security overview](https://www.secretflow.org.cn/en/docs/scql/0.9.3b1/topics/security/overview):
 
 |                                | SCQL 0.9.3b1 → Security overview                                                                             |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| :----------------------------- | :----------------------------------------------------------------------------------------------------------- |
 | Source file                    | <https://github.com/secretflow/scql/blob/0.9.3b1/docs/topics/security/overview.rst>                          |
 | PO file                        | <https://github.com/secretflow/scql/blob/0.9.3b1/docs/locales/zh_CN/LC_MESSAGES/topics/security/overview.po> |
 | MDX output (local)             | `docs/_build/mdx/scql/0.9.3b1/en/topics/security/overview.mdx`                                               |
@@ -967,7 +967,7 @@ the pathname `/en/docs/scql/0.9.3b1/topics/security/overview`, when [matched][ma
 using the pattern `/:lang/docs/:repo/:ref/*`, results in:
 
 |         |                            |
-| ------- | -------------------------- |
+| :------ | :------------------------- |
 | `:repo` | `scql`                     |
 | `:ref`  | `0.9.3b1`                  |
 | `:lang` | `en`                       |
@@ -1004,7 +1004,7 @@ parameters from pathname:
    ```
 
    |         |                                                                           |
-   | ------- | ------------------------------------------------------------------------- |
+   | :------ | :------------------------------------------------------------------------ |
    | repo    | `scql`                                                                    |
    | version | `gh-0.9.3b1`                                                              |
    | file    | `package.json`                                                            |
@@ -1038,7 +1038,7 @@ parameters from pathname:
 3. The loader imports the entrypoint using [`import()`]:
 
    |         |                                                                                                    |
-   | ------- | -------------------------------------------------------------------------------------------------- |
+   | :------ | :------------------------------------------------------------------------------------------------- |
    | repo    | `scql`                                                                                             |
    | version | `0.0.4-gbd33dae-b202503070338267683`                                                               |
    | file    | `./dist/index.js`                                                                                  |
@@ -1052,7 +1052,7 @@ parameters from pathname:
 >
 > You can try this in [Deno] or in browser consoles and poke around:
 >
-> <img src="tests/demo/media/deno-import.png" width="564">
+> <img src="tests/demo/media/deno-import.png">
 
 ### Localization
 
@@ -1150,7 +1150,7 @@ Then, you must update the PO files with your translations:
 The dev server reads the following variables:
 
 | Variable              | Usage                                                       | Defined in                                                                      |
-| --------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| :-------------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------------ |
 | `DOCTOOLS_CONFIG_DIR` | Serve built files from the specified Sphinx project         | [`cmd/preview.py:PreviewServerArgs`](src/py/secretflow_doctools/cmd/preview.py) |
 | `VITE_SERVER_PORT`    | Port that the Vite dev server will use                      | [`vite.config.ts`](vite.config.ts)                                              |
 | `FLASK_RUN_PORT`      | Port that the Flask app (which serves built files) will use | [Configuring from Environment Variables][flask-env]                             |
@@ -1161,7 +1161,7 @@ The `publish:pypi` command, which publishes [built wheels](#building-the-python-
 PyPI, reads the following variables:
 
 | Variable           | Usage      | Defined in                                             |
-| ------------------ | ---------- | ------------------------------------------------------ |
+| :----------------- | :--------- | :----------------------------------------------------- |
 | `HATCH_INDEX_AUTH` | PyPI token | [How to authenticate for index publishing][hatch-auth] |
 
 #### `secretflow-doctools publish` <!-- omit from toc -->
@@ -1170,7 +1170,7 @@ The `secretflow-doctools publish` command, which
 [publishes built documentation to npm](#publishing-docs), reads the following variables:
 
 | Variable                     | Usage                                                     | Defined in                                                    |
-| ---------------------------- | --------------------------------------------------------- | ------------------------------------------------------------- |
+| :--------------------------- | :-------------------------------------------------------- | :------------------------------------------------------------ |
 | `DRY_RUN`                    | `npm publish` will proceed **if and only if** `DRY_RUN=0` | [`cmd/publish.py`](src/py/secretflow_doctools/cmd/publish.py) |
 | `DOCTOOLS_PUBLISH_NPM_TOKEN` | npm token                                                 | [`cmd/publish.py`](src/py/secretflow_doctools/cmd/publish.py) |
 
