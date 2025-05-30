@@ -1,4 +1,5 @@
 import shutil
+import sysconfig
 import tarfile
 from importlib.resources import files
 from pathlib import Path
@@ -10,6 +11,16 @@ from secretflow_doctools.l10n import gettext as _
 
 def get_js_binary() -> tuple[str, list[str]]:
     import secretflow_doctools
+
+    shared_scripts = Path(sysconfig.get_path("scripts"))
+
+    bin_path = shared_scripts.joinpath("secretflow-doctools-js-cli")
+    if bin_path.exists():
+        return str(bin_path.resolve()), []
+
+    bin_path = shared_scripts.joinpath("secretflow-doctools-js-cli.exe")
+    if bin_path.exists():
+        return str(bin_path.resolve()), []
 
     module_dir = files(secretflow_doctools)
 

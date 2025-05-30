@@ -4,6 +4,7 @@ from subprocess import check_call
 from tempfile import TemporaryDirectory
 from typing import Any, Callable
 
+from hatchling.builders.plugin.interface import IncludedFile
 from hatchling.builders.utils import normalize_artifact_permissions, replace_file
 from hatchling.builders.wheel import (
     RecordFile,
@@ -87,7 +88,11 @@ class WheelBuilderWithDenort(WheelBuilder):
                     bin_relpath = Path("secretflow_doctools/js")
                     bin_relpath = bin_relpath.joinpath(outfile.name)
                     bin_relpath = str(bin_relpath)
-                    record = archive.write_file(bin_relpath, f.read(), mode=0o755)
+                    bin_name = "secretflow-doctools-js-cli"
+                    if "windows-msvc" in triple:
+                        bin_name += ".exe"
+                    included_file = IncludedFile(str(outfile), bin_relpath, bin_name)
+                    record = archive.write_shared_script(included_file, f.read())
                     records.write(record)
 
                 self.write_data(

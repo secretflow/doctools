@@ -260,22 +260,22 @@ msgstr "请提供环境变量 {env}"
 msgid "missing required environment variables"
 msgstr "未提供所有必需的环境变量"
 
-#: src/py/secretflow_doctools/js/cli.py:26
+#: src/py/secretflow_doctools/js/cli.py:37
 #, python-brace-format
 msgid "a required file {file} was not found"
 msgstr "关键文件 {file} 不存在"
 
-#: src/py/secretflow_doctools/js/cli.py:33
+#: src/py/secretflow_doctools/js/cli.py:44
 msgid "neither deno nor node is available on PATH"
 msgstr "未有在 PATH 上找到 deno 或者 node"
 
-#: src/py/secretflow_doctools/js/cli.py:49
+#: src/py/secretflow_doctools/js/cli.py:60
 msgid ""
 "help: the package `secretflow-doctools` was not installed correctly. "
 "please reinstall it."
 msgstr "帮助： Python 包 `secretflow-doctools` 未有正确安装，请重新安装该依赖。"
 
-#: src/py/secretflow_doctools/js/cli.py:55
+#: src/py/secretflow_doctools/js/cli.py:66
 msgid ""
 "in development: please run `pnpm nx build:sdist` to ensure JavaScript "
 "resources are compiled correctly"

@@ -4,7 +4,7 @@ license = "Apache-2.0"
 name = "secretflow-doctools"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "0.8.0"
+version = "0.8.1"
 
 dependencies = [
   "ansi2html~=1.9",
@@ -46,9 +46,9 @@ email = "secretflow-contact@service.alipay.com"
 name = "SecretFlow Team"
 
 [project.urls]
-documentation = "https://github.com/secretflow/doctools/blob/main/CONTRIBUTING.md"
-issues = "https://github.com/secretflow/doctools/issues"
-source = "https://github.com/secretflow/doctools"
+Documentation = "https://github.com/secretflow/doctools/blob/main/CONTRIBUTING.md"
+Issues = "https://github.com/secretflow/doctools/issues"
+Repository = "https://github.com/secretflow/doctools"
 
 [build-system]
 build-backend = "hatchling.build"
