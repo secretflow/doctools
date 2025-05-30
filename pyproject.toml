@@ -1,5 +1,6 @@
 [project]
 description = "Documentation builder for SecretFlow"
+license = "Apache-2.0"
 name = "secretflow-doctools"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,7 +13,7 @@ dependencies = [
   "more-itertools~=10.6",
   "myst-parser~=4.0",
   "pexpect~=4.9",
-  "pydantic~=2.10",
+  "pydantic~=2.6",
   "pydantic-settings~=2.8",
   "requests~=2.32",
   "ruamel-yaml~=0.18",
@@ -39,6 +40,15 @@ dev = [
 
 [project.scripts]
 secretflow-doctools = "secretflow_doctools.__main__:cli"
+
+[[project.authors]]
+email = "secretflow-contact@service.alipay.com"
+name = "SecretFlow Team"
+
+[project.urls]
+documentation = "https://github.com/secretflow/doctools/blob/main/CONTRIBUTING.md"
+issues = "https://github.com/secretflow/doctools/issues"
+source = "https://github.com/secretflow/doctools"
 
 [build-system]
 build-backend = "hatchling.build"
