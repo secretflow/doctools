@@ -81,6 +81,12 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
         with open(package_root.joinpath(".npmrc"), "w+") as f:
             f.write(f"//{registry_url.netloc}/:_authToken = ${{NPM_TOKEN}}\n")
 
+        def getenv():
+            return {
+                **os.environ,
+                "NPM_TOKEN": credentials.npm_token.get_secret_value(),
+            }
+
         with fatal_on_subprocess_error(
             "npm",
             "publish",
@@ -91,15 +97,29 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
         ) as cmd:
             subprocess.run(
                 cmd,
-                env={
-                    **os.environ,
-                    "NPM_TOKEN": credentials.npm_token.get_secret_value(),
-                },
+                env=getenv(),
                 cwd=package_root,
                 stdout=None,
                 stderr=None,
                 text=True,
             ).check_returncode()
+
+        if not dry_run:
+            with fatal_on_subprocess_error(
+                "npm",
+                "dist-tag",
+                "add",
+                f"{name}@{package_version}",
+                "latest",
+            ) as cmd:
+                subprocess.run(
+                    cmd,
+                    env=getenv(),
+                    cwd=package_root,
+                    stdout=None,
+                    stderr=None,
+                    text=True,
+                ).check_returncode()
 
 
 class Credentials(BaseSettings):
