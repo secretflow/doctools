@@ -4,7 +4,7 @@ license = "Apache-2.0"
 name = "secretflow-doctools"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "0.8.2"
+version = "0.8.3"
 
 dependencies = [
   "ansi2html~=1.9",

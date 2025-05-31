@@ -22,8 +22,6 @@ from secretflow_doctools.vcs import HeadRef, git_describe
 def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
     dry_run = os.getenv("DRY_RUN") != "0"
 
-    porcelain(dry_run=dry_run)
-
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
     revision = git_describe()
 
@@ -37,7 +35,7 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
                     "  - main or master"
                 )
             )
-            exit(1)
+            raise SystemExit(1)
 
     registry_url = urlsplit(registry)
 
@@ -59,14 +57,25 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
             },
         },
         "files": ["index.js", "dist"],
-        "x-secretflow-refs": [],
+        "x-secretflow-refs": [revision.ref],
     }
 
     published = requests.get(registry_url._replace(path=f"/{name}").geturl()).text
     published = PublishedPackage.model_validate_json(published)
-    published = [t for t in published.dist_tags if t.startswith("gh-")]
+    published = [t[3:] for t in published.dist_tags if t.startswith("gh-")]
 
     package_json["x-secretflow-refs"].extend(published)
+
+    logger.info(_("name:    {name}"), name=repr(name))
+    logger.info(_("tags:    {tag}, latest"), tag=repr(package_tag))
+    logger.info(_("version: {version}"), version=repr(package_version))
+    logger.debug(json.dumps(package_json, indent=2))
+
+    if dirty := porcelain():
+        logger.warning(_("git has uncommitted changes:\n{dirty}"), dirty=dirty.strip())
+        if not dry_run:
+            logger.critical(_("refusing to publish"))
+            raise SystemExit(1)
 
     with fatal_on_missing_env_vars(Credentials):
         credentials = Credentials()
@@ -132,15 +141,14 @@ class PublishedPackage(BaseModel):
     dist_tags: dict[str, str] = Field(alias="dist-tags")
 
 
-def porcelain(dry_run: bool):
+def porcelain():
     with fatal_on_subprocess_error("git", "status", "--porcelain") as cmd:
         status = subprocess.run(
             cmd,
-            text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
+            text=True,
             check=True,
         )
 
-    if not dry_run and status.stdout:
-        raise ValueError(_("refusing to publish: git has uncommitted changes"))
+    return status.stdout

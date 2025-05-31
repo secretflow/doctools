@@ -1942,7 +1942,7 @@ wheels = [
 
 [[package]]
 name = "secretflow-doctools"
-version = "0.8.0"
+version = "0.8.3"
 source = { editable = "." }
 dependencies = [
     { name = "ansi2html" },

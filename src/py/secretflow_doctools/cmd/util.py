@@ -79,7 +79,7 @@ class SphinxPaths:
             )
 
         if not config_dir or not source_dir or not output_dir:
-            exit(1)
+            raise SystemExit(1)
 
         return cls(
             config_dir=Path(config_dir),
@@ -122,15 +122,14 @@ class SphinxPreconditions:
 
         origin = git_origin()
         if not origin:
-            non_fatal(_("failed to get git origin url"))
             remote = None
         else:
             remote = guess_remote_vcs(origin)
         if not remote:
-            non_fatal(_("failed to get project name from git origin"))
+            non_fatal(_("failed to get project name using git origin url"))
 
         if exit_code:
-            exit(exit_code)
+            raise SystemExit(exit_code)
 
         self.remote = remote
         self.config = config
@@ -143,7 +142,7 @@ class SphinxPreconditions:
 def fatal_on_invalid_sphinx_conf():
     def onerror(error):
         logger.error(error)
-        exit(1)
+        raise SystemExit(1)
 
     with logger.catch(
         (ConfigError, ValidationError),
@@ -166,7 +165,7 @@ def fatal_on_missing_env_vars(cls: type[BaseSettings]):
                         env=repr(prefix + "_".join(map(str, err["loc"]))),
                     )
         logger.error(error)
-        exit(1)
+        raise SystemExit(1)
 
     with logger.catch(
         ValidationError,

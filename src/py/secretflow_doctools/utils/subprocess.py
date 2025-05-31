@@ -22,7 +22,7 @@ def fatal_on_subprocess_error(*args):
             _("failed to run command, see above for errors\nCommand: {cmd}"),
             cmd=shlex.join(cmd),
         )
-        exit(1)
+        raise SystemExit(1)
 
     with logger.catch(
         (OSError, subprocess.SubprocessError),
