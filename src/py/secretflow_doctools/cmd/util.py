@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TypeVar
 
 from loguru import logger
 from pydantic import ValidationError
@@ -126,7 +126,12 @@ class SphinxPreconditions:
         else:
             remote = guess_remote_vcs(origin)
         if not remote:
-            non_fatal(_("failed to get project name using git origin url"))
+            non_fatal(
+                _(
+                    "failed to get or parse origin url from git config,"
+                    " which is required to configure project name"
+                )
+            )
 
         if exit_code:
             raise SystemExit(exit_code)
@@ -153,8 +158,10 @@ def fatal_on_invalid_sphinx_conf():
         yield
 
 
-@contextmanager
-def fatal_on_missing_env_vars(cls: type[BaseSettings]):
+_Env = TypeVar("_Env", bound=BaseSettings)
+
+
+def require_env_vars(cls: type[_Env]) -> _Env:
     def onerror(error):
         if isinstance(error, ValidationError):
             prefix = cls.model_config.get("env_prefix", "")
@@ -173,4 +180,4 @@ def fatal_on_missing_env_vars(cls: type[BaseSettings]):
         message=_("missing required environment variables"),
         onerror=onerror,
     ):
-        yield
+        return cls()

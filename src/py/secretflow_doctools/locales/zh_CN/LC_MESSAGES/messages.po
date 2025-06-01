@@ -192,22 +192,44 @@ msgstr ""
 "  - 在包含标签的发布分支上，或\n"
 "  - 在 main 或 master 分支上"
 
-#: src/py/secretflow_doctools/cmd/publish.py:69
+#: src/py/secretflow_doctools/cmd/publish.py:41
+#, python-brace-format
+msgid "using registry: {reg}"
+msgstr "使用 npm registry {reg}"
+
+#: src/py/secretflow_doctools/cmd/publish.py:46
 #, python-brace-format
 msgid "name:    {name}"
 msgstr ""
 
-#: src/py/secretflow_doctools/cmd/publish.py:70
+#: src/py/secretflow_doctools/cmd/publish.py:47
 #, python-brace-format
 msgid "tags:    {tag}, latest"
 msgstr ""
 
-#: src/py/secretflow_doctools/cmd/publish.py:71
+#: src/py/secretflow_doctools/cmd/publish.py:48
 #, python-brace-format
 msgid "version: {version}"
 msgstr ""
 
-#: src/py/secretflow_doctools/cmd/publish.py:75
+#: src/py/secretflow_doctools/cmd/publish.py:69
+msgid "fetching existing refs"
+msgstr "正在获取已发布版本"
+
+#: src/py/secretflow_doctools/cmd/publish.py:74
+msgid "failed to determine existing refs"
+msgstr "无法获取已发布版本"
+
+#: src/py/secretflow_doctools/cmd/publish.py:83
+#, python-brace-format
+msgid "found refs: {v}"
+msgstr "已发布版本: {v}"
+
+#: src/py/secretflow_doctools/cmd/publish.py:85
+msgid "received 404, assuming a new package"
+msgstr "指定包名不存在，将会视作新发布"
+
+#: src/py/secretflow_doctools/cmd/publish.py:95
 #, python-brace-format
 msgid ""
 "git has uncommitted changes:\n"
@@ -216,9 +238,14 @@ msgstr ""
 "仓库存在未提交的更改：\n"
 "{dirty}"
 
-#: src/py/secretflow_doctools/cmd/publish.py:77
+#: src/py/secretflow_doctools/cmd/publish.py:99
 msgid "refusing to publish"
 msgstr "拒绝发布"
+
+#: src/py/secretflow_doctools/cmd/publish.py:106
+#, python-brace-format
+msgid "setting up package at {dir}"
+msgstr "临时目录 {dir}"
 
 #: src/py/secretflow_doctools/cmd/update_translations.py:52
 #, python-brace-format
@@ -264,20 +291,22 @@ msgstr "正在检查 Sphinx 配置文件"
 msgid "\"secretflow_doctools\" must be in `extensions` in conf.py"
 msgstr "conf.py 中的 `extensions` 选项必须包含 \"secretflow_doctools\""
 
-#: src/py/secretflow_doctools/cmd/util.py:129
-msgid "failed to get project name using git origin url"
-msgstr "无法通过 git 远程地址获取项目名"
+#: src/py/secretflow_doctools/cmd/util.py:131
+msgid ""
+"failed to get or parse origin url from git config, which is required to "
+"configure project name"
+msgstr "无法从 git 配置中获取或解析 origin url，无法配置项目名"
 
-#: src/py/secretflow_doctools/cmd/util.py:150
+#: src/py/secretflow_doctools/cmd/util.py:155
 msgid "failed to validate Sphinx conf.py"
 msgstr "Sphinx 配置文件校验不通过"
 
-#: src/py/secretflow_doctools/cmd/util.py:164
+#: src/py/secretflow_doctools/cmd/util.py:171
 #, python-brace-format
 msgid "provide the environment variable {env}"
 msgstr "请提供环境变量 {env}"
 
-#: src/py/secretflow_doctools/cmd/util.py:173
+#: src/py/secretflow_doctools/cmd/util.py:180
 msgid "missing required environment variables"
 msgstr "未提供所有必需的环境变量"
 
