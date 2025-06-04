@@ -148,12 +148,13 @@
       "cache": false,
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "nx run-many -t build:lib -t check:eslint -t check:stylelint -t check:prettier -t check:pyright -t check:ruff",
-          "nx run test"
-        ],
+        "commands": ["nx ci:checks", "nx test"],
         "parallel": false
       }
+    },
+    "ci:checks": {
+      "cache": false,
+      "command": "nx run-many -t build:lib -t check:eslint -t check:stylelint -t check:prettier -t check:pyright -t check:ruff"
     },
     "dev": {
       "cache": false,

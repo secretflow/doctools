@@ -57,7 +57,10 @@ def guess_remote_vcs(origin: str) -> Optional[RemoteVCS]:
 
 
 def git_origin(remote="origin") -> Optional[str]:
-    with logger.catch(level="WARNING", message=_("failed to get git remote")):
+    with logger.catch(
+        level="WARNING",
+        message=_("failed to get url for remote {remote}").format(remote=repr(remote)),
+    ):
         return (
             subprocess.run(
                 ["git", "config", "--get", f"remote.{remote}.url"],

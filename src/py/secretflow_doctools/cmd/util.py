@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TypeVar
 
 from loguru import logger
 from pydantic import ValidationError
@@ -79,7 +79,7 @@ class SphinxPaths:
             )
 
         if not config_dir or not source_dir or not output_dir:
-            exit(1)
+            raise SystemExit(1)
 
         return cls(
             config_dir=Path(config_dir),
@@ -122,15 +122,19 @@ class SphinxPreconditions:
 
         origin = git_origin()
         if not origin:
-            non_fatal(_("failed to get git origin url"))
             remote = None
         else:
             remote = guess_remote_vcs(origin)
         if not remote:
-            non_fatal(_("failed to get project name from git origin"))
+            non_fatal(
+                _(
+                    "failed to get or parse origin url from git config,"
+                    " which is required to configure project name"
+                )
+            )
 
         if exit_code:
-            exit(exit_code)
+            raise SystemExit(exit_code)
 
         self.remote = remote
         self.config = config
@@ -143,7 +147,7 @@ class SphinxPreconditions:
 def fatal_on_invalid_sphinx_conf():
     def onerror(error):
         logger.error(error)
-        exit(1)
+        raise SystemExit(1)
 
     with logger.catch(
         (ConfigError, ValidationError),
@@ -154,8 +158,10 @@ def fatal_on_invalid_sphinx_conf():
         yield
 
 
-@contextmanager
-def fatal_on_missing_env_vars(cls: type[BaseSettings]):
+_Env = TypeVar("_Env", bound=BaseSettings)
+
+
+def require_env_vars(cls: type[_Env]) -> _Env:
     def onerror(error):
         if isinstance(error, ValidationError):
             prefix = cls.model_config.get("env_prefix", "")
@@ -163,10 +169,10 @@ def fatal_on_missing_env_vars(cls: type[BaseSettings]):
                 if err["type"] == "missing":
                     logger.warning(
                         _("provide the environment variable {env}"),
-                        env=repr(prefix + "_".join(map(str, err["loc"]))),
+                        env=repr(prefix + "_".join(map(str, err["loc"]))).upper(),
                     )
         logger.error(error)
-        exit(1)
+        raise SystemExit(1)
 
     with logger.catch(
         ValidationError,
@@ -174,4 +180,4 @@ def fatal_on_missing_env_vars(cls: type[BaseSettings]):
         message=_("missing required environment variables"),
         onerror=onerror,
     ):
-        yield
+        return cls()
