@@ -99,8 +99,6 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
             logger.critical(_("refusing to publish"))
             raise SystemExit(1)
 
-    credentials = require_env_vars(Credentials)
-
     with TemporaryDirectory() as package_root:
         package_root = Path(package_root)
         logger.debug(_("setting up package at {dir}"), dir=package_root)
@@ -113,10 +111,14 @@ def publish(name: str, index_js: str, registry: str, tag: Optional[str]):
             f.write(f"//{registry_url.netloc}/:_authToken = ${{NPM_TOKEN}}\n")
 
         def getenv():
-            return {
-                **os.environ,
-                "NPM_TOKEN": credentials.npm_token.get_secret_value(),
-            }
+            if dry_run:
+                return {**os.environ}
+            else:
+                token = require_env_vars(Credentials).npm_token.get_secret_value()
+                return {
+                    **os.environ,
+                    "NPM_TOKEN": token,
+                }
 
         with fatal_on_subprocess_error(
             "npm",

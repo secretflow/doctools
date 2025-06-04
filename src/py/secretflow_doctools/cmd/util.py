@@ -169,7 +169,7 @@ def require_env_vars(cls: type[_Env]) -> _Env:
                 if err["type"] == "missing":
                     logger.warning(
                         _("provide the environment variable {env}"),
-                        env=repr(prefix + "_".join(map(str, err["loc"]))),
+                        env=repr(prefix + "_".join(map(str, err["loc"]))).upper(),
                     )
         logger.error(error)
         raise SystemExit(1)
