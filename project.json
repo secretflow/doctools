@@ -148,7 +148,7 @@
       "cache": false,
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["nx run ci:checks", "nx run test"],
+        "commands": ["nx ci:checks", "nx test"],
         "parallel": false
       }
     },
