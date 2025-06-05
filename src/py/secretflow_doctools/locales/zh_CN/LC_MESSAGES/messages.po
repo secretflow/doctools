@@ -136,42 +136,42 @@ msgstr "无法获取仓库的 {remote} 远程地址"
 msgid "unexpected git describe output: {output}"
 msgstr "未预期的 git describe 输出: {output}"
 
-#: src/py/secretflow_doctools/cmd/build.py:50
+#: src/py/secretflow_doctools/cmd/build.py:53
 msgid "failed to get current tag, falling back to `main`"
 msgstr "无法获取当前提交对应的标签，将会使用 `main` 作为版本号"
 
-#: src/py/secretflow_doctools/cmd/build.py:58
+#: src/py/secretflow_doctools/cmd/build.py:61
 #, python-brace-format
 msgid "using {ref} as version, source: current commit is tagged"
 msgstr "将会使用 {ref} 作为版本；来源：当前提交的 tag"
 
-#: src/py/secretflow_doctools/cmd/build.py:64
+#: src/py/secretflow_doctools/cmd/build.py:67
 #, python-brace-format
 msgid "using {ref} as version, source: nearest tag on release branch {branch}"
 msgstr "将会使用 {ref} 作为版本；来源：当前 release 分支 {branch} 上最近的 tag"
 
-#: src/py/secretflow_doctools/cmd/build.py:73
+#: src/py/secretflow_doctools/cmd/build.py:76
 #, python-brace-format
 msgid "using {ref} as version, source: current branch name"
 msgstr "将会使用 {ref} 作为版本；来源：当前分支名"
 
-#: src/py/secretflow_doctools/cmd/build.py:80
+#: src/py/secretflow_doctools/cmd/build.py:83
 #: src/py/secretflow_doctools/cmd/update_translations.py:48
 #, python-brace-format
 msgid "source dir: {dir}"
 msgstr "文档路径: {dir}"
 
-#: src/py/secretflow_doctools/cmd/build.py:81
+#: src/py/secretflow_doctools/cmd/build.py:84
 #: src/py/secretflow_doctools/cmd/update_translations.py:49
 #, python-brace-format
 msgid "output dir: {dir}"
 msgstr "输出路径: {dir}"
 
-#: src/py/secretflow_doctools/cmd/build.py:106
+#: src/py/secretflow_doctools/cmd/build.py:114
 msgid "compiling to JavaScript"
 msgstr "正在编译 JavaScript"
 
-#: src/py/secretflow_doctools/cmd/build.py:127
+#: src/py/secretflow_doctools/cmd/build.py:135
 #, python-brace-format
 msgid "to preview, run: {prog_name} preview -c {config_dir}"
 msgstr "要预览，请运行: {prog_name} preview -c {config_dir}"
@@ -242,7 +242,7 @@ msgstr ""
 msgid "refusing to publish"
 msgstr "拒绝发布"
 
-#: src/py/secretflow_doctools/cmd/publish.py:106
+#: src/py/secretflow_doctools/cmd/publish.py:104
 #, python-brace-format
 msgid "setting up package at {dir}"
 msgstr "临时目录 {dir}"
