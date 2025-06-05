@@ -49,7 +49,7 @@ opt_output_dir = click.option(
 @click.option(
     "-l",
     "--lang",
-    default=("en",),
+    default=(),
     multiple=True,
     help=_(
         """
