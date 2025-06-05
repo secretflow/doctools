@@ -188,7 +188,12 @@ export function rehypeReactRouter({
           if (resolved) {
             absolute.pathname = pathToFileURL(resolved).pathname;
           } else {
-            const rel = pathlib.relative(file.path, fileURLToPath(absolute));
+            let rel: string;
+            try {
+              rel = pathlib.relative(file.path, fileURLToPath(absolute));
+            } catch {
+              rel = absolute.href;
+            }
             const msg = `[react-router] cannot resolve ${rel} from ${file.path}`;
             logger?.warn(msg);
             parent.children[idx] = {
