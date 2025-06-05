@@ -8,9 +8,11 @@ from loguru import logger
 from secretflow_doctools.cmd.util import (
     SphinxPaths,
     SphinxPreconditions,
+    fatal_on_invalid_sphinx_conf,
 )
 from secretflow_doctools.js.cli import get_js_binary
 from secretflow_doctools.l10n import gettext as _
+from secretflow_doctools.options import GettextConfig, parse_config
 from secretflow_doctools.utils.subprocess import fatal_on_subprocess_error
 from secretflow_doctools.vcs import (
     HeadRef,
@@ -41,6 +43,7 @@ def build(
 
     options = SphinxPreconditions(paths=paths, args=sphinx_args).check()
     assert options.remote
+    assert options.config
 
     repo = options.remote.name
     ref = "main"
@@ -99,6 +102,11 @@ def build(
             *options.args,
         ) as cmd:
             subprocess.run(cmd, stdout=None, stderr=None, text=True).check_returncode()
+
+    if not lang:
+        with fatal_on_invalid_sphinx_conf():
+            gettext = parse_config(options.config, GettextConfig)
+        lang = (gettext.language,)
 
     for lang_id in lang:
         build_one(lang_id)

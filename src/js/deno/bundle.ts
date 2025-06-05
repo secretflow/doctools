@@ -32,6 +32,7 @@ import {
   esbuildStatic,
   remarkEsbuildStatic,
 } from "../mdx/remark-esbuild-static.ts";
+import { remarkEscapeMath } from "../mdx/remark-escape-math.ts";
 import { remarkSwagger } from "../mdx/remark-swagger.ts";
 import { remarkTarget } from "../mdx/remark-target.ts";
 import { remarkValidateDOMNesting } from "../mdx/remark-validate-dom-nesting.ts";
@@ -319,6 +320,7 @@ class Bundler {
         [remarkGFM],
         [remarkDirective],
         [remarkMath],
+        [remarkEscapeMath],
         [remarkAdmonitions],
         [remarkTarget],
         [remarkValidateDOMNesting],
