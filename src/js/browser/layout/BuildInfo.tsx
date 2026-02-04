@@ -50,7 +50,7 @@ export function BuildInfo() {
         <a
           href={`https://github.com/${git_owner}/${git_repo}/commit/${commit}`}
           target="_blank"
-          rel="noreferrer"
+          rel="noreferrer nofollow"
         >
           {intoLinkInner(inner, commit)}
         </a>

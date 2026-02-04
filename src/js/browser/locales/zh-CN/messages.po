@@ -184,17 +184,17 @@ msgstr "二进制数据"
 msgid "Chapters"
 msgstr "文档导航"
 
-#: src/js/browser/banners/PageNotFound.tsx:109
+#: src/js/browser/banners/PageNotFound.tsx:108
 msgid "Click here to return to the home page of {versionName}"
 msgstr "点击此处回到 {versionName} 文档的首页"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:51
-#: src/js/browser/banners/UncaughtRouteError.tsx:58
+#: src/js/browser/banners/UncaughtRouteError.tsx:50
+#: src/js/browser/banners/UncaughtRouteError.tsx:57
 msgid "Could not display this page"
 msgstr "尝试显示本页面时遇到了问题"
 
 #. placeholder {0}: quoteUrl(repo)
-#: src/js/browser/banners/RepoNotFound.tsx:39
+#: src/js/browser/banners/RepoNotFound.tsx:38
 msgid "Could not find documentation for <0>{0}</0>."
 msgstr "找不到关于 <0>{0}</0> 的文档。"
 
@@ -213,8 +213,8 @@ msgstr "默认是"
 msgid "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
 msgstr "{0} 的文档还没有翻译成{1}，已为你重定向到{2}版本。"
 
-#: src/js/browser/banners/RepoNotFound.tsx:21
-#: src/js/browser/banners/RepoNotFound.tsx:27
+#: src/js/browser/banners/RepoNotFound.tsx:20
+#: src/js/browser/banners/RepoNotFound.tsx:26
 msgid "Documentation not found"
 msgstr "找不到文档库"
 
@@ -230,19 +230,19 @@ msgstr "正在加载索引，请稍候 ..."
 msgid "example:"
 msgstr "示例："
 
-#: src/js/browser/app.tsx:910
+#: src/js/browser/app.tsx:933
 msgid "Failed to display article content"
 msgstr "显示文档正文时发生错误"
 
-#: src/js/browser/app.tsx:936
+#: src/js/browser/app.tsx:959
 msgid "Failed to display article outline"
 msgstr "显示文档大纲时发生错误"
 
-#: src/js/browser/app.tsx:866
+#: src/js/browser/app.tsx:886
 msgid "Failed to display navigation menus"
 msgstr "显示导航菜单时发生错误"
 
-#: src/js/browser/app.tsx:879
+#: src/js/browser/app.tsx:899
 msgid "Failed to display table of contents"
 msgstr "显示文档目录时发生错误"
 
@@ -262,8 +262,8 @@ msgstr "首页"
 msgid "How to use"
 msgstr "如何使用"
 
-#: src/js/browser/banners/RepoNotFound.tsx:44
-#: src/js/browser/banners/PageNotFound.tsx:81
+#: src/js/browser/banners/RepoNotFound.tsx:43
+#: src/js/browser/banners/PageNotFound.tsx:80
 msgid "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
 msgstr "如果你是通过输入网址的方式访问本页面，请检查拼写是否正确。该内容也可能已被移动或删除。"
 
@@ -305,7 +305,7 @@ msgstr "必须是 {0} 的倍数"
 msgid "must match regular expression <0>{0}</0>"
 msgstr "必须匹配正则表达式 <0>{0}</0>"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:41
+#: src/js/browser/banners/UncaughtRouteError.tsx:40
 msgid "Network problems occurred while downloading page content."
 msgstr "由于网络异常或者连接超时，页面内容下载失败。"
 
@@ -349,8 +349,8 @@ msgstr "页面构建于"
 msgid "Page error"
 msgstr "页面异常"
 
-#: src/js/browser/banners/PageNotFound.tsx:71
-#: src/js/browser/banners/PageNotFound.tsx:73
+#: src/js/browser/banners/PageNotFound.tsx:70
+#: src/js/browser/banners/PageNotFound.tsx:72
 msgid "Page not found"
 msgstr "页面未找到"
 
@@ -367,7 +367,7 @@ msgid "Query parameters"
 msgstr "Query 参数"
 
 #. placeholder {0}: error.cause.res.status
-#: src/js/browser/banners/UncaughtRouteError.tsx:28
+#: src/js/browser/banners/UncaughtRouteError.tsx:27
 msgid "Received an HTTP {0} error while downloading page content."
 msgstr "加载页面内容时遇到了 HTTP {0} 错误。"
 
@@ -412,11 +412,12 @@ msgstr "搜索"
 msgid "Search in {title} ..."
 msgstr "在 {title} 中搜索 ..."
 
-#: src/js/browser/banners/PageNotFound.tsx:115
+#: src/js/browser/banners/PageNotFound.tsx:114
 msgid "Searching for more pages ..."
 msgstr "正在搜索更多页面 ..."
 
-#: src/js/browser/layout/HTMLTitle.tsx:46
+#: src/js/browser/layout/HTMLTitle.tsx:53
+#: src/js/browser/layout/HTMLKeywords.tsx:36
 msgid "SecretFlow Docs"
 msgstr "隐语文档"
 
@@ -445,12 +446,12 @@ msgstr "报告文档问题"
 msgid "Technical info"
 msgstr "技术信息"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:19
+#: src/js/browser/banners/UncaughtRouteError.tsx:18
 msgid "The application encountered an unexpected error. We apologize for the inconvenience."
 msgstr "页面遇到了未预期的异常。因此造成的不便我们深表歉意。"
 
 #. placeholder {0}: wordBreak(quoteUrl(suffix))
-#: src/js/browser/banners/PageNotFound.tsx:75
+#: src/js/browser/banners/PageNotFound.tsx:74
 msgid "The page <0>{0}</0> was not found in {versionName}."
 msgstr "页面 <0>{0}</0> 在 {versionName} 中未找到。"
 
@@ -500,10 +501,10 @@ msgstr "查看文档源码"
 msgid "Warning"
 msgstr "警告"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:70
+#: src/js/browser/banners/UncaughtRouteError.tsx:69
 msgid "You may <0>refresh this page</0>, or try again later."
 msgstr "你可以<0>尝试刷新本页面</0>，或者稍后再试。"
 
-#: src/js/browser/banners/PageNotFound.tsx:89
+#: src/js/browser/banners/PageNotFound.tsx:88
 msgid "You may also be looking for:"
 msgstr "你要找的页面也可能是："

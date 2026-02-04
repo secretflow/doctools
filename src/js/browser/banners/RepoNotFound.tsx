@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet-async";
 
 import { quoteUrl, useErrorEnum } from "../error";
 import type { ErrorCause } from "../error";
-import { useHTMLTitle } from "../layout/HTMLTitle";
 import { RepoLoading } from "../layout/RepoLoading";
 
 import { ErrorDetails, userInput } from "./ErrorDetails";
@@ -18,7 +17,7 @@ export function RepoNotFound({
   return (
     <Fragment>
       <Helmet>
-        <title>{useHTMLTitle(t`Documentation not found`)}</title>
+        <title>{t`Documentation not found`}</title>
       </Helmet>
       <ErrorDetails
         type="warning"

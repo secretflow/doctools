@@ -16,6 +16,7 @@ export function ImageViewer(props: PropsWithChildren<ComponentProps<"img">>) {
     <Image2
       key={src}
       src={src}
+      alt="隐语-数据可信流通技术社区"
       width={width ? `${width}` : "auto"}
       preview={{ mask: false, src }}
     />

@@ -23,7 +23,12 @@ export function ViewPageSource() {
       icon = faGitlabSquare;
     }
     return (
-      <Typography.Link type="secondary" href={githubUrl} target="_blank">
+      <Typography.Link
+        type="secondary"
+        href={githubUrl}
+        rel="noopener noreferrer nofollow"
+        target="_blank"
+      >
         <FontAwesomeIcon
           icon={icon}
           style={{ display: "inline-block", width: "16px" }}

@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import { Helmet } from "react-helmet-async";
 
 import { useErrorEnum } from "../error";
-import { useHTMLTitle } from "../layout/HTMLTitle";
 import { RepoLoading } from "../layout/RepoLoading";
 
 import { ErrorDetails, link } from "./ErrorDetails";
@@ -48,7 +47,7 @@ export function UncaughtRouteError() {
   return (
     <Fragment>
       <Helmet>
-        <title>{useHTMLTitle(t`Could not display this page`)}</title>
+        <title>{t`Could not display this page`}</title>
       </Helmet>
       <ErrorDetails
         type="error"

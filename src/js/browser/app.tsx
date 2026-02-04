@@ -12,6 +12,8 @@ import { ConfigProvider, Divider } from "antd";
 import { debounce } from "lodash";
 import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
 import { createContext, memo, useContext, useEffect, useRef, useState } from "react";
+// import { createRoot } from 'react-dom/client';
+// import { renderToString } from 'react-dom/server';
 import { HelmetProvider } from "react-helmet-async";
 import { Panel, PanelGroup } from "react-resizable-panels";
 import type {
@@ -77,6 +79,9 @@ import {
 import { runtime } from "./jsx";
 import { Breadcrumbs } from "./layout/Breadcrumbs";
 import { BuildInfo } from "./layout/BuildInfo";
+import { CanonicalLink } from "./layout/CanonicalLink";
+import { HTMLDescription } from "./layout/HTMLDescription";
+import { HTMLKeywords } from "./layout/HTMLKeywords";
 import { HTMLTitle } from "./layout/HTMLTitle";
 import { LangSwitcher } from "./layout/LangSwitcher";
 import { LinkLoading } from "./layout/LinkLoading";
@@ -227,7 +232,26 @@ export type SiteExtras = Readonly<{
    *
    * @see {@link HTMLTitle}
    */
-  useSiteTitle?: () => string;
+  useSiteTitle?: (
+    v: PageContent,
+    s: RepoContent,
+    m: {
+      path: string[];
+      items: SidebarItem[];
+    } | null,
+  ) => string;
+  /**
+   * return the final section of the HTML `<mate keywords=''>`
+   *
+   * @see {@link HTMLKeywords}
+   */
+  useSiteKeywords?: (v: PageContent, s: RepoContent) => string;
+  /**
+   * return the final section of the HTML `<mate description=''>`
+   *
+   * @see {@link HTMLDescription}
+   */
+  getSiteDescription?: (v: PageContent, s: RepoContent) => Promise<string>;
   /**
    * additional components to render into the UI, will receive metadata about the
    * current repo and page if available
@@ -889,6 +913,9 @@ export function createDocumentationSite(env: Environment) {
                 <Infallible>
                   <SuppressUncaught>
                     <HTMLTitle />
+                    <CanonicalLink />
+                    <HTMLKeywords />
+                    <HTMLDescription />
                     <Breadcrumbs />
                   </SuppressUncaught>
                 </Infallible>
@@ -1311,7 +1338,6 @@ export function IntraLink({ to, ...props }: ComponentProps<typeof NavLink>) {
   const {
     path: { parse, build },
   } = useSiteContent();
-
   try {
     if (typeof to === "string") {
       const url = new URL(to);

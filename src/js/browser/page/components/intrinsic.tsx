@@ -22,7 +22,7 @@ export function code({ children, ...props }: ComponentProps<"code">) {
 
 export function a({ children, target, ...props }: ComponentProps<"a">) {
   return (
-    <Anchor {...props} target={target}>
+    <Anchor {...props} target={target} rel="noopener noreferrer nofollow">
       {wordBreak(children)}
       {target === "_blank" ? (
         <FontAwesomeIcon

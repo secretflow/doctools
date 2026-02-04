@@ -16,7 +16,6 @@ import {
 } from "../app";
 import { quoteUrl } from "../error";
 import type { ErrorCause } from "../error";
-import { useHTMLTitle } from "../layout/HTMLTitle";
 import { wordBreak } from "../page/whitespace";
 import { useFullTextSearch } from "../search/client";
 
@@ -68,7 +67,7 @@ export function PageNotFound({
   return (
     <Fragment>
       <Helmet>
-        <title>{useHTMLTitle(t`Page not found`)}</title>
+        <title>{t`Page not found`}</title>
       </Helmet>
       <ErrorDetails type="warning" title={t`Page not found`}>
         <p style={userInput}>

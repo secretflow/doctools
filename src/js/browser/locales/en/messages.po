@@ -184,17 +184,17 @@ msgstr "binary data"
 msgid "Chapters"
 msgstr "Chapters"
 
-#: src/js/browser/banners/PageNotFound.tsx:109
+#: src/js/browser/banners/PageNotFound.tsx:108
 msgid "Click here to return to the home page of {versionName}"
 msgstr "Click here to return to the home page of {versionName}"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:51
-#: src/js/browser/banners/UncaughtRouteError.tsx:58
+#: src/js/browser/banners/UncaughtRouteError.tsx:50
+#: src/js/browser/banners/UncaughtRouteError.tsx:57
 msgid "Could not display this page"
 msgstr "Could not display this page"
 
 #. placeholder {0}: quoteUrl(repo)
-#: src/js/browser/banners/RepoNotFound.tsx:39
+#: src/js/browser/banners/RepoNotFound.tsx:38
 msgid "Could not find documentation for <0>{0}</0>."
 msgstr "Could not find documentation for <0>{0}</0>."
 
@@ -213,8 +213,8 @@ msgstr "default ="
 msgid "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
 msgstr "Documentation for {0} has not yet been translated to {1}. You are viewing the {2} version instead."
 
-#: src/js/browser/banners/RepoNotFound.tsx:21
-#: src/js/browser/banners/RepoNotFound.tsx:27
+#: src/js/browser/banners/RepoNotFound.tsx:20
+#: src/js/browser/banners/RepoNotFound.tsx:26
 msgid "Documentation not found"
 msgstr "Documentation not found"
 
@@ -230,19 +230,19 @@ msgstr "Downloading search index ..."
 msgid "example:"
 msgstr "example:"
 
-#: src/js/browser/app.tsx:910
+#: src/js/browser/app.tsx:933
 msgid "Failed to display article content"
 msgstr "Failed to display article content"
 
-#: src/js/browser/app.tsx:936
+#: src/js/browser/app.tsx:959
 msgid "Failed to display article outline"
 msgstr "Failed to display article outline"
 
-#: src/js/browser/app.tsx:866
+#: src/js/browser/app.tsx:886
 msgid "Failed to display navigation menus"
 msgstr "Failed to display navigation menus"
 
-#: src/js/browser/app.tsx:879
+#: src/js/browser/app.tsx:899
 msgid "Failed to display table of contents"
 msgstr "Failed to display table of contents"
 
@@ -262,8 +262,8 @@ msgstr "Homepage"
 msgid "How to use"
 msgstr "How to use"
 
-#: src/js/browser/banners/RepoNotFound.tsx:44
-#: src/js/browser/banners/PageNotFound.tsx:81
+#: src/js/browser/banners/RepoNotFound.tsx:43
+#: src/js/browser/banners/PageNotFound.tsx:80
 msgid "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
 msgstr "If you entered a web address, check it is correct. The content may have otherwise been moved or deleted."
 
@@ -305,7 +305,7 @@ msgstr "multiple of {0}"
 msgid "must match regular expression <0>{0}</0>"
 msgstr "must match regular expression <0>{0}</0>"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:41
+#: src/js/browser/banners/UncaughtRouteError.tsx:40
 msgid "Network problems occurred while downloading page content."
 msgstr "Network problems occurred while downloading page content."
 
@@ -349,8 +349,8 @@ msgstr "Page built"
 msgid "Page error"
 msgstr "Page error"
 
-#: src/js/browser/banners/PageNotFound.tsx:71
-#: src/js/browser/banners/PageNotFound.tsx:73
+#: src/js/browser/banners/PageNotFound.tsx:70
+#: src/js/browser/banners/PageNotFound.tsx:72
 msgid "Page not found"
 msgstr "Page not found"
 
@@ -367,7 +367,7 @@ msgid "Query parameters"
 msgstr "Query parameters"
 
 #. placeholder {0}: error.cause.res.status
-#: src/js/browser/banners/UncaughtRouteError.tsx:28
+#: src/js/browser/banners/UncaughtRouteError.tsx:27
 msgid "Received an HTTP {0} error while downloading page content."
 msgstr "Received an HTTP {0} error while downloading page content."
 
@@ -412,11 +412,12 @@ msgstr "Search"
 msgid "Search in {title} ..."
 msgstr "Search in {title} ..."
 
-#: src/js/browser/banners/PageNotFound.tsx:115
+#: src/js/browser/banners/PageNotFound.tsx:114
 msgid "Searching for more pages ..."
 msgstr "Searching for more pages ..."
 
-#: src/js/browser/layout/HTMLTitle.tsx:46
+#: src/js/browser/layout/HTMLTitle.tsx:53
+#: src/js/browser/layout/HTMLKeywords.tsx:36
 msgid "SecretFlow Docs"
 msgstr "SecretFlow Docs"
 
@@ -445,12 +446,12 @@ msgstr "Suggest an edit"
 msgid "Technical info"
 msgstr "Technical info"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:19
+#: src/js/browser/banners/UncaughtRouteError.tsx:18
 msgid "The application encountered an unexpected error. We apologize for the inconvenience."
 msgstr "The application encountered an unexpected error. We apologize for the inconvenience."
 
 #. placeholder {0}: wordBreak(quoteUrl(suffix))
-#: src/js/browser/banners/PageNotFound.tsx:75
+#: src/js/browser/banners/PageNotFound.tsx:74
 msgid "The page <0>{0}</0> was not found in {versionName}."
 msgstr "The page <0>{0}</0> was not found in {versionName}."
 
@@ -500,10 +501,10 @@ msgstr "View page source"
 msgid "Warning"
 msgstr "Warning"
 
-#: src/js/browser/banners/UncaughtRouteError.tsx:70
+#: src/js/browser/banners/UncaughtRouteError.tsx:69
 msgid "You may <0>refresh this page</0>, or try again later."
 msgstr "You may <0>refresh this page</0>, or try again later."
 
-#: src/js/browser/banners/PageNotFound.tsx:89
+#: src/js/browser/banners/PageNotFound.tsx:88
 msgid "You may also be looking for:"
 msgstr "You may also be looking for:"

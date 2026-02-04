@@ -43,7 +43,12 @@ export function SuggestEdit() {
   });
 
   return (
-    <Typography.Link type="secondary" href={newIssueURL} target="_blank">
+    <Typography.Link
+      type="secondary"
+      href={newIssueURL}
+      rel="noopener noreferrer nofollow"
+      target="_blank"
+    >
       <FontAwesomeIcon
         icon={faMessage}
         style={{ display: "inline-block", width: "16px" }}
